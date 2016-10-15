@@ -147,7 +147,8 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             chargeId: row.chargeId,
                             comics: [],
                             specialProjectData: {},
-                            currentComicIndex: row.currentComicIndex
+                            currentComicIndex: row.currentComicIndex,
+                            currentComicStepIndex: row.currentComicStepIndex
                         };
 
                         m_functionFetchTags(
@@ -429,8 +430,23 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                         libraryIth = Object.assign(libraryIth, JSON.parse(rowIth.libraryJSON).library);
 
-                                        comicIth.libraries.push(libraryIth);
-                                        return cbe1(null);
+                                        // libraryIth.editors was saved as a joined ('\n') string of user emails (user.userName).
+                                        // Since the ultimate source of this property is gotten from library_users (and saving made sure of that), we will rebuild the string.
+                                        libraryIth.editors = '';
+                                        var sqlString = "select u.userName from " + self.dbname + "library_users lu inner join user u on u.id=lu.userId where lu.libraryId=" + libraryIth.id + ";";
+                                        var exRet = sql.execute(sqlString,
+                                            function(rows) {
+                                                rows.forEach(
+                                                    function(row) {
+                                                        if (libraryIth.editors.length) { libraryIth.libraryJSON.editors += '\n'; }
+                                                        libraryIth.editors += row.userName;
+                                                    }
+                                                );
+
+                                                comicIth.libraries.push(libraryIth);
+                                                return cbe1(null);
+                                            }
+                                        );
                                     },
                                     function(err) { // Main callback for inner async.eachSeries.
 
@@ -982,7 +998,8 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             isOnlineClass: (project.isOnlineClass || project.specialProjectData.onlineClassProject ? 1 : 0),
                             lastSaved: (new Date()),
                             chargeId: project.chargeId,
-                            currentComicIndex: project.currentComicIndex
+                            currentComicIndex: project.currentComicIndex,
+                            currentComicStepIndex: row.currentComicStepIndex
                         };
 
                         if (project.specialProjectData.openMode === "searched") {
@@ -1124,7 +1141,8 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             firstSaved: moment(project.firstSaved).format("YYYY-MM-DD HH:mm:ss"),
                             lastSaved: (new Date()),
                             chargeId: project.chargeId,
-                            currentComicIndex: project.currentComicIndex
+                            currentComicIndex: project.currentComicIndex,
+                            currentComicStepIndex: row.currentComicStepIndex
                         };
 
                         var exceptionRet = m_checkGutsForUndefined('project', guts);
@@ -1557,7 +1575,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                         comicId: ccIth.comicId,
                         ordinal: ccIth.ordinal,
                         description: ccIth.description,
-                        JSONsteps: JSON.stringify(ccIth.JSONsteps)
+                        stepsJSON: JSON.stringify(ccIth.stepsJSON)
                     };
 
                     var strQuery = "INSERT " + self.dbname + "comiccode SET ?";

@@ -124,6 +124,11 @@ define(["Core/errorHelper"],
 																				};
 
 																				$.extend(true, client.project.specialProjectData, specialProjectData);
+																	    		
+																	    		exceptionRet = manager.loadProject(client.project);
+																	    		if (exceptionRet) { throw exceptionRet; }
+
+																				client.setBrowserTabAndBtns();
 
 																			} catch (e) { errorHelper.show(e); }
 																		}

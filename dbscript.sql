@@ -39,12 +39,6 @@ begin
 			
 			if strItemType = 'project' THEN
 				insert project_tags values (itemIdVarName, @id);
-			elseif strItemType = 'type' THEN
-				insert type_tags values (itemIdVarName, @id);
-			elseif strItemType = 'method' THEN
-				insert method_tags values (itemIdVarName, @id);
-			else
-				insert library_tags values (itemIdVarName, @id);
 			end if;
 		END IF;
 		SET @inipos = @endpos + 1;
@@ -110,7 +104,7 @@ begin
         
     if @dbstate = 0 THEN
 
-    	-- For the duration of @dbstate 0 disable any constraint enforcement,
+    	-- For the duration of @dbstate=0 we disable any constraint enforcement,
     	-- since we're creating the tables in alphabetical, not logical, order.
     	set FOREIGN_KEY_CHECKS = 0;
 
@@ -147,7 +141,7 @@ begin
 		  `comicId` int(11) NOT NULL,
 		  `ordinal` int(11) NOT NULL,
 		  `description` text NOT NULL,
-		  `JSONsteps` mediumtext NOT NULL,
+		  `stepsJSON` JSON NOT NULL,
 		  PRIMARY KEY (`id`,`comicId`),
 		  KEY `FK_comiccode` (`comicId`),
 		  CONSTRAINT `FK_comiccode` FOREIGN KEY (`comicId`) REFERENCES `comics` (`id`) ON DELETE CASCADE
@@ -251,6 +245,7 @@ begin
 		  `lastSaved` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		  `chargeId` varchar(255) DEFAULT '',
 		  `currentComicIndex` int(11) NOT NULL DEFAULT '0',
+		  `currentComicStepIndex` int(11) NOT NULL DEFAULT '0',
 		  PRIMARY KEY (`id`),
 		  KEY `idx_ownedByUserId` (`ownedByUserId`)
 		) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
@@ -386,7 +381,7 @@ begin
 		ALTER TABLE `comics_statements` ENABLE KEYS;
 
 		ALTER TABLE `libraries` DISABLE KEYS;
-		INSERT INTO `libraries` VALUES (1,'GameAppLibrary',1,0,0,1,0,'','{"library": {"name": "GameAppLibrary", "id": 1, "types": [], "editors": [], "references": [], "description": ""}}'),(2,'ConsoleAppLibrary',1,0,0,1,0,'','{"library": {"name": "ConsoleAppLibrary", "id": 2, "types": [], "editors": [], "references": [], "description": ""}}'),(3,'WebsiteAppLibrary',1,0,0,1,0,'','{"library": {"name": "WebsiteAppLibrary", "id": 3, "types": [], "editors": [], "references": [], "description": ""}}'),(4,'HololensAppLibrary',1,0,0,1,0,'','{"library": {"name": "HololensAppLibrary", "id": 4, "types": [], "editors": [], "references": [], "description": ""}}'),(5,'MapAppLibrary',1,0,0,1,0,'','{"library": {"name": "MapAppLibrary", "id": 5, "types": [], "editors": [], "references": [], "description": ""}}'),(6,'GameBaseLibrary',1,0,1,0,0,'','{"library": {"name": "GameBaseLibrary", "id": 6, "types": [], "editors": [], "references": [], "description": ""}}'),(7,'ConsoleBaseLibrary',1,0,1,0,0,'','{"library": {"name": "ConsoleBaseLibrary", "id": 7, "types": [], "editors": [], "references": [], "description": ""}}'),(8,'WebsiteBaseLibrary',1,0,1,0,0,'','{"library": {"name": "WebsiteBaseLibrary", "id": 8, "types": [], "editors": [], "references": [], "description": ""}}'),(9,'HololensBaseLibrary',1,0,1,0,0,'','{"library": {"name": "HololensBaseLibrary", "id": 9, "types": [], "editors": [], "references": [], "description": ""}}'),(10,'MapBaseLibrary',1,0,1,0,0,'','{"library": {"name": "MapBaseLibrary", "id": 10, "types": [], "editors": [], "references": [], "description": ""}}'),(11,'KernelTypesLibrary',1,1,0,0,0,'','{"library": {"name": "KernelTypesLibrary", "id": 11, "types": [], "editors": [], "references": [], "description": ""}}'),(12,'VisualObjectLibrary',1,1,0,0,0,'','{"library": {"name": "VisualObjectLibrary", "id": 12, "types": [], "editors": [], "references": [], "description": ""}}');
+		INSERT INTO `libraries` VALUES (1,'GameAppLibrary',1,0,0,1,0,'','{"library": {"name": "GameAppLibrary", "id": 1, "types": [], "editors": "", "references": "", "description": ""}}'),(2,'ConsoleAppLibrary',1,0,0,1,0,'','{"library": {"name": "ConsoleAppLibrary", "id": 2, "types": [], "editors": "", "references": "", "description": ""}}'),(3,'WebsiteAppLibrary',1,0,0,1,0,'','{"library": {"name": "WebsiteAppLibrary", "id": 3, "types": [], "editors": "", "references": "", "description": ""}}'),(4,'HololensAppLibrary',1,0,0,1,0,'','{"library": {"name": "HololensAppLibrary", "id": 4, "types": [], "editors": "", "references": "", "description": ""}}'),(5,'MapAppLibrary',1,0,0,1,0,'','{"library": {"name": "MapAppLibrary", "id": 5, "types": [], "editors": "", "references": "", "description": ""}}'),(6,'GameBaseLibrary',1,0,1,0,0,'','{"library": {"name": "GameBaseLibrary", "id": 6, "types": [], "editors": "", "references": "", "description": ""}}'),(7,'ConsoleBaseLibrary',1,0,1,0,0,'','{"library": {"name": "ConsoleBaseLibrary", "id": 7, "types": [], "editors": "", "references": "", "description": ""}}'),(8,'WebsiteBaseLibrary',1,0,1,0,0,'','{"library": {"name": "WebsiteBaseLibrary", "id": 8, "types": [], "editors": "", "references": "", "description": ""}}'),(9,'HololensBaseLibrary',1,0,1,0,0,'','{"library": {"name": "HololensBaseLibrary", "id": 9, "types": [], "editors": "", "references": "", "description": ""}}'),(10,'MapBaseLibrary',1,0,1,0,0,'','{"library": {"name": "MapBaseLibrary", "id": 10, "types": [], "editors": "", "references": "", "description": ""}}'),(11,'KernelTypesLibrary',1,1,0,0,0,'','{"library": {"name": "KernelTypesLibrary", "id": 11, "types": [], "editors": "", "references": "", "description": ""}}'),(12,'VisualObjectLibrary',1,1,0,0,0,'','{"library": {"name": "VisualObjectLibrary", "id": 12, "types": [], "editors": "", "references": "", "description": ""}}');
 		ALTER TABLE `libraries` ENABLE KEYS;
 
 		ALTER TABLE `permissions` DISABLE KEYS;
@@ -398,7 +393,7 @@ begin
 		ALTER TABLE `project_tags` ENABLE KEYS;
 
 		ALTER TABLE `projects` DISABLE KEYS;
-		INSERT INTO `projects` VALUES (1,'New Game Project',1,1,1,'',0,'media/images/gameProject.png',0,0.00,0.00,1,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0),(2,'New Console Project',1,1,1,'',0,'media/images/consoleProject.png',0,0.00,0.00,2,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0),(3,'New Website Project',1,1,1,'',0,'media/images/websiteProject.png',0,0.00,0.00,3,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0),(4,'New Hololens Project',1,1,1,'',0,'media/images/hololensProject.png',0,0.00,0.00,4,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0),(5,'New Map Project',1,1,1,'',0,'media/images/mappingProject.png',0,0.00,0.00,5,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0);
+		INSERT INTO `projects` VALUES (1,'New Game Project',1,1,1,'',0,'media/images/gameProject.png',0,0.00,0.00,1,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0),(2,'New Console Project',1,1,1,'',0,'media/images/consoleProject.png',0,0.00,0.00,2,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0),(3,'New Website Project',1,1,1,'',0,'media/images/websiteProject.png',0,0.00,0.00,3,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0),(4,'New Hololens Project',1,1,1,'',0,'media/images/hololensProject.png',0,0.00,0.00,4,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0),(5,'New Map Project',1,1,1,'',0,'media/images/mappingProject.png',0,0.00,0.00,5,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0);
 		ALTER TABLE `projects` ENABLE KEYS;
 
 		ALTER TABLE `projects_comics_libraries` DISABLE KEYS;
@@ -450,8 +445,8 @@ begin
 
 		INSERT INTO `comics` VALUES (6,'Complete TechGroms Help',0,'tn3.png');
 		INSERT INTO `comics_statements` VALUES (6,1),(6,2),(6,3),(6,4),(6,5),(6,6),(6,7),(6,8),(6,9),(6,10),(6,11),(6,12),(6,13),(6,14);
-		INSERT INTO `libraries` VALUES (13,'EmptyLibrary',1,0,0,1,0,'','{"library": {"name": "EmptyLibrary", "id": 13, "types": [], "editors": [], "references": [], "description": ""}}');
-		INSERT INTO `projects` VALUES (6,'New Empty Project',1,1,1,'',0,'media/images/emptyProject.png',0,0.00,0.00,1,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0);
+		INSERT INTO `libraries` VALUES (13,'EmptyLibrary',1,0,0,1,0,'','{"library": {"name": "EmptyLibrary", "id": 13, "types": [], "editors": "", "references": "", "description": ""}}');
+		INSERT INTO `projects` VALUES (6,'New Empty Project',1,1,1,'',0,'media/images/emptyProject.png',0,0.00,0.00,1,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0);
 		INSERT INTO `projects_comics_libraries` VALUES (6,6,13),(6,6,11),(6,6,12);
 		INSERT INTO `projecttypes` VALUES (6,'empty');
 		INSERT INTO `tags` VALUES (36,'empty');
