@@ -1050,7 +1050,7 @@ define(["NextWave/source/utility/prototypes",
                             // Create the new Library.
                             var libraryNew = new Library(self.currentComic);
                             if (!objectLibrary ||
-                                !objectLibrary.id) {
+                                !objectLibrary.hasOwnProperty("id")) {
 
                                 objectLibrary = {
 
@@ -1127,14 +1127,8 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-
+                            // Click the hidden input to dropdown the select file browser facility.
                             document.getElementById("ProjectDialogInput").click();
-
-
-
-                            //var jsonArray = JSON.stringify(self.currentLibrary.data, undefined, 4).split('\r\n');
-                            //var file = new File(jsonArray, self.currentLibrary.data.name + ".json", {type: "text/plain;charset=utf-8"});
-                            //saveAs(file);
 
                             return null;
                         } catch (e) {
