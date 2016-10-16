@@ -1050,7 +1050,7 @@ define(["NextWave/source/utility/prototypes",
                             // Create the new Library.
                             var libraryNew = new Library(self.currentComic);
                             if (!objectLibrary ||
-                                !objectLibrary.ownedByUserId) {
+                                !objectLibrary.id) {
 
                                 objectLibrary = {
 
@@ -1065,6 +1065,9 @@ define(["NextWave/source/utility/prototypes",
                                     editors: "",
                                     description: ""
                                 };
+                            } else {
+
+                                objectLibrary.name = strUnique;
                             }
                             var exceptionRet = libraryNew.create(objectLibrary);
                             if (exceptionRet) {
