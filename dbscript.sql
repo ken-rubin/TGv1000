@@ -17,33 +17,33 @@ call drop_create_TGv1001(@dropTheDB)//
 
 USE TGv1001//
 
-DROP PROCEDURE IF EXISTS doTags//
-create procedure doTags(tagsconcat varchar(255), itemIdVarName varchar(20), strItemType varchar(20))
-begin
+-- DROP PROCEDURE IF EXISTS doTags//
+-- create procedure doTags(tagsconcat varchar(255), itemIdVarName varchar(20), strItemType varchar(20))
+-- begin
 
-	set @delim = '~';
-	set @inipos = 1;
-	set @fullstr = tagsconcat;
-	set @maxlen = LENGTH(@fullstr);
+-- 	set @delim = '~';
+-- 	set @inipos = 1;
+-- 	set @fullstr = tagsconcat;
+-- 	set @maxlen = LENGTH(@fullstr);
 	
-	REPEAT
-		set @endpos = LOCATE(@delim, @fullstr, @inipos);
-		set @tag = SUBSTR(@fullstr, @inipos, @endpos - @inipos);
+-- 	REPEAT
+-- 		set @endpos = LOCATE(@delim, @fullstr, @inipos);
+-- 		set @tag = SUBSTR(@fullstr, @inipos, @endpos - @inipos);
 		
-		if @tag <> '' AND @tag IS NOT NULL THEN
-			set @id := (select id from tags where description=@tag);
-			if @id IS NULL THEN
-				insert tags (description) values (@tag);
-				set @id := (select LAST_INSERT_ID());
-			end if;
+-- 		if @tag <> '' AND @tag IS NOT NULL THEN
+-- 			set @id := (select id from tags where description=@tag);
+-- 			if @id IS NULL THEN
+-- 				insert tags (description) values (@tag);
+-- 				set @id := (select LAST_INSERT_ID());
+-- 			end if;
 			
-			if strItemType = 'project' THEN
-				insert project_tags values (itemIdVarName, @id);
-			end if;
-		END IF;
-		SET @inipos = @endpos + 1;
-	UNTIL @inipos >= @maxlen END REPEAT;
-end //
+-- 			if strItemType = 'project' THEN
+-- 				insert project_tags values (itemIdVarName, @id);
+-- 			end if;
+-- 		END IF;
+-- 		SET @inipos = @endpos + 1;
+-- 	UNTIL @inipos >= @maxlen END REPEAT;
+-- end //
 
 DROP FUNCTION IF EXISTS getUniqueProjNameForUser//
 create FUNCTION getUniqueProjNameForUser(checkName varchar(255), userId int(11))
@@ -109,7 +109,7 @@ begin
     	set FOREIGN_KEY_CHECKS = 0;
 
 		CREATE TABLE `classes` (
-		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `id` INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
 		  `name` varchar(255) DEFAULT NULL,
 		  `baseProjectId` int UNSIGNED DEFAULT '0',
 		  `instructorFirstName` varchar(255) DEFAULT NULL,
@@ -131,39 +131,37 @@ begin
 		  `classNotes` text,
 		  `maxClassSize` int(11) DEFAULT '0',
 		  `loanComputersAvailable` tinyint(1) DEFAULT '0',
-		  PRIMARY KEY (`id`),
 		  KEY `FK_project_classes` (`baseProjectId`),
 		  CONSTRAINT `FK_project_classes` FOREIGN KEY (`baseProjectId`) REFERENCES `projects` (`id`) ON DELETE CASCADE
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+		) ENGINE=InnoDB;
 
 		CREATE TABLE `comiccode` (
-		  `id` int(11) NOT NULL,
-		  `comicId` int(11) NOT NULL,
+		  `id` INT UNSIGNED AUTO_INCREMENT NOT NULL,
+		  `comicId` INT UNSIGNED NOT NULL,
 		  `ordinal` int(11) NOT NULL,
 		  `description` text NOT NULL,
 		  `stepsJSON` JSON NOT NULL,
 		  PRIMARY KEY (`id`,`comicId`),
 		  KEY `FK_comiccode` (`comicId`),
 		  CONSTRAINT `FK_comiccode` FOREIGN KEY (`comicId`) REFERENCES `comics` (`id`) ON DELETE CASCADE
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+		) ENGINE=InnoDB;
 
 		CREATE TABLE `comics` (
-		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `id` INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
 		  `name` varchar(255) NOT NULL,
 		  `ordinal` int(11) NOT NULL,
-		  `thumbnail` varchar(255) NOT NULL,
-		  PRIMARY KEY (`id`)
-		) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+		  `thumbnail` varchar(255) NOT NULL
+		) ENGINE=InnoDB;
     
 		CREATE TABLE `comics_statements` (
-		  `comicId` int(11) NOT NULL,
-		  `statementId` int(11) NOT NULL,
+		  `comicId` INT UNSIGNED NOT NULL,
+		  `statementId` INT UNSIGNED NOT NULL,
 		  PRIMARY KEY (`comicId`,`statementId`),
 		  CONSTRAINT `FK_comicsstmt` FOREIGN KEY (`comicId`) REFERENCES `comics` (`id`) ON DELETE CASCADE
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+		) ENGINE=InnoDB;
 
 		CREATE TABLE `libraries` (
-		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `id` INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
 		  `name` varchar(255) NOT NULL,
 		  `createdByUserId` int(11) DEFAULT NULL,
 		  `isSystemLibrary` tinyint(1) NOT NULL DEFAULT '0',
@@ -171,12 +169,11 @@ begin
           `isAppLibrary` tinyint(1) NOT NULL DEFAULT '0',
 		  `imageId` int(11) NOT NULL DEFAULT '0',
 		  `altImagePath` varchar(255) NOT NULL DEFAULT '',
-		  `libraryJSON` JSON NOT NULL,
-		  PRIMARY KEY (`id`)
-		) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
+		  `libraryJSON` JSON NOT NULL
+		) ENGINE=InnoDB;
 
 		CREATE TABLE `onlineclasses` (
-		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `id` INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
 		  `name` varchar(255) DEFAULT NULL,
 		  `baseProjectId` int UNSIGNED DEFAULT '0',
 		  `instructorFirstName` varchar(255) DEFAULT NULL,
@@ -190,19 +187,17 @@ begin
 		  `schedule` json DEFAULT NULL,
 		  `active` tinyint(1) DEFAULT '0',
 		  `classNotes` text,
-		  PRIMARY KEY (`id`),
 		  KEY `FK_project_onlineclasses` (`baseProjectId`),
 		  CONSTRAINT `FK_project_onlineclasses` FOREIGN KEY (`baseProjectId`) REFERENCES `projects` (`id`) ON DELETE CASCADE
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+		) ENGINE=InnoDB;
 
 		CREATE TABLE `permissions` (
-		  `id` int(11) NOT NULL AUTO_INCREMENT,
-		  `description` varchar(255) NOT NULL,
-		  PRIMARY KEY (`id`)
-		) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;
+		  `id` INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
+		  `description` varchar(255) NOT NULL
+		) ENGINE=InnoDB;
 
 		CREATE TABLE `products` (
-		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `id` INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
 		  `name` varchar(255) NOT NULL,
 		  `baseProjectId` int UNSIGNED NOT NULL DEFAULT '0',
 		  `level` varchar(255) NOT NULL,
@@ -212,17 +207,9 @@ begin
 		  `price` decimal(9,2) NOT NULL DEFAULT '0.00',
 		  `active` tinyint(1) NOT NULL DEFAULT '0',
 		  `videoURL` varchar(255) NOT NULL DEFAULT '',
-		  PRIMARY KEY (`id`),
 		  KEY `FK_project_products` (`baseProjectId`),
 		  CONSTRAINT `FK_project_products` FOREIGN KEY (`baseProjectId`) REFERENCES `projects` (`id`) ON DELETE CASCADE
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-		CREATE TABLE `project_tags` (
-		  `projectId` int UNSIGNED NOT NULL,
-		  `tagId` int(11) NOT NULL,
-		  PRIMARY KEY (`projectId`,`tagId`),
-		  CONSTRAINT `FK_project_tags` FOREIGN KEY (`projectId`) REFERENCES `projects` (`id`) ON DELETE CASCADE
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+		) ENGINE=InnoDB;
 
 		CREATE TABLE `projects` (
 		  `id` INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
@@ -251,81 +238,63 @@ begin
 
 		CREATE TABLE `projects_comics_libraries` (
 		  `projectId` INT UNSIGNED NOT NULL,
-		  `comicId` int(11) NOT NULL,
-		  `libraryId` int(11) NOT NULL,
+		  `comicId` int UNSIGNED NOT NULL,
+		  `libraryId` int UNSIGNED NOT NULL,
 		  PRIMARY KEY (`projectId`,`comicId`,`libraryId`),
 		  CONSTRAINT `FK_projects_comics_libraries` FOREIGN KEY (`projectId`) REFERENCES `projects` (`id`) ON DELETE CASCADE
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+		) ENGINE=InnoDB;
 
 		CREATE TABLE `projecttypes` (
-		  `id` int(11) NOT NULL,
-		  `description` varchar(100) NOT NULL,
-		  PRIMARY KEY (`id`)
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+		  `id` INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
+		  `description` varchar(100) NOT NULL
+		) ENGINE=InnoDB;
 
 		CREATE TABLE `refunds` (
-		  `id` int(11) NOT NULL AUTO_INCREMENT,
-		  `userId` int(11) NOT NULL,
+		  `id` INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
+		  `userId` int UNSIGNED NOT NULL,
 		  `projectId` int UNSIGNED NOT NULL,
 		  `refundId` varchar(255) NOT NULL,
-		  `dtRefund` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-		  PRIMARY KEY (`id`)
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+		  `dtRefund` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
+		) ENGINE=InnoDB;
 
 		CREATE TABLE `resources` (
-		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `id` INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
 		  `name` varchar(255) NOT NULL DEFAULT '',
 		  `createdByUserId` int(11) NOT NULL,
 		  `resourceTypeId` int(11) NOT NULL,
 		  `public` tinyint(1) NOT NULL DEFAULT '0',
 		  `quarantined` tinyint(1) NOT NULL DEFAULT '0',
-		  PRIMARY KEY (`id`),
+		  `description` varchar(255) NOT NULL DEFAULT '',
 		  KEY `idx_createdByUserId` (`createdByUserId`),
 		  KEY `idx_resourceTypeId` (`resourceTypeId`)
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-		CREATE TABLE `resources_tags` (
-		  `resourceId` int(11) NOT NULL,
-		  `tagId` int(11) NOT NULL,
-		  PRIMARY KEY (`resourceId`,`tagId`)
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+		) ENGINE=InnoDB;
 
 		CREATE TABLE `resourcetypes` (
-		  `id` int(11) NOT NULL,
-		  `description` varchar(255) NOT NULL,
-		  PRIMARY KEY (`id`)
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+		  `id` INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
+		  `description` varchar(255) NOT NULL
+		) ENGINE=InnoDB;
 
 		CREATE TABLE `routes` (
-		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `id` INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
 		  `path` varchar(255) NOT NULL,
 		  `moduleName` varchar(255) NOT NULL,
 		  `route` varchar(255) NOT NULL,
 		  `verb` varchar(255) NOT NULL,
 		  `method` varchar(255) NOT NULL,
 		  `requiresJWT` tinyint(1) NOT NULL DEFAULT '1',
-		  `JWTerrorMsg` varchar(255) DEFAULT NULL,
-		  PRIMARY KEY (`id`)
-		) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8;
+		  `JWTerrorMsg` varchar(255) DEFAULT NULL
+		) ENGINE=InnoDB;
 
 		CREATE TABLE `statements` (
-		  `id` int(11) NOT NULL,
-		  `name` varchar(255) NOT NULL,
-		  PRIMARY KEY (`id`),
-		  UNIQUE KEY `id_UNIQUE` (`id`)
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-		CREATE TABLE `tags` (
-		  `id` int(11) NOT NULL AUTO_INCREMENT,
-		  `description` varchar(255) NOT NULL,
-		  PRIMARY KEY (`id`)
-		) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8;
+		  `id` INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
+		  `name` varchar(255) NOT NULL
+		) ENGINE=InnoDB;
 
 		CREATE TABLE `ug_permissions` (
-		  `usergroupId` int(11) NOT NULL,
-		  `permissionId` int(11) NOT NULL,
+		  `usergroupId` int UNSIGNED NOT NULL,
+		  `permissionId` int UNSIGNED NOT NULL,
 		  PRIMARY KEY (`usergroupId`,`permissionId`)
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+		) ENGINE=InnoDB;
 
 		CREATE TABLE `user` (
 		  `id` INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
@@ -342,22 +311,19 @@ begin
 		) ENGINE=InnoDB;
 
 		CREATE TABLE `usergroups` (
-		  `id` int(11) NOT NULL AUTO_INCREMENT,
-		  `name` varchar(255) NOT NULL,
-		  PRIMARY KEY (`id`),
-		  UNIQUE KEY `id_UNIQUE` (`id`)
-		) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+		  `id` INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
+		  `name` varchar(255) NOT NULL
+		) ENGINE=InnoDB;
 
 		CREATE TABLE `waitlist` (
-		  `id` int(11) NOT NULL AUTO_INCREMENT,
+		  `id` INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
 		  `projectId` INT UNSIGNED NOT NULL,
-		  `userId` int(11) NOT NULL,
+		  `userId` int UNSIGNED NOT NULL,
 		  `userName` varchar(45) DEFAULT NULL,
 		  `dtWaitlisted` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		  `dtInvited` datetime DEFAULT NULL,
-		  `fourHourWarningSent` tinyint(1) DEFAULT '0',
-		  PRIMARY KEY (`id`)
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+		  `fourHourWarningSent` tinyint(1) DEFAULT '0'
+		) ENGINE=InnoDB;
 
     	-- Re-enable constraint enforcement.
     	set FOREIGN_KEY_CHECKS = 1;
@@ -387,10 +353,6 @@ begin
 		INSERT INTO `permissions` VALUES (1,'can_edit_core_comics'),(2,'can_edit_base_and_system_libraries_and_types_therein'),(3,'can_make_public'),(4,'can_visit_adminzone'),(5,'can_open_free_projects'),(6,'can_buy_projects'),(7,'can_create_classes'),(8,'can_create_products'),(9,'can_create_onlineClasses'),(10,'can_edit_permissions'),(11,'can_unquarantine'),(12,'can_activate_PPs'),(13,'can_manage_site'),(14,'can_register_for_sites');
 		ALTER TABLE `permissions` ENABLE KEYS;
 
-		ALTER TABLE `project_tags` DISABLE KEYS;
-		-- INSERT INTO `project_tags` VALUES (6,9),(6,10),(7,9),(7,32);
-		ALTER TABLE `project_tags` ENABLE KEYS;
-
 		ALTER TABLE `projects` DISABLE KEYS;
 		INSERT INTO `projects` VALUES (1,'New Game Project',1,1,1,'This is the core project from which all games are derived.',0,'media/images/gameProject.png',0,0.00,0.00,1,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0),(2,'New Console Project',1,1,1,'This is the core project from which all console-based apps are derived.',0,'media/images/consoleProject.png',0,0.00,0.00,2,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0),(3,'New Website Project',1,1,1,'This is the core project from which all web sites are derived.',0,'media/images/websiteProject.png',0,0.00,0.00,3,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0),(4,'New Hololens Project',1,1,1,'This is the core project from which all Microsoft HoloLens projects are derived.',0,'media/images/hololensProject.png',0,0.00,0.00,4,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0),(5,'New Map Project',1,1,1,'This is the core project from which all mapping projects are derived.',0,'media/images/mappingProject.png',0,0.00,0.00,5,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0);
 		ALTER TABLE `projects` ENABLE KEYS;
@@ -414,10 +376,6 @@ begin
 		ALTER TABLE `statements` DISABLE KEYS;
 		INSERT INTO `statements` VALUES (1,'StatementBreak'),(2,'StatementContinue'),(3,'StatementExpression'),(4,'StatementFor'),(5,'StatementForIn'),(6,'StatementIf'),(7,'StatementReturn'),(8,'StatementThrow'),(9,'StatementTry'),(10,'StatementVar'),(11,'StatementWhile'),(12,'StatementComment'),(13,'StatementDebugger'),(14,'StatementFreeform');
 		ALTER TABLE `statements` ENABLE KEYS;
-
-		ALTER TABLE `tags` DISABLE KEYS;
-		INSERT INTO `tags` VALUES (8,'library'),(9,'project'),(10,'mapping'),(11,'mapapplibrary'),(12,'type'),(13,'app'),(14,'method'),(15,'initialize'),(16,'construct'),(17,'mapbaselibrary'),(18,'mapbasetype'),(19,'kerneltypeslibrary'),(20,'array'),(21,'boolean'),(22,'date'),(23,'math'),(24,'number'),(25,'regexp'),(26,'string'),(27,'visualobjectlibrary'),(28,'visualobject'),(29,'newlibrary'),(30,'newtype'),(31,'constuct'),(32,'agame'),(33,'gameapplibrary'),(34,'gamebaselibrary'),(35,'gamebasetype');
-		ALTER TABLE `tags` ENABLE KEYS;
 
 		ALTER TABLE `ug_permissions` DISABLE KEYS;
 		INSERT INTO `ug_permissions` VALUES (1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8),(1,9),(1,10),(1,11),(1,12),(2,3),(2,4),(2,5),(2,6),(2,7),(3,5),(3,6),(4,5),(5,13),(6,5),(6,6),(6,14);
@@ -448,13 +406,12 @@ begin
 		INSERT INTO `projects` VALUES (6,'New Empty Project',1,1,1,'This is the core project from which you should derive a project where you want full control over libraries and types. It is empty until you fill it.',0,'media/images/emptyProject.png',0,0.00,0.00,1,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0);
 		INSERT INTO `projects_comics_libraries` VALUES (6,6,13),(6,6,11),(6,6,12);
 		INSERT INTO `projecttypes` VALUES (6,'empty');
-		INSERT INTO `tags` VALUES (36,'empty');
 
 		CREATE TABLE `library_users` (
-		  `libraryId` int(11) NOT NULL,
-		  `userId` int(11) NOT NULL,
+		  `libraryId` int UNSIGNED NOT NULL,
+		  `userId` int UNSIGNED NOT NULL,
 		  PRIMARY KEY (`libraryId`,`userId`)
-		) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+		) ENGINE=InnoDB;
 
 		INSERT INTO `library_users` VALUES (1,1),(2,1),(3,1),(4,1),(5,1),(6,1);
 

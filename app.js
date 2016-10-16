@@ -182,7 +182,7 @@ app.get('/index',
 console.log("Set up SQL module.");
 var SQL = require("./modules/SQL");
 var sql = new SQL(app);
-sql.setPool('root', '');
+sql.setPool('root', 'Albatross!1');
 
 /////////////////////////////////////
 console.log("Set up Logger.");

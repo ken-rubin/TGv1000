@@ -136,7 +136,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             parentProjectId: row.parentProjectId,
                             parentPrice: row.parentPrice,
                             priceBump: row.priceBump,
-                            tags: '',
                             projectTypeId: row.projectTypeId,
                             isCoreProject: (row.isCoreProject === 1 ? true : false),
                             isProduct: (row.isProduct === 1 ? true : false),
@@ -151,137 +150,124 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             currentComicStepIndex: row.currentComicStepIndex
                         };
 
-                        m_functionFetchTags(
-                            project.id, 
-                            'project', 
-                            function(err, tags)  {
+                        // In series:
+                        //  1. Potentially retrieve fields from one of the tables: classes, products or onlineclasses.
+                        //  2. Retrieve project's comics and their content.
+                        //  3. Retrieve the Base Type (fleshed out) for the App type and push it to projects.systemTypes.
+                        //  4. No more. Retrieve all system types (fleshed out) and push them onto projects.systemTypes. Just public ones for a non-prileged user.
+                        async.series(
+                            [
+                                // 1. PP data, potentially.
+                                function(cb) {
 
-                                if (err) {
-                                    return res.json({ success: false, message: err.message});
-                                }
+                                    try {
 
-                                project.tags = tags;
-
-                                // In series:
-                                //  1. Potentially retrieve fields from one of the tables: classes, products or onlineclasses.
-                                //  2. Retrieve project's comics and their content.
-                                //  3. Retrieve the Base Type (fleshed out) for the App type and push it to projects.systemTypes.
-                                //  4. No more. Retrieve all system types (fleshed out) and push them onto projects.systemTypes. Just public ones for a non-prileged user.
-                                async.series(
-                                    [
-                                        // 1. PP data, potentially.
-                                        function(cb) {
-
-                                            try {
-
-                                                // If none of these three project fields is true, then there is no purchasable project and we may proceed on to 2.
-                                                if (!project.isProduct && !project.isClass && !project.isOnlineClass) {
-                                                    // A normal project.
-                                                    return cb(null);
-                                                }
-
-                                                // Privleged user is editing a project or a non-privileged user is considering buying a purchaseable prject.
-                                                // Need to read and insert special Product, Class or OnlineClass data into project.
-                                                var tableName = project.isProduct ? 'products' : project.isClass ? 'classes' : 'onlineclasses';
-                                                strQuery = "select * from " + self.dbname + tableName + " where baseProjectId=" + project.id + ";";
-                                                var exceptionRet = sql.execute(strQuery,
-                                                    function(rows) {
-                                                        if (rows.length !== 1) {
-                                                            return cb(new Error('Error retrieving your project.'));
-                                                        }
-
-                                                        // Take the Product, Class or Online class info out of rows[0] and put it in project.specialProjectData.xxxData.
-                                                        sPD = {};
-
-                                                        for (var p in rows[0]) {
-
-                                                            if (p === 'schedule') {
-
-                                                                sPD[p] = JSON.parse(rows[0][p]);
-                                                            } else {
-
-                                                                sPD[p] = rows[0][p];
-                                                            }
-                                                        }
-                                                        if (project.isProduct) {
-                                                            project.specialProjectData['productData'] = sPD;
-                                                        } else if (project.isClass) {
-                                                            project.specialProjectData['classData'] = sPD;
-                                                        } else {
-                                                            project.specialProjectData['onlineClassData'] = sPD;
-                                                        }
-
-                                                        // Note: the remainder of project.specialProjectData will be added in OpenProjectDialog.js.
-                                                        // Also, project fields such as id will be adjusted there. They used to be handled here.
-
-                                                        return cb(null);
-                                                    },
-                                                    function(strError) {
-                                                        return cb(new Error(strError));
-                                                    }
-                                                );
-                                                if (exceptionRet) {
-                                                    return cb(exceptionRet);
-                                                }
-                                            } catch(e) { return cb(e); }
-                                        },
-                                        // 2. Comics. Since we now will have project and each comic, we can fetch libraries and then types in libraries and below.
-                                        function(cb) {
-
-                                            try {
-
-                                                m_functionRetProjDoComics(  
-                                                    req, 
-                                                    res, 
-                                                    project,
-                                                    function(err) {
-                                                        if (err) { return cb(err); }
-
-                                                        // Success. The project is filled.
-
-                                                        // Sort comics by ordinal.
-                                                        project.comics.sort(function(a,b){return a.ordinal - b.ordinal;});
-
-                                                        // Sort comiccode according to its ordinals.
-                                                        project.comics.forEach(
-                                                            function(comic) {
-
-                                                                // Finally, sort the comic's comiccode.
-                                                                comic.comiccode.sort(function(a,b){return a.ordinal - b.ordinal;});
-                                                            }
-                                                        );
-
-                                                        return cb(null);
-                                                    }
-                                                );
-                                            } catch(e) { return cb(e); }
-                                        }
-                                    ],
-                                    function(err) {
-                                        if (err) {
-                                            return res.json({success:false, message: err.message});
+                                        // If none of these three project fields is true, then there is no purchasable project and we may proceed on to 2.
+                                        if (!project.isProduct && !project.isClass && !project.isOnlineClass) {
+                                            // A normal project.
+                                            return cb(null);
                                         }
 
-                                        m_functionUpdateUserJWTCookie(
-                                            req,
-                                            res,
-                                            project,
-                                            function(err) {
-
-                                                if (err) {
-
-                                                    return res.json({
-                                                        success: false,
-                                                        message: err.message
-                                                    });
+                                        // Privleged user is editing a project or a non-privileged user is considering buying a purchaseable prject.
+                                        // Need to read and insert special Product, Class or OnlineClass data into project.
+                                        var tableName = project.isProduct ? 'products' : project.isClass ? 'classes' : 'onlineclasses';
+                                        strQuery = "select * from " + self.dbname + tableName + " where baseProjectId=" + project.id + ";";
+                                        var exceptionRet = sql.execute(strQuery,
+                                            function(rows) {
+                                                if (rows.length !== 1) {
+                                                    return cb(new Error('Error retrieving your project.'));
                                                 }
 
-                                                return res.json({
-                                                    success: true,
-                                                    project: project
-                                                });
+                                                // Take the Product, Class or Online class info out of rows[0] and put it in project.specialProjectData.xxxData.
+                                                sPD = {};
+
+                                                for (var p in rows[0]) {
+
+                                                    if (p === 'schedule') {
+
+                                                        sPD[p] = JSON.parse(rows[0][p]);
+                                                    } else {
+
+                                                        sPD[p] = rows[0][p];
+                                                    }
+                                                }
+                                                if (project.isProduct) {
+                                                    project.specialProjectData['productData'] = sPD;
+                                                } else if (project.isClass) {
+                                                    project.specialProjectData['classData'] = sPD;
+                                                } else {
+                                                    project.specialProjectData['onlineClassData'] = sPD;
+                                                }
+
+                                                // Note: the remainder of project.specialProjectData will be added in OpenProjectDialog.js.
+                                                // Also, project fields such as id will be adjusted there. They used to be handled here.
+
+                                                return cb(null);
+                                            },
+                                            function(strError) {
+                                                return cb(new Error(strError));
                                             }
                                         );
+                                        if (exceptionRet) {
+                                            return cb(exceptionRet);
+                                        }
+                                    } catch(e) { return cb(e); }
+                                },
+                                // 2. Comics. Since we now will have project and each comic, we can fetch libraries and then types in libraries and below.
+                                function(cb) {
+
+                                    try {
+
+                                        m_functionRetProjDoComics(  
+                                            req, 
+                                            res, 
+                                            project,
+                                            function(err) {
+                                                if (err) { return cb(err); }
+
+                                                // Success. The project is filled.
+
+                                                // Sort comics by ordinal.
+                                                project.comics.sort(function(a,b){return a.ordinal - b.ordinal;});
+
+                                                // Sort comiccode according to its ordinals.
+                                                project.comics.forEach(
+                                                    function(comic) {
+
+                                                        // Finally, sort the comic's comiccode.
+                                                        comic.comiccode.sort(function(a,b){return a.ordinal - b.ordinal;});
+                                                    }
+                                                );
+
+                                                return cb(null);
+                                            }
+                                        );
+                                    } catch(e) { return cb(e); }
+                                }
+                            ],
+                            function(err) {
+                                if (err) {
+                                    return res.json({success:false, message: err.message});
+                                }
+
+                                m_functionUpdateUserJWTCookie(
+                                    req,
+                                    res,
+                                    project,
+                                    function(err) {
+
+                                        if (err) {
+
+                                            return res.json({
+                                                success: false,
+                                                message: err.message
+                                            });
+                                        }
+
+                                        return res.json({
+                                            success: true,
+                                            project: project
+                                        });
                                     }
                                 );
                             }
@@ -504,66 +490,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                 }
             );
         } catch(e) { return callback(e); }
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //
-    //                  Utility method(s) for retrieve routes
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    var m_functionFetchTags = function(thingId, strItemType, callback) {
-
-        try {
-
-            // Retrieve and set tags, skipping strItemType and any tag that matches the email-address-testing regexp.
-
-            var eReg = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
-
-            /* ' */
-
-            var strQuery = "select t.description from " + self.dbname + "tags t where id in (select tagId from " + self.dbname + strItemType + "_tags where " + strItemType + "Id = " + thingId + ");";
-            var exceptionRet = sql.execute(strQuery,
-                function(rows){
-
-                    try {
-
-                        // Concatenate tags while at the same time skipping strItemType and e-mail-like tags.
-                        var tags = "";
-                        if (rows.length > 0) {
-
-                            rows.forEach(function(row) {
-
-                                if (row.description !== strItemType) {
-
-                                    if (!row.description.match(eReg)) {
-
-                                        tags += row.description + ' ';
-                                    }
-                                }
-                            });
-                        }
-
-                        return callback(null, tags);
-
-                    } catch(ee) {
-
-                        return callback(ee, '');
-                    }
-                },
-                function(strError){
-
-                    return callback(new Error(strError), '');
-                }
-            );
-            if (exceptionRet){
-
-                return callback(exceptionRet, '');
-            }
-        } catch(e) {
-
-            return callback(e, '');
-        }
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1044,19 +970,9 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     // (2)
                     function(cb) {
 
-                        // Use async.parallel to save the project's tags, possible purchasable project info and its comics in parallel.
+                        // Use async.parallel to save the project's possible purchasable project info and its comics in parallel.
                         async.parallel(
                             [
-                                // (2a)
-                                function(cb) {
-                                    m_log("Going to write project tags");
-                                    m_setUpAndWriteTags(connection, res, project.id, 'project', req.user.userName, project.tags, project.name, 
-                                        function(err) {
-                                            return cb(err);
-                                        }
-                                    );
-                                },
-                                // (2b)
                                 function(cb) {
                                     m_log("Calling m_saveComicsToDB");
                                     m_saveComicsToDB(connection, req, res, project,
@@ -1065,7 +981,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                         }
                                     );
                                 },
-                                // (2c)
                                 function(cb) {
                                     if (project.specialProjectData.userAllowedToCreateEditPurchProjs && (project.specialProjectData.openMode === 'new' || project.specialProjectData.openMode === 'searched')) {
                                         m_log("Calling m_savePurchProductData");
@@ -1190,19 +1105,9 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     // (3)
                     function(cb) {
 
-                        // Use async.parallel to save the project's tags and start doing its comics in parallel.
+                        // Use async.parallel to save the project's comics and possible purchasable project data in parallel.
                         async.parallel(
                             [
-                                // (3a)
-                                function(cb) {
-                                    m_log("Going to write project tags");
-                                    m_setUpAndWriteTags(connection, res, project.id, 'project', req.user.userName, project.tags, project.name, 
-                                        function(err) {
-                                            return cb(err);
-                                        }
-                                    );
-                                },
-                                // (3b)
                                 function(cb) {
                                     m_log("Calling m_saveComicsToDB");
                                     m_saveComicsToDB(connection, req, res, project,
@@ -1211,7 +1116,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                         }
                                     );
                                 },
-                                // (3c)
                                 function(cb) {
                                     if (project.specialProjectData.userAllowedToCreateEditPurchProjs && (project.specialProjectData.openMode === 'new' || project.specialProjectData.openMode === 'searched')) {
 
@@ -1662,42 +1566,42 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                 libraryIth.id = rows[0].insertId;
                             }
 
-                            // Now do library_tags and the types within the library. Finally, return cb(null);
-                            async.parallel(
-                                [
-                                    function(cb) {
-                                        m_log("Going to write library tags");
-                                        m_setUpAndWriteTags(connection, res, libraryIth.id, 'library', req.user.userName, libraryIth.tags, libraryIth.name, 
-                                            function(err) {
-                                                return cb(err);
-                                            }
-                                        );
-                                    },
-                                    function(cb) {
-                                        m_log("Going to m_saveTypesInLibraryIthToDB");
-                                        m_saveTypesInLibraryIthToDB(connection, req, res, project, comicIth, libraryIth,
-                                            function(err) {
-                                                return cb(err);
-                                            }
-                                        );
-                                    },
-                                    function(cb) {
-                                        // Write record to projects_comics_libraries.
-                                        var juncguts = {
-                                            projectId: project.id,
-                                            comicId: comicIth.id,
-                                            libraryId: libraryIth.id
-                                        };
-                                        var juncquery = "insert " + self.dbname + "projects_comics_libraries SET ?";
-                                        sql.queryWithCxnWithPlaceholders(connection, juncquery, juncguts,
-                                            function(err, rows) {
-                                                return cb(err);
-                                            }
-                                        );
-                                    }
-                                ],
-                                function(err) { return cb(err); }
+                            // // Now do library_tags and the types within the library. Finally, return cb(null);
+                            // async.parallel(
+                            //     [
+                            //         function(cb) {
+                            //             m_log("Going to write library tags");
+                            //             m_setUpAndWriteTags(connection, res, libraryIth.id, 'library', req.user.userName, libraryIth.tags, libraryIth.name, 
+                            //                 function(err) {
+                            //                     return cb(err);
+                            //                 }
+                            //             );
+                            //         },
+                            //         function(cb) {
+                            //             m_log("Going to m_saveTypesInLibraryIthToDB");
+                            //             m_saveTypesInLibraryIthToDB(connection, req, res, project, comicIth, libraryIth,
+                            //                 function(err) {
+                            //                     return cb(err);
+                            //                 }
+                            //             );
+                            //         },
+                            //         function(cb) {
+                            // Write record to projects_comics_libraries.
+                            var juncguts = {
+                                projectId: project.id,
+                                comicId: comicIth.id,
+                                libraryId: libraryIth.id
+                            };
+                            var juncquery = "insert " + self.dbname + "projects_comics_libraries SET ?";
+                            sql.queryWithCxnWithPlaceholders(connection, juncquery, juncguts,
+                                function(err, rows) {
+                                    return cb(err);
+                                }
                             );
+                            //         }
+                            //     ],
+                            //     function(err) { return cb(err); }
+                            // );
                         }
                     );
                 },
@@ -1724,67 +1628,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             return new Error(strError);
         }
         return null;
-    }
-
-    var m_setUpAndWriteTags = function(connection, res, itemId, strItemType, userName, strTags, strName, callback) {
-
-        try {
-            
-            m_log("***In m_setUpAndWriteTags for " + strItemType + " " + strName + "***");
-
-            // Start tagArray with resource type description, userName (if not assoc. with a System Type) and resource name (with internal spaces replaced by '_').
-            var tagArray = [];
-            tagArray.push(strItemType);
-            if (strName.length > 0) {
-
-                tagArray.push(strName.trim().replace(/\s/g, '_').toLowerCase());
-            }
-
-            // Get optional user-entered tags ready to combine with above three tags.
-            var ccArray = [];
-            if (strTags) {
-
-                ccArray = strTags.toLowerCase().match(/([\w\-]+)/g);
-
-                if (ccArray){
-                    tagArray = tagArray.concat(ccArray);
-                }
-            }
-
-            // Remove possible dups from tagArray.
-            var uniqueArray = [];
-            uniqueArray.push(tagArray[0]);
-            for (var i = 1; i < tagArray.length; i++) {
-                var compIth = tagArray[i];
-                var found = false;
-                for (var j = 0; j < uniqueArray.length; j++) {
-                    if (uniqueArray[j] === compIth){
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    uniqueArray.push(compIth);
-                }
-            }
-
-            var tagsString = uniqueArray.join('~') + '~';
-            var strSql = "call " + self.dbname + "doTags(" + connection.escape(tagsString) + "," + itemId + ",'" + strItemType + "');";
-                
-            m_log("Sending this sql: " + strSql);
-            sql.queryWithCxn(connection, strSql, 
-                function(err, rows) {
-
-                    try{
-
-                        if (err) { throw err; }
-
-                        return callback(null);
-
-                    } catch(et) { return callback(et); }
-                }
-            );
-        } catch(e) { callback(e); }
     }
 
     var m_functionFinalCallback = function (err, req, res, connection, project) {
@@ -1896,34 +1739,34 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             }
                         );
                     },
-                    // (2)
-                    function(passOn, cb) {
+                    // // (2)
+                    // function(passOn, cb) {
 
-                        // We're going to try to use nested async.eachSeries to get product tags for the 2 dimensions of passOn.arrayRows.
-                        async.eachSeries(passOn.arrayRows,
-                            function(arIth, cb) {
+                    //     // We're going to try to use nested async.eachSeries to get product tags for the 2 dimensions of passOn.arrayRows.
+                    //     async.eachSeries(passOn.arrayRows,
+                    //         function(arIth, cb) {
 
-                                async.eachSeries(arIth,
-                                    function(arIthJth, cb) {
+                    //             async.eachSeries(arIth,
+                    //                 function(arIthJth, cb) {
 
-                                        m_functionFetchTags(
-                                            arIthJth.baseProjectId,
-                                            'project',
-                                            function(err, tags) {
+                    //                     m_functionFetchTags(
+                    //                         arIthJth.baseProjectId,
+                    //                         'project',
+                    //                         function(err, tags) {
 
-                                                if (err) { return cb(err); }
+                    //                             if (err) { return cb(err); }
 
-                                                arIthJth.tags = tags;
-                                                return cb(null);
-                                            }
-                                        );
-                                    },
-                                    function(err) { return cb(err); }
-                                );
-                            },
-                            function(err) { return cb(err, passOn); }
-                        );
-                    },
+                    //                             arIthJth.tags = tags;
+                    //                             return cb(null);
+                    //                         }
+                    //                     );
+                    //                 },
+                    //                 function(err) { return cb(err); }
+                    //             );
+                    //         },
+                    //         function(err) { return cb(err, passOn); }
+                    //     );
+                    // },
                     // (3)
                     function(passOn, cb) {
 
@@ -2008,36 +1851,29 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                             // Extract values needed for parallel steps 2 and 3 below.
                             var imageId;
-                            var tags;
                             var name;
                             var id;
                             var description;
                             if (req.body.hasOwnProperty("classData")) {
                                 req.body.classData.schedule = JSON.stringify(req.body.classData.schedule);
                                 imageId = req.body.classData.imageId;
-                                tags = req.body.classData.tags;
-                                delete req.body.classData.tags;
                                 name = req.body.classData.name;
                                 description = req.body.classData.classDescription;
                                 id = req.body.classData.baseProjectId;
                             } else if (req.body.hasOwnProperty("onlineClassData")) {
                                 req.body.onlineClassData.schedule = JSON.stringify(req.body.onlineClassData.schedule);
                                 imageId = req.body.onlineClassData.imageId;
-                                tags = req.body.onlineClassData.tags;
-                                delete req.body.onlineClassData.tags;
                                 name = req.body.onlineClassData.name;
                                 description = req.body.onlineClassData.classDescription;
                                 id = req.body.onlineClassData.baseProjectId;
                             } else if (req.body.hasOwnProperty("productData")) {
                                 imageId = req.body.productData.imageId;
-                                tags = req.body.productData.tags;
-                                delete req.body.productData.tags;
                                 name = req.body.productData.name;
                                 description = req.body.productData.productDescription;
                                 id = req.body.productData.baseProjectId;
                             }
 
-                            // In parallel (1) save to classes, onlineclasses or products; (2) update some fields in the project; and (3) update the project's tags.
+                            // In parallel (1) save to classes, onlineclasses or products; (2) update some fields in the project.
                             async.parallel(
                                 [
                                     // (1)
@@ -2088,22 +1924,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                 return cb(err);
                                             }
                                         );
-                                    },
-                                    // (3)
-                                    function(cb) {
-
-                                        sql.queryWithCxn(connection, "delete from " + self.dbname + "project_tags where projectId=" + id + ";",
-                                            function(err, rows) {
-                                                if (err) { return cb(err); }
-
-                                                m_setUpAndWriteTags(connection, res, id, 'project', req.user.userName, tags, name, 
-                                                    function(err) {
-                                                        return cb(err);
-                                                    }
-                                                );
-                                            }    
-                                        );
-                                    },
+                                    }
                                 ],
                                 function(err) {
                                     

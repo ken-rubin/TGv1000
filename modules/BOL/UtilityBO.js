@@ -777,7 +777,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
     self.routeSearchResources = function (req, res) {
 
         // This is a search for Images or Sounds (resourceTypeIds 1 and 2, respectively).
-
+// TODO All needs changing
         try {
 
             console.log("Entered UtilityBO/routeSearchResources with req.body = " + JSON.stringify(req.body));
@@ -930,7 +930,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
             // (3) perform many select statements to get projects that both match tags and contain correct items based on req.body.userAllowedToCreateEditPurchProjs; 
             // (4) if req.body.userAllowedToCreateEditPurchProjs === "0", then winnow classes down by date and distance; onlineclasses by date; and for Products and Online Classes see if already bought.
             // (5) Finally, for all surviving classes determine current number of users who bought the class.
-
+// TODO all needs changing
             async.waterfall(
                 [
                     // (1)
@@ -1025,7 +1025,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                             // Owned by user. Same for both priv and non-priv.
                             // In this query I'm just trying to select (as comicProjectId) the id of the purchased project.
 /* TOXXX STARTED            strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.comicProjectId from " + self.dbname + "projects p where p.ownedByUserId=" + req.user.userId + " and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));"; */
-                            // TODO: for now I've just removed the selection of comicProjectId--or rather I return 0 so there's a field there.
+    // TODO: for now I've just removed the selection of comicProjectId--or rather I return 0 so there's a field there.
                             strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, 0 as comicProjectId from " + self.dbname + "projects p where p.ownedByUserId=" + req.user.userId + " and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
 
                             // Others' accounts
