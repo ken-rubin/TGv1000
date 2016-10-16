@@ -45,6 +45,13 @@ define(["NextWave/source/utility/prototypes",
                     self.inherits(CodeExpression,
                         "[payload]");
 
+                    // Add to children collection.
+                    if (self.children &&
+                        self.payload) {
+
+                        self.children.push(self.payload);
+                    }
+
                     ////////////////////////
                     // Public methods.
 

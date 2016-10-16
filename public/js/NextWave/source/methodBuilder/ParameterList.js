@@ -42,8 +42,9 @@ define(["NextWave/source/utility/prototypes",
 
                     // Always add a final, empty item.
                     let cl = new CodeLiteral("...");
-                    let ces = new CodeExpressionStub(new CodeExpressionLiteral());
-                    self.addItem(ces);
+                    //let cel = new CodeExpressionLiteral(cl);
+
+                    self.addItem(cl);
                     let editor = cl.payload;
                     // Wire callback to key pressed here.
                     let functionKeyPressed = function () {
@@ -51,25 +52,50 @@ define(["NextWave/source/utility/prototypes",
                         try {
 
                             // Scan for an empty stub.  If not found, add one.
-                            let bFoundOne = false;
-                            for (let ces of self) {
+                            let arrayEmptyOnes = [];
+                            let bDidntRemoveToMakeThingsSimpler = false;
+                            let iLength = self.items.length;
+                            self.items.forEach(function (cl) {
 
-                                let cl = ces.payload;
+                                // Account for this cl.
+                                iLength--;
+
+                                // Get the Editor.
                                 let editor = cl.payload;
-                                let strPayload = editor.payload;
-                                if (!strPayload) {
+                                if (editor) {
 
-                                    bFoundOne = true;
-                                    break;
+                                    // Get the current text.
+                                    let strPayload = editor.text;
+                                    if (!strPayload  ||
+                                        strPayload === "...") {
+
+                                        if (iLength === 0) {
+
+                                            bDidntRemoveToMakeThingsSimpler = true;
+                                            editor.text = "...";
+                                        } else {
+
+                                            arrayEmptyOnes.push(cl);
+                                        }
+                                    }
+                                } else {
+
+                                    arrayEmptyOnes.push(cl);
                                 }
-                            }
+                            });
 
-                            if (!bFoundOne) {
+                            // Remove all empty entries.
+                            arrayEmptyOnes.forEach(function (cl) {
+
+                                self.removeItem(cl);
+                            });
+
+                            if (!bDidntRemoveToMakeThingsSimpler) {
 
                                 // Always add a final, empty item.
                                 let cl = new CodeLiteral("...");
-                                let ces = new CodeExpressionStub(new CodeExpressionLiteral());
-                                self.addItem(ces);
+                                //let ces = new CodeExpressionStub(new CodeExpressionLiteral(cl));
+                                self.addItem(cl);
                                 let editor = cl.payload;
                                 editor.onKeyPressed = functionKeyPressed;
                             }
@@ -79,6 +105,15 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
                     editor.onKeyPressed = functionKeyPressed;
+
+                    // Expose a virtual method for  
+                    // which derived classes to stub.
+                    self.innerRender = function (contextRender) {
+
+                        functionKeyPressed();
+                        return null;
+                    };
+
 
                     ////////////////////////
                     // Public methods.

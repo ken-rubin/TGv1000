@@ -15,7 +15,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/ListItem",
     "NextWave/source/utility/Edit",
 
-    "NextWave/source/methodBuilder/ArgumentList",
+    "NextWave/source/methodBuilder/ParameterList",
     "NextWave/source/methodBuilder/Block",
     "NextWave/source/methodBuilder/CodeExpressionGroup",
     "NextWave/source/methodBuilder/CodeExpressionInfix",
@@ -46,14 +46,9 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/methodBuilder/CodeStatementTry",
     "NextWave/source/methodBuilder/CodeStatementVar",
     "NextWave/source/methodBuilder/CodeStatementWhile",
-
     "NextWave/source/methodBuilder/CodeType",
-
-    "NextWave/source/methodBuilder/Parameter",
-    "NextWave/source/methodBuilder/ParameterList",
-
     "NextWave/source/methodBuilder/StatementList"],
-    function (prototypes, ListItem, Edit, ArgumentList, Block, CodeExpressionGroup, CodeExpressionInfix, CodeExpressionInvocation, CodeExpressionLiteral, CodeExpressionName, CodeExpressionPostfix, CodeExpressionPrefix, CodeExpressionRefinement, CodeExpressionTernary, CodeExpressionType, CodeLiteral, CodeName, CodeVar, CodeStatementBreak, CodeStatementContinue, CodeStatementComment, CodeStatementDebugger, CodeStatementExpression, CodeStatementFor, CodeStatementForIn, CodeStatementFreeform, CodeStatementIf, CodeStatementReturn, CodeStatementThrow, CodeStatementTry, CodeStatementVar, CodeStatementWhile, CodeType, Parameter, ParameterList, StatementList) {
+    function (prototypes, ListItem, Edit, ParameterList, Block, CodeExpressionGroup, CodeExpressionInfix, CodeExpressionInvocation, CodeExpressionLiteral, CodeExpressionName, CodeExpressionPostfix, CodeExpressionPrefix, CodeExpressionRefinement, CodeExpressionTernary, CodeExpressionType, CodeLiteral, CodeName, CodeVar, CodeStatementBreak, CodeStatementContinue, CodeStatementComment, CodeStatementDebugger, CodeStatementExpression, CodeStatementFor, CodeStatementForIn, CodeStatementFreeform, CodeStatementIf, CodeStatementReturn, CodeStatementThrow, CodeStatementTry, CodeStatementVar, CodeStatementWhile, CodeType, StatementList) {
 	
 		try {
 

@@ -23,7 +23,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/expression/Expression",
     "NextWave/source/literal/Literal",
     "NextWave/source/statement/Statement",
-    "NextWave/source/methodBuilder/ArgumentList",
+    "NextWave/source/methodBuilder/ParameterList",
     "NextWave/source/methodBuilder/Block",
     "NextWave/source/methodBuilder/CodeStatement",
     "NextWave/source/methodBuilder/CodeExpression",
@@ -35,7 +35,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/methodBuilder/CodeName",
     "NextWave/source/methodBuilder/CodeVar",
     "NextWave/source/methodBuilder/Parameter"],
-    function (prototypes, settings, Point, Size, Area, Layer, ListItem, Type, Method, Property, Event, Name, Expression, Literal, Statement, ArgumentList, Block, CodeStatement, CodeExpression, CodeExpressionStub, CodeStatementFor, CodeStatementVar, CodeExpressionInfix, CodeExpressionName, CodeName, CodeVar, Parameter) {
+    function (prototypes, settings, Point, Size, Area, Layer, ListItem, Type, Method, Property, Event, Name, Expression, Literal, Statement, ParameterList, Block, CodeStatement, CodeExpression, CodeExpressionStub, CodeStatementFor, CodeStatementVar, CodeExpressionInfix, CodeExpressionName, CodeName, CodeVar, Parameter) {
 
         try {
 
@@ -411,7 +411,7 @@ define(["NextWave/source/utility/prototypes",
                                 }
 
                                 // If dragging an expression, then possibly place
-                                // expression ArgumentList placements.
+                                // expression ParameterList placements.
                                 if (self.dragObject instanceof CodeExpression ||
                                     self.dragObject instanceof Expression ||
                                     self.dragObject instanceof Literal ||
@@ -504,7 +504,7 @@ define(["NextWave/source/utility/prototypes",
                                 }
 
                                 // If nothing found yet, could be an 
-                                // expression placement in an ArgumentList.
+                                // expression placement in an ParameterList.
                                 if (self.expressionPlacements &&
                                     self.expressionPlacements.length > 0) {
 
@@ -858,10 +858,10 @@ define(["NextWave/source/utility/prototypes",
                                 }
 
                                 // If the collectionOwner is a CodeExpressionStub which is 
-                                // immediately owned by an ArgumentList, then remove it too.
+                                // immediately owned by an ParameterList, then remove it too.
                                 var collectionOwnerCollection = collectionOwner.collection;
                                 if (collectionOwnerCollection &&
-                                    collectionOwnerCollection instanceof ArgumentList) {
+                                    collectionOwnerCollection instanceof ParameterList) {
 
                                     var exceptionRet = collectionOwnerCollection.removeItem(collectionOwner);
                                     if (exceptionRet) {
@@ -1067,7 +1067,7 @@ define(["NextWave/source/utility/prototypes",
                                     var objectExpressionPlacement = self.expressionPlacements[i];
 
                                     // objectExpressionPlacement contains:
-                                    // 1) The collection (ArgumentList),
+                                    // 1) The collection (ParameterList),
                                     // 2) The insertted dragTarget.
                                     var alCollection = objectExpressionPlacement.collection;
                                     var exceptionRet = alCollection.purgeExpressionPlacements();
@@ -1095,7 +1095,7 @@ define(["NextWave/source/utility/prototypes",
                         try {
 
                             // objectExpressionPlacement contains:
-                            // 1) The collection (ArgumentList).
+                            // 1) The collection (ParameterList).
                             // 2) The placement.
                             var alCollection = objectExpressionPlacement.collection;
                             var cesPlacement = objectExpressionPlacement.dragTarget;

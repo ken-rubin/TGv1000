@@ -635,6 +635,13 @@ define(["NextWave/source/utility/prototypes",
                                         m_areaMaximal.extent.height + 2 * settings.general.scrollStub.yOffset / 5));
                             }
 
+                            // Call virtual.
+                            let exceptionRet = self.innerCalculateLayout(areaMaximal, contextRender);
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
                             // Adjust scroll offset, if necessary.
                             return self.possiblyAdjustScrollOffset();
                         } catch (e) {
@@ -643,10 +650,31 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Expose a virtual method for  
+                    // which derived classes to stub.
+                    self.innerCalculateLayout = function (areaMaximal, contextRender) {
+
+                        return null;
+                    };
+
+                    // Expose a virtual method for  
+                    // which derived classes to stub.
+                    self.innerRender = function (contextRender) {
+
+                        return null;
+                    };
+
                     // Render out the objects.
                     self.render = function (contextRender) {
                         
                         try {
+
+                            // Call virtual.
+                            let exceptionRet = self.innerRender(contextRender);
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
 
                             // If scrolling, then scroll first.
                             if (m_functionScroll) {
@@ -670,7 +698,7 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Draw the rounded body background.
-                            var exceptionRet = m_areaMaximal.generateRoundedRectPath(contextRender);
+                            exceptionRet = m_areaMaximal.generateRoundedRectPath(contextRender);
                             if (exceptionRet) {
 
                                 throw exceptionRet;

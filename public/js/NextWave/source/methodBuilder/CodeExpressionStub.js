@@ -37,7 +37,7 @@ define(["NextWave/source/utility/prototypes",
                     // The render area.
                     self.area = null;
                     // Indicates that this object is displayed as and  
-                    // functions as an expression placement in an ArgumentList.
+                    // functions as an expression placement in an ParameterList.
                     self.placement = false;
                     // Callback invoked when the payload is set.
                     self.onPayloadSet = null;

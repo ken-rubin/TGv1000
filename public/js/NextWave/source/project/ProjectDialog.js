@@ -1105,8 +1105,14 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            var jsonArray = JSON.stringify(self.currentLibrary.data, undefined, 4).split('\r\n');
-                            var file = new File(jsonArray, self.currentLibrary.data.name + ".json", {type: "text/plain;charset=utf-8"});
+                            // Save the current library.
+                            let exceptionRet = self.currentLibrary.save();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+                            let jsonArray = JSON.stringify(self.currentLibrary.data, undefined, 4).split('\r\n');
+                            let file = new File(jsonArray, self.currentLibrary.data.name + ".json", {type: "text/plain;charset=utf-8"});
                             saveAs(file);
 
                             return null;
