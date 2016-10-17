@@ -2,26 +2,8 @@
 ## Ken's Issues
 
 
-## Jerry's NamesPanel/CenterPanel work
-- Discuss question in MethodBuilder around line 120 with Ken.
-- Renaming--renaming throughout and in namesPanel:
-    - Type
-    - Method
-    - Parameter
-    - Type in var name = new Type()
-- Do namesPanel and all renaming propagation. 
-    - Ken says: You need to loop over the current method builder, yes, but also all the types in the type trees.  Two totally different passes. Or perhaps it is better to do the type tree passes and then reload the center panel. Do you think you can do this today (Wednesday)? Need to save typeName in NameList, too.
-- Test self.removeMethod and self.removeProperty in Manager.js.
-- Should privileged users be allowed to delete system types? Right now they can, but they may be in use by someone. Discuss with Ken. He believes so. What steps do we have to take to make this work? Does the deletion go into ST.sql?
-- Add protection (as appropriate) in MethodBuilder.js argumentsParameterList and statementsStatementList. This protection should probably control drop targets.
- 
 ## Jerry's Next Issues
-- We need to be able delete a Type (done), but prevent if it's in use anywhere in comic: inside methods; as Type in Property; as Base in Type. Or something.
-- When saving (system types, but probably regular project), after reloading display the same exact center panel as before the save. I.e., retain a detailed context and re-play it.
 - As a normal user I started to create a project, but never saved it. lastProject (name) and lastProjectId were saved to the token with the name and id of the core project the new project was to be based on and that project was opened on re-entry. They should only be saved when the project is saved.
-- **Ask Ken if there's a better way for me to test for deletion of initialize and construct methods. This is in SectionPart.js around this code: self.settingsNode.fillBackground !== settings.tree.method.fillBackground.
-- Do LayerDesigner.
-- The System Type field in Type mode of center panel should be a text string that is empty for normal types.
 - Load Stripe.js script when it's needed. Use $.getScript('https://js.stripe.com/v2/'); Remove from indexScripts.jade. Test for prior existence before loading.
 - John says that a@a.com cannot choose/save an image for a new project. Don't know at which phase.
 - From John:
@@ -29,7 +11,7 @@
 - Saw some sort of display problem in horizontal scroller in one of the image search dialogs. **Might have fixed this.**
 - AZPPBuyersDialog.js
     - The way I've had to do the buttons on the Buyers and Waitlisted tabs is ugly. Work on them. In fact, work on many column width problems (like also w/l since).
-    - As changes are made that affect the DB (and thus each of the datatables, I could do manual stuff or I could just refresh from scratch. Which way is better? **I think refreshing from the DB and rebuilding the datatables is better for several reasons: (1) easier; (2) just being used by admin users; (3) functionality is used infrequently, so why bother?
+    - As changes are made (when using AZPPBuyersDialog) that affect the DB (and thus each of the data tables, I could do manual stuff or I could just refresh from scratch. Which way is better? **I think refreshing from the DB and rebuilding the datatables is better for several reasons: (1) easier; (2) just being used by admin users; (3) functionality is used infrequently, so why bother?
     - Buyers tab
         - Finish dropping someone from a class and (optionally) giving a refund thru Stripe. **Done. Needs testing.**
         - Send an email to the user if a refund has been processed. **Done. Needs testing.**
@@ -47,8 +29,7 @@
     - In fnInvite finish writing posting.done
     - In fnInvite if numEnrollees + numInvited < maxClassSize, suggest to admin user that class could be made active
 - AZProjectsDialog
-    - How are projects, types, methods and images saved now? Should not be accessible to normal users until the actions in this dialog are done.
-    - Ability to make projects, types, methods, images, videos, sounds public, un-quarantined, etc. (AZProjectsDialog).
+    - Ability to make projects, libraries, images, videos, sounds public, un-quarantined, etc. (AZProjectsDialog).
         - *Public* means other non-privileged users can find it.
             - What starts off as public?
             - What starts off as private?
@@ -59,7 +40,7 @@
         - An active product for sale (Prod1) is quarantined and public, but I just set quarantined = 0 in Workbench.
         - A purchased product is quarantined and public. It should be quarantined and private. **Wrong**
         - Added image to project owned by a@a.com. It has both public and quarantined set to false. This is correct.
-- Cron.js
+- Cron.js (This is a perpetually-running background task that monitors upcoming classes, openings that have arisen, etc. It mostly sends out emails that have clickable links in them. Then the hyperlink is handled as well as possible by blowing through the login page to the correct dialog--like Buy.)
     - Finish job2
     - Reenable.
     - Add waitlist reminder emails
@@ -96,7 +77,7 @@
 - Think about updating the multer npm module. We're at 0.1.8. It's up to 1.1.0.
 - If a user goes from OpenProjectDialog to BuyDialog and decides not to buy and clicks the Cancel button, should I re-open OpenProjectDialog? I don't at this time.
 + Add more occurrences that display the new BootstrapDialog.confirm to make sure they want to lose possible changes to current project. Show the dialog in these cases: 
-    - click "TGv1000" to return to sign-in page; should this be taken as a signout and invalidate the JWT?
+    - click "TGv1001" to return to sign-in page; should this be taken as a signout and invalidate the JWT?
     - close window or browser (possible?)
 - Check that I did the radio button edits correctly in these jade files: newMethodDialog, newPropertyDialog--if they even exist in Ken's rewrite.
 - Do we want to have to search for System Types that aren't base types for any other type? Probably. **Discuss with Ken.**
@@ -109,9 +90,7 @@
     - Still may want to do these (where it makes sense): 
         - ImageSearchDialog
         - ImageURLDialog
-        - MethodSearchDialog
         - OpenProjectDialog
-        - TypeSearchDialog
 
 ## A Discussion of Projects and Purchasable Projects
 
@@ -352,14 +331,10 @@
 ## To discuss
 
 - When they click the link in the p/w reset email, there are usually two tabs open for TechGroms. (1) What harm does this do? (2) Can we close the other (or re-use it)? **How about closing it when the e-mail is generated?** Doesn't seem possible to close the windo using javascript. **Discuss with Ken & John.**
-- Do we want to (or can we) round X,Y to 0, 1 or 2 decimals?
-- All: If someone buys a project/type/method, we want them to be able to modify/extend it. What's to keep their friend from copying it for free? We can keep them from retrieving a project that had a price, since it points back to a classOrProduct with a price.
-- A New SystemType should probably require an image. **Discuss with Ken.**
-- **Ken:** If I open a new project, the App Type is the Current Type and initialize is the Current Method, but, since we don't display app_initialize or the getter and setters for X, Y, Width and Height, the App category doesn't even appear in the schema category list.
-    - If I add a 2nd method to the App Type, App now shows up, since it has something useful to display.
-    - The problem is that, if I then delete this method, the App category is still there, but clicking it show no draggable blocks becuae there aren't any. Does this behavior bother you?
+- All: If someone buys a project, we want them to be able to modify/extend it. What's to keep their friend from copying it for free? We can keep them from retrieving a project that had a price, since it points back to a classOrProduct with a price.
+- A new SystemType should probably require an image. **Discuss with Ken.**
 
-
+## Edited to here (10/17/2016)
 
 ## General description of programming using our system
 A Type is our equivalent of a class in a standard programming language (C# or C++). Like a class it consists of methods, properties and events. A Type's methods can use (instantiate) another Type to access or manipulate its contents.  The method also has access to a "this" reference and any specified parameters.
