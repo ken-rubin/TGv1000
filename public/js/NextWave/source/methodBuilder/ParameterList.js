@@ -240,14 +240,23 @@ define(["NextWave/source/utility/prototypes",
                         var strParameters = " ";
 
                         // Clone the parameters.
+                        let bOutputAParameter = false;
                         for (var i = 0; i < self.items.length; i++) {
 
-                            if (i > 0) {
+                            if (bOutputAParameter) {
 
                                 strParameters += " , ";
                             }
 
-                            strParameters += self.items[i].generateJavaScript();
+                            let itemIth = self.items[i];
+                            if (itemIth.payload &&
+                                (!itemIth.payload ||
+                                    itemIth.payload.text === "...")) {
+
+                                continue;
+                            }
+
+                            strParameters += itemIth.generateJavaScript();
                         }
 
                         return strParameters;

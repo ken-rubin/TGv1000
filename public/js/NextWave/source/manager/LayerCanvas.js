@@ -77,7 +77,9 @@ define(["NextWave/source/utility/prototypes",
                                 var instanceIth = arrayInstances[i];
 
                                 // Just continue if it is not visual.
-                                if (!(instanceIth instanceof window.tg.VisualObject)) {
+                                if (!window.tg ||
+                                    !window.tg.VisualObject ||
+                                    !(instanceIth instanceof window.tg.VisualObject)) {
 
                                     continue;
                                 }

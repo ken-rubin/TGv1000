@@ -34,39 +34,25 @@ define(["NextWave/source/utility/prototypes",
                             window.tg = {};
                             window.tg.instances = [];
 
-                            // Ensure that types are instantiated
-                            // in reverse dependency order.
-
-                            // Load each module into the environment.
-                            for (var i = 0; i < objectModules.systemTypes.length; i++) {
-
-                                var strTypeIth = objectModules.systemTypes[i];
-                                eval(strTypeIth);
-                            }
-
-                            // Load each module into the environment.
+                            // Load up/allocate all the library instances necessary.
+                            let libraryApp = null;
                             for (var i = 0; i < objectModules.types.length; i++) {
 
-                                var strTypeIth = objectModules.types[i];
-                                eval(strTypeIth);
+                                let typeIth = objectModules.types[i];
+                                eval(typeIth.constructor);
+
+                                if (typeIth.type.data.name === "App") {
+
+                                    libraryApp = typeIth.library;
+                                }
+
                             }
 
                             // Allocate app.
-                            window.tg.app = new window.tg.App(true);
-                            window.tg.app.initialize();
+                            if (libraryApp) {
 
-                            // Begin the rendering.
-                            if (m_renderCookie) {
-
-                                var exceptionRet = self.stop();
-                                if (exceptionRet) {
-
-                                    return exceptionRet;
-                                }
+                                window.tg.app = new window.tg[libraryApp.data.name].App(true);
                             }
-                            m_renderCookie = setInterval(m_functionAnimate,
-                                self.refreshInterval);
-
                             return null;
                         } catch (e) {
 

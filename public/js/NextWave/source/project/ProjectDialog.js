@@ -1198,7 +1198,7 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Add constructor (construct).
-                            exceptionRet = m_functionAddMethod("constuct");
+                            exceptionRet = m_functionAddMethod("construct");
                             if (exceptionRet) {
 
                                 return exceptionRet;

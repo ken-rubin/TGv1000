@@ -369,7 +369,7 @@ define(["NextWave/source/utility/prototypes",
                             self.dragLayer.active = false;
 
                             // Build all javascript code.
-                            var objectModules = self.generateJavaScript();
+                            var objectModules = window.projectDialog.generateJavaScript();
                             return simulator.start(objectModules);
                         } catch(e) {
 

@@ -223,7 +223,7 @@ define(["NextWave/source/project/Method",
                             self.data.name = self.data.name.replace(/ /g, "");
 
                             // Build the constructor function for the type.
-                            var strConstructorFunction = //"debugger;\n\n" +
+                            var strConstructorFunction = "if (!window.tg." + self.owner.data.name + ") { window.tg." + self.owner.data.name + " = {}; } \n\n" +
                                 "window.tg." + self.owner.data.name + "." + self.data.name + " = function () {\n\n" +
                                 "    // Closure.\n" +
                                 "    var self = this;\n\n";
@@ -307,7 +307,12 @@ define(["NextWave/source/project/Method",
                             }
 
                             // Stow.
-                            arrayTypes.push(strConstructorFunction);
+                            arrayTypes.push({
+
+                                constructor: strConstructorFunction,
+                                type: self,
+                                library: self.owner
+                            });
 
                             return null;
                         } catch (e) {
