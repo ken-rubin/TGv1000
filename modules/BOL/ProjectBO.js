@@ -845,7 +845,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                 [
                     // (1)
                     function(cb) {
-// WORK NEEDED                        
+// TODO: WORK NEEDED                        
                         // The following will delete the former project completely from the database.
                         var strQuery = "delete from " + self.dbname + "comics where id in (select comicId from projects_comics_libraries where projectId=" + project.id + "); ";
                         strQuery += "delete from " + self.dbname + "types where libraryId in (select pcl.libraryId from " + self.dbname + "projects_comics_libraries pcl inner join " + self.dbname + "libraries l on l.id=pcl.libraryId where isSystemLibrary=0 and isBaseLibrary=0 and projectId=" + project.id + "); ";
@@ -951,7 +951,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                 project.id = rows[0].insertId;
 
 //  TOXXX MUST CHANGE comicProjectId no longer exists.
-// WORK NEEDED                        
+// TODO: WORK NEEDED                        
                                 // Check if necessary to and then, if so, update project.comicProjectId
                                 if (project.comicProjectId === 0) {
 
@@ -1079,7 +1079,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     // (2)
                     function(cb) {
 // TOXXX HERE DOWN HAS TO CHANGE
-// WORK NEEDED                        
+// TODO: WORK NEEDED                        
                         async.parallel(
                             [
                                 // (2a)
@@ -1778,7 +1778,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                     function(arIthJth, cb) {
 
 // MUST BE CHANGED projects.comicProjectId no longer exists.
-// WORK NEEDED                        
+// TODO: WORK NEEDED                        
                                         var strQuery = "select count(*) as cnt from " + self.dbname + "projects where comicProjectId=" + arIthJth.baseProjectId + " and id<>" + arIthJth.baseProjectId + ";";
                                         sql.execute(strQuery,
                                             function(rows){

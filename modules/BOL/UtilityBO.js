@@ -781,7 +781,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
         try {
 
             console.log("Entered UtilityBO/routeSearchResources with req.body = " + JSON.stringify(req.body));
-            // req.body.tags
+            // req.body.description
             // req.user.userId
             // req.user.userName
             // req.body.resourceTypeId  1,2,
@@ -791,12 +791,12 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
             var resourceTypeDescr = m_resourceTypes[iResourceTypeId];
 
             // Add resource type description to the tags the user (may have) entered.
-            var tags = req.body.tags + " " + resourceTypeDescr;
+            var description = req.body.tags + " " + resourceTypeDescr;
 
             // If we're retrieving only items created by user, add userName to tags.
             if (req.body.onlyOwnedByUser === "1") {
 
-                tags += " " + req.user.userName;
+                description += " " + req.user.userName;
             }
             console.log("tags massaged='" + tags + "'");
 

@@ -212,7 +212,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 
 						    // formData.append("userId", g_profile["userId"]); not needed; sent in JWT
 						    // formData.append("userName", g_profile["userName"]); not needed; sent in JWT
-						    formData.append("tags", tags);
+						    formData.append("description", tags);
 						    formData.append("resourceTypeId", "1");
 						    formData.append("resourceName", strResourceName);
 

@@ -145,7 +145,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 						    var tags = $("#ISSearchInput").val().toLowerCase().trim();
 					        var posting = $.post("/BOL/UtilityBO/SearchResources", 
 					        	{
-					        		tags: tags, 
+					        		description: tags, 
 					        		// userId: g_profile["userId"], not needed; sent in JWT
 					        		// userName: g_profile["userName"], not needed; sent in JWT
 					        		resourceTypeId: 1,

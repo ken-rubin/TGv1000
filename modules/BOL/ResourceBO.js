@@ -63,7 +63,7 @@ module.exports = function ResourceBO(app, sql, logger, mailWrapper) {
             // req.user.userId
             // req.user.userName
             // req.body.url             image or sound to retrieve
-            // req.body.tags            tags to associate with resource (in addition to resourceName and 'sound' or 'image')
+            // req.body.description     description to allow fuzzy string search -- used to be: tags to associate with resource (in addition to resourceName and 'sound' or 'image')
             // req.body.resourceTypeId
             // req.body.resourceName
 
@@ -128,7 +128,7 @@ module.exports = function ResourceBO(app, sql, logger, mailWrapper) {
 
                     // body is a buffer containing the resource.
 
-                    var sqlString = "insert " + self.dbname + "resources (createdByUserId,resourceTypeId,public,name) values (" + req.user.userId + "," + req.body.resourceTypeId + ",0," + mysql.escape(req.body.resourceName) + ");";
+                    var sqlString = "insert " + self.dbname + "resources (createdByUserId,resourceTypeId,public,name,description) values (" + req.user.userId + "," + req.body.resourceTypeId + ",0," + mysql.escape(req.body.resourceName) + "," + mysql.escape(req.body.description) + ");";
                     sql.execute(sqlString,
                         function(rows){
 
@@ -142,9 +142,8 @@ module.exports = function ResourceBO(app, sql, logger, mailWrapper) {
 
                                 var id = rows[0].insertId;
 
-                                // We have the tags for this new resource, we have to add unique ones to the tags table, returning their new ids along 
-                                // with found tags' ids. These ids will be added to records in the resources_tags table since we now know the id of the new resource.
-                                m_setUpAndDoTags(id, req.body.resourceTypeId, req.user.userName, req.body.tags, req.body.resourceName, function(err) {
+                                var resourcePath = 'public/resources/' + id.toString() + '.' + ext;
+                                fs.writeFile(resourcePath, body, function(err) {
 
                                     if (err) {
 
@@ -154,23 +153,10 @@ module.exports = function ResourceBO(app, sql, logger, mailWrapper) {
                                         });
                                     } else {
 
-                                        var resourcePath = 'public/resources/' + id.toString() + '.' + ext;
-                                        fs.writeFile(resourcePath, body, function(err) {
-
-                                            if (err) {
-
-                                                res.json({
-                                                    success:false,
-                                                    message: err.message
-                                                });
-                                            } else {
-
-                                                // The original file has been placed into the resources folder.
-                                                res.json({
-                                                    success: true,
-                                                    id: id
-                                                });
-                                            }
+                                        // The original file has been placed into the resources folder.
+                                        res.json({
+                                            success: true,
+                                            id: id
                                         });
                                     }
                                 });
@@ -204,7 +190,7 @@ module.exports = function ResourceBO(app, sql, logger, mailWrapper) {
             // req.user.userName
             // req.body.resourceTypeId
             // req.body.filePath        name assigned by multer with folder; e.g., "uploads\\xyz123456789.png"
-            // req.body.tags            tags to associate with resource (in addition to resourceName and 'sound' or 'image')
+            // req.body.description     description for fuzzy search -- used to be: tags to associate with resource (in addition to resourceName and 'sound' or 'image')
             // req.body.resourceName
 
             // Notes: 
@@ -214,7 +200,7 @@ module.exports = function ResourceBO(app, sql, logger, mailWrapper) {
 
             var ext = (req.body.resourceTypeId === "1") ? 'png' : "mp3";
 
-            var sqlString = "insert " + self.dbname + "resources (createdByUserId,resourceTypeId,public,name) values (" + req.user.userId + "," + req.body.resourceTypeId + ",0," + mysql.escape(req.body.resourceName) + ");";
+            var sqlString = "insert " + self.dbname + "resources (createdByUserId,resourceTypeId,public,name,description) values (" + req.user.userId + "," + req.body.resourceTypeId + ",0," + mysql.escape(req.body.resourceName) + "," + mysql.escape(req.body.description) + ");";
             sql.execute(sqlString,
                 function(rows){
 
@@ -1217,29 +1203,29 @@ module.exports = function ResourceBO(app, sql, logger, mailWrapper) {
     //     }
     // }
 
-    var m_createTagJunctions = function(resourceId, tagIds) {
+    // var m_createTagJunctions = function(resourceId, tagIds) {
 
-        var strSql = "insert into " + self.dbname + "resources_tags (resourceId,tagId) values";
-        for (var j = 0; j < tagIds.length; j++) {
+    //     var strSql = "insert into " + self.dbname + "resources_tags (resourceId,tagId) values";
+    //     for (var j = 0; j < tagIds.length; j++) {
 
-            strSql = strSql + "(" + resourceId.toString() + "," + tagIds[j].toString() + ")";
-            if (j !== tagIds.length - 1){
+    //         strSql = strSql + "(" + resourceId.toString() + "," + tagIds[j].toString() + ")";
+    //         if (j !== tagIds.length - 1){
 
-                strSql = strSql + ",";
-            }
-        }
-        strSql = strSql + ";";
-        sql.execute(strSql,
-            function(rows){
+    //             strSql = strSql + ",";
+    //         }
+    //     }
+    //     strSql = strSql + ";";
+    //     sql.execute(strSql,
+    //         function(rows){
 
-                return null;
-            },
-            function(strErr){
+    //             return null;
+    //         },
+    //         function(strErr){
 
-                return {message:'Error received inserting into resources_tags: ' + strErr};
-            }
-        );
-    }
+    //             return {message:'Error received inserting into resources_tags: ' + strErr};
+    //         }
+    //     );
+    // }
 
     // var m_setUpAndDoTags = function(resourceId, strResourceTypeId, userName, strTags, strName, callback) {
 

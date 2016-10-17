@@ -17,33 +17,97 @@ call drop_create_TGv1001(@dropTheDB)//
 
 USE TGv1001//
 
--- DROP PROCEDURE IF EXISTS doTags//
--- create procedure doTags(tagsconcat varchar(255), itemIdVarName varchar(20), strItemType varchar(20))
--- begin
+drop function if exists soundex_match //
 
--- 	set @delim = '~';
--- 	set @inipos = 1;
--- 	set @fullstr = tagsconcat;
--- 	set @maxlen = LENGTH(@fullstr);
-	
--- 	REPEAT
--- 		set @endpos = LOCATE(@delim, @fullstr, @inipos);
--- 		set @tag = SUBSTR(@fullstr, @inipos, @endpos - @inipos);
-		
--- 		if @tag <> '' AND @tag IS NOT NULL THEN
--- 			set @id := (select id from tags where description=@tag);
--- 			if @id IS NULL THEN
--- 				insert tags (description) values (@tag);
--- 				set @id := (select LAST_INSERT_ID());
--- 			end if;
-			
--- 			if strItemType = 'project' THEN
--- 				insert project_tags values (itemIdVarName, @id);
--- 			end if;
--- 		END IF;
--- 		SET @inipos = @endpos + 1;
--- 	UNTIL @inipos >= @maxlen END REPEAT;
--- end //
+-- The soundex_match returns 1 if the soundex of needle = the soundex of any word in haystack. Else 0.
+CREATE FUNCTION `soundex_match`(needle varchar(128), haystack text, splitChar varchar(1)) 
+	RETURNS tinyint(4)
+BEGIN
+	declare spacePos int;
+	declare searchLen int default 0;
+	declare curWord varchar(128) default '';
+	declare tempStr text default haystack;
+	declare tmp text default '';
+	declare soundx1 varchar(64) default '';
+	declare soundx2 varchar(64) default '';    
+
+	set searchLen = length(haystack);
+	set spacePos  = locate(splitChar, tempStr);
+	set soundx1   = soundex(needle);
+
+	while searchLen > 0 do
+		if spacePos = 0 then
+			set tmp = tempStr;
+			select soundex(tmp) into soundx2;
+			if soundx1 = soundx2 then
+				return 1;
+			else
+				return 0;
+			end if;
+		else
+			set tmp = substr(tempStr, 1, spacePos-1);
+			set soundx2 = soundex(tmp);
+			if soundx1 = soundx2 then
+				return 1;
+			end if;
+
+			set tempStr = substr(tempStr, spacePos+1);
+			set searchLen = length(tempStr);
+		end if;      
+
+		set spacePos = locate(splitChar, tempStr);
+	end while;  
+
+	return 0;
+
+END //
+
+drop function if exists soundex_match_all //
+
+-- The soundex_match_all returns the percentage of words in needle whose soundex matches soundex of any word in haystack.
+create function soundex_match_all(needle text, haystack text, splitChar varchar(1)) RETURNS double 
+begin 
+	DECLARE comma INT DEFAULT 0; 
+    DECLARE word TEXT;
+    DECLARE total_score double;
+    DECLARE total_num_words double; 
+    SET comma = LOCATE(splitChar, needle); 
+    SET word = TRIM(needle); 
+    
+    if LENGTH(haystack) = 0 then 
+    	/* 0 word search term */
+    	/* We could return 0 (no matches) or 1 (all match). */
+    	/* Let's try it with 1. */
+		return 1; 
+	elseif comma = 0 then 
+		/* one word search term */ 
+        return soundex_match(word, haystack, splitChar); /* Same as returning soundex_match / 1. */
+	end if; 
+    
+    SET total_score = 0;
+    SET total_num_words = 0;
+    SET word = trim(substr(needle, 1, comma)); 
+    
+    /* Insert each split variable into the word variable */ 
+    REPEAT 
+    	SET total_num_words = total_num_words + 1;
+		SET total_score = total_score + soundex_match(word, haystack, splitChar);
+
+        /* get the next word */ 
+        SET needle = trim(substr(needle, comma)); 
+        SET comma = LOCATE(splitChar, needle); 
+        if comma = 0 then 
+			/* last word */ 
+            SET word = needle;
+        else
+	        SET word = trim(substr(needle, 1, comma)); 
+		end if; 
+        
+    UNTIL length(needle) = 0 /* Used to be word. */
+	END REPEAT; 
+
+    return total_score / total_num_words; 
+end // 
 
 DROP FUNCTION IF EXISTS getUniqueProjNameForUser//
 create FUNCTION getUniqueProjNameForUser(checkName varchar(255), userId int(11))
@@ -160,6 +224,7 @@ begin
 		  CONSTRAINT `FK_comicsstmt` FOREIGN KEY (`comicId`) REFERENCES `comics` (`id`) ON DELETE CASCADE
 		) ENGINE=InnoDB;
 
+		-- id and description are columns in the table and are in libraryJSON. They are kept in sync in ProjectBO.
 		CREATE TABLE `libraries` (
 		  `id` INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
 		  `name` varchar(255) NOT NULL,
@@ -169,7 +234,9 @@ begin
           `isAppLibrary` tinyint(1) NOT NULL DEFAULT '0',
 		  `imageId` int(11) NOT NULL DEFAULT '0',
 		  `altImagePath` varchar(255) NOT NULL DEFAULT '',
-		  `libraryJSON` JSON NOT NULL
+		  `libraryJSON` JSON NOT NULL,
+		  `description` TEXT,
+		  FULLTEXT idx (name, description)
 		) ENGINE=InnoDB;
 
 		CREATE TABLE `onlineclasses` (
@@ -346,7 +413,7 @@ begin
 		ALTER TABLE `comics_statements` ENABLE KEYS;
 
 		ALTER TABLE `libraries` DISABLE KEYS;
-		INSERT INTO `libraries` VALUES (1,'GameAppLibrary',1,0,0,1,0,'','{"library": {"name": "GameAppLibrary", "id": 1, "types": [], "editors": "", "references": "", "description": ""}}'),(2,'ConsoleAppLibrary',1,0,0,1,0,'','{"library": {"name": "ConsoleAppLibrary", "id": 2, "types": [], "editors": "", "references": "", "description": ""}}'),(3,'WebsiteAppLibrary',1,0,0,1,0,'','{"library": {"name": "WebsiteAppLibrary", "id": 3, "types": [], "editors": "", "references": "", "description": ""}}'),(4,'HololensAppLibrary',1,0,0,1,0,'','{"library": {"name": "HololensAppLibrary", "id": 4, "types": [], "editors": "", "references": "", "description": ""}}'),(5,'MapAppLibrary',1,0,0,1,0,'','{"library": {"name": "MapAppLibrary", "id": 5, "types": [], "editors": "", "references": "", "description": ""}}'),(6,'GameBaseLibrary',1,0,1,0,0,'','{"library": {"name": "GameBaseLibrary", "id": 6, "types": [], "editors": "", "references": "", "description": ""}}'),(7,'ConsoleBaseLibrary',1,0,1,0,0,'','{"library": {"name": "ConsoleBaseLibrary", "id": 7, "types": [], "editors": "", "references": "", "description": ""}}'),(8,'WebsiteBaseLibrary',1,0,1,0,0,'','{"library": {"name": "WebsiteBaseLibrary", "id": 8, "types": [], "editors": "", "references": "", "description": ""}}'),(9,'HololensBaseLibrary',1,0,1,0,0,'','{"library": {"name": "HololensBaseLibrary", "id": 9, "types": [], "editors": "", "references": "", "description": ""}}'),(10,'MapBaseLibrary',1,0,1,0,0,'','{"library": {"name": "MapBaseLibrary", "id": 10, "types": [], "editors": "", "references": "", "description": ""}}'),(11,'KernelTypesLibrary',1,1,0,0,0,'','{"library": {"name": "KernelTypesLibrary", "id": 11, "types": [], "editors": "", "references": "", "description": ""}}'),(12,'VisualObjectLibrary',1,1,0,0,0,'','{"library": {"name": "VisualObjectLibrary", "id": 12, "types": [], "editors": "", "references": "", "description": ""}}');
+		INSERT INTO `libraries` VALUES (1,'GameAppLibrary',1,0,0,1,0,'','{"library": {"name": "GameAppLibrary", "id": 1, "types": [], "editors": "", "references": "", "description": ""}}',''),(2,'ConsoleAppLibrary',1,0,0,1,0,'','{"library": {"name": "ConsoleAppLibrary", "id": 2, "types": [], "editors": "", "references": "", "description": ""}}',''),(3,'WebsiteAppLibrary',1,0,0,1,0,'','{"library": {"name": "WebsiteAppLibrary", "id": 3, "types": [], "editors": "", "references": "", "description": ""}}',''),(4,'HololensAppLibrary',1,0,0,1,0,'','{"library": {"name": "HololensAppLibrary", "id": 4, "types": [], "editors": "", "references": "", "description": ""}}',''),(5,'MapAppLibrary',1,0,0,1,0,'','{"library": {"name": "MapAppLibrary", "id": 5, "types": [], "editors": "", "references": "", "description": ""}}',''),(6,'GameBaseLibrary',1,0,1,0,0,'','{"library": {"name": "GameBaseLibrary", "id": 6, "types": [], "editors": "", "references": "", "description": ""}}',''),(7,'ConsoleBaseLibrary',1,0,1,0,0,'','{"library": {"name": "ConsoleBaseLibrary", "id": 7, "types": [], "editors": "", "references": "", "description": ""}}',''),(8,'WebsiteBaseLibrary',1,0,1,0,0,'','{"library": {"name": "WebsiteBaseLibrary", "id": 8, "types": [], "editors": "", "references": "", "description": ""}}',''),(9,'HololensBaseLibrary',1,0,1,0,0,'','{"library": {"name": "HololensBaseLibrary", "id": 9, "types": [], "editors": "", "references": "", "description": ""}}',''),(10,'MapBaseLibrary',1,0,1,0,0,'','{"library": {"name": "MapBaseLibrary", "id": 10, "types": [], "editors": "", "references": "", "description": ""}}',''),(11,'KernelTypesLibrary',1,1,0,0,0,'','{"library": {"name": "KernelTypesLibrary", "id": 11, "types": [], "editors": "", "references": "", "description": ""}}',''),(12,'VisualObjectLibrary',1,1,0,0,0,'','{"library": {"name": "VisualObjectLibrary", "id": 12, "types": [], "editors": "", "references": "", "description": ""}}','');
 		ALTER TABLE `libraries` ENABLE KEYS;
 
 		ALTER TABLE `permissions` DISABLE KEYS;
@@ -402,7 +469,7 @@ begin
 
 		INSERT INTO `comics` VALUES (6,'Complete TechGroms Help',0,'tn3.png');
 		INSERT INTO `comics_statements` VALUES (6,1),(6,2),(6,3),(6,4),(6,5),(6,6),(6,7),(6,8),(6,9),(6,10),(6,11),(6,12),(6,13),(6,14);
-		INSERT INTO `libraries` VALUES (13,'EmptyLibrary',1,0,0,1,0,'','{"library": {"name": "EmptyLibrary", "id": 13, "types": [], "editors": "", "references": "", "description": ""}}');
+		INSERT INTO `libraries` VALUES (13,'EmptyLibrary',1,0,0,1,0,'','{"library": {"name": "EmptyLibrary", "id": 13, "types": [], "editors": "", "references": "", "description": ""}}','');
 		INSERT INTO `projects` VALUES (6,'New Empty Project',1,1,1,'This is the core project from which you should derive a project where you want full control over libraries and types. It is empty until you fill it.',0,'media/images/emptyProject.png',0,0.00,0.00,1,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0);
 		INSERT INTO `projects_comics_libraries` VALUES (6,6,13),(6,6,11),(6,6,12);
 		INSERT INTO `projecttypes` VALUES (6,'empty');
