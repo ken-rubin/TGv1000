@@ -65,6 +65,9 @@ END //
 drop function if exists soundex_match_all //
 
 -- The soundex_match_all returns the percentage of words in needle whose soundex matches soundex of any word in haystack.
+-- needle is the search phrase entered by the user. haystack is the description entered by the object creator (project, resource or library).
+-- soundex_match_all as it is written needs to be called repeatedly on a lot of candidates. That should at least be
+-- optimized by restricting the number of haystacks to search.
 create function soundex_match_all(needle text, haystack text, splitChar varchar(1)) RETURNS double 
 begin 
 	DECLARE comma INT DEFAULT 0; 
@@ -132,13 +135,14 @@ begin
     RETURN @uniqueName;
 end //
 
-DROP FUNCTION IF EXISTS getProjectsLinkedToComic0OfProject//
-CREATE FUNCTION getProjectsLinkedToComic0OfProject(projectIdIn int(11))
+DROP FUNCTION IF EXISTS getProjectsLinkedToComicsOfProject//
+-- This function is used to find purchased projects. Input is the id of the purchasable project.
+-- It returns the id's of all purchased projects since they share the same comics.
+-- This implies that all PPs have a unique set of comics.
+CREATE FUNCTION getProjectsLinkedToComicsOfProject(projectIdIn int(11))
 	RETURNS TEXT
 begin
 
-	-- Note: this returns projectIdIn, too.
-	-- set @projectId := (select distinct pcl.projectId from projects_comics_libraries pcl inner join comics c on c.id=pcl.comicId where pcl.projectId=projectIdIn AND c.ordinal=0);
     set @comicId = (select comicId from projects_comics_libraries where projectId=projectIdIn LIMIT 1);
 	set @projectIds := (select group_concat(distinct projectId separator ',') from projects_comics_libraries where comicId=@comicId AND projectId<>projectIdIn);
     
@@ -150,7 +154,7 @@ drop procedure if exists maintainDB//
 create procedure maintainDB()
 begin
 
-	select @cnt := count(*) from information_schema.tables where table_schema = 'TGv1001' and table_name = 'control';
+	set @cnt = (select count(*) from information_schema.tables where table_schema = 'TGv1001' and table_name = 'control');
     
 	if @cnt = 0 THEN
 
@@ -221,7 +225,8 @@ begin
 		  `comicId` INT UNSIGNED NOT NULL,
 		  `statementId` INT UNSIGNED NOT NULL,
 		  PRIMARY KEY (`comicId`,`statementId`),
-		  CONSTRAINT `FK_comicsstmt` FOREIGN KEY (`comicId`) REFERENCES `comics` (`id`) ON DELETE CASCADE
+		  CONSTRAINT `FK_comicsstmt1` FOREIGN KEY (`comicId`) REFERENCES `comics` (`id`) ON DELETE CASCADE,
+		  CONSTRAINT `FK_comicsstmt2` FOREIGN KEY (`statementId`) REFERENCES `statements` (`id`) ON DELETE CASCADE
 		) ENGINE=InnoDB;
 
 		-- id and description are columns in the table and are in libraryJSON. They are kept in sync in ProjectBO.
@@ -300,6 +305,8 @@ begin
 		  `chargeId` varchar(255) DEFAULT '',
 		  `currentComicIndex` int(11) NOT NULL DEFAULT '0',
 		  `currentComicStepIndex` int(11) NOT NULL DEFAULT '0',
+		  KEY `FK_project_projects` (`parentProjectId`),
+		  CONSTRAINT `FK_project_projects` FOREIGN KEY (`parentProjectId`) REFERENCES `projects` (`id`) ON DELETE CASCADE,
 		  FULLTEXT idx (name, description)
 		) ENGINE=InnoDB;
 
@@ -308,7 +315,9 @@ begin
 		  `comicId` int UNSIGNED NOT NULL,
 		  `libraryId` int UNSIGNED NOT NULL,
 		  PRIMARY KEY (`projectId`,`comicId`,`libraryId`),
-		  CONSTRAINT `FK_projects_comics_libraries` FOREIGN KEY (`projectId`) REFERENCES `projects` (`id`) ON DELETE CASCADE
+		  CONSTRAINT `FK_projects_comics_libraries1` FOREIGN KEY (`projectId`) REFERENCES `projects` (`id`) ON DELETE CASCADE,
+		  CONSTRAINT `FK_projects_comics_libraries2` FOREIGN KEY (`comicId`) REFERENCES `comics` (`id`) ON DELETE CASCADE,
+		  CONSTRAINT `FK_projects_comics_libraries3` FOREIGN KEY (`libraryId`) REFERENCES `libraries` (`id`) ON DELETE CASCADE
 		) ENGINE=InnoDB;
 
 		CREATE TABLE `projecttypes` (
@@ -360,7 +369,8 @@ begin
 		CREATE TABLE `ug_permissions` (
 		  `usergroupId` int UNSIGNED NOT NULL,
 		  `permissionId` int UNSIGNED NOT NULL,
-		  PRIMARY KEY (`usergroupId`,`permissionId`)
+		  PRIMARY KEY (`usergroupId`,`permissionId`),
+		  CONSTRAINT `FK_ug_permissions` FOREIGN KEY (`permissionId`) REFERENCES `permissions` (`id`) ON DELETE CASCADE
 		) ENGINE=InnoDB;
 
 		CREATE TABLE `user` (
@@ -373,7 +383,8 @@ begin
 		  `zipcode` char(5) NOT NULL,
 		  `timezone` mediumtext NOT NULL,
 		  `lastProject` varchar(255) NOT NULL DEFAULT '',
-		  `lastProjectId` int UNSIGNED NOT NULL DEFAULT '0',
+		  `lastProjectId` int UNSIGNED NULL,
+		  CONSTRAINT `FK_user_projects` FOREIGN KEY (`lastProjectId`) REFERENCES `projects` (`id`) ON DELETE SET NULL,
 		  FULLTEXT idx (userName)
 		) ENGINE=InnoDB;
 
@@ -402,6 +413,7 @@ begin
 
     if @dbstate = 1 THEN
 
+    	-- For the duration of @dbstate = 1 disable all KEY checking, since we're in a screwy order.
     	set FOREIGN_KEY_CHECKS = 0;
 
     	ALTER TABLE `comics` DISABLE KEYS;
@@ -421,7 +433,7 @@ begin
 		ALTER TABLE `permissions` ENABLE KEYS;
 
 		ALTER TABLE `projects` DISABLE KEYS;
-		INSERT INTO `projects` VALUES (1,'New Game Project',1,1,1,'This is the core project from which all games are derived.',0,'media/images/gameProject.png',0,0.00,0.00,1,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0),(2,'New Console Project',1,1,1,'This is the core project from which all console-based apps are derived.',0,'media/images/consoleProject.png',0,0.00,0.00,2,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0),(3,'New Website Project',1,1,1,'This is the core project from which all web sites are derived.',0,'media/images/websiteProject.png',0,0.00,0.00,3,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0),(4,'New Hololens Project',1,1,1,'This is the core project from which all Microsoft HoloLens projects are derived.',0,'media/images/hololensProject.png',0,0.00,0.00,4,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0),(5,'New Map Project',1,1,1,'This is the core project from which all mapping projects are derived.',0,'media/images/mappingProject.png',0,0.00,0.00,5,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0);
+		INSERT INTO `projects` VALUES (1,'New Game Project',1,1,1,'This is the core project from which all games are derived.',0,'media/images/gameProject.png',NULL,0.00,0.00,1,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0),(2,'New Console Project',1,1,1,'This is the core project from which all console-based apps are derived.',0,'media/images/consoleProject.png',NULL,0.00,0.00,2,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0),(3,'New Website Project',1,1,1,'This is the core project from which all web sites are derived.',0,'media/images/websiteProject.png',NULL,0.00,0.00,3,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0),(4,'New Hololens Project',1,1,1,'This is the core project from which all Microsoft HoloLens projects are derived.',0,'media/images/hololensProject.png',NULL,0.00,0.00,4,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0),(5,'New Map Project',1,1,1,'This is the core project from which all mapping projects are derived.',0,'media/images/mappingProject.png',NULL,0.00,0.00,5,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0);
 		ALTER TABLE `projects` ENABLE KEYS;
 
 		ALTER TABLE `projects_comics_libraries` DISABLE KEYS;
@@ -465,19 +477,19 @@ begin
     if @dbstate = 2 THEN
 
     	-- Create an "empty" core project.
-    	-- Add library_users table to denote "owners".
-
 		INSERT INTO `comics` VALUES (6,'Complete TechGroms Help',0,'tn3.png');
 		INSERT INTO `comics_statements` VALUES (6,1),(6,2),(6,3),(6,4),(6,5),(6,6),(6,7),(6,8),(6,9),(6,10),(6,11),(6,12),(6,13),(6,14);
 		INSERT INTO `libraries` VALUES (13,'EmptyLibrary',1,0,0,1,0,'','{"library": {"name": "EmptyLibrary", "id": 13, "types": [], "editors": "", "references": "", "description": ""}}','');
-		INSERT INTO `projects` VALUES (6,'New Empty Project',1,1,1,'This is the core project from which you should derive a project where you want full control over libraries and types. It is empty until you fill it.',0,'media/images/emptyProject.png',0,0.00,0.00,1,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0);
+		INSERT INTO `projects` VALUES (6,'New Empty Project',1,1,1,'This is the core project from which you should derive a project where you want full control over libraries and types. It is empty until you fill it.',0,'media/images/emptyProject.png',NULL,0.00,0.00,1,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0);
 		INSERT INTO `projects_comics_libraries` VALUES (6,6,13),(6,6,11),(6,6,12);
 		INSERT INTO `projecttypes` VALUES (6,'empty');
 
+    	-- Add library_users table to record a library's "editors".
 		CREATE TABLE `library_users` (
 		  `libraryId` int UNSIGNED NOT NULL,
 		  `userId` int UNSIGNED NOT NULL,
-		  PRIMARY KEY (`libraryId`,`userId`)
+		  PRIMARY KEY (`libraryId`,`userId`),
+		  CONSTRAINT `FK_library_users` FOREIGN KEY (`libraryId`) REFERENCES `libraries` (`id`) ON DELETE CASCADE
 		) ENGINE=InnoDB;
 
 		INSERT INTO `library_users` VALUES (1,1),(2,1),(3,1),(4,1),(5,1),(6,1);

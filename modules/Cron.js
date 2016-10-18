@@ -92,7 +92,7 @@ module.exports = function Cron(app, sql, logger, mailWrapper) {
 														// Find users owning projects that are linked to classIth.
 
 /* TOXXX DONE											var strQuery = "select distinct u.userName, u.firstName from " + self.dbname + "user u inner join " + self.dbname + "projects p on u.id = p.ownedByUserId where p.comicProjectId=" + classIth.baseProjectId + " and p.isClass=0;";*/
-            											var strQuery = "select distinct u.userName, u.firstName from " + self.dbname + "user u inner join " + self.dbname + "projects p on u.id = p.ownedByUserId where p.id in (" + self.dbname + "getProjectsLinkedToComic0OfProject(" + classIth.baseProjectId + ")) and p.isClass=0;";
+            											var strQuery = "select distinct u.userName, u.firstName from " + self.dbname + "user u inner join " + self.dbname + "projects p on u.id = p.ownedByUserId where p.id in (" + self.dbname + "getProjectsLinkedToComicsOfProject(" + classIth.baseProjectId + ")) and p.isClass=0;";
 														sql.execute(strQuery,
 															function(rows) {
 
@@ -216,7 +216,7 @@ module.exports = function Cron(app, sql, logger, mailWrapper) {
 													function(classIth, cb) {
 
 /* TOXXX DONE */										var strQuery = "select distinct u.userName, u.firstName from " + self.dbname + "user u inner join " + self.dbname + "projects p on u.id = p.ownedByUserId where p.comicProjectId=" + classIth.baseProjectId + " and p.isClass=0;";
-            											var strQuery = "select distinct u.userName, u.firstName from " + self.dbname + "user u inner join " + self.dbname + "projects p on u.id = p.ownedByUserId where p.id in (" + self.dbname + "getProjectsLinkedToComic0OfProject(" + classIth.baseProjectId + ")) and p.isClass=0;";
+            											var strQuery = "select distinct u.userName, u.firstName from " + self.dbname + "user u inner join " + self.dbname + "projects p on u.id = p.ownedByUserId where p.id in (" + self.dbname + "getProjectsLinkedToComicsOfProject(" + classIth.baseProjectId + ")) and p.isClass=0;";
 														sql.execute(strQuery,
 															function(rows) {
 
