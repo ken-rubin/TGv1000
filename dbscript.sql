@@ -199,18 +199,15 @@ begin
 		  `classNotes` text,
 		  `maxClassSize` int(11) DEFAULT '0',
 		  `loanComputersAvailable` tinyint(1) DEFAULT '0',
-		  KEY `FK_project_classes` (`baseProjectId`),
 		  CONSTRAINT `FK_project_classes` FOREIGN KEY (`baseProjectId`) REFERENCES `projects` (`id`) ON DELETE CASCADE
 		) ENGINE=InnoDB;
 
 		CREATE TABLE `comiccode` (
-		  `id` INT UNSIGNED AUTO_INCREMENT NOT NULL,
+		  `id` INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
 		  `comicId` INT UNSIGNED NOT NULL,
 		  `ordinal` int(11) NOT NULL,
 		  `description` text NOT NULL,
 		  `stepsJSON` JSON NOT NULL,
-		  PRIMARY KEY (`id`,`comicId`),
-		  KEY `FK_comiccode` (`comicId`),
 		  CONSTRAINT `FK_comiccode` FOREIGN KEY (`comicId`) REFERENCES `comics` (`id`) ON DELETE CASCADE
 		) ENGINE=InnoDB;
 
@@ -259,7 +256,6 @@ begin
 		  `schedule` json DEFAULT NULL,
 		  `active` tinyint(1) DEFAULT '0',
 		  `classNotes` text,
-		  KEY `FK_project_onlineclasses` (`baseProjectId`),
 		  CONSTRAINT `FK_project_onlineclasses` FOREIGN KEY (`baseProjectId`) REFERENCES `projects` (`id`) ON DELETE CASCADE
 		) ENGINE=InnoDB;
 
@@ -279,7 +275,6 @@ begin
 		  `price` decimal(9,2) NOT NULL DEFAULT '0.00',
 		  `active` tinyint(1) NOT NULL DEFAULT '0',
 		  `videoURL` varchar(255) NOT NULL DEFAULT '',
-		  KEY `FK_project_products` (`baseProjectId`),
 		  CONSTRAINT `FK_project_products` FOREIGN KEY (`baseProjectId`) REFERENCES `projects` (`id`) ON DELETE CASCADE
 		) ENGINE=InnoDB;
 
@@ -305,7 +300,6 @@ begin
 		  `chargeId` varchar(255) DEFAULT '',
 		  `currentComicIndex` int(11) NOT NULL DEFAULT '0',
 		  `currentComicStepIndex` int(11) NOT NULL DEFAULT '0',
-		  KEY `FK_project_projects` (`parentProjectId`),
 		  CONSTRAINT `FK_project_projects` FOREIGN KEY (`parentProjectId`) REFERENCES `projects` (`id`) ON DELETE CASCADE,
 		  FULLTEXT idx (name, description)
 		) ENGINE=InnoDB;
@@ -461,7 +455,7 @@ begin
 		ALTER TABLE `ug_permissions` ENABLE KEYS;
 
 		ALTER TABLE `user` DISABLE KEYS;
-		INSERT INTO `user` VALUES (1,'templates@techgroms.com','System','User','$2a$10$XULC/AcP/94VUb0EdiTG4eIiLI/zaW4n/qcovbRb2/SDTLmoG2BDe',1,'10601','America/New_York','',0);
+		INSERT INTO `user` VALUES (1,'templates@techgroms.com','System','User','$2a$10$XULC/AcP/94VUb0EdiTG4eIiLI/zaW4n/qcovbRb2/SDTLmoG2BDe',1,'10601','America/New_York','',NULL);
 		ALTER TABLE `user` ENABLE KEYS;
 
 		ALTER TABLE `usergroups` DISABLE KEYS;
@@ -479,7 +473,7 @@ begin
     	-- Create an "empty" core project.
 		INSERT INTO `comics` VALUES (6,'Complete TechGroms Help',0,'tn3.png');
 		INSERT INTO `comics_statements` VALUES (6,1),(6,2),(6,3),(6,4),(6,5),(6,6),(6,7),(6,8),(6,9),(6,10),(6,11),(6,12),(6,13),(6,14);
-		INSERT INTO `libraries` VALUES (13,'EmptyLibrary',1,0,0,1,0,'','{"library": {"name": "EmptyLibrary", "id": 13, "types": [], "editors": "", "references": "", "description": ""}}','');
+		INSERT INTO `libraries` VALUES (13,'App_Library',1,0,0,1,0,'','{"library": {"id": 13, "name": "EmptyLibrary", "types": [{"name": "App", "baseTypeName": "", "description": "This type\'s construct method will run first.", "methods": [{"name": "construct", "parameters": [], "statements": [], "comment": "All app initialization should be in this method.", "arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": [{"type": "CodeLiteral", "parameters": [{"type": "String", "value": "..." }, {"type": "Boolean", "value": false}, {"type": "Boolean", "value": false}]}]}]}}],"properties": [],"events": [],"isSystemType": 0,"public": 0}],"editors": "","references": "KernelTypesLibrary","description": "This library is the place to put all your initialization code. We\'ve started you off with an App type containing a construct method. You take it from here."}}','');
 		INSERT INTO `projects` VALUES (6,'New Empty Project',1,1,1,'This is the core project from which you should derive a project where you want full control over libraries and types. It is empty until you fill it.',0,'media/images/emptyProject.png',NULL,0.00,0.00,1,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0);
 		INSERT INTO `projects_comics_libraries` VALUES (6,6,13),(6,6,11),(6,6,12);
 		INSERT INTO `projecttypes` VALUES (6,'empty');

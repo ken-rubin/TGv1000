@@ -90,14 +90,49 @@ define(["Core/errorHelper",
 									);
 								} else {
 
-									// manager.loadNoProject();
 									if ($.isFunction(callback)) { callback(); }
 								}
 							} else {
 								// Privileged user.
 
-								// self.loadSystemTypesAndPinPanels(callback);
-								if ($.isFunction(callback)) { callback(); }
+								self.openProjectFromDB(6,
+									function() {
+
+										self.project.id = 0;	// just to be sure it doesn't overwrite a core project
+										self.project.isCoreProject = false;
+
+										// We could also do these things that used to be done in the BO, but we aren't--at least for now.
+						                        //     comicIth.id = 0; 
+
+										self.project.name = 'noname';
+										self.project.tags = '';
+										self.project.description = '';
+										if (self.project.imageId) {
+											self.project.altImagePath = '';
+										}
+										self.project.ownedByUserId = parseInt(g_profile["userId"], 10);
+
+										// Now we'll add the fields to the project that will both tell the rest of the UI how to handle it and will affect how it gets saved to the database.
+										self.project.specialProjectData = {
+											userAllowedToCreateEditPurchProjs: manager.userAllowedToCreateEditPurchProjs,
+											userCanWorkWithSystemLibsAndTypes: manager.userCanWorkWithSystemLibsAndTypes,
+											ownedByUser: true,
+											othersProjects: false,
+											normalProject: true,
+											coreProject: false,
+											classProject: false,
+											productProject: false,
+											onlineClassProject: false,
+											comicsEdited: false,
+											systemTypesEdited: false,
+											openMode: 'new'
+										};
+							    		var exceptionRet = manager.loadProject(self.project);
+							    		if (exceptionRet) { throw exceptionRet; }
+
+										if ($.isFunction(callback)) { callback(); }
+									}
+								);
 							}
 
 							return null;
