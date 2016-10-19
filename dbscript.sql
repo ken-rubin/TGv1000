@@ -135,11 +135,11 @@ begin
     RETURN @uniqueName;
 end //
 
-DROP FUNCTION IF EXISTS getProjectsLinkedToComicsOfProject//
+DROP FUNCTION IF EXISTS getProjectsLinkedToGivenProjectByComic//
 -- This function is used to find purchased projects. Input is the id of the purchasable project.
 -- It returns the id's of all purchased projects since they share the same comics.
 -- This implies that all PPs have a unique set of comics.
-CREATE FUNCTION getProjectsLinkedToComicsOfProject(projectIdIn int(11))
+CREATE FUNCTION getProjectsLinkedToGivenProjectByComic(projectIdIn int(11))
 	RETURNS TEXT
 begin
 
