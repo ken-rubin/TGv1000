@@ -179,7 +179,7 @@ begin
 		CREATE TABLE `classes` (
 		  `id` INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
 		  `name` varchar(255) DEFAULT NULL,
-		  `baseProjectId` int UNSIGNED DEFAULT '0',
+		  `baseProjectId` INT UNSIGNED DEFAULT NULL,
 		  `instructorFirstName` varchar(255) DEFAULT NULL,
 		  `instructorLastName` varchar(255) DEFAULT NULL,
 		  `instructorPhone` varchar(255) DEFAULT NULL,
@@ -208,7 +208,7 @@ begin
 		  `ordinal` int(11) NOT NULL,
 		  `description` text NOT NULL,
 		  `stepsJSON` JSON NOT NULL,
-		  CONSTRAINT `FK_comiccode` FOREIGN KEY (`comicId`) REFERENCES `comics` (`id`) ON DELETE CASCADE
+		  CONSTRAINT `FK_comiccode_comic` FOREIGN KEY (`comicId`) REFERENCES `comics` (`id`) ON DELETE CASCADE
 		) ENGINE=InnoDB;
 
 		CREATE TABLE `comics` (
@@ -222,14 +222,15 @@ begin
 		  `comicId` INT UNSIGNED NOT NULL,
 		  `statementId` INT UNSIGNED NOT NULL,
 		  PRIMARY KEY (`comicId`,`statementId`),
-		  CONSTRAINT `FK_comicsstmt1` FOREIGN KEY (`comicId`) REFERENCES `comics` (`id`) ON DELETE CASCADE,
-		  CONSTRAINT `FK_comicsstmt2` FOREIGN KEY (`statementId`) REFERENCES `statements` (`id`) ON DELETE CASCADE
+		  CONSTRAINT `FK_comics_stmt1` FOREIGN KEY (`comicId`) REFERENCES `comics` (`id`) ON DELETE CASCADE,
+		  CONSTRAINT `FK_comics_stmt2` FOREIGN KEY (`statementId`) REFERENCES `statements` (`id`) ON DELETE CASCADE
 		) ENGINE=InnoDB;
 
 		-- id and description are columns in the table and are in libraryJSON. They are kept in sync in ProjectBO.
 		CREATE TABLE `libraries` (
 		  `id` INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
 		  `name` varchar(255) NOT NULL,
+		  `description` TEXT,
 		  `createdByUserId` int(11) DEFAULT NULL,
 		  `isSystemLibrary` tinyint(1) NOT NULL DEFAULT '0',
           `isBaseLibrary` tinyint(1) NOT NULL DEFAULT '0',
@@ -237,14 +238,13 @@ begin
 		  `imageId` int(11) NOT NULL DEFAULT '0',
 		  `altImagePath` varchar(255) NOT NULL DEFAULT '',
 		  `libraryJSON` JSON NOT NULL,
-		  `description` TEXT,
 		  FULLTEXT idx (name, description)
 		) ENGINE=InnoDB;
 
 		CREATE TABLE `onlineclasses` (
 		  `id` INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
 		  `name` varchar(255) DEFAULT NULL,
-		  `baseProjectId` int UNSIGNED DEFAULT '0',
+		  `baseProjectId` INT UNSIGNED DEFAULT NULL,
 		  `instructorFirstName` varchar(255) DEFAULT NULL,
 		  `instructorLastName` varchar(255) DEFAULT NULL,
 		  `instructorEmail` varchar(255) DEFAULT NULL,
@@ -267,7 +267,7 @@ begin
 		CREATE TABLE `products` (
 		  `id` INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
 		  `name` varchar(255) NOT NULL,
-		  `baseProjectId` int UNSIGNED NOT NULL DEFAULT '0',
+		  `baseProjectId` INT UNSIGNED NOT NULL DEFAULT NULL,
 		  `level` varchar(255) NOT NULL,
 		  `difficulty` varchar(255) NOT NULL,
 		  `productDescription` text,
@@ -281,13 +281,13 @@ begin
 		CREATE TABLE `projects` (
 		  `id` INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
 		  `name` varchar(255) NOT NULL,
+		  `description` TEXT,
 		  `ownedByUserId` int(11) NOT NULL,
 		  `public` tinyint(1) NOT NULL DEFAULT '0',
 		  `quarantined` tinyint(1) NOT NULL DEFAULT '1',
-		  `description` TEXT,
 		  `imageId` int(11) NOT NULL DEFAULT '0',
 		  `altImagePath` varchar(255) NOT NULL DEFAULT '',
-		  `parentProjectId` int UNSIGNED DEFAULT NULL,
+		  `baseProjectId` INT UNSIGNED DEFAULT NULL,
 		  `parentPrice` decimal(9,2) NOT NULL DEFAULT '0.00',
 		  `priceBump` decimal(9,2) NOT NULL DEFAULT '0.00',
 		  `projectTypeId` int(11) NOT NULL,
@@ -306,8 +306,8 @@ begin
 
 		CREATE TABLE `projects_comics_libraries` (
 		  `projectId` INT UNSIGNED NOT NULL,
-		  `comicId` int UNSIGNED NOT NULL,
-		  `libraryId` int UNSIGNED NOT NULL,
+		  `comicId` INT UNSIGNED NOT NULL,
+		  `libraryId` INT UNSIGNED NOT NULL,
 		  PRIMARY KEY (`projectId`,`comicId`,`libraryId`),
 		  CONSTRAINT `FK_projects_comics_libraries1` FOREIGN KEY (`projectId`) REFERENCES `projects` (`id`) ON DELETE CASCADE,
 		  CONSTRAINT `FK_projects_comics_libraries2` FOREIGN KEY (`comicId`) REFERENCES `comics` (`id`) ON DELETE CASCADE,
@@ -321,20 +321,22 @@ begin
 
 		CREATE TABLE `refunds` (
 		  `id` INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
-		  `userId` int UNSIGNED NOT NULL,
-		  `projectId` int UNSIGNED NOT NULL,
+		  `userId` INT UNSIGNED NOT NULL,
+		  `projectId` INT UNSIGNED NOT NULL,
 		  `refundId` varchar(255) NOT NULL,
 		  `dtRefund` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
+		  CONSTRAINT `FK_refunds_user` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON DELETE CASCADE,
+		  CONSTRAINT `FK_refunds_project` FOREIGN KEY (`projectId`) REFERENCES `projects` (`id`) ON DELETE CASCADE
 		) ENGINE=InnoDB;
 
 		CREATE TABLE `resources` (
 		  `id` INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
 		  `name` varchar(255) NOT NULL DEFAULT '',
+		  `description` TEXT,
 		  `createdByUserId` int(11) NOT NULL,
 		  `resourceTypeId` int(11) NOT NULL,
 		  `public` tinyint(1) NOT NULL DEFAULT '0',
 		  `quarantined` tinyint(1) NOT NULL DEFAULT '0',
-		  `description` varchar(255) NOT NULL DEFAULT '',
 		  KEY `idx_createdByUserId` (`createdByUserId`),
 		  KEY `idx_resourceTypeId` (`resourceTypeId`)
 		) ENGINE=InnoDB;
@@ -361,8 +363,8 @@ begin
 		) ENGINE=InnoDB;
 
 		CREATE TABLE `ug_permissions` (
-		  `usergroupId` int UNSIGNED NOT NULL,
-		  `permissionId` int UNSIGNED NOT NULL,
+		  `usergroupId` INT UNSIGNED NOT NULL,
+		  `permissionId` INT UNSIGNED NOT NULL,
 		  PRIMARY KEY (`usergroupId`,`permissionId`),
 		  CONSTRAINT `FK_ug_permissions` FOREIGN KEY (`permissionId`) REFERENCES `permissions` (`id`) ON DELETE CASCADE
 		) ENGINE=InnoDB;
@@ -377,8 +379,9 @@ begin
 		  `zipcode` char(5) NOT NULL,
 		  `timezone` mediumtext NOT NULL,
 		  `lastProject` varchar(255) NOT NULL DEFAULT '',
-		  `lastProjectId` int UNSIGNED NULL,
+		  `lastProjectId` INT UNSIGNED NULL,
 		  CONSTRAINT `FK_user_projects` FOREIGN KEY (`lastProjectId`) REFERENCES `projects` (`id`) ON DELETE SET NULL,
+		  CONSTRAINT `FK_user_usergroup` FOREIGN KEY (`usergroupId`) REFERENCES `usergroups` (`id`) ON DELETE SET NULL,
 		  FULLTEXT idx (userName)
 		) ENGINE=InnoDB;
 
@@ -390,11 +393,13 @@ begin
 		CREATE TABLE `waitlist` (
 		  `id` INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
 		  `projectId` INT UNSIGNED NOT NULL,
-		  `userId` int UNSIGNED NOT NULL,
+		  `userId` INT UNSIGNED NOT NULL,
 		  `userName` varchar(45) DEFAULT NULL,
 		  `dtWaitlisted` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		  `dtInvited` datetime DEFAULT NULL,
 		  `fourHourWarningSent` tinyint(1) DEFAULT '0'
+		  CONSTRAINT `FK_waitlist_projects` FOREIGN KEY (`projectId`) REFERENCES `projects` (`id`) ON DELETE DELETE,
+		  CONSTRAINT `FK_waitlist_user` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON DELETE SET DELETE
 		) ENGINE=InnoDB;
 
     	-- Re-enable constraint enforcement.
@@ -480,8 +485,8 @@ begin
 
     	-- Add library_users table to record a library's "editors".
 		CREATE TABLE `library_users` (
-		  `libraryId` int UNSIGNED NOT NULL,
-		  `userId` int UNSIGNED NOT NULL,
+		  `libraryId` INT UNSIGNED NOT NULL,
+		  `userId` INT UNSIGNED NOT NULL,
 		  PRIMARY KEY (`libraryId`,`userId`),
 		  CONSTRAINT `FK_library_users` FOREIGN KEY (`libraryId`) REFERENCES `libraries` (`id`) ON DELETE CASCADE
 		) ENGINE=InnoDB;
