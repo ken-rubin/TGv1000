@@ -218,6 +218,22 @@ begin
 		  `thumbnail` varchar(255) NOT NULL
 		) ENGINE=InnoDB;
     
+		CREATE TABLE `comics_projects` (
+		  `comicId` INT UNSIGNED NOT NULL,
+		  `projectId` INT UNSIGNED NOT NULL,
+		  PRIMARY KEY (`comicId`,`projectId`),
+		  CONSTRAINT `FK_comics_proj1` FOREIGN KEY (`comicId`) REFERENCES `comics` (`id`) ON DELETE CASCADE,
+		  CONSTRAINT `FK_comics_proj2` FOREIGN KEY (`projectId`) REFERENCES `projects` (`id`) ON DELETE CASCADE
+		) ENGINE=InnoDB;
+
+		CREATE TABLE `comics_libraries` (
+		  `comicId` INT UNSIGNED NOT NULL,
+		  `libraryId` INT UNSIGNED NOT NULL,
+		  PRIMARY KEY (`comicId`,`libraryId`),
+		  CONSTRAINT `FK_comics_lib1` FOREIGN KEY (`comicId`) REFERENCES `comics` (`id`) ON DELETE CASCADE,
+		  CONSTRAINT `FK_comics_lib2` FOREIGN KEY (`libraryId`) REFERENCES `libraries` (`id`) ON DELETE CASCADE
+		) ENGINE=InnoDB;
+
 		CREATE TABLE `comics_statements` (
 		  `comicId` INT UNSIGNED NOT NULL,
 		  `statementId` INT UNSIGNED NOT NULL,
@@ -227,18 +243,31 @@ begin
 		) ENGINE=InnoDB;
 
 		-- id and description are columns in the table and are in libraryJSON. They are kept in sync in ProjectBO.
+		-- comicId is for user-controlled libraries, specifically tied to their own comics (or the default comic).
+		-- For special libraries, the comics_libraries table controls the linkage.
+		-- projectId is also used for these single-user libraries.
+		-- Special libraries are independent of projects.
 		CREATE TABLE `libraries` (
 		  `id` INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
 		  `name` varchar(255) NOT NULL,
 		  `description` TEXT,
+		  `comicId` INT UNSIGNED DEFAULT NULL,
+		  `projectId` INT UNSIGNED DEFAULT NULL,
 		  `createdByUserId` int(11) DEFAULT NULL,
-		  `isSystemLibrary` tinyint(1) NOT NULL DEFAULT '0',
-          `isBaseLibrary` tinyint(1) NOT NULL DEFAULT '0',
-          `isAppLibrary` tinyint(1) NOT NULL DEFAULT '0',
 		  `imageId` int(11) NOT NULL DEFAULT '0',
 		  `altImagePath` varchar(255) NOT NULL DEFAULT '',
 		  `libraryJSON` JSON NOT NULL,
+		  CONSTRAINT `FK_library_comics` FOREIGN KEY (`comicId`) REFERENCES `comics` (`id`) ON DELETE CASCADE,
+		  CONSTRAINT `FK_library_projects` FOREIGN KEY (`projectId`) REFERENCES `projects` (`id`) ON DELETE CASCADE,
 		  FULLTEXT idx (name, description)
+		) ENGINE=InnoDB;
+
+    	-- Add library_users table to record a library's "editors".
+		CREATE TABLE `library_users` (
+		  `libraryId` INT UNSIGNED NOT NULL,
+		  `userId` INT UNSIGNED NOT NULL,
+		  PRIMARY KEY (`libraryId`,`userId`),
+		  CONSTRAINT `FK_library_users` FOREIGN KEY (`libraryId`) REFERENCES `libraries` (`id`) ON DELETE CASCADE
 		) ENGINE=InnoDB;
 
 		CREATE TABLE `onlineclasses` (
@@ -304,6 +333,7 @@ begin
 		  FULLTEXT idx (name, description)
 		) ENGINE=InnoDB;
 
+/*
 		CREATE TABLE `projects_comics_libraries` (
 		  `projectId` INT UNSIGNED NOT NULL,
 		  `comicId` INT UNSIGNED NOT NULL,
@@ -313,7 +343,7 @@ begin
 		  CONSTRAINT `FK_projects_comics_libraries2` FOREIGN KEY (`comicId`) REFERENCES `comics` (`id`) ON DELETE CASCADE,
 		  CONSTRAINT `FK_projects_comics_libraries3` FOREIGN KEY (`libraryId`) REFERENCES `libraries` (`id`) ON DELETE CASCADE
 		) ENGINE=InnoDB;
-
+*/
 		CREATE TABLE `projecttypes` (
 		  `id` INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
 		  `description` varchar(100) NOT NULL
@@ -416,55 +446,101 @@ begin
     	set FOREIGN_KEY_CHECKS = 0;
 
     	ALTER TABLE `comics` DISABLE KEYS;
-		INSERT INTO `comics` VALUES (1,'TechGroms Game Project Help',0,'tn3.png'),(2,'TechGroms Console Project Help',0,'tn3.png'),(3,'TechGroms Website Project Help',0,'tn3.png'),(4,'TechGroms Hololens Project Help',0,'tn3.png'),(5,'TechGroms Map Project Help',0,'tn3.png');
+		INSERT INTO `comics` 
+			VALUES (1,'TechGroms Game Project Help',0,'tn3.png'),(2,'TechGroms Console Project Help',0,'tn3.png'),(3,'TechGroms Website Project Help',0,'tn3.png'),(4,'TechGroms Hololens Project Help',0,'tn3.png'),(5,'TechGroms Map Project Help',0,'tn3.png'),(6,'Complete TechGroms Help',0,'tn3.png');
     	ALTER TABLE `comics` ENABLE KEYS;
 
+		ALTER TABLE `comics_libraries` DISABLE KEYS;
+		INSERT INTO `comics_libraries` ();
+		ALTER TABLE `comics_libraries` ENABLE KEYS;
+
+		ALTER TABLE `comics_projects` DISABLE KEYS;
+		INSERT INTO `comics_projects` ();
+		ALTER TABLE `comics_projects` ENABLE KEYS;
+
 		ALTER TABLE `comics_statements` DISABLE KEYS;
-		INSERT INTO `comics_statements` VALUES (1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8),(1,9),(1,10),(1,11),(1,12),(1,13),(1,14),(2,1),(2,2),(2,3),(2,4),(2,5),(2,6),(2,7),(2,8),(2,9),(2,10),(2,11),(2,12),(2,13),(2,14),(3,1),(3,2),(3,3),(3,4),(3,5),(3,6),(3,7),(3,8),(3,9),(3,10),(3,11),(3,12),(3,13),(3,14),(4,1),(4,2),(4,3),(4,4),(4,5),(4,6),(4,7),(4,8),(4,9),(4,10),(4,11),(4,12),(4,13),(4,14),(5,1),(5,2),(5,3),(5,4),(5,5),(5,6),(5,7),(5,8),(5,9),(5,10),(5,11),(5,12),(5,13),(5,14);
+		INSERT INTO `comics_statements` 
+			VALUES (1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8),(1,9),(1,10),(1,11),(1,12),(1,13),(1,14),(2,1),(2,2),(2,3),(2,4),(2,5),(2,6),(2,7),(2,8),(2,9),(2,10),(2,11),(2,12),(2,13),(2,14),(3,1),(3,2),(3,3),(3,4),(3,5),(3,6),(3,7),(3,8),(3,9),(3,10),(3,11),(3,12),(3,13),(3,14),(4,1),(4,2),(4,3),(4,4),(4,5),(4,6),(4,7),(4,8),(4,9),(4,10),(4,11),(4,12),(4,13),(4,14),(5,1),(5,2),(5,3),(5,4),(5,5),(5,6),(5,7),(5,8),(5,9),(5,10),(5,11),(5,12),(5,13),(5,14),(6,1),(6,2),(6,3),(6,4),(6,5),(6,6),(6,7),(6,8),(6,9),(6,10),(6,11),(6,12),(6,13),(6,14);
 		ALTER TABLE `comics_statements` ENABLE KEYS;
 
 		ALTER TABLE `libraries` DISABLE KEYS;
-		INSERT INTO `libraries` VALUES (1,'GameAppLibrary',1,0,0,1,0,'','{"library": {"name": "GameAppLibrary", "id": 1, "types": [], "editors": "", "references": "", "description": ""}}',''),(2,'ConsoleAppLibrary',1,0,0,1,0,'','{"library": {"name": "ConsoleAppLibrary", "id": 2, "types": [], "editors": "", "references": "", "description": ""}}',''),(3,'WebsiteAppLibrary',1,0,0,1,0,'','{"library": {"name": "WebsiteAppLibrary", "id": 3, "types": [], "editors": "", "references": "", "description": ""}}',''),(4,'HololensAppLibrary',1,0,0,1,0,'','{"library": {"name": "HololensAppLibrary", "id": 4, "types": [], "editors": "", "references": "", "description": ""}}',''),(5,'MapAppLibrary',1,0,0,1,0,'','{"library": {"name": "MapAppLibrary", "id": 5, "types": [], "editors": "", "references": "", "description": ""}}',''),(6,'GameBaseLibrary',1,0,1,0,0,'','{"library": {"name": "GameBaseLibrary", "id": 6, "types": [], "editors": "", "references": "", "description": ""}}',''),(7,'ConsoleBaseLibrary',1,0,1,0,0,'','{"library": {"name": "ConsoleBaseLibrary", "id": 7, "types": [], "editors": "", "references": "", "description": ""}}',''),(8,'WebsiteBaseLibrary',1,0,1,0,0,'','{"library": {"name": "WebsiteBaseLibrary", "id": 8, "types": [], "editors": "", "references": "", "description": ""}}',''),(9,'HololensBaseLibrary',1,0,1,0,0,'','{"library": {"name": "HololensBaseLibrary", "id": 9, "types": [], "editors": "", "references": "", "description": ""}}',''),(10,'MapBaseLibrary',1,0,1,0,0,'','{"library": {"name": "MapBaseLibrary", "id": 10, "types": [], "editors": "", "references": "", "description": ""}}',''),(11,'KernelTypesLibrary',1,1,0,0,0,'','{"library": {"name": "KernelTypesLibrary", "id": 11, "types": [], "editors": "", "references": "", "description": ""}}',''),(12,'VisualObjectLibrary',1,1,0,0,0,'','{"library": {"name": "VisualObjectLibrary", "id": 12, "types": [], "editors": "", "references": "", "description": ""}}','');
+		INSERT INTO `libraries` (`id`,`name`,`description`,`comicId`,`projectId`,`createdByUserId`,`imageId`,`altImagePath`,`libraryJSON`)
+			VALUES  (1,'GameAppLibrary',1,0,0,1,0,'','{"library": {"name": "GameAppLibrary", "id": 1, "types": [], "editors": "", "references": "", "description": ""}}',''),
+					(2,'ConsoleAppLibrary',1,0,0,1,0,'','{"library": {"name": "ConsoleAppLibrary", "id": 2, "types": [], "editors": "", "references": "", "description": ""}}',''),
+					(3,'WebsiteAppLibrary',1,0,0,1,0,'','{"library": {"name": "WebsiteAppLibrary", "id": 3, "types": [], "editors": "", "references": "", "description": ""}}',''),
+					(4,'HololensAppLibrary',1,0,0,1,0,'','{"library": {"name": "HololensAppLibrary", "id": 4, "types": [], "editors": "", "references": "", "description": ""}}',''),
+					(5,'MapAppLibrary',1,0,0,1,0,'','{"library": {"name": "MapAppLibrary", "id": 5, "types": [], "editors": "", "references": "", "description": ""}}',''),
+					(6,'GameBaseLibrary',1,0,1,0,0,'','{"library": {"name": "GameBaseLibrary", "id": 6, "types": [], "editors": "", "references": "", "description": ""}}',''),
+					(7,'ConsoleBaseLibrary',1,0,1,0,0,'','{"library": {"name": "ConsoleBaseLibrary", "id": 7, "types": [], "editors": "", "references": "", "description": ""}}',''),
+					(8,'WebsiteBaseLibrary',1,0,1,0,0,'','{"library": {"name": "WebsiteBaseLibrary", "id": 8, "types": [], "editors": "", "references": "", "description": ""}}',''),
+					(9,'HololensBaseLibrary',1,0,1,0,0,'','{"library": {"name": "HololensBaseLibrary", "id": 9, "types": [], "editors": "", "references": "", "description": ""}}',''),
+					(10,'MapBaseLibrary',1,0,1,0,0,'','{"library": {"name": "MapBaseLibrary", "id": 10, "types": [], "editors": "", "references": "", "description": ""}}',''),
+					(11,'KernelTypesLibrary',1,1,0,0,0,'','{"library": {"name": "KernelTypesLibrary", "id": 11, "types": [], "editors": "", "references": "", "description": ""}}',''),
+					(12,'VisualObjectLibrary',1,1,0,0,0,'','{"library": {"name": "VisualObjectLibrary", "id": 12, "types": [], "editors": "", "references": "", "description": ""}}',''),
+					(13,'App_Library',1,0,0,1,0,'','{"library": {"id": 13, "name": "EmptyLibrary", "types": [{"name": "App", "baseTypeName": "", "description": "This type\'s construct method will run first.", "methods": [{"name": "construct", "parameters": [], "statements": [], "comment": "All app initialization should be in this method.", "arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": [{"type": "CodeLiteral", "parameters": [{"type": "String", "value": "..." }, {"type": "Boolean", "value": false}, {"type": "Boolean", "value": false}]}]}]}}],"properties": [],"events": [],"isSystemType": 0,"public": 0}],"editors": "","references": "KernelTypesLibrary","description": "This library is the place to put all your initialization code. We\'ve started you off with an App type containing a construct method. You take it from here."}}','');
 		ALTER TABLE `libraries` ENABLE KEYS;
 
+		ALTER TABLE `library_users` DISABLE KEYS;
+		INSERT INTO `library_users` 
+			VALUES (1,1),(2,1),(3,1),(4,1),(5,1),(6,1);
+		ALTER TABLE `library_users` ENABLE KEYS;
+
 		ALTER TABLE `permissions` DISABLE KEYS;
-		INSERT INTO `permissions` VALUES (1,'can_edit_core_comics'),(2,'can_edit_base_and_system_libraries_and_types_therein'),(3,'can_make_public'),(4,'can_visit_adminzone'),(5,'can_open_free_projects'),(6,'can_buy_projects'),(7,'can_create_classes'),(8,'can_create_products'),(9,'can_create_onlineClasses'),(10,'can_edit_permissions'),(11,'can_unquarantine'),(12,'can_activate_PPs'),(13,'can_manage_site'),(14,'can_register_for_sites');
+		INSERT INTO `permissions` 
+			VALUES (1,'can_edit_core_comics'),(2,'can_edit_base_and_system_libraries_and_types_therein'),(3,'can_make_public'),(4,'can_visit_adminzone'),(5,'can_open_free_projects'),(6,'can_buy_projects'),(7,'can_create_classes'),(8,'can_create_products'),(9,'can_create_onlineClasses'),(10,'can_edit_permissions'),(11,'can_unquarantine'),(12,'can_activate_PPs'),(13,'can_manage_site'),(14,'can_register_for_sites');
 		ALTER TABLE `permissions` ENABLE KEYS;
 
 		ALTER TABLE `projects` DISABLE KEYS;
-		INSERT INTO `projects` VALUES (1,'New Game Project',1,1,1,'This is the core project from which all games are derived.',0,'media/images/gameProject.png',NULL,0.00,0.00,1,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0),(2,'New Console Project',1,1,1,'This is the core project from which all console-based apps are derived.',0,'media/images/consoleProject.png',NULL,0.00,0.00,2,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0),(3,'New Website Project',1,1,1,'This is the core project from which all web sites are derived.',0,'media/images/websiteProject.png',NULL,0.00,0.00,3,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0),(4,'New Hololens Project',1,1,1,'This is the core project from which all Microsoft HoloLens projects are derived.',0,'media/images/hololensProject.png',NULL,0.00,0.00,4,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0),(5,'New Map Project',1,1,1,'This is the core project from which all mapping projects are derived.',0,'media/images/mappingProject.png',NULL,0.00,0.00,5,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0);
+		INSERT INTO `projects` (`id`,`name`,`description`,`ownedByUserId`,`public`,`quarantined`,`imageId`,`altImagePath`,`baseProjectId`,`parentPrice`,`priceBump`,`projectTypeId`,`isCoreProject`,`isProduct`,`isClass`,`isOnlineClass`,
+								`firstSaved`,`lastSaved`,`chargeId`,`currentComicIndex`,`currentComicStepIndex`)
+			VALUES 	(1,'New Game Project',1,1,1,'This is the core project from which all games are derived.',0,'media/images/gameProject.png',NULL,0.00,0.00,1,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0),
+					(2,'New Console Project',1,1,1,'This is the core project from which all console-based apps are derived.',0,'media/images/consoleProject.png',NULL,0.00,0.00,2,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0),
+					(3,'New Website Project',1,1,1,'This is the core project from which all web sites are derived.',0,'media/images/websiteProject.png',NULL,0.00,0.00,3,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0),
+					(4,'New Hololens Project',1,1,1,'This is the core project from which all Microsoft HoloLens projects are derived.',0,'media/images/hololensProject.png',NULL,0.00,0.00,4,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0),
+					(5,'New Map Project',1,1,1,'This is the core project from which all mapping projects are derived.',0,'media/images/mappingProject.png',NULL,0.00,0.00,5,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0),
+					(6,'New Empty Project',1,1,1,'This is the core project from which you should derive a project where you want full control over libraries and types. It is empty until you fill it.',0,'media/images/emptyProject.png',NULL,0.00,0.00,1,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0);
 		ALTER TABLE `projects` ENABLE KEYS;
 
+/*
 		ALTER TABLE `projects_comics_libraries` DISABLE KEYS;
-		INSERT INTO `projects_comics_libraries` VALUES (1,1,1),(1,1,6),(1,1,11),(1,1,12),(2,2,2),(2,2,7),(2,2,11),(2,2,12),(3,3,3),(3,3,8),(3,3,11),(3,3,12),(4,4,4),(4,4,9),(4,4,11),(4,4,12),(5,5,5),(5,5,10),(5,5,11),(5,5,12);
+		INSERT INTO `projects_comics_libraries` 
+			VALUES (1,1,1),(1,1,6),(1,1,11),(1,1,12),(2,2,2),(2,2,7),(2,2,11),(2,2,12),(3,3,3),(3,3,8),(3,3,11),(3,3,12),(4,4,4),(4,4,9),(4,4,11),(4,4,12),(5,5,5),(5,5,10),(5,5,11),(5,5,12),(6,6,13),(6,6,11),(6,6,12);
 		ALTER TABLE `projects_comics_libraries` ENABLE KEYS;
+*/
 
 		ALTER TABLE `projecttypes` DISABLE KEYS;
-		INSERT INTO `projecttypes` VALUES (1,'game'),(2,'console'),(3,'website'),(4,'hololens'),(5,'map');
+		INSERT INTO `projecttypes` 
+			VALUES (1,'game'),(2,'console'),(3,'website'),(4,'hololens'),(5,'map'),(6,'empty');
 		ALTER TABLE `projecttypes` ENABLE KEYS;
 
 		ALTER TABLE `resourcetypes` DISABLE KEYS;
-		INSERT INTO `resourcetypes` VALUES (1,'image'),(2,'sound');
+		INSERT INTO `resourcetypes` 
+			VALUES (1,'image'),(2,'sound');
 		ALTER TABLE `resourcetypes` ENABLE KEYS;
 
 		ALTER TABLE `routes` DISABLE KEYS;
-		INSERT INTO `routes` VALUES (1,'./modules/BOL/','ValidateBO','/BOL/ValidateBO/UserAuthenticate','post','routeUserAuthenticate',0,NULL),(2,'./modules/BOL/','ValidateBO','/BOL/ValidateBO/NewEnrollment','post','routeNewEnrollment',0,NULL),(3,'./modules/BOL/','ResourceBO','/BOL/ResourceBO/SaveResource','post','routeSaveResource',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),(4,'./modules/BOL/','ResourceBO','/BOL/ResourceBO/SaveURLResource','post','routeSaveURLResource',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),(5,'./modules/BOL/','UtilityBO','/BOL/UtilityBO/SearchResources','post','routeSearchResources',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),(6,'./modules/BOL/','UtilityBO','/BOL/UtilityBO/SearchProjects','post','routeSearchProjects',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),(7,'./modules/BOL/','UtilityBO','/BOL/UtilityBO/SearchTypes','post','routeSearchTypes',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),(8,'./modules/BOL/','UtilityBO','/BOL/UtilityBO/SearchMethods','post','routeSearchMethods',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),(9,'./modules/BOL/','ProjectBO','/BOL/ProjectBO/SaveProject','post','routeSaveProject',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),(10,'./modules/BOL/','ProjectBO','/BOL/ProjectBO/RetrieveProject','post','routeRetrieveProject',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),(11,'./modules/BOL/','ProjectBO','/BOL/ProjectBO/RetrieveType','post','routeRetrieveType',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),(12,'./modules/BOL/','ProjectBO','/BOL/ProjectBO/RetrieveMethod','post','routeRetrieveMethod',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),(13,'./modules/BOL/','ValidateBO','/BOL/ValidateBO/SendPasswordResetEmail','post','routeSendPasswordResetEmail',0,NULL),(14,'./modules/BOL/','ValidateBO','/BOL/ValidateBO/ResetPassword','post','routePasswordReset',0,NULL),(15,'./modules/BOL/','UtilityBO','/BOL/UtilityBO/ProcessCharge','post','routeProcessCharge',1,'We encountered a session validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),(16,'./modules/BOL/','UtilityBO','/BOL/UtilityBO/GetStripePK','post','routeGetStripePK',1,'We encountered a session validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),(17,'./modules/BOL/','UtilityBO','/BOL/UtilityBO/PutUserOnWaitlist','post','routePutUserOnWaitlist',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),(18,'./modules/BOL/','ProjectBO','/BOL/ProjectBO/RetrievePurchasableProjectData','post','routeRetrievePurchasableProjectData',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),(19,'./modules/BOL/','ProjectBO','/BOL/ProjectBO/SavePPData','post','routeSavePPData',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),(20,'./modules/BOL/','UtilityBO','/BOL/UtilityBO/GetAllUserMaintData','post','routeGetAllUserMaintData',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),(21,'./modules/BOL/','UtilityBO','/BOL/UtilityBO/AddPermission','post','routeAddPermission',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),(22,'./modules/BOL/','UtilityBO','/BOL/UtilityBO/AddUsergroup','post','routeAddUsergroup',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),(23,'./modules/BOL/','UtilityBO','/BOL/UtilityBO/UpdateUserUsergroup','post','routeUpdateUserUsergroup',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),(24,'./modules/BOL/','UtilityBO','/BOL/UtilityBO/UpdateUgPermissions','post','routeUpdateUgPermissions',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),(25,'./modules/BOL/','UtilityBO','/BOL/UtilityBO/GetPPBuyers','post','routeGetPPBuyers',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),(26,'./modules/BOL/','UtilityBO','/BOL/UtilityBO/UndoPurchase','post','routeUndoPurchase',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),(27,'./modules/BOL/','UtilityBO','/BOL/UtilityBO/SendClassInvite','post','routeSendClassInvite',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),(30,'./modules/BOL/','ProjectBO','/BOL/ProjectBO/FetchNormalUserNewProjectTypes','post','routeFetchNormalUserNewProjectTypes',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.');
+		INSERT INTO `routes` (`path`,`moduleName`,`route`,`verb`,`method`,`requiresJWT`,`JWTerrorMsg`)
+			VALUES ('./modules/BOL/','ValidateBO','/BOL/ValidateBO/UserAuthenticate','post','routeUserAuthenticate',0,NULL),('./modules/BOL/','ValidateBO','/BOL/ValidateBO/NewEnrollment','post','routeNewEnrollment',0,NULL),('./modules/BOL/','ResourceBO','/BOL/ResourceBO/SaveResource','post','routeSaveResource',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),('./modules/BOL/','ResourceBO','/BOL/ResourceBO/SaveURLResource','post','routeSaveURLResource',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),('./modules/BOL/','UtilityBO','/BOL/UtilityBO/SearchResources','post','routeSearchResources',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),('./modules/BOL/','UtilityBO','/BOL/UtilityBO/SearchProjects','post','routeSearchProjects',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),('./modules/BOL/','ProjectBO','/BOL/ProjectBO/SaveProject','post','routeSaveProject',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),('./modules/BOL/','ProjectBO','/BOL/ProjectBO/RetrieveProject','post','routeRetrieveProject',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),('./modules/BOL/','ValidateBO','/BOL/ValidateBO/SendPasswordResetEmail','post','routeSendPasswordResetEmail',0,NULL),('./modules/BOL/','ValidateBO','/BOL/ValidateBO/ResetPassword','post','routePasswordReset',0,NULL),('./modules/BOL/','UtilityBO','/BOL/UtilityBO/ProcessCharge','post','routeProcessCharge',1,'We encountered a session validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),('./modules/BOL/','UtilityBO','/BOL/UtilityBO/GetStripePK','post','routeGetStripePK',1,'We encountered a session validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),('./modules/BOL/','UtilityBO','/BOL/UtilityBO/PutUserOnWaitlist','post','routePutUserOnWaitlist',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),('./modules/BOL/','ProjectBO','/BOL/ProjectBO/RetrievePurchasableProjectData','post','routeRetrievePurchasableProjectData',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),('./modules/BOL/','ProjectBO','/BOL/ProjectBO/SavePPData','post','routeSavePPData',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),('./modules/BOL/','UtilityBO','/BOL/UtilityBO/GetAllUserMaintData','post','routeGetAllUserMaintData',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),('./modules/BOL/','UtilityBO','/BOL/UtilityBO/AddPermission','post','routeAddPermission',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),('./modules/BOL/','UtilityBO','/BOL/UtilityBO/AddUsergroup','post','routeAddUsergroup',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),('./modules/BOL/','UtilityBO','/BOL/UtilityBO/UpdateUserUsergroup','post','routeUpdateUserUsergroup',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),('./modules/BOL/','UtilityBO','/BOL/UtilityBO/UpdateUgPermissions','post','routeUpdateUgPermissions',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),('./modules/BOL/','UtilityBO','/BOL/UtilityBO/GetPPBuyers','post','routeGetPPBuyers',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),('./modules/BOL/','UtilityBO','/BOL/UtilityBO/UndoPurchase','post','routeUndoPurchase',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),('./modules/BOL/','UtilityBO','/BOL/UtilityBO/SendClassInvite','post','routeSendClassInvite',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.'),('./modules/BOL/','ProjectBO','/BOL/ProjectBO/FetchNormalUserNewProjectTypes','post','routeFetchNormalUserNewProjectTypes',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.');
 		ALTER TABLE `routes` ENABLE KEYS;
 
 		ALTER TABLE `statements` DISABLE KEYS;
-		INSERT INTO `statements` VALUES (1,'StatementBreak'),(2,'StatementContinue'),(3,'StatementExpression'),(4,'StatementFor'),(5,'StatementForIn'),(6,'StatementIf'),(7,'StatementReturn'),(8,'StatementThrow'),(9,'StatementTry'),(10,'StatementVar'),(11,'StatementWhile'),(12,'StatementComment'),(13,'StatementDebugger'),(14,'StatementFreeform');
+		INSERT INTO `statements` 
+			VALUES (1,'StatementBreak'),(2,'StatementContinue'),(3,'StatementExpression'),(4,'StatementFor'),(5,'StatementForIn'),(6,'StatementIf'),(7,'StatementReturn'),(8,'StatementThrow'),(9,'StatementTry'),(10,'StatementVar'),(11,'StatementWhile'),(12,'StatementComment'),(13,'StatementDebugger'),(14,'StatementFreeform');
 		ALTER TABLE `statements` ENABLE KEYS;
 
 		ALTER TABLE `ug_permissions` DISABLE KEYS;
-		INSERT INTO `ug_permissions` VALUES (1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8),(1,9),(1,10),(1,11),(1,12),(2,3),(2,4),(2,5),(2,6),(2,7),(3,5),(3,6),(4,5),(5,13),(6,5),(6,6),(6,14);
+		INSERT INTO `ug_permissions` 
+			VALUES (1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8),(1,9),(1,10),(1,11),(1,12),(2,3),(2,4),(2,5),(2,6),(2,7),(3,5),(3,6),(4,5),(5,13),(6,5),(6,6),(6,14);
 		ALTER TABLE `ug_permissions` ENABLE KEYS;
 
 		ALTER TABLE `user` DISABLE KEYS;
-		INSERT INTO `user` VALUES (1,'templates@techgroms.com','System','User','$2a$10$XULC/AcP/94VUb0EdiTG4eIiLI/zaW4n/qcovbRb2/SDTLmoG2BDe',1,'10601','America/New_York','',NULL);
+		INSERT INTO `user` VALUES 
+			(1,'templates@techgroms.com','System','User','$2a$10$XULC/AcP/94VUb0EdiTG4eIiLI/zaW4n/qcovbRb2/SDTLmoG2BDe',1,'10601','America/New_York','',NULL);
 		ALTER TABLE `user` ENABLE KEYS;
 
 		ALTER TABLE `usergroups` DISABLE KEYS;
-		INSERT INTO `usergroups` VALUES (1,'developer'),(2,'instructor'),(3,'registered_user'),(4,'unregistered_user'),(5,'site_teacher'),(6,'site_student');
+		INSERT INTO `usergroups` 
+			VALUES (1,'developer'),(2,'instructor'),(3,'registered_user'),(4,'unregistered_user'),(5,'site_teacher'),(6,'site_student');
 		ALTER TABLE `usergroups` ENABLE KEYS;
 
     	set FOREIGN_KEY_CHECKS = 1;
@@ -473,34 +549,17 @@ begin
 
     end if;
     
-    if @dbstate = 2 THEN
+    if @dbstate = 222 THEN
 
-    	-- Create an "empty" core project.
-		INSERT INTO `comics` VALUES (6,'Complete TechGroms Help',0,'tn3.png');
-		INSERT INTO `comics_statements` VALUES (6,1),(6,2),(6,3),(6,4),(6,5),(6,6),(6,7),(6,8),(6,9),(6,10),(6,11),(6,12),(6,13),(6,14);
-		INSERT INTO `libraries` VALUES (13,'App_Library',1,0,0,1,0,'','{"library": {"id": 13, "name": "EmptyLibrary", "types": [{"name": "App", "baseTypeName": "", "description": "This type\'s construct method will run first.", "methods": [{"name": "construct", "parameters": [], "statements": [], "comment": "All app initialization should be in this method.", "arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": [{"type": "CodeLiteral", "parameters": [{"type": "String", "value": "..." }, {"type": "Boolean", "value": false}, {"type": "Boolean", "value": false}]}]}]}}],"properties": [],"events": [],"isSystemType": 0,"public": 0}],"editors": "","references": "KernelTypesLibrary","description": "This library is the place to put all your initialization code. We\'ve started you off with an App type containing a construct method. You take it from here."}}','');
-		INSERT INTO `projects` VALUES (6,'New Empty Project',1,1,1,'This is the core project from which you should derive a project where you want full control over libraries and types. It is empty until you fill it.',0,'media/images/emptyProject.png',NULL,0.00,0.00,1,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0);
-		INSERT INTO `projects_comics_libraries` VALUES (6,6,13),(6,6,11),(6,6,12);
-		INSERT INTO `projecttypes` VALUES (6,'empty');
 
-    	-- Add library_users table to record a library's "editors".
-		CREATE TABLE `library_users` (
-		  `libraryId` INT UNSIGNED NOT NULL,
-		  `userId` INT UNSIGNED NOT NULL,
-		  PRIMARY KEY (`libraryId`,`userId`),
-		  CONSTRAINT `FK_library_users` FOREIGN KEY (`libraryId`) REFERENCES `libraries` (`id`) ON DELETE CASCADE
-		) ENGINE=InnoDB;
-
-		INSERT INTO `library_users` VALUES (1,1),(2,1),(3,1),(4,1),(5,1),(6,1);
 
 		set @dbstate := @dbstate + 1;	-- @dbstate = 3
 		UPDATE control set dbstate=@dbstate where id=1;
 
     end if;
     
-    if @dbstate = 3 THEN
+    if @dbstate = 333 THEN
 
-		delete from `routes` where method in ('routeSearchTypes', 'routeSearchMethods', 'routeRetrieveType', 'routeRetrieveMethod');
     
 		set @dbstate := @dbstate + 1;	-- @dbstate = 4
 		UPDATE control set dbstate=@dbstate where id=1;
