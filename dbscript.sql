@@ -179,7 +179,7 @@ begin
 		CREATE TABLE `classes` (
 		  `id` INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
 		  `name` varchar(255) DEFAULT NULL,
-		  `baseProjectId` INT UNSIGNED DEFAULT NULL,
+		  `baseProjectId` INT UNSIGNED NOT NULL,
 		  `instructorFirstName` varchar(255) DEFAULT NULL,
 		  `instructorLastName` varchar(255) DEFAULT NULL,
 		  `instructorPhone` varchar(255) DEFAULT NULL,
@@ -253,7 +253,7 @@ begin
 		  `description` TEXT,
 		  `comicId` INT UNSIGNED DEFAULT NULL,
 		  `projectId` INT UNSIGNED DEFAULT NULL,
-		  `createdByUserId` int(11) DEFAULT NULL,
+		  `createdByUserId` INT UNSIGNED NOT NULL,
 		  `imageId` int(11) NOT NULL DEFAULT '0',
 		  `altImagePath` varchar(255) NOT NULL DEFAULT '',
 		  `libraryJSON` JSON NOT NULL,
@@ -273,7 +273,7 @@ begin
 		CREATE TABLE `onlineclasses` (
 		  `id` INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
 		  `name` varchar(255) DEFAULT NULL,
-		  `baseProjectId` INT UNSIGNED DEFAULT NULL,
+		  `baseProjectId` INT UNSIGNED NOT NULL,
 		  `instructorFirstName` varchar(255) DEFAULT NULL,
 		  `instructorLastName` varchar(255) DEFAULT NULL,
 		  `instructorEmail` varchar(255) DEFAULT NULL,
@@ -296,7 +296,7 @@ begin
 		CREATE TABLE `products` (
 		  `id` INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
 		  `name` varchar(255) NOT NULL,
-		  `baseProjectId` INT UNSIGNED NOT NULL DEFAULT NULL,
+		  `baseProjectId` INT UNSIGNED NOT NULL,
 		  `level` varchar(255) NOT NULL,
 		  `difficulty` varchar(255) NOT NULL,
 		  `productDescription` text,
@@ -329,7 +329,7 @@ begin
 		  `chargeId` varchar(255) DEFAULT '',
 		  `currentComicIndex` int(11) NOT NULL DEFAULT '0',
 		  `currentComicStepIndex` int(11) NOT NULL DEFAULT '0',
-		  CONSTRAINT `FK_project_projects` FOREIGN KEY (`parentProjectId`) REFERENCES `projects` (`id`) ON DELETE CASCADE,
+		  CONSTRAINT `FK_project_projects` FOREIGN KEY (`baseProjectId`) REFERENCES `projects` (`id`) ON DELETE CASCADE,
 		  FULLTEXT idx (name, description)
 		) ENGINE=InnoDB;
 
@@ -354,7 +354,7 @@ begin
 		  `userId` INT UNSIGNED NOT NULL,
 		  `projectId` INT UNSIGNED NOT NULL,
 		  `refundId` varchar(255) NOT NULL,
-		  `dtRefund` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
+		  `dtRefund` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		  CONSTRAINT `FK_refunds_user` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON DELETE CASCADE,
 		  CONSTRAINT `FK_refunds_project` FOREIGN KEY (`projectId`) REFERENCES `projects` (`id`) ON DELETE CASCADE
 		) ENGINE=InnoDB;
@@ -405,13 +405,13 @@ begin
 		  `firstName` varchar(45) NOT NULL,
 		  `lastName` varchar(45) NOT NULL,
 		  `pwHash` varchar(16000) NOT NULL,
-		  `usergroupId` int(11) NOT NULL,
+		  `usergroupId` INT UNSIGNED NOT NULL,
 		  `zipcode` char(5) NOT NULL,
 		  `timezone` mediumtext NOT NULL,
 		  `lastProject` varchar(255) NOT NULL DEFAULT '',
-		  `lastProjectId` INT UNSIGNED NULL,
+		  `lastProjectId` INT UNSIGNED,
 		  CONSTRAINT `FK_user_projects` FOREIGN KEY (`lastProjectId`) REFERENCES `projects` (`id`) ON DELETE SET NULL,
-		  CONSTRAINT `FK_user_usergroup` FOREIGN KEY (`usergroupId`) REFERENCES `usergroups` (`id`) ON DELETE SET NULL,
+		  -- CONSTRAINT `FK_user_usergroup` FOREIGN KEY (`usergroupId`) REFERENCES `usergroups` (`id`) ON DELETE SET NULL, can never delete a usergroup without removing all users
 		  FULLTEXT idx (userName)
 		) ENGINE=InnoDB;
 
@@ -427,9 +427,9 @@ begin
 		  `userName` varchar(45) DEFAULT NULL,
 		  `dtWaitlisted` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		  `dtInvited` datetime DEFAULT NULL,
-		  `fourHourWarningSent` tinyint(1) DEFAULT '0'
-		  CONSTRAINT `FK_waitlist_projects` FOREIGN KEY (`projectId`) REFERENCES `projects` (`id`) ON DELETE DELETE,
-		  CONSTRAINT `FK_waitlist_user` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON DELETE SET DELETE
+		  `fourHourWarningSent` tinyint(1) DEFAULT '0',
+		  CONSTRAINT `FK_waitlist_projects` FOREIGN KEY (`projectId`) REFERENCES `projects` (`id`) ON DELETE CASCADE,
+		  CONSTRAINT `FK_waitlist_user` FOREIGN KEY (`userId`) REFERENCES `user` (`id`) ON DELETE CASCADE
 		) ENGINE=InnoDB;
 
     	-- Re-enable constraint enforcement.
@@ -447,15 +447,20 @@ begin
 
     	ALTER TABLE `comics` DISABLE KEYS;
 		INSERT INTO `comics` 
-			VALUES (1,'TechGroms Game Project Help',0,'tn3.png'),(2,'TechGroms Console Project Help',0,'tn3.png'),(3,'TechGroms Website Project Help',0,'tn3.png'),(4,'TechGroms Hololens Project Help',0,'tn3.png'),(5,'TechGroms Map Project Help',0,'tn3.png'),(6,'Complete TechGroms Help',0,'tn3.png');
+			VALUES 	(1,'TechGroms Game Project Help',0,'tn3.png'),
+					(2,'TechGroms Console Project Help',0,'tn3.png'),
+					(3,'TechGroms Website Project Help',0,'tn3.png'),
+					(4,'TechGroms Hololens Project Help',0,'tn3.png'),
+					(5,'TechGroms Map Project Help',0,'tn3.png'),
+					(6,'Complete TechGroms Help',0,'tn3.png');
     	ALTER TABLE `comics` ENABLE KEYS;
 
 		ALTER TABLE `comics_libraries` DISABLE KEYS;
-		INSERT INTO `comics_libraries` ();
+		-- INSERT INTO `comics_libraries` ();
 		ALTER TABLE `comics_libraries` ENABLE KEYS;
 
 		ALTER TABLE `comics_projects` DISABLE KEYS;
-		INSERT INTO `comics_projects` ();
+		-- INSERT INTO `comics_projects` ();
 		ALTER TABLE `comics_projects` ENABLE KEYS;
 
 		ALTER TABLE `comics_statements` DISABLE KEYS;
@@ -464,20 +469,20 @@ begin
 		ALTER TABLE `comics_statements` ENABLE KEYS;
 
 		ALTER TABLE `libraries` DISABLE KEYS;
-		INSERT INTO `libraries` (`id`,`name`,`description`,`comicId`,`projectId`,`createdByUserId`,`imageId`,`altImagePath`,`libraryJSON`)
-			VALUES  (1,'GameAppLibrary',1,0,0,1,0,'','{"library": {"name": "GameAppLibrary", "id": 1, "types": [], "editors": "", "references": "", "description": ""}}',''),
-					(2,'ConsoleAppLibrary',1,0,0,1,0,'','{"library": {"name": "ConsoleAppLibrary", "id": 2, "types": [], "editors": "", "references": "", "description": ""}}',''),
-					(3,'WebsiteAppLibrary',1,0,0,1,0,'','{"library": {"name": "WebsiteAppLibrary", "id": 3, "types": [], "editors": "", "references": "", "description": ""}}',''),
-					(4,'HololensAppLibrary',1,0,0,1,0,'','{"library": {"name": "HololensAppLibrary", "id": 4, "types": [], "editors": "", "references": "", "description": ""}}',''),
-					(5,'MapAppLibrary',1,0,0,1,0,'','{"library": {"name": "MapAppLibrary", "id": 5, "types": [], "editors": "", "references": "", "description": ""}}',''),
-					(6,'GameBaseLibrary',1,0,1,0,0,'','{"library": {"name": "GameBaseLibrary", "id": 6, "types": [], "editors": "", "references": "", "description": ""}}',''),
-					(7,'ConsoleBaseLibrary',1,0,1,0,0,'','{"library": {"name": "ConsoleBaseLibrary", "id": 7, "types": [], "editors": "", "references": "", "description": ""}}',''),
-					(8,'WebsiteBaseLibrary',1,0,1,0,0,'','{"library": {"name": "WebsiteBaseLibrary", "id": 8, "types": [], "editors": "", "references": "", "description": ""}}',''),
-					(9,'HololensBaseLibrary',1,0,1,0,0,'','{"library": {"name": "HololensBaseLibrary", "id": 9, "types": [], "editors": "", "references": "", "description": ""}}',''),
-					(10,'MapBaseLibrary',1,0,1,0,0,'','{"library": {"name": "MapBaseLibrary", "id": 10, "types": [], "editors": "", "references": "", "description": ""}}',''),
-					(11,'KernelTypesLibrary',1,1,0,0,0,'','{"library": {"name": "KernelTypesLibrary", "id": 11, "types": [], "editors": "", "references": "", "description": ""}}',''),
-					(12,'VisualObjectLibrary',1,1,0,0,0,'','{"library": {"name": "VisualObjectLibrary", "id": 12, "types": [], "editors": "", "references": "", "description": ""}}',''),
-					(13,'App_Library',1,0,0,1,0,'','{"library": {"id": 13, "name": "EmptyLibrary", "types": [{"name": "App", "baseTypeName": "", "description": "This type\'s construct method will run first.", "methods": [{"name": "construct", "parameters": [], "statements": [], "comment": "All app initialization should be in this method.", "arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": [{"type": "CodeLiteral", "parameters": [{"type": "String", "value": "..." }, {"type": "Boolean", "value": false}, {"type": "Boolean", "value": false}]}]}]}}],"properties": [],"events": [],"isSystemType": 0,"public": 0}],"editors": "","references": "KernelTypesLibrary","description": "This library is the place to put all your initialization code. We\'ve started you off with an App type containing a construct method. You take it from here."}}','');
+		INSERT INTO `libraries` (`id`,`name`,`description`,`comicId`,`projectId`,`createdByUserId`,`libraryJSON`)
+			VALUES  (1,'GameAppLibrary','This library contains the types and methods needed to build ',NULL,NULL,1,'{"library": {"name": "GameAppLibrary", "id": 1, "types": [], "editors": "", "references": "", "description": ""}}'),
+					(2,'ConsoleAppLibrary','This library contains the types and methods needed to build ',NULL,NULL,1,'{"library": {"name": "ConsoleAppLibrary", "id": 2, "types": [], "editors": "", "references": "", "description": ""}}'),
+					(3,'WebsiteAppLibrary','This library contains the types and methods needed to build ',NULL,NULL,1,'{"library": {"name": "WebsiteAppLibrary", "id": 3, "types": [], "editors": "", "references": "", "description": ""}}'),
+					(4,'HololensAppLibrary','This library contains the types and methods needed to build ',NULL,NULL,1,'{"library": {"name": "HololensAppLibrary", "id": 4, "types": [], "editors": "", "references": "", "description": ""}}'),
+					(5,'MapAppLibrary','This library contains the types and methods needed to build ',NULL,NULL,1,'{"library": {"name": "MapAppLibrary", "id": 5, "types": [], "editors": "", "references": "", "description": ""}}'),
+					(6,'GameBaseLibrary','This library contains the types and methods needed to build a variety of interesting visual games.',NULL,NULL,1,'{"library": {"name": "GameBaseLibrary", "id": 6, "types": [], "editors": "", "references": "", "description": "This library contains the types and methods needed to build a variety of interesting visual games."}}'),
+					(7,'ConsoleBaseLibrary','This library contains the types and methods needed to build a console app. This is one where you interact through typed commands and responses.',NULL,NULL,1,'{"library": {"name": "ConsoleBaseLibrary", "id": 7, "types": [], "editors": "", "references": "", "description": "This library contains the types and methods needed to build a console app. This is one where you interact through typed commands and responses."}}'),
+					(8,'WebsiteBaseLibrary','This library contains the types and methods needed to build a fully functional website.',NULL,NULL,1,'{"library": {"name": "WebsiteBaseLibrary", "id": 8, "types": [], "editors": "", "references": "", "description": "This library contains the types and methods needed to build a fully functional website."}}'),
+					(9,'HololensBaseLibrary','This library contains the types and methods needed to build a Hololens 3-D app.',NULL,NULL,1,'{"library": {"name": "HololensBaseLibrary", "id": 9, "types": [], "editors": "", "references": "", "description": "This library contains the types and methods needed to build a Hololens 3-D app."}}'),
+					(10,'MapBaseLibrary','This library contains the types and methods needed to build a map-based app.',NULL,NULL,1,'{"library": {"name": "MapBaseLibrary", "id": 10, "types": [], "editors": "", "references": "", "description": "This library contains the types and methods needed to build a map-based app."}}'),
+					(11,'KernelTypesLibrary','This library contains the types and methods that hold and manipulate basic data variables like numbers, strings and so forth.',NULL,NULL,1,'{"library": {"name": "KernelTypesLibrary", "id": 11, "types": [], "editors": "", "references": "", "description": "This library contains the types and methods that hold and manipulate basic data variables like numbers, strings and so forth."}}'),
+					(12,'VisualObjectLibrary','This library contains the types and methods needed to build any animated game or other visual presentation with drawings, movement and so forth.',NULL,NULL,1,'{"library": {"name": "VisualObjectLibrary", "id": 12, "types": [], "editors": "", "references": "", "description": "This library contains the types and methods needed to build any animated game or other visual presentation with drawings, movement and so forth."}}'),
+					(13,'App_Library','This library is the place to put all your initialization code. We\'ve started you off with an App type containing a construct method. You take it from here.',NULL,NULL,1,'{"library": {"id": 13, "name": "EmptyLibrary", "types": [{"name": "App", "baseTypeName": "", "description": "This type\'s construct method will run first.", "methods": [{"name": "construct", "parameters": [], "statements": [], "comment": "All app initialization should be in this method.", "arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": [{"type": "CodeLiteral", "parameters": [{"type": "String", "value": "..." }, {"type": "Boolean", "value": false}, {"type": "Boolean", "value": false}]}]}]}}],"properties": [],"events": [],"isSystemType": 0,"public": 0}],"editors": "","references": "KernelTypesLibrary","description": "This library is the place to put all your initialization code. We\'ve started you off with an App type containing a construct method. You take it from here."}}');
 		ALTER TABLE `libraries` ENABLE KEYS;
 
 		ALTER TABLE `library_users` DISABLE KEYS;
@@ -491,14 +496,13 @@ begin
 		ALTER TABLE `permissions` ENABLE KEYS;
 
 		ALTER TABLE `projects` DISABLE KEYS;
-		INSERT INTO `projects` (`id`,`name`,`description`,`ownedByUserId`,`public`,`quarantined`,`imageId`,`altImagePath`,`baseProjectId`,`parentPrice`,`priceBump`,`projectTypeId`,`isCoreProject`,`isProduct`,`isClass`,`isOnlineClass`,
-								`firstSaved`,`lastSaved`,`chargeId`,`currentComicIndex`,`currentComicStepIndex`)
-			VALUES 	(1,'New Game Project',1,1,1,'This is the core project from which all games are derived.',0,'media/images/gameProject.png',NULL,0.00,0.00,1,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0),
-					(2,'New Console Project',1,1,1,'This is the core project from which all console-based apps are derived.',0,'media/images/consoleProject.png',NULL,0.00,0.00,2,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0),
-					(3,'New Website Project',1,1,1,'This is the core project from which all web sites are derived.',0,'media/images/websiteProject.png',NULL,0.00,0.00,3,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0),
-					(4,'New Hololens Project',1,1,1,'This is the core project from which all Microsoft HoloLens projects are derived.',0,'media/images/hololensProject.png',NULL,0.00,0.00,4,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0),
-					(5,'New Map Project',1,1,1,'This is the core project from which all mapping projects are derived.',0,'media/images/mappingProject.png',NULL,0.00,0.00,5,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0),
-					(6,'New Empty Project',1,1,1,'This is the core project from which you should derive a project where you want full control over libraries and types. It is empty until you fill it.',0,'media/images/emptyProject.png',NULL,0.00,0.00,1,1,0,0,0,'2016-09-27 08:17:00','2016-09-27 08:17:00','',0,0);
+		INSERT INTO `projects` (`id`,`name`,`description`,`ownedByUserId`,`public`,`quarantined`,`imageId`,`altImagePath`,`projectTypeId`,`isCoreProject`)
+			VALUES 	(1,'New Game Project','This is the core project from which all games are derived.',1,1,1,0,'media/images/gameProject.png',1,1),
+					(2,'New Console Project','This is the core project from which all console-based apps are derived.',1,1,1,0,'media/images/consoleProject.png',2,1),
+					(3,'New Website Project','This is the core project from which all web sites are derived.',1,1,1,0,'media/images/websiteProject.png',3,1),
+					(4,'New Hololens Project','This is the core project from which all Microsoft HoloLens projects are derived.',1,1,1,0,'media/images/hololensProject.png',4,1),
+					(5,'New Map Project','This is the core project from which all mapping projects are derived.',1,1,1,0,'media/images/mappingProject.png',5,1),
+					(6,'New Empty Project','This is the core project from which you should derive a project where you want full control over libraries and types. It is empty until you fill it.',1,1,1,0,'media/images/emptyProject.png',1,1);
 		ALTER TABLE `projects` ENABLE KEYS;
 
 /*
