@@ -488,8 +488,8 @@ begin
 		ALTER TABLE `library_users` DISABLE KEYS;
 		INSERT INTO `library_users` 
 			VALUES (1,1),(2,1),(3,1),(4,1),(5,1),(6,1);
-		ALTER TABLE `library_users` ENABLE KEYS;
 
+		ALTER TABLE `library_users` ENABLE KEYS;
 		ALTER TABLE `permissions` DISABLE KEYS;
 		INSERT INTO `permissions` 
 			VALUES (1,'can_edit_core_comics'),(2,'can_edit_base_and_system_libraries_and_types_therein'),(3,'can_make_public'),(4,'can_visit_adminzone'),(5,'can_open_free_projects'),(6,'can_buy_projects'),(7,'can_create_classes'),(8,'can_create_products'),(9,'can_create_onlineClasses'),(10,'can_edit_permissions'),(11,'can_unquarantine'),(12,'can_activate_PPs'),(13,'can_manage_site'),(14,'can_register_for_sites');
