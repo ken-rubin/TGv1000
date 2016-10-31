@@ -218,20 +218,20 @@ begin
 		  `thumbnail` varchar(255) NOT NULL
 		) ENGINE=InnoDB;
     
-		CREATE TABLE `comics_projects` (
-		  `comicId` INT UNSIGNED NOT NULL,
-		  `projectId` INT UNSIGNED NOT NULL,
-		  PRIMARY KEY (`comicId`,`projectId`),
-		  CONSTRAINT `FK_comics_proj1` FOREIGN KEY (`comicId`) REFERENCES `comics` (`id`) ON DELETE CASCADE,
-		  CONSTRAINT `FK_comics_proj2` FOREIGN KEY (`projectId`) REFERENCES `projects` (`id`) ON DELETE CASCADE
-		) ENGINE=InnoDB;
-
-		CREATE TABLE `comics_libraries` (
+		CREATE TABLE `comics_slibraries` (
 		  `comicId` INT UNSIGNED NOT NULL,
 		  `libraryId` INT UNSIGNED NOT NULL,
 		  PRIMARY KEY (`comicId`,`libraryId`),
 		  CONSTRAINT `FK_comics_lib1` FOREIGN KEY (`comicId`) REFERENCES `comics` (`id`) ON DELETE CASCADE,
 		  CONSTRAINT `FK_comics_lib2` FOREIGN KEY (`libraryId`) REFERENCES `libraries` (`id`) ON DELETE CASCADE
+		) ENGINE=InnoDB;
+
+		CREATE TABLE `comics_ulibraries` (
+		  `comicId` INT UNSIGNED NOT NULL,
+		  `libraryId` INT UNSIGNED NOT NULL,
+		  PRIMARY KEY (`comicId`,`libraryId`),
+		  CONSTRAINT `FK_comics_lib3` FOREIGN KEY (`comicId`) REFERENCES `comics` (`id`) ON DELETE CASCADE,
+		  CONSTRAINT `FK_comics_lib4` FOREIGN KEY (`libraryId`) REFERENCES `libraries` (`id`) ON DELETE CASCADE
 		) ENGINE=InnoDB;
 
 		CREATE TABLE `comics_statements` (
@@ -243,27 +243,19 @@ begin
 		) ENGINE=InnoDB;
 
 		-- id and description are columns in the table and are in libraryJSON. They are kept in sync in ProjectBO.
-		-- comicId is for user-controlled libraries, specifically tied to their own comics (or the default comic).
-		-- For special libraries, the comics_libraries table controls the linkage.
-		-- projectId is also used for these single-user libraries.
-		-- Special libraries are independent of projects.
 		CREATE TABLE `libraries` (
 		  `id` INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
 		  `name` varchar(255) NOT NULL,
 		  `description` TEXT,
-		  `comicId` INT UNSIGNED DEFAULT NULL,
-		  `projectId` INT UNSIGNED DEFAULT NULL,
 		  `createdByUserId` INT UNSIGNED NOT NULL,
 		  `imageId` int(11) NOT NULL DEFAULT '0',
 		  `altImagePath` varchar(255) NOT NULL DEFAULT '',
 		  `libraryJSON` JSON NOT NULL,
-		  CONSTRAINT `FK_library_comics` FOREIGN KEY (`comicId`) REFERENCES `comics` (`id`) ON DELETE CASCADE,
-		  CONSTRAINT `FK_library_projects` FOREIGN KEY (`projectId`) REFERENCES `projects` (`id`) ON DELETE CASCADE,
 		  FULLTEXT idx (name, description)
 		) ENGINE=InnoDB;
 
-    	-- Add library_users table to record a library's "editors".
-		CREATE TABLE `library_users` (
+    	-- Add library_editors table to record a library's "editors".
+		CREATE TABLE `library_editors` (
 		  `libraryId` INT UNSIGNED NOT NULL,
 		  `userId` INT UNSIGNED NOT NULL,
 		  PRIMARY KEY (`libraryId`,`userId`),
@@ -344,6 +336,14 @@ begin
 		  CONSTRAINT `FK_projects_comics_libraries3` FOREIGN KEY (`libraryId`) REFERENCES `libraries` (`id`) ON DELETE CASCADE
 		) ENGINE=InnoDB;
 */
+		CREATE TABLE `projects_comics` (
+		  `projectId` INT UNSIGNED NOT NULL,
+		  `comicId` INT UNSIGNED NOT NULL,
+		  PRIMARY KEY (`projectId`,`comicId`),
+		  CONSTRAINT `FK_comics_proj1` FOREIGN KEY (`comicId`) REFERENCES `comics` (`id`) ON DELETE CASCADE,
+		  CONSTRAINT `FK_comics_proj2` FOREIGN KEY (`projectId`) REFERENCES `projects` (`id`) ON DELETE CASCADE
+		) ENGINE=InnoDB;
+
 		CREATE TABLE `projecttypes` (
 		  `id` INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
 		  `description` varchar(100) NOT NULL
@@ -455,13 +455,15 @@ begin
 					(6,'Complete TechGroms Help',0,'tn3.png');
     	ALTER TABLE `comics` ENABLE KEYS;
 
-		ALTER TABLE `comics_libraries` DISABLE KEYS;
-		-- INSERT INTO `comics_libraries` ();
-		ALTER TABLE `comics_libraries` ENABLE KEYS;
+		ALTER TABLE `comics_slibraries` DISABLE KEYS;
+		INSERT INTO `comics_slibraries` 
+			VALUES (1,6),(2,7),(3,8),(4,9),(5,10),(1,11),(2,11),(3,11),(4,11),(5,11),(6,11),(1,12);
+		ALTER TABLE `comics_slibraries` ENABLE KEYS;
 
-		ALTER TABLE `comics_projects` DISABLE KEYS;
-		-- INSERT INTO `comics_projects` ();
-		ALTER TABLE `comics_projects` ENABLE KEYS;
+		ALTER TABLE `comics_ulibraries` DISABLE KEYS;
+		INSERT INTO `comics_ulibraries` 
+			VALUES (1,1),(2,2),(3,3),(4,4),(5,5),(6,13);
+		ALTER TABLE `comics_ulibraries` ENABLE KEYS;
 
 		ALTER TABLE `comics_statements` DISABLE KEYS;
 		INSERT INTO `comics_statements` 
@@ -469,27 +471,27 @@ begin
 		ALTER TABLE `comics_statements` ENABLE KEYS;
 
 		ALTER TABLE `libraries` DISABLE KEYS;
-		INSERT INTO `libraries` (`id`,`name`,`description`,`comicId`,`projectId`,`createdByUserId`,`libraryJSON`)
-			VALUES  (1,'GameAppLibrary','This library contains the types and methods needed to build ',NULL,NULL,1,'{"library": {"name": "GameAppLibrary", "id": 1, "types": [], "editors": "", "references": "", "description": ""}}'),
-					(2,'ConsoleAppLibrary','This library contains the types and methods needed to build ',NULL,NULL,1,'{"library": {"name": "ConsoleAppLibrary", "id": 2, "types": [], "editors": "", "references": "", "description": ""}}'),
-					(3,'WebsiteAppLibrary','This library contains the types and methods needed to build ',NULL,NULL,1,'{"library": {"name": "WebsiteAppLibrary", "id": 3, "types": [], "editors": "", "references": "", "description": ""}}'),
-					(4,'HololensAppLibrary','This library contains the types and methods needed to build ',NULL,NULL,1,'{"library": {"name": "HololensAppLibrary", "id": 4, "types": [], "editors": "", "references": "", "description": ""}}'),
-					(5,'MapAppLibrary','This library contains the types and methods needed to build ',NULL,NULL,1,'{"library": {"name": "MapAppLibrary", "id": 5, "types": [], "editors": "", "references": "", "description": ""}}'),
-					(6,'GameBaseLibrary','This library contains the types and methods needed to build a variety of interesting visual games.',NULL,NULL,1,'{"library": {"name": "GameBaseLibrary", "id": 6, "types": [], "editors": "", "references": "", "description": "This library contains the types and methods needed to build a variety of interesting visual games."}}'),
-					(7,'ConsoleBaseLibrary','This library contains the types and methods needed to build a console app. This is one where you interact through typed commands and responses.',NULL,NULL,1,'{"library": {"name": "ConsoleBaseLibrary", "id": 7, "types": [], "editors": "", "references": "", "description": "This library contains the types and methods needed to build a console app. This is one where you interact through typed commands and responses."}}'),
-					(8,'WebsiteBaseLibrary','This library contains the types and methods needed to build a fully functional website.',NULL,NULL,1,'{"library": {"name": "WebsiteBaseLibrary", "id": 8, "types": [], "editors": "", "references": "", "description": "This library contains the types and methods needed to build a fully functional website."}}'),
-					(9,'HololensBaseLibrary','This library contains the types and methods needed to build a Hololens 3-D app.',NULL,NULL,1,'{"library": {"name": "HololensBaseLibrary", "id": 9, "types": [], "editors": "", "references": "", "description": "This library contains the types and methods needed to build a Hololens 3-D app."}}'),
-					(10,'MapBaseLibrary','This library contains the types and methods needed to build a map-based app.',NULL,NULL,1,'{"library": {"name": "MapBaseLibrary", "id": 10, "types": [], "editors": "", "references": "", "description": "This library contains the types and methods needed to build a map-based app."}}'),
-					(11,'KernelTypesLibrary','This library contains the types and methods that hold and manipulate basic data variables like numbers, strings and so forth.',NULL,NULL,1,'{"library": {"name": "KernelTypesLibrary", "id": 11, "types": [], "editors": "", "references": "", "description": "This library contains the types and methods that hold and manipulate basic data variables like numbers, strings and so forth."}}'),
-					(12,'VisualObjectLibrary','This library contains the types and methods needed to build any animated game or other visual presentation with drawings, movement and so forth.',NULL,NULL,1,'{"library": {"name": "VisualObjectLibrary", "id": 12, "types": [], "editors": "", "references": "", "description": "This library contains the types and methods needed to build any animated game or other visual presentation with drawings, movement and so forth."}}'),
-					(13,'App_Library','This library is the place to put all your initialization code. We\'ve started you off with an App type containing a construct method. You take it from here.',NULL,NULL,1,'{"library": {"id": 13, "name": "EmptyLibrary", "types": [{"name": "App", "baseTypeName": "", "description": "This type\'s construct method will run first.", "methods": [{"name": "construct", "parameters": [], "statements": [], "comment": "All app initialization should be in this method.", "arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": [{"type": "CodeLiteral", "parameters": [{"type": "String", "value": "..." }, {"type": "Boolean", "value": false}, {"type": "Boolean", "value": false}]}]}]}}],"properties": [],"events": [],"isSystemType": 0,"public": 0}],"editors": "","references": "KernelTypesLibrary","description": "This library is the place to put all your initialization code. We\'ve started you off with an App type containing a construct method. You take it from here."}}');
+		INSERT INTO `libraries` (`id`,`name`,`description`,`createdByUserId`,`libraryJSON`)
+			VALUES  (1,'GameAppLibrary','This library contains the types and methods needed to build ',1,'{"library": {"name": "GameAppLibrary", "id": 1, "types": [], "editors": "", "references": "", "description": ""}}'),
+					(2,'ConsoleAppLibrary','This library contains the types and methods needed to build ',1,'{"library": {"name": "ConsoleAppLibrary", "id": 2, "types": [], "editors": "", "references": "", "description": ""}}'),
+					(3,'WebsiteAppLibrary','This library contains the types and methods needed to build ',1,'{"library": {"name": "WebsiteAppLibrary", "id": 3, "types": [], "editors": "", "references": "", "description": ""}}'),
+					(4,'HololensAppLibrary','This library contains the types and methods needed to build ',1,'{"library": {"name": "HololensAppLibrary", "id": 4, "types": [], "editors": "", "references": "", "description": ""}}'),
+					(5,'MapAppLibrary','This library contains the types and methods needed to build ',1,'{"library": {"name": "MapAppLibrary", "id": 5, "types": [], "editors": "", "references": "", "description": ""}}'),
+					(6,'GameBaseLibrary','This library contains the types and methods needed to build a variety of interesting visual games.',1,'{"library": {"name": "GameBaseLibrary", "id": 6, "types": [], "editors": "", "references": "", "description": "This library contains the types and methods needed to build a variety of interesting visual games."}}'),
+					(7,'ConsoleBaseLibrary','This library contains the types and methods needed to build a console app. This is one where you interact through typed commands and responses.',1,'{"library": {"name": "ConsoleBaseLibrary", "id": 7, "types": [], "editors": "", "references": "", "description": "This library contains the types and methods needed to build a console app. This is one where you interact through typed commands and responses."}}'),
+					(8,'WebsiteBaseLibrary','This library contains the types and methods needed to build a fully functional website.',1,'{"library": {"name": "WebsiteBaseLibrary", "id": 8, "types": [], "editors": "", "references": "", "description": "This library contains the types and methods needed to build a fully functional website."}}'),
+					(9,'HololensBaseLibrary','This library contains the types and methods needed to build a Hololens 3-D app.',1,'{"library": {"name": "HololensBaseLibrary", "id": 9, "types": [], "editors": "", "references": "", "description": "This library contains the types and methods needed to build a Hololens 3-D app."}}'),
+					(10,'MapBaseLibrary','This library contains the types and methods needed to build a map-based app.',1,'{"library": {"name": "MapBaseLibrary", "id": 10, "types": [], "editors": "", "references": "", "description": "This library contains the types and methods needed to build a map-based app."}}'),
+					(11,'KernelTypesLibrary','This library contains the types and methods that hold and manipulate basic data variables like numbers, strings and so forth.',1,'{"library": {"name": "KernelTypesLibrary", "id": 11, "types": [], "editors": "", "references": "", "description": "This library contains the types and methods that hold and manipulate basic data variables like numbers, strings and so forth."}}'),
+					(12,'VisualObjectLibrary','This library contains the types and methods needed to build any animated game or other visual presentation with drawings, movement and so forth.',1,'{"library": {"name": "VisualObjectLibrary", "id": 12, "types": [], "editors": "", "references": "", "description": "This library contains the types and methods needed to build any animated game or other visual presentation with drawings, movement and so forth."}}'),
+					(13,'App_Library','This library is the place to put all your initialization code. We\'ve started you off with an App type containing a construct method. You take it from here.',1,'{"library": {"id": 13, "name": "EmptyLibrary", "types": [{"name": "App", "baseTypeName": "", "description": "This type\'s construct method will run first.", "methods": [{"name": "construct", "parameters": [], "statements": [], "comment": "All app initialization should be in this method.", "arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": [{"type": "CodeLiteral", "parameters": [{"type": "String", "value": "..." }, {"type": "Boolean", "value": false}, {"type": "Boolean", "value": false}]}]}]}}],"properties": [],"events": [],"isSystemType": 0,"public": 0}],"editors": "","references": "KernelTypesLibrary","description": "This library is the place to put all your initialization code. We\'ve started you off with an App type containing a construct method. You take it from here."}}');
 		ALTER TABLE `libraries` ENABLE KEYS;
 
-		ALTER TABLE `library_users` DISABLE KEYS;
-		INSERT INTO `library_users` 
-			VALUES (1,1),(2,1),(3,1),(4,1),(5,1),(6,1);
+		ALTER TABLE `library_editors` DISABLE KEYS;
+		INSERT INTO `library_editors` 
+			VALUES (1,1),(2,1),(3,1),(4,1),(5,1),(6,1),(7,1),(8,1),(9,1),(10,1),(11,1),(12,1),(13,1);
+		ALTER TABLE `library_editors` ENABLE KEYS;
 
-		ALTER TABLE `library_users` ENABLE KEYS;
 		ALTER TABLE `permissions` DISABLE KEYS;
 		INSERT INTO `permissions` 
 			VALUES (1,'can_edit_core_comics'),(2,'can_edit_base_and_system_libraries_and_types_therein'),(3,'can_make_public'),(4,'can_visit_adminzone'),(5,'can_open_free_projects'),(6,'can_buy_projects'),(7,'can_create_classes'),(8,'can_create_products'),(9,'can_create_onlineClasses'),(10,'can_edit_permissions'),(11,'can_unquarantine'),(12,'can_activate_PPs'),(13,'can_manage_site'),(14,'can_register_for_sites');
@@ -511,6 +513,10 @@ begin
 			VALUES (1,1,1),(1,1,6),(1,1,11),(1,1,12),(2,2,2),(2,2,7),(2,2,11),(2,2,12),(3,3,3),(3,3,8),(3,3,11),(3,3,12),(4,4,4),(4,4,9),(4,4,11),(4,4,12),(5,5,5),(5,5,10),(5,5,11),(5,5,12),(6,6,13),(6,6,11),(6,6,12);
 		ALTER TABLE `projects_comics_libraries` ENABLE KEYS;
 */
+
+		ALTER TABLE `projects_comics` DISABLE KEYS;
+		-- INSERT INTO `projects_comics` ();
+		ALTER TABLE `projects_comics` ENABLE KEYS;
 
 		ALTER TABLE `projecttypes` DISABLE KEYS;
 		INSERT INTO `projecttypes` 
