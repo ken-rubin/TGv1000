@@ -493,6 +493,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							var exceptionRet = client.openProjectFromDB(
 								// 1st parameter is 1-5 based on m_projectType: "Game"-1 "Console"-2 "Web Site"-3 "HoloLens"-4 "Mapping"-5
 								["Game", "Console", "Web Site", "HoloLens", "Mapping", "Empty"].indexOf(m_projectType) + 1, 
+								'new',
 								function(){	// callback is used to set fields after async fetch of empty-ish core project from db.
 
 									client.project.id = 0;	// just to be sure it doesn't overwrite a core project

@@ -107,6 +107,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
             m_log("Entered ProjectBO/routeRetrieveProject with req.body=" + JSON.stringify(req.body) + " req.user=" + JSON.stringify(req.user));
             // req.body.projectId
+            // req.body.mode
             // req.user.userId
 
             var sqlQuery;
@@ -127,13 +128,13 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             id: row.id,
                             originalProjectId: row.id,
                             name: row.name,
+                            description: row.description,
                             ownedByUserId: row.ownedByUserId,
                             public: row.public,
                             quarantined: row.quarantined,
-                            description: row.description,
                             imageId: row.imageId,
                             altImagePath: row.altImagePath,
-                            parentProjectId: row.parentProjectId,
+                            baseProjectId: row.baseProjectId,
                             parentPrice: row.parentPrice,
                             priceBump: row.priceBump,
                             projectTypeId: row.projectTypeId,
@@ -152,9 +153,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                         // In series:
                         //  1. Potentially retrieve fields from one of the tables: classes, products or onlineclasses.
-                        //  2. Retrieve project's comics and their content.
-                        //  3. Retrieve the Base Type (fleshed out) for the App type and push it to projects.systemTypes.
-                        //  4. No more. Retrieve all system types (fleshed out) and push them onto projects.systemTypes. Just public ones for a non-prileged user.
+                        //  2. Retrieve project's comics and their content (comiccode and libraries).
                         async.series(
                             [
                                 // 1. PP data, potentially.
@@ -168,7 +167,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                             return cb(null);
                                         }
 
-                                        // Privleged user is editing a project or a non-privileged user is considering buying a purchaseable prject.
+                                        // Privleged user is editing a project or a non-privileged user is considering buying a purchasable prject.
                                         // Need to read and insert special Product, Class or OnlineClass data into project.
                                         var tableName = project.isProduct ? 'products' : project.isClass ? 'classes' : 'onlineclasses';
                                         strQuery = "select * from " + self.dbname + tableName + " where baseProjectId=" + project.id + ";";
@@ -213,7 +212,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                         }
                                     } catch(e) { return cb(e); }
                                 },
-                                // 2. Comics. Since we now will have project and each comic, we can fetch libraries and then types in libraries and below.
+                                // 2. Comics.
                                 function(cb) {
 
                                     try {
@@ -329,7 +328,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
         try {
 
-            // m_log('In m_functionRetProjDoComics');
+            m_log('In m_functionRetProjDoComics');
 
             var strSql = "select * from " + self.dbname + "comics where id in (select comicId from projects_comics_libraries where projectId=" + project.id + ");";
             var exceptionRet = sql.execute(strSql,

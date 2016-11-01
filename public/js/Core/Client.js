@@ -75,7 +75,7 @@ define(["Core/errorHelper",
 								// If lastProjectId, fetch it and load it into manager.
 								if (lastProjectId) {
 
-									self.openProjectFromDB(lastProjectId,
+									self.openProjectFromDB(lastProjectId, 'editOwn',
 										function() {
 
 											BootstrapDialog.show({
@@ -95,7 +95,7 @@ define(["Core/errorHelper",
 							} else {
 								// Privileged user.
 
-								self.openProjectFromDB(6,
+								self.openProjectFromDB(6, 'new',
 									function() {
 
 										self.project.id = 0;	// just to be sure it doesn't overwrite a core project
@@ -592,13 +592,14 @@ define(["Core/errorHelper",
 						} catch (e) { callback(e); }
 					}
 
-					self.openProjectFromDB = function (iProjectId, callback) {
+					self.openProjectFromDB = function (iProjectId, strMode, callback) {
 
 						try {
 
 							var posting = $.post("/BOL/ProjectBO/RetrieveProject", 
 								{
-									projectId: iProjectId
+									projectId: iProjectId,
+									mode: strMode
 									// userId: g_profile["userId"] not needed; sent in JWT
 								},
 								'json');
@@ -635,13 +636,14 @@ define(["Core/errorHelper",
 					// This one is used in BuyDialog after a purchase is completed.
 					// It is also used when client is created to load latest project.
 					// callback is always present to complete the process.
-					self.openProjectFromDBNoLoadIntoManager = function (iProjectId, callback) {
+					self.openProjectFromDBNoLoadIntoManager = function (iProjectId, strMode, callback) {
 
 						try {
 
 							var posting = $.post("/BOL/ProjectBO/RetrieveProject", 
 								{
-									projectId: iProjectId
+									projectId: iProjectId,
+									mode: strMode
 									// userId: g_profile["userId"] not needed; sent in JWT
 								},
 								'json');

@@ -51,11 +51,11 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 						m_dialog.close();
 					}
 
-					self.callFunctionOK = function(iProjectId, bOnlyOwnedByUser, bOnlyOthersProjects) {
+					self.callFunctionOK = function(iProjectId, bOnlyOwnedByUser, bOnlyOthersProjects, strMode) {
 
 						try {
 
-							m_functionOK(iProjectId, bOnlyOwnedByUser, bOnlyOthersProjects);
+							m_functionOK(iProjectId, bOnlyOwnedByUser, bOnlyOthersProjects, strMode);
 							m_dialog.close();
 
 						} catch (e) { errorHelper.show(e); }
@@ -134,7 +134,8 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 							    			
 								    		self.callFunctionOK(projectId, 
 								    							(stripNum === 1), 
-								    							(stripNum === 2)
+								    							(stripNum === 2),
+								    							stripNum === 0 ? 'editCore' : stripNum === 1 ? 'editOwn' : stripNum === 2 ? 'editOthers' : manager.userAllowedToCreateEditPurchProjs ? 'editPP' : 'buyPP'
 								    		);
 								    	} else {
 

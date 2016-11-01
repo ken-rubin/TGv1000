@@ -507,15 +507,9 @@ begin
 					(6,'New Empty Project','This is the core project from which you should derive a project where you want full control over libraries and types. It is empty until you fill it.',1,1,1,0,'media/images/emptyProject.png',1,1);
 		ALTER TABLE `projects` ENABLE KEYS;
 
-/*
-		ALTER TABLE `projects_comics_libraries` DISABLE KEYS;
-		INSERT INTO `projects_comics_libraries` 
-			VALUES (1,1,1),(1,1,6),(1,1,11),(1,1,12),(2,2,2),(2,2,7),(2,2,11),(2,2,12),(3,3,3),(3,3,8),(3,3,11),(3,3,12),(4,4,4),(4,4,9),(4,4,11),(4,4,12),(5,5,5),(5,5,10),(5,5,11),(5,5,12),(6,6,13),(6,6,11),(6,6,12);
-		ALTER TABLE `projects_comics_libraries` ENABLE KEYS;
-*/
-
 		ALTER TABLE `projects_comics` DISABLE KEYS;
-		-- INSERT INTO `projects_comics` ();
+		INSERT INTO `projects_comics` 
+			VALUES (1,1),(2,2),(3,3),(4,4),(5,5),(6,6);
 		ALTER TABLE `projects_comics` ENABLE KEYS;
 
 		ALTER TABLE `projecttypes` DISABLE KEYS;
