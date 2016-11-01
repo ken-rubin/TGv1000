@@ -107,8 +107,11 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
             m_log("Entered ProjectBO/routeRetrieveProject with req.body=" + JSON.stringify(req.body) + " req.user=" + JSON.stringify(req.user));
             // req.body.projectId
-            // req.body.mode
+            // req.body.mode: "new", "copyOthers", "buyPP" work one way (set most id's=0); "editCore", "editOwn", "editPP" work another (retain most id's).
+            //                  On saving, however, they affect the treatment of comics and libraries.
             // req.user.userId
+
+            var iFetchMode = ["new", "copyOthers", "buyPP", "editCore", "editOwn", "editPP"].indexOf(req.body.mode);
 
             var sqlQuery;
             sqlQuery = "select * from " + self.dbname + "projects where id=" + req.body.projectId + ";";
@@ -125,7 +128,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                         var row = rows[0];
                         var project = 
                         {
-                            id: row.id,
+                            id: (iFetchMode < 3) ? 0 : row.id,
                             originalProjectId: row.id,
                             name: row.name,
                             description: row.description,
@@ -148,7 +151,8 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             comics: [],
                             specialProjectData: {},
                             currentComicIndex: row.currentComicIndex,
-                            currentComicStepIndex: row.currentComicStepIndex
+                            currentComicStepIndex: row.currentComicStepIndex,
+                            iFetchMode: iFetchMode
                         };
 
                         // In series:
@@ -330,7 +334,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
             m_log('In m_functionRetProjDoComics');
 
-            var strSql = "select * from " + self.dbname + "comics where id in (select comicId from projects_comics_libraries where projectId=" + project.id + ");";
+            var strSql = "select * from " + self.dbname + "comics where id in (select comicId from projects_comics where projectId=" + project.id + ");";
             var exceptionRet = sql.execute(strSql,
                 function(rows) {
 
