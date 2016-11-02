@@ -496,12 +496,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								'new',
 								function(){	// callback is used to set fields after async fetch of empty-ish core project from db.
 
-									client.project.id = 0;	// just to be sure it doesn't overwrite a core project
 									client.project.isCoreProject = false;
-
-									// We could also do these things that used to be done in the BO, but we aren't--at least for now.
-					                        //     comicIth.id = 0; 
-	                                        //     method.id = 0; AND property.id = 0; AND event.id = 0;
 
 									client.project.name = strProjectName;
 									client.project.tags = strProjectTags;
@@ -510,7 +505,6 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									if (m_imageId) {
 										client.project.altImagePath = '';
 									}
-									client.project.ownedByUserId = parseInt(g_profile["userId"], 10);
 
 									// Now we'll add the fields to the project that will both tell the rest of the UI how to handle it and will affect how it gets saved to the database.
 									client.project.specialProjectData = {

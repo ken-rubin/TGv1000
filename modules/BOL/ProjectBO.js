@@ -297,6 +297,11 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
         try {
 
+            if (project.id === 0) {
+
+                return callback(null);
+            }
+
             // Save project.name and project.id to user row in DB.
             var sqlQuery = "update " + self.dbname + "user set lastproject=" + mysql.escape(project.name) + ", lastProjectId=" + project.id + " where id=" + req.user.userId + ";";
             sql.execute(
@@ -334,14 +339,14 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
             m_log('In m_functionRetProjDoComics');
 
-            var strSql = "select * from " + self.dbname + "comics where id in (select comicId from projects_comics where projectId=" + project.id + ");";
+            var strSql = "select * from " + self.dbname + "comics where id in (select comicId from projects_comics where projectId=" + project.originalProjectId + ");";
             var exceptionRet = sql.execute(strSql,
                 function(rows) {
 
                     // Every project has to have at least 1 comic.
                     if (rows.length === 0) {
 
-                        return callback(new Error("Could not retrieve comics for project with id=" + project.id));
+                        return callback(new Error("Could not retrieve comics for project with id=" + project.originalProjectId));
                     } 
 
                     // Use async to process each comic in the project and fetch their internals.
@@ -393,33 +398,36 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                     ) {
         try {
 
+            m_log('In m_functionRetProjDoComicInternals');
+
             // Using async.parallel, load comicIth's libraries (user and system), statements and comiccode.
             async.parallel([
                     function(cbp1) {    // libraries
 
                         // Fetch two sets of libraries at once: user and system libraries.
-                        var sqlQuery = "select * from " + self.dbname + "libraries where id in (select libraryId from comics_ulibraries where comicId=" + comicIth.id + ");" 
-                            + "select * from " + self.dbname + "libraries where id in (select libraryId from comics_slibraries where comicId=" + comicIth.id + ");";
+                        var sqlQuery = "select * from " + self.dbname + "libraries where id in (select libraryId from comics_ulibraries where comicId=" + comicIth.originalComicId + ");" 
+                            + "select * from " + self.dbname + "libraries where id in (select libraryId from comics_slibraries where comicId=" + comicIth.originalComicId + ");";
 
                         var exceptionRet = sql.execute(sqlQuery,
                             function(rows) {
                                 
-                                if (rows.length !== 2) { return cbp1(new Error("Unable to retrieve project. Could not retrieve libraries for comic with id=" + comicIth.id)); }
+                                if (rows.length !== 2) { return cbp1(new Error("Unable to retrieve project. Could not retrieve libraries for comic with id=" + comicIth.originalComicId)); }
 
                                 // Use async to separately process ulibraries and slibraries which are in rows[0] and rows[1].
                                 var cLibType = ' ';
-                                async.eachSeries(rows,
+                                async.eachSeries(rows,   // [0] for ulibraries and [1] for slibraries.
                                     function(rowsIth, cbpa) {
-
+m_log("In loop 1");
                                         if (cLibType === ' ') {
                                             cLibType = 'u';
                                         } else {
                                             cLibType = 's';
                                         }
 
-                                        async.eachSeries(rowsIth,
+                                        async.eachSeries(rowsIth,   // Now we'll loop over all ulibraries or all slibraries
                                             function(rowIth, cbpaa) {
 
+m_log("In loop 2");
                                                 m_functionPrepareIncomingLibrary(req, res, project, comicIth, rowIth, cLibType, 
                                                     function(err) {
                                                         return cbpaa(err);
@@ -444,7 +452,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     },
                     function(cbp2) {  // statements
 
-                        var strQuery = "select name from " + self.dbname + "statements where id in (select statementId from " + self.dbname + "comics_statements where comicId=" + comicIth.id + ") order by name asc;";
+                        var strQuery = "select name from " + self.dbname + "statements where id in (select statementId from " + self.dbname + "comics_statements where comicId=" + comicIth.originalComicId + ") order by name asc;";
                         sql.execute(
                             strQuery,
                             function(rows) {
@@ -462,7 +470,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     },
                     function(cbp3) {    // comiccode
 
-                        var exceptionRet = sql.execute("select * from " + self.dbname + "comiccode where comicId=" + comicIth.id + ";",
+                        var exceptionRet = sql.execute("select * from " + self.dbname + "comiccode where comicId=" + comicIth.originalComicId + ";",
                             function(rows) {
 
                                 // 0 rows is fine during project/comic development.
@@ -492,6 +500,9 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
     var m_functionPrepareIncomingLibrary = function (req, res, project, comicIth, rowIth, cLibType, callback) {
 
         try {
+
+            m_log('In m_functionPrepareIncomingLibrary');
+
             var libraryIth = {
                 id: (project.iFetchMode < 3) ? 0 : rowIth.id,
                 originalLibraryId: rowIth.id,
@@ -505,13 +516,15 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             libraryIth = Object.assign(libraryIth, JSON.parse(rowIth.libraryJSON).library);
 
             // libraryIth.editors was saved as a joined ('\n') string of user emails (user.userName).
-            // Since the ultimate source of this property is gotten from library_users (and saving made sure of that), we will rebuild the string.
+            // Since the ultimate source of this property is gotten from library_editors (and saving made sure of that), we will rebuild the string.
             libraryIth.editors = '';
-            var sqlString = "select u.userName from " + self.dbname + "library_users lu inner join user u on u.id=lu.userId where lu.libraryId=" + libraryIth.id + ";";
+            var sqlString = "select u.userName from " + self.dbname + "library_editors lu inner join user u on u.id=lu.userId where lu.libraryId=" + libraryIth.originalLibraryId + ";";
             var exRet = sql.execute(sqlString,
                 function(rows) {
                     rows.forEach(
                         function(row) {
+
+m_log("In loop 3");
                             if (libraryIth.editors.length) { libraryIth.libraryJSON.editors += '\n'; }
                             libraryIth.editors += row.userName;
                         }
