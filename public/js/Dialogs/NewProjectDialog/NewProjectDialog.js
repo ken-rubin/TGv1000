@@ -643,7 +643,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 										};
 									}
 
-						    		exceptionRet = manager.loadProject(client.project);
+						    		var exceptionRet = manager.loadProject(client.project);
 						    		if (exceptionRet) { throw exceptionRet; }
 
 									client.setBrowserTabAndBtns();

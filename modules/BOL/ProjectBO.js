@@ -417,7 +417,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                 var cLibType = ' ';
                                 async.eachSeries(rows,   // [0] for ulibraries and [1] for slibraries.
                                     function(rowsIth, cbpa) {
-m_log("In loop 1");
                                         if (cLibType === ' ') {
                                             cLibType = 'u';
                                         } else {
@@ -427,7 +426,6 @@ m_log("In loop 1");
                                         async.eachSeries(rowsIth,   // Now we'll loop over all ulibraries or all slibraries
                                             function(rowIth, cbpaa) {
 
-m_log("In loop 2");
                                                 m_functionPrepareIncomingLibrary(req, res, project, comicIth, rowIth, cLibType, 
                                                     function(err) {
                                                         return cbpaa(err);
@@ -524,7 +522,6 @@ m_log("In loop 2");
                     rows.forEach(
                         function(row) {
 
-m_log("In loop 3");
                             if (libraryIth.editors.length) { libraryIth.libraryJSON.editors += '\n'; }
                             libraryIth.editors += row.userName;
                         }
