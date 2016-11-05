@@ -725,7 +725,7 @@ define(["Core/errorHelper",
 										var exceptionRet;
 										if (bFromCloseProjectMenuItem || false) {
 
-											exceptionRet = manager.loadNoProject();
+											exceptionRet = manager.loadProject(null);	// Used to be manager.loadNoProject(), but that's gone now.
 
 										} else {
 
