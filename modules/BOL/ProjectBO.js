@@ -405,44 +405,26 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     function(cbp1) {    // libraries
 
                         // Fetch two sets of libraries at once: user and system libraries.
-                        var sqlQuery = "select * from " + self.dbname + "libraries where id in (select libraryId from comics_ulibraries where comicId=" + comicIth.originalComicId + ");" 
-                            + "select * from " + self.dbname + "libraries where id in (select libraryId from comics_slibraries where comicId=" + comicIth.originalComicId + ");";
+                        var sqlQuery = "select * from " + self.dbname + "libraries where id in (select libraryId from comics_libraries where comicId=" + comicIth.originalComicId + ");"; 
 
                         var exceptionRet = sql.execute(sqlQuery,
                             function(rows) {
                                 
-                                if (rows.length !== 2) { return cbp1(new Error("Unable to retrieve project. Could not retrieve libraries for comic with id=" + comicIth.originalComicId)); }
+                                if (rows.length === 0) { return cbp1(new Error("Unable to retrieve project. Could not retrieve libraries for comic with id=" + comicIth.originalComicId)); }
 
-                                // Use async to separately process ulibraries and slibraries which are in rows[0] and rows[1].
-                                var cLibType = ' ';
-                                async.eachSeries(rows,   // [0] for ulibraries and [1] for slibraries.
-                                    function(rowsIth, cbpa) {
-                                        if (cLibType === ' ') {
-                                            cLibType = 'u';
-                                        } else {
-                                            cLibType = 's';
-                                        }
+                                async.eachSeries(rows,
+                                    function(rowIth, cbpaa) {
 
-                                        async.eachSeries(rowsIth,   // Now we'll loop over all ulibraries or all slibraries
-                                            function(rowIth, cbpaa) {
-
-                                                m_functionPrepareIncomingLibrary(req, res, project, comicIth, rowIth, cLibType, 
-                                                    function(err) {
-                                                        return cbpaa(err);
-                                                    }
-                                                );
-                                            },
-                                            function(err) { // Main callback for inner inner async.eachSeries.
-                                                return cbpa(err);
+                                        m_functionPrepareIncomingLibrary(req, res, project, comicIth, rowIth, 
+                                            function(err) {
+                                                return cbpaa(err);
                                             }
-                                        )
+                                        );
                                     },
-                                    function(err) { // Main callback for outer inner async.eachSeries.
-
-                                        // Return to outer async.parallel for next step or, if (err!==null), jump to its error function.
+                                    function(err) { // Main callback for inner inner async.eachSeries.
                                         return cbp1(err);
                                     }
-                                );
+                                )
                             },
                             function(strError) { return cbp1(new Error(strError)); }
                         );
@@ -495,7 +477,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
         } catch(e) { return callback(e); }
     }
 
-    var m_functionPrepareIncomingLibrary = function (req, res, project, comicIth, rowIth, cLibType, callback) {
+    var m_functionPrepareIncomingLibrary = function (req, res, project, comicIth, rowIth, callback) {
 
         try {
 
@@ -505,8 +487,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                 id: (project.iFetchMode < 3) ? 0 : rowIth.id,
                 originalLibraryId: rowIth.id,
                 createdByUserId: rowIth.createdByUserId,
-                isSystemLibrary: (cLibType === 's' ? true : false),
-                isUserLibrary: (cLibType === 'u' ? true : false),
                 imageId: rowIth.imageId,
                 altImagePath: rowIth.altImagePath
             };

@@ -218,20 +218,12 @@ begin
 		  `thumbnail` varchar(255) NOT NULL
 		) ENGINE=InnoDB;
     
-		CREATE TABLE `comics_slibraries` (
+		CREATE TABLE `comics_libraries` (
 		  `comicId` INT UNSIGNED NOT NULL,
 		  `libraryId` INT UNSIGNED NOT NULL,
 		  PRIMARY KEY (`comicId`,`libraryId`),
 		  CONSTRAINT `FK_comics_lib1` FOREIGN KEY (`comicId`) REFERENCES `comics` (`id`) ON DELETE CASCADE,
 		  CONSTRAINT `FK_comics_lib2` FOREIGN KEY (`libraryId`) REFERENCES `libraries` (`id`) ON DELETE CASCADE
-		) ENGINE=InnoDB;
-
-		CREATE TABLE `comics_ulibraries` (
-		  `comicId` INT UNSIGNED NOT NULL,
-		  `libraryId` INT UNSIGNED NOT NULL,
-		  PRIMARY KEY (`comicId`,`libraryId`),
-		  CONSTRAINT `FK_comics_lib3` FOREIGN KEY (`comicId`) REFERENCES `comics` (`id`) ON DELETE CASCADE,
-		  CONSTRAINT `FK_comics_lib4` FOREIGN KEY (`libraryId`) REFERENCES `libraries` (`id`) ON DELETE CASCADE
 		) ENGINE=InnoDB;
 
 		CREATE TABLE `comics_statements` (
@@ -325,17 +317,6 @@ begin
 		  FULLTEXT idx (name, description)
 		) ENGINE=InnoDB;
 
-/*
-		CREATE TABLE `projects_comics_libraries` (
-		  `projectId` INT UNSIGNED NOT NULL,
-		  `comicId` INT UNSIGNED NOT NULL,
-		  `libraryId` INT UNSIGNED NOT NULL,
-		  PRIMARY KEY (`projectId`,`comicId`,`libraryId`),
-		  CONSTRAINT `FK_projects_comics_libraries1` FOREIGN KEY (`projectId`) REFERENCES `projects` (`id`) ON DELETE CASCADE,
-		  CONSTRAINT `FK_projects_comics_libraries2` FOREIGN KEY (`comicId`) REFERENCES `comics` (`id`) ON DELETE CASCADE,
-		  CONSTRAINT `FK_projects_comics_libraries3` FOREIGN KEY (`libraryId`) REFERENCES `libraries` (`id`) ON DELETE CASCADE
-		) ENGINE=InnoDB;
-*/
 		CREATE TABLE `projects_comics` (
 		  `projectId` INT UNSIGNED NOT NULL,
 		  `comicId` INT UNSIGNED NOT NULL,
@@ -455,15 +436,10 @@ begin
 					(6,'Complete TechGroms Help',0,'tn3.png');
     	ALTER TABLE `comics` ENABLE KEYS;
 
-		ALTER TABLE `comics_slibraries` DISABLE KEYS;
-		INSERT INTO `comics_slibraries` 
-			VALUES (1,6),(2,7),(3,8),(4,9),(5,10),(1,11),(2,11),(3,11),(4,11),(5,11),(6,11),(1,12);
-		ALTER TABLE `comics_slibraries` ENABLE KEYS;
-
-		ALTER TABLE `comics_ulibraries` DISABLE KEYS;
-		INSERT INTO `comics_ulibraries` 
-			VALUES (1,1),(2,2),(3,3),(4,4),(5,5),(6,13);
-		ALTER TABLE `comics_ulibraries` ENABLE KEYS;
+		ALTER TABLE `comics_libraries` DISABLE KEYS;
+		INSERT INTO `comics_libraries` 
+			VALUES (1,1),(2,2),(3,3),(4,4),(5,5),(6,13),(1,6),(2,7),(3,8),(4,9),(5,10),(1,11),(2,11),(3,11),(4,11),(5,11),(6,11),(1,12);
+		ALTER TABLE `comics_libraries` ENABLE KEYS;
 
 		ALTER TABLE `comics_statements` DISABLE KEYS;
 		INSERT INTO `comics_statements` 
@@ -484,7 +460,7 @@ begin
 					(10,'MapBaseLibrary','This library contains the types and methods needed to build a map-based app.',1,'{"library": {"name": "MapBaseLibrary", "id": 10, "types": [], "editors": "", "references": "", "description": "This library contains the types and methods needed to build a map-based app."}}'),
 					(11,'KernelTypesLibrary','This library contains the types and methods that hold and manipulate basic data variables like numbers, strings and so forth.',1,'{"library": {"name": "KernelTypesLibrary", "id": 11, "types": [], "editors": "", "references": "", "description": "This library contains the types and methods that hold and manipulate basic data variables like numbers, strings and so forth."}}'),
 					(12,'VisualObjectLibrary','This library contains the types and methods needed to build any animated game or other visual presentation with drawings, movement and so forth.',1,'{"library": {"name": "VisualObjectLibrary", "id": 12, "types": [], "editors": "", "references": "", "description": "This library contains the types and methods needed to build any animated game or other visual presentation with drawings, movement and so forth."}}'),
-					(13,'App_Library','This library is the place to put all your initialization code. We\'ve started you off with an App type containing a construct method. You take it from here.',1,'{"library": {"id": 13, "name": "EmptyLibrary", "types": [{"name": "App", "baseTypeName": "", "description": "This type\'s construct method will run first.", "methods": [{"name": "construct", "parameters": [], "statements": [], "comment": "All app initialization should be in this method.", "arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": [{"type": "CodeLiteral", "parameters": [{"type": "String", "value": "..." }, {"type": "Boolean", "value": false}, {"type": "Boolean", "value": false}]}]}]}}],"properties": [],"events": [],"isSystemType": 0,"public": 0}],"editors": "","references": "KernelTypesLibrary","description": "This library is the place to put all your initialization code. We\'ve started you off with an App type containing a construct method. You take it from here."}}');
+					(13,'App_Library','This library is the place to put all your initialization code. We\'ve started you off with an App type containing a constructor method. You take it from here.',1,'{"library": {"id": 13, "name": "EmptyLibrary", "types": [{"name": "App", "baseTypeName": "", "description": "This type\'s constructor method will run first.", "methods": [{"name": "constructor", "parameters": [], "statements": [], "comment": "All app initialization should be in this method.", "arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": [{"type": "CodeLiteral", "parameters": [{"type": "String", "value": "..." }, {"type": "Boolean", "value": false}, {"type": "Boolean", "value": false}]}]}]}}],"properties": [],"events": [],"isSystemType": 0,"public": 0}],"editors": "","references": "KernelTypesLibrary","description": "This library is the place to put all your initialization code. We\'ve started you off with an App type containing a constructor method. You take it from here."}}');
 		ALTER TABLE `libraries` ENABLE KEYS;
 
 		-- ALTER TABLE `library_editors` DISABLE KEYS;
