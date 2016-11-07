@@ -214,6 +214,7 @@ begin
 		CREATE TABLE `comics` (
 		  `id` INT UNSIGNED AUTO_INCREMENT NOT NULL PRIMARY KEY,
 		  `name` varchar(255) NOT NULL,
+		  `description` TEXT,
 		  `ordinal` int(11) NOT NULL,
 		  `thumbnail` varchar(255) NOT NULL
 		) ENGINE=InnoDB;

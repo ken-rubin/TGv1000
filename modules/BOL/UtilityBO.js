@@ -906,12 +906,10 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
 
     self.routeSearchProjects = function (req, res) {
 
-        // This is a search for projects based on tags.
-
         try {
 
             console.log("Entered UtilityBO/routeSearchProjects with req.body = " + JSON.stringify(req.body));
-            // req.body.tags
+            // req.body.searchPhrase
             // req.user.userId
             // req.user.userName
             // req.body.userAllowedToCreateEditPurchProjs
@@ -925,12 +923,12 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
             //  [5] online classes (if req.body.userAllowedToCreateEditPurchProjs, then all, active or not, no matter when; else just active and soon)
 
             // Will use async.waterfall to build up passOn javascript object:
-            // (1) if req.body.userAllowedToCreateEditPurchProjs === "0", retrieve user's home zipcode.
-            // (2) get string of tag id's; 
+            // (1) if req.body.userAllowedToCreateEditPurchProjs === "0", retrieve user's home zipcode;
+            // (2) set things up to do soundex match on req.body.searchPhrase; this will result in creating a temporary table of soundex indices in descending order with 0 results ignored.
             // (3) perform many select statements to get projects that both match tags and contain correct items based on req.body.userAllowedToCreateEditPurchProjs; 
             // (4) if req.body.userAllowedToCreateEditPurchProjs === "0", then winnow classes down by date and distance; onlineclasses by date; and for Products and Online Classes see if already bought.
             // (5) Finally, for all surviving classes determine current number of users who bought the class.
-// TODO all needs changing
+
             async.waterfall(
                 [
                     // (1)
@@ -959,26 +957,22 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                     // (2)
                     function(passOn, cb) {
 
-                        // Add resource type description to the tags the user (may have) entered.
-                        var tags = req.body.tags + " project";
-
-                        // Turn tags into string with commas between tags and tags surrounded by single quotes.
-                        var ccArray = tags.match(/([\w\-\_\@\.]+)/g);
-
-                        var ccString = '';
-                        for (var i = 0; i < ccArray.length; i++) {
-
-                            if (i > 0) { ccString = ccString + ','; }
-                            ccString = ccString + "'" + ccArray[i] + "'";
+                        var tempTableUniqueName = '';
+                        if (req.body.searchPhrase.length) {
+    
+                            // Gen unique name for this call's temporary table.
+                            tempTableUniqueName = 'search_table_' + replace(m_createGuid(), '-', '');
+                            var sqlString = "create temporary table " + self.dbname + tempTableUniqueName + "(projectId INT UNSIGNED, sindex DOUBLE) ENGINE=InnoDB;";
+                            sqlString += "insert " + self.dbname + tempTableUniqueName + " select id, soundex_match_all(" + mysql.escape(req.body.searchPhrase) + ", description, ' ') from " + self.dbname "projects where length(description)>0;";
+                            // sqlString += "delete from " + self.dbname + tempTableUniqueName + " where sindex=0;"; NOT DELETING; IGNORE IN RETRIEVAL.
+                            // sqlString += "alter table " + self.dbname + tempTableUniqueName + " order by sindex desc;"; NOT SORTING TABLE; RETRIEVE WITH ORDER BY.
+                            sqlString += "select COUNT(*) as cnt FROM " + self.dbname + tempTableUniqueName + " where sindex>0;";
                         }
 
-                        var sqlString = "select id from " + self.dbname + "tags where description in (" + ccString + ");";
                         console.log(sqlString);
                         sql.execute(sqlString,
                             function (arrayRows) {
                             
-                                // We have to get the same number of rows back from the query as ccArray.length.
-                                // Otherwise we didn't have a complete match and nothing qualifies--except core projects for privileged users which don't user tags for retrieval.
                                 if (arrayRows.length !== ccArray.length) {
 
                                     // Success as far as the POST is concerned but an empty array of projects will be returned.
@@ -1011,10 +1005,12 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         var strQuery = '';
 
                         // In the queries below, we're not retrieving the whole project rows (or the project joined with class or product).
-                        // We're just selecting enough to create the image (with project.id) in the carousel and to decide (in the case of classes and products)
-                        // if the project should be retrieved in the first place. 
+                        // We're just selecting: enough to create the image (with project.id) in the carousel; information for fairly
+                        // detailed tooltips for purchasable prjects; and, for classes and products, to decide if the project should be retrieved in the first place.
+
+                        // Projects are retrieved with a soundex_match_all index (<= 1), ordered in descending order by this index, with 0 index projects eliminated.
                         
-                        // Core projects for privileged users. Empty array for non.
+                        // Core projects for privileged users. Empty array for non. req.body.searchPhase isn't used.
                         if (req.body.userAllowedToCreateEditPurchProjs === "1") {
                             strQuery = "select p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId from " + self.dbname + "projects p where p.isCoreProject=1;";
                         } else {
@@ -1491,5 +1487,12 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
         }
     }
 
+    var m_createGuid = function() {
+
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random()*16|0, v = c === 'x' ? r : (r&0x3|0x8);
+                return v.toString(16);
+            });
+    }
 };
 

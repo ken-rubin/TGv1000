@@ -2,15 +2,16 @@
 //-
 .well
   .row
-    h4 Enter a search word or phrase--even a complete sentence. (This is actually optional. If you leave search words blank, we return everything.) 
-    h5 Results will come back roughly in descending order of best (nearest) match.
+    h4
+      | Enter some search words or a phrase--even a complete sentence.
+      | Results will come back roughly in descending order of best match.
     .row
       br
       .col-xs-2
-        label.control-label(for="ISSearchInput", style="margin-top:8px;") &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Search words
-      .col-xs-6
-        input.form-control#ISSearchInput(type="text" placeholder="Type tags to match here." tabindex=1)
-      .col-xs-4
+        label.control-label(for="ISSearchInput", style="margin-top:8px;") &nbsp;&nbsp;&nbsp;&nbsp;Search phrase:
+      .col-xs-7
+        input.form-control#ISSearchInput(type="text" placeholder="Optional. If you enter no search words, we return all available projects." tabindex=1)
+      .col-xs-3
         button.btn.btn-info#ISInnerSearchButton Search
     br
     .row.HideIfNonPriv
