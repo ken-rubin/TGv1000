@@ -1006,7 +1006,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                             // Not including temp table in queries, since there was no req.body.searchPhrase.
 
                             // Owned by user. Same for both priv and non-priv.
-                            // In this query I'm just trying to select (as comicProjectId) the id of the purchased project.
+                            // In this query I'm selecting baseProjectId as the id of the purchased project.
                             strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.baseProjectId from " + self.dbname + "projects p where p.ownedByUserId=" + req.user.userId + ";";
 
                             // Others' accounts
@@ -1048,43 +1048,43 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
 
                             // Include temp table in queries.
                             // Owned by user. Same for both priv and non-priv.
-                            // In this query I'm just trying to select (as comicProjectId) the id of the purchased project.
-                            strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.comicProjectId from " + self.dbname + "projects p where p.ownedByUserId=" + req.user.userId + " and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                            // In this query I'm selecting baseProjectId as the id of the purchased project.
+                            strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.baseProjectId, t.sindex from " + self.dbname + "projects p inner join " + self.dbname + passOn.tempTableName + " t on t.projectId=p.id where p.ownedByUserId=" + req.user.userId + " and p.id in (select projectId from " + self.dbname + passOn.tempTableName + " where sindex>0);";
 
                             // Others' accounts
                             if (req.body.userAllowedToCreateEditPurchProjs === "1") {
                                 // A privileged user doesn't care about public/private.
-                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.isOnlineClass=0 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, t.sindex from " + self.dbname + "projects p inner join " + self.dbname + passOn.tempTableName + " t on t.projectId=p.id where p.ownedByUserId<>" + req.user.userId + " and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.isOnlineClass=0 and p.id in (select projectId from " + self.dbname + passOn.tempTableName + " where sindex>0);";
                             } else {
                                 // A non-privileged user can retrieve only public projects and only "normal" projects.
-                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.public=1 and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.isOnlineClass=0 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, t.sindex from " + self.dbname + "projects p inner join " + self.dbname + passOn.tempTableName + " t on t.projectId=p.id where p.ownedByUserId<>" + req.user.userId + " and p.public=1 and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.isOnlineClass=0 and p.id in (select projectId from " + self.dbname + passOn.tempTableName + " where sindex>0);";
                             }
 
                             // Products
                             if (req.body.userAllowedToCreateEditPurchProjs === "1") {
                                 // A privileged user doesn't care about active.
-                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, pr.level, pr.difficulty, pr.productDescription, pr.imageId as prImageId, pr.price, pr.active, pr.videoURL from " + self.dbname + "projects p inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where p.isProduct=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, t.sindex, pr.level, pr.difficulty, pr.productDescription, pr.imageId as prImageId, pr.price, pr.active, pr.videoURL from " + self.dbname + "projects p inner join " + self.dbname + passOn.tempTableName + " t on t.projectId=p.id inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where p.isProduct=1 and p.id in (select projectId from " + self.dbname + passOn.tempTableName + " where sindex>0);";
                             } else {
                                 // A non-privileged user just sees active projects.
-                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.isProduct, pr.* from " + self.dbname + "projects p inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where pr.active=1 and p.isProduct=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.isProduct, t.sindex, pr.* from " + self.dbname + "projects p inner join " + self.dbname + passOn.tempTableName + " t on t.projectId=p.id inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where pr.active=1 and p.isProduct=1 and p.id in (select projectId from " + self.dbname + passOn.tempTableName + " where sindex>0);";
                             }
 
                             // Classes
                             if (req.body.userAllowedToCreateEditPurchProjs === "1") {
                                 // A privileged user doesn't care about active.
-                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, cl.level, cl.difficulty, cl.classDescription, cl.imageId as clImageId, cl.price, cl.schedule, cl.active, cl.classNotes, cl.zip, cl.maxClassSize from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where p.isClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, t.sindex, cl.level, cl.difficulty, cl.classDescription, cl.imageId as clImageId, cl.price, cl.schedule, cl.active, cl.classNotes, cl.zip, cl.maxClassSize from " + self.dbname + "projects p inner join " + self.dbname + passOn.tempTableName + " t on t.projectId=p.id inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where p.isClass=1 and p.id in (select projectId from " + self.dbname + passOn.tempTableName + " where sindex>0);";
                             } else {
                                 // A non-privileged user just sees active classes.
-                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.isClass, cl.* from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where cl.active=1 and p.isClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, t.sindex, p.isClass, cl.* from " + self.dbname + "projects p inner join " + self.dbname + passOn.tempTableName + " t on t.projectId=p.id inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where cl.active=1 and p.isClass=1 and p.id in (select projectId from " + self.dbname + passOn.tempTableName + " where sindex>0);";
                             }
 
                             // Online classes
                             if (req.body.userAllowedToCreateEditPurchProjs === "1") {
                                 // A privileged user doesn't care about active.
-                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, cl.level, cl.difficulty, cl.classDescription, cl.imageId as clImageId, cl.price, cl.schedule, cl.active, cl.classNotes from " + self.dbname + "projects p inner join " + self.dbname + "onlineclasses cl on cl.baseProjectId=p.id where p.isOnlineClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, t.sindex, cl.level, cl.difficulty, cl.classDescription, cl.imageId as clImageId, cl.price, cl.schedule, cl.active, cl.classNotes from " + self.dbname + "projects p inner join " + self.dbname + passOn.tempTableName + " t on t.projectId=p.id inner join " + self.dbname + "onlineclasses cl on cl.baseProjectId=p.id where p.isOnlineClass=1 and p.id in (select projectId from " + self.dbname + passOn.tempTableName + " where sindex>0);";
                             } else {
                                 // A non-privileged user just sees active classes.
-                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.isOnlineClass, cl.* from " + self.dbname + "projects p inner join " + self.dbname + "onlineclasses cl on cl.baseProjectId=p.id where cl.active=1 and p.isOnlineClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, t.sindex, p.isOnlineClass, cl.* from " + self.dbname + "projects p inner join " + self.dbname + passOn.tempTableName + " t on t.projectId=p.id inner join " + self.dbname + "onlineclasses cl on cl.baseProjectId=p.id where cl.active=1 and p.isOnlineClass=1 and p.id in (select projectId from " + self.dbname + passOn.tempTableName + " where sindex>0);";
                             }
                         }
 
@@ -1266,112 +1266,109 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         } else { return cb(null, passOn); }
                     },
                     // (4c)
-                    function(passOn, cb) {
+                    function (passOn, cb) {
 
                         if (req.body.userAllowedToCreateEditPurchProjs === "0") {
                             // Loop through products left in passOn.projects[3] and add property alreadyBought by comparing to all projects in passOn.projects[1].
 
-// TODO punting for now
-//                             for (var i = 0; i < passOn.projects[3].length; i++) {
+                            for (var i = 0; i < passOn.projects[3].length; i++) {
 
-//                                 var pIth = passOn.projects[3][i];
-//                                 pIth.alreadyBought = false;
+                                var pIth = passOn.projects[3][i];
+                                pIth.alreadyBought = false;
 
-//                                 for (var j = 0; j < passOn.projects[1].length; j++) {
+                                for (var j = 0; j < passOn.projects[1].length; j++) {
 
-//                                     var pJth = passOn.projects[1][j];
-// /* TOXXX */                         if (pJth.comicProjectId === pIth.projectId) {
+                                    var pJth = passOn.projects[1][j];
+                                    if (pJth.baseProjectId === pIth.projectId) {
 
-//                                         pIth.alreadyBought = true;
-//                                         break;
-//                                     }
-//                                 }
-//                             }
+                                        pIth.alreadyBought = true;
+                                        break;
+                                    }
+                                }
+                            }
 
                             return cb(null, passOn);
 
                         } else { return cb(null, passOn); }
                     },
                     // (4d)
-                    function(passOn, cb) {
+                    function (passOn, cb) {
 
                         if (req.body.userAllowedToCreateEditPurchProjs === "0") {
                             // Loop through online classes left in passOn.projects[5] and add property alreadyEnrolled by comparing to all projects in passOn.projects[1].
 
-// TODO punting for now
-//                             for (var i = 0; i < passOn.projects[5].length; i++) {
+                            for (var i = 0; i < passOn.projects[5].length; i++) {
 
-//                                 var pIth = passOn.projects[5][i];
-//                                 pIth.alreadyEnrolled = false;
+                                var pIth = passOn.projects[5][i];
+                                pIth.alreadyEnrolled = false;
 
-//                                 for (var j = 0; j < passOn.projects[1].length; j++) {
+                                for (var j = 0; j < passOn.projects[1].length; j++) {
 
-//                                     var pJth = passOn.projects[1][j];
-// /* TOXXX */                         if (pJth.comicProjectId === pIth.projectId) {
+                                    var pJth = passOn.projects[1][j];
+                                    if (pJth.baseProjectId === pIth.projectId) {
 
-//                                         pIth.alreadyEnrolled = true;
-//                                         break;
-//                                     }
-//                                 }
-//                             }
+                                        pIth.alreadyEnrolled = true;
+                                        break;
+                                    }
+                                }
+                            }
 
                             return cb(null, passOn);
 
                         } else { return cb(null, passOn); }
                     },
                     // (4e)
-                    function(passOn, cb) {
+                    function (passOn, cb) {
 
                         if (req.body.userAllowedToCreateEditPurchProjs === "0") {
                             // Loop through classes left in passOn.projects[2] and add property alreadyEnrolled by comparing to all projects in passOn.projects[1].
 
-// TODO punting for now
-//                             for (var i = 0; i < passOn.projects[4].length; i++) {
+                            for (var i = 0; i < passOn.projects[4].length; i++) {
 
-//                                 var pIth = passOn.projects[4][i];
-//                                 pIth.alreadyEnrolled = false;
+                                var pIth = passOn.projects[4][i];
+                                pIth.alreadyEnrolled = false;
 
-//                                 for (var j = 0; j < passOn.projects[1].length; j++) {
+                                for (var j = 0; j < passOn.projects[1].length; j++) {
 
-//                                     var pJth = passOn.projects[1][j];
-// /* TOXXX */                         if (pJth.comicProjectId === pIth.projectId) {
+                                    var pJth = passOn.projects[1][j];
+                                    if (pJth.baseProjectId === pIth.projectId) {
 
-//                                         pIth.alreadyEnrolled = true;
-//                                         break;
-//                                     }
-//                                 }
-//                             }
+                                        pIth.alreadyEnrolled = true;
+                                        break;
+                                    }
+                                }
+                            }
 
                             return cb(null, passOn);
 
                         } else { return cb(null, passOn); }
                     },
                     // (5)
-                    function(passOn, cb) {
+                    function (passOn, cb) {
 
                         async.eachSeries(passOn.projects[4],
-                            function(projectIth, cb) {
+                            function (projectIth, cb) {
 
-// TODO punting for now
-// /* TOXXX */                     var strQuery = "select count(*) as cnt from " + self.dbname + "projects where comicProjectId=" + projectIth.projectId + " and id<>" + projectIth.projectId + ";";
+                                var strQuery = "select count(*) as cnt from " + self.dbname + "projects where baseProjectId=" + projectIth.projectId + " and id<>" + projectIth.projectId + ";";
 
-//                                 sql.execute(strQuery,
-//                                     function(rows){
+                                sql.execute(strQuery,
+                                    function (rows) {
 
-//                                         if (rows.length === 0) {
-//                                             projectIth.numEnrollees = 0;
-//                                         } else {
-//                                             projectIth.numEnrollees = rows[0].cnt;
-//                                         }
-// TEMP:
-                                        projectIth.numEnrollees = 0;
+                                        if (rows.length === 0) {
+                                            projectIth.numEnrollees = 0;
+                                        } else {
+                                            projectIth.numEnrollees = rows[0].cnt;
+                                        }
+
                                         return cb(null, passOn);
-                                    // },
-                                    // function(strError) { return cb(new Error(strError)); }
-                                // );
-                            },
-                            function(err) {
-                                return cb(err, passOn);
+                                        // },
+                                        // function(strError) { return cb(new Error(strError)); }
+                                        // );
+                                    },
+                                    function (err) {
+                                        return cb(err, passOn);
+                                    }
+                                );
                             }
                         );
                     },
