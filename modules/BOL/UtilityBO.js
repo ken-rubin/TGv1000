@@ -964,7 +964,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                             // Gen unique name for this call's temporary table.
                             tempTableUniqueName = 'search_table_' + replace(m_createGuid(), '-', '');
                             sqlString = "create temporary table " + self.dbname + tempTableUniqueName + "(projectId INT UNSIGNED, sindex DOUBLE) ENGINE=InnoDB;";
-                            sqlString += "insert " + self.dbname + tempTableUniqueName + " select id, soundex_match_all(" + mysql.escape(req.body.searchPhrase) + ", description, ' ') from " + self.dbname "projects where length(description)>0;";
+                            sqlString += "insert " + self.dbname + tempTableUniqueName + " select id, soundex_match_all(" + mysql.escape(req.body.searchPhrase) + ", description, ' ') from " + self.dbname + "projects where length(description)>0;";
                             // sqlString += "delete from " + self.dbname + tempTableUniqueName + " where sindex=0;"; NOT DELETING; IGNORE IN RETRIEVAL.
                             // sqlString += "alter table " + self.dbname + tempTableUniqueName + " order by sindex desc;"; NOT SORTING TABLE; RETRIEVE WITH ORDER BY.
                             sqlString += "select COUNT(*) as cnt FROM " + self.dbname + tempTableUniqueName + " where sindex>0;";
@@ -1013,7 +1013,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         if (passOn.idString.length) {
                             // Owned by user. Same for both priv and non-priv.
                             // In this query I'm just trying to select (as comicProjectId) the id of the purchased project.
-                            strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.comicProjectId from " + self.dbname + "projects p where p.ownedByUserId=" + req.user.userId + " and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));"; */
+                            strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.comicProjectId from " + self.dbname + "projects p where p.ownedByUserId=" + req.user.userId + " and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
 
                             // Others' accounts
                             if (req.body.userAllowedToCreateEditPurchProjs === "1") {
