@@ -958,46 +958,40 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                     function(passOn, cb) {
 
                         var tempTableUniqueName = '';
+                        var sqlString = '';
                         if (req.body.searchPhrase.length) {
     
                             // Gen unique name for this call's temporary table.
                             tempTableUniqueName = 'search_table_' + replace(m_createGuid(), '-', '');
-                            var sqlString = "create temporary table " + self.dbname + tempTableUniqueName + "(projectId INT UNSIGNED, sindex DOUBLE) ENGINE=InnoDB;";
+                            sqlString = "create temporary table " + self.dbname + tempTableUniqueName + "(projectId INT UNSIGNED, sindex DOUBLE) ENGINE=InnoDB;";
                             sqlString += "insert " + self.dbname + tempTableUniqueName + " select id, soundex_match_all(" + mysql.escape(req.body.searchPhrase) + ", description, ' ') from " + self.dbname "projects where length(description)>0;";
                             // sqlString += "delete from " + self.dbname + tempTableUniqueName + " where sindex=0;"; NOT DELETING; IGNORE IN RETRIEVAL.
                             // sqlString += "alter table " + self.dbname + tempTableUniqueName + " order by sindex desc;"; NOT SORTING TABLE; RETRIEVE WITH ORDER BY.
                             sqlString += "select COUNT(*) as cnt FROM " + self.dbname + tempTableUniqueName + " where sindex>0;";
                         }
 
-                        console.log(sqlString);
-                        sql.execute(sqlString,
-                            function (arrayRows) {
-                            
-                                if (arrayRows.length !== ccArray.length) {
+                        passOn.tempTableName = tempTableUniqueName;
 
-                                    // Success as far as the POST is concerned but an empty array of projects will be returned.
-                                    // So on to the next function in the waterfall.
-                                    passOn.idString = '';
-                                    passOn.idCount = '0';
+                        if (sqlString.length) {
+
+                            console.log(sqlString);
+                            sql.execute(sqlString,
+                                function (arrayRows) {
+                                
+                                    if (arrayRows.length !== 1) { return cb(new Error('PROGRAM ERROR RECEIVED matching search phrase ' + req.body.searchPhrase), null); }
+
+                                    if (arrayRows[0].cnt === 0) { return cb(new Error('No projects matched search phrase ' + req.body.searchPhrase), null); }
+
+                                    // We can proceed since some matches came out of searchPhrase.
                                     return cb(null, passOn);
-                                }
+                                },
+                                function(strError) { return cb(new Error(strError), null); }
+                            );
+                        } else {
 
-                                // We can proceed since all tags exist and their id's are in arrayRows.
-                                // Construct tagIds joined by ',' for use in main queries below. Hold in idString.
-                                var idString = '';
-                                for (var i = 0; i < arrayRows.length; i++) {
-
-                                    if (i > 0) { idString = idString + ','; }
-                                    idString = idString + arrayRows[i].id.toString();
-                                }
-
-                                passOn.idString = idString;
-                                passOn.idCount = arrayRows.length.toString();
-
-                                return cb(null, passOn);
-                            },
-                            function(strError) { return cb(new Error(strError), null); }
-                        );
+                            // There was no searchPhrase, so we're good to go.
+                            return cb(null, passOn);
+                        }
                     },
                     // (3)
                     function(passOn, cb) {
@@ -1008,9 +1002,8 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         // We're just selecting: enough to create the image (with project.id) in the carousel; information for fairly
                         // detailed tooltips for purchasable prjects; and, for classes and products, to decide if the project should be retrieved in the first place.
 
-                        // Projects are retrieved with a soundex_match_all index (<= 1), ordered in descending order by this index, with 0 index projects eliminated.
-                        
-                        // Core projects for privileged users. Empty array for non. req.body.searchPhase isn't used.
+                        // Core projects for privileged users. Empty array for non. req.body.searchPhase (actually passOn.tempTableName) isn't used.
+
                         if (req.body.userAllowedToCreateEditPurchProjs === "1") {
                             strQuery = "select p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId from " + self.dbname + "projects p where p.isCoreProject=1;";
                         } else {
@@ -1020,9 +1013,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         if (passOn.idString.length) {
                             // Owned by user. Same for both priv and non-priv.
                             // In this query I'm just trying to select (as comicProjectId) the id of the purchased project.
-/* TOXXX STARTED            strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.comicProjectId from " + self.dbname + "projects p where p.ownedByUserId=" + req.user.userId + " and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));"; */
-    // TODO: for now I've just removed the selection of comicProjectId--or rather I return 0 so there's a field there.
-                            strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, 0 as comicProjectId from " + self.dbname + "projects p where p.ownedByUserId=" + req.user.userId + " and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                            strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.comicProjectId from " + self.dbname + "projects p where p.ownedByUserId=" + req.user.userId + " and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));"; */
 
                             // Others' accounts
                             if (req.body.userAllowedToCreateEditPurchProjs === "1") {
