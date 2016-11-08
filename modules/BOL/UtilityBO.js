@@ -927,7 +927,8 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
             // (2) set things up to do soundex match on req.body.searchPhrase; this will result in creating a temporary table of soundex indices in descending order with 0 results ignored.
             // (3) perform many select statements to get projects that both match tags and contain correct items based on req.body.userAllowedToCreateEditPurchProjs; 
             // (4) if req.body.userAllowedToCreateEditPurchProjs === "0", then winnow classes down by date and distance; onlineclasses by date; and for Products and Online Classes see if already bought.
-            // (5) Finally, for all surviving classes determine current number of users who bought the class.
+            // (5) for all surviving classes determine current number of users who bought the class.
+            // (6) drop the temp table if it was created.
 
             async.waterfall(
                 [
@@ -939,59 +940,49 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                             sql.execute("select zipcode from " + self.dbname + "user where id=" + req.user.userId + ";",
                                 function(rows) {
 
-                                    if (rows.length !== 1) {
-                                        return cb(new Error("Unable to read user table to determine zip code."), null);
-                                    }
+                                    if (rows.length !== 1) { return cb(new Error("Unable to read user table to determine zip code."), null); }
 
-                                    return cb(null, {zipcode:rows[0]["zipcode"]});
+                                    return cb(null, {zipcode: rows[0]["zipcode"]});
                                 },
                                 function(strError) {
                                     return cb(new Error(strError), null);
                                 }
                             );
                         } else {
-                            // priv user doesn't need zipcode
+
+                            // Priv. user doesn't need zipcode.
                             return cb(null, {zipcode: ''});
                         }
                     },
                     // (2)
                     function(passOn, cb) {
 
-                        var tempTableUniqueName = '';
-                        var sqlString = '';
-                        if (req.body.searchPhrase.length) {
-    
-                            // Gen unique name for this call's temporary table.
-                            tempTableUniqueName = 'search_table_' + replace(m_createGuid(), '-', '');
-                            sqlString = "create temporary table " + self.dbname + tempTableUniqueName + "(projectId INT UNSIGNED, sindex DOUBLE) ENGINE=InnoDB;";
-                            sqlString += "insert " + self.dbname + tempTableUniqueName + " select id, soundex_match_all(" + mysql.escape(req.body.searchPhrase) + ", description, ' ') from " + self.dbname + "projects where length(description)>0;";
-                            // sqlString += "delete from " + self.dbname + tempTableUniqueName + " where sindex=0;"; NOT DELETING; IGNORE IN RETRIEVAL.
-                            // sqlString += "alter table " + self.dbname + tempTableUniqueName + " order by sindex desc;"; NOT SORTING TABLE; RETRIEVE WITH ORDER BY.
-                            sqlString += "select COUNT(*) as cnt FROM " + self.dbname + tempTableUniqueName + " where sindex>0;";
-                        }
+                        if (req.body.searchPhrase.length === 0) {
 
-                        passOn.tempTableName = tempTableUniqueName;
-
-                        if (sqlString.length) {
-
-                            console.log(sqlString);
-                            sql.execute(sqlString,
-                                function (arrayRows) {
-                                
-                                    if (arrayRows.length !== 1) { return cb(new Error('PROGRAM ERROR RECEIVED matching search phrase ' + req.body.searchPhrase), null); }
-
-                                    if (arrayRows[0].cnt === 0) { return cb(new Error('No projects matched search phrase ' + req.body.searchPhrase), null); }
-
-                                    // We can proceed since some matches came out of searchPhrase.
-                                    return cb(null, passOn);
-                                },
-                                function(strError) { return cb(new Error(strError), null); }
-                            );
-                        } else {
-
-                            // There was no searchPhrase, so we're good to go.
+                            passOn["tempTableName"] = '';
                             return cb(null, passOn);
                         }
+
+                        var sqlString = '';
+    
+                        // Gen unique name for this call's temporary table.
+                        var tempTableUniqueName = 'search_table_' + replace(m_createGuid(), '-', '');
+                        passOn["tempTableName"] = tempTableUniqueName;
+                        sqlString = "create temporary table " + self.dbname + tempTableUniqueName + "(projectId INT UNSIGNED, sindex DOUBLE) ENGINE=InnoDB;";
+                        sqlString += "insert " + self.dbname + tempTableUniqueName + " select id, soundex_match_all(" + mysql.escape(req.body.searchPhrase) + ", description, ' ') from " + self.dbname + "projects where length(description)>0;";
+
+                        console.log(sqlString);
+                        sql.execute(sqlString,
+                            function (arrayRows) {
+                            
+                                // Need to debug into this and see what is returned in arrayRows--just to see if anything needs checking.
+                                // if (arrayRows.length !== 1) { return cb(new Error('PROGRAM ERROR RECEIVED matching search phrase ' + req.body.searchPhrase), null); }
+
+                                // We can proceed whether or not some matches came out of searchPhrase. Total failure (i.e., a temp table with no sindex values > 0) will be handled below.
+                                return cb(null, passOn);
+                            },
+                            function(strError) { return cb(new Error(strError), null); }
+                        );
                     },
                     // (3)
                     function(passOn, cb) {
@@ -1003,14 +994,59 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         // detailed tooltips for purchasable prjects; and, for classes and products, to decide if the project should be retrieved in the first place.
 
                         // Core projects for privileged users. Empty array for non. req.body.searchPhase (actually passOn.tempTableName) isn't used.
-
+                        // We do this query to fill passOn.projects[0] in any case.
                         if (req.body.userAllowedToCreateEditPurchProjs === "1") {
                             strQuery = "select p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId from " + self.dbname + "projects p where p.isCoreProject=1;";
                         } else {
-                            strQuery = "select p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId from " + self.dbname + "projects p where p.isCoreProject=-1;";   // we want this to return no rows but use [0].
+                            // We want this to return no rows but use [0].
+                            strQuery = "select p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId from " + self.dbname + "projects p where p.isCoreProject=-1;";
                         }
 
-                        if (passOn.idString.length) {
+                        if (passOn.tempTableName.length === 0) {
+                            // Not including temp table in queries, since there was no req.body.searchPhrase.
+
+                            // Owned by user. Same for both priv and non-priv.
+                            // In this query I'm just trying to select (as comicProjectId) the id of the purchased project.
+                            strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.baseProjectId from " + self.dbname + "projects p where p.ownedByUserId=" + req.user.userId + ";";
+
+                            // Others' accounts
+                            if (req.body.userAllowedToCreateEditPurchProjs === "1") {
+                                // A privileged user doesn't care about public/private.
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.isOnlineClass=0;";
+                            } else {
+                                // A non-privileged user can retrieve only public projects and only "normal" projects.
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.public=1 and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.isOnlineClass=0;";
+                            }
+
+                            // Products
+                            if (req.body.userAllowedToCreateEditPurchProjs === "1") {
+                                // A privileged user doesn't care about active.
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, pr.level, pr.difficulty, pr.productDescription, pr.imageId as prImageId, pr.price, pr.active, pr.videoURL from " + self.dbname + "projects p inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where p.isProduct=1;";
+                            } else {
+                                // A non-privileged user just sees active projects.
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.isProduct, pr.* from " + self.dbname + "projects p inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where pr.active=1 and p.isProduct=1;";
+                            }
+
+                            // Classes
+                            if (req.body.userAllowedToCreateEditPurchProjs === "1") {
+                                // A privileged user doesn't care about active.
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, cl.level, cl.difficulty, cl.classDescription, cl.imageId as clImageId, cl.price, cl.schedule, cl.active, cl.classNotes, cl.zip, cl.maxClassSize from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where p.isClass=1;";
+                            } else {
+                                // A non-privileged user just sees active classes.
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.isClass, cl.* from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where cl.active=1 and p.isClass=1;";
+                            }
+
+                            // Online classes
+                            if (req.body.userAllowedToCreateEditPurchProjs === "1") {
+                                // A privileged user doesn't care about active.
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, cl.level, cl.difficulty, cl.classDescription, cl.imageId as clImageId, cl.price, cl.schedule, cl.active, cl.classNotes from " + self.dbname + "projects p inner join " + self.dbname + "onlineclasses cl on cl.baseProjectId=p.id where p.isOnlineClass=1;";
+                            } else {
+                                // A non-privileged user just sees active classes.
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.isOnlineClass, cl.* from " + self.dbname + "projects p inner join " + self.dbname + "onlineclasses cl on cl.baseProjectId=p.id where cl.active=1 and p.isOnlineClass=1;";
+                            }
+                        } else {
+
+                            // Include temp table in queries.
                             // Owned by user. Same for both priv and non-priv.
                             // In this query I'm just trying to select (as comicProjectId) the id of the purchased project.
                             strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.comicProjectId from " + self.dbname + "projects p where p.ownedByUserId=" + req.user.userId + " and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
@@ -1329,7 +1365,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
 //                                         }
 // TEMP:
                                         projectIth.numEnrollees = 0;
-                                        return cb(null);
+                                        return cb(null, passOn);
                                     // },
                                     // function(strError) { return cb(new Error(strError)); }
                                 // );
@@ -1337,6 +1373,20 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                             function(err) {
                                 return cb(err, passOn);
                             }
+                        );
+                    },
+                    // (6)
+                    function(passOn, cb) {
+
+                        if (!passOn.tempTableName.length) { return cb(null, passOn); }
+
+                        // If this drop of the temp table fails, we ignore it. MySql will clean it up eventually.
+                        var strQuery = "drop temporary table " + self.dbname + passOn.tempTableName + ";";
+                        sql.execute(strQuery,
+                            function(rows) {
+                                return cb(null, passOn);
+                            },
+                            function(err) { return cb(null, passOn); }
                         );
                     }
                 ],
