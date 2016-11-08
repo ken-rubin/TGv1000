@@ -426,15 +426,14 @@ begin
 
     	-- For the duration of @dbstate = 1 disable all KEY checking, since we're in a screwy order.
     	set FOREIGN_KEY_CHECKS = 0;
-
     	ALTER TABLE `comics` DISABLE KEYS;
 		INSERT INTO `comics` 
-			VALUES 	(1,'TechGroms Game Project Help',0,'tn3.png'),
-					(2,'TechGroms Console Project Help',0,'tn3.png'),
-					(3,'TechGroms Website Project Help',0,'tn3.png'),
-					(4,'TechGroms Hololens Project Help',0,'tn3.png'),
-					(5,'TechGroms Map Project Help',0,'tn3.png'),
-					(6,'Complete TechGroms Help',0,'tn3.png');
+			VALUES 	(1,'TechGroms Game Project Help','',0,'tn3.png'),
+					(2,'TechGroms Console Project Help','',0,'tn3.png'),
+					(3,'TechGroms Website Project Help','',0,'tn3.png'),
+					(4,'TechGroms Hololens Project Help','',0,'tn3.png'),
+					(5,'TechGroms Map Project Help','',0,'tn3.png'),
+					(6,'Complete TechGroms Help','',0,'tn3.png');
     	ALTER TABLE `comics` ENABLE KEYS;
 
 		ALTER TABLE `comics_libraries` DISABLE KEYS;
