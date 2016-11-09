@@ -963,10 +963,10 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                             return cb(null, passOn);
                         }
 
-                        var sqlString = '';
+                        let sqlString = '';
     
                         // Gen unique name for this call's temporary table.
-                        var tempTableUniqueName = 'search_table_' + replace(m_createGuid(), '-', '');
+                        let tempTableUniqueName = 'search_table_' + m_createGuid().replace('-', '');
                         passOn["tempTableName"] = tempTableUniqueName;
                         sqlString = "create temporary table " + self.dbname + tempTableUniqueName + "(projectId INT UNSIGNED, sindex DOUBLE) ENGINE=InnoDB;";
                         sqlString += "insert " + self.dbname + tempTableUniqueName + " select id, soundex_match_all(" + mysql.escape(req.body.searchPhrase) + ", description, ' ') from " + self.dbname + "projects where length(description)>0;";
@@ -987,7 +987,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                     // (3)
                     function(passOn, cb) {
 
-                        var strQuery = '';
+                        let strQuery = '';
 
                         // In the queries below, we're not retrieving the whole project rows (or the project joined with class or product).
                         // We're just selecting: enough to create the image (with project.id) in the carousel; information for fairly
@@ -1046,7 +1046,8 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                             }
                         } else {
 
-                            // Include temp table in queries.
+                            // A searchPhrase was entered by the user and some non-0-index projects were found. Include temp table in queries.
+
                             // Owned by user. Same for both priv and non-priv.
                             // In this query I'm selecting baseProjectId as the id of the purchased project.
                             strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.baseProjectId, t.sindex from " + self.dbname + "projects p inner join " + self.dbname + passOn.tempTableName + " t on t.projectId=p.id where p.ownedByUserId=" + req.user.userId + " and p.id in (select projectId from " + self.dbname + passOn.tempTableName + " where sindex>0);";
@@ -1091,18 +1092,18 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         sql.execute(strQuery,
                             function(rows){
 
-                                if (passOn.idString.length) {
+                                if (passOn.tempTableName.length) {
 
                                     // rows is a jagged array with first dimension size = 6.
-                                    var totRows = 0;
-                                    for (var i = 0; i < 6; i++) { totRows += rows[i].length; }
+                                    let totRows = 0;
+                                    for (let i = 0; i < 6; i++) { totRows += rows[i].length; }
                                     if (totRows === 0) {
                                         passOn.projects = rows;
                                         return cb(null, passOn);
                                     }
 
                                     // Sort rows on projectName, since async retrieval doesn't let us sort in the query.
-                                    for (var i = 0; i < 6; i++) {
+                                    for (let i = 0; i < 6; i++) {
                                         if (rows[i].length) {
 
                                             rows[i].sort(function(a,b){
@@ -1132,7 +1133,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                                         passOn.projects[0] = new Array();
                                     }
 
-                                    for (var i = 1; i < 6; i++) {
+                                    for (let i = 1; i < 6; i++) {
                                         passOn.projects[i] = new Array();
                                     }
 
@@ -1159,17 +1160,17 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                             // only only those starting within 3 months. They also must be within 35 miles of req.body.nearZip.
                             // Any non-qualified are removed from passOn.projects[4].
 
-                            var mntNow = moment();
+                            let mntNow = moment();
 
                             async.eachSeries(passOn.projects[4],
                                 function(projectIth, cb) {
 
                                     projectIth.remove = false;
-                                    var strClass1Date = JSON.parse(projectIth.schedule)[0].date;
+                                    let strClass1Date = JSON.parse(projectIth.schedule)[0].date;
                                     // This date must exist or the class could not have been made active.
                                     // As must the zipcode used below.
 
-                                    var mntClass1Date = moment(strClass1Date, "YYYY-MM-DD");
+                                    let mntClass1Date = moment(strClass1Date, "YYYY-MM-DD");
                                     if (mntClass1Date.isBefore(mntNow) || mntClass1Date.isAfter(mntNow.clone().add(3, "months"))) {
                                         
                                         // Class started in the past or starts more than 3 months from now.
@@ -1180,15 +1181,15 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
 
                                         // Class is not disqualified due to start date. We'll do the zipcode distance check.
                                         // https://www.zipcodeapi.com/rest/<zipcodekey>/distance.<format>/<zip_code1>/<zip_code2>/<units>.
-                                        var url = "https://www.zipcodeapi.com/rest/" + app.get("zipcodekey") + "/distance.json/" + projectIth.zip + "/" + passOn.zipcode + "/mile";
-                                        var xhr = new XMLHttpRequest();
+                                        let url = "https://www.zipcodeapi.com/rest/" + app.get("zipcodekey") + "/distance.json/" + projectIth.zip + "/" + passOn.zipcode + "/mile";
+                                        let xhr = new XMLHttpRequest();
                                         xhr.open("GET", url, true);     // true means async (which is default)
                                         xhr.onload = function (e) {
 
                                             if (xhr.status === 200) {
                                                 // A good result to test.
                                                 console.log("Got xhr.responseText: " + xhr.responseText);
-                                                var distanceJSON = JSON.parse(xhr.responseText);
+                                                let distanceJSON = JSON.parse(xhr.responseText);
                                                 if (distanceJSON.hasOwnProperty("distance")) {
                                                     // Has distance prop.
                                                     if (distanceJSON.distance > 35) {
@@ -1216,7 +1217,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                                 function(err) {
 
                                     // err is always null, since in all error cases, we just remove the project.
-                                    for (var i = passOn.projects[4].length - 1; i >= 0; i--) {
+                                    for (let i = passOn.projects[4].length - 1; i >= 0; i--) {
                                         if (passOn.projects[4][i].remove) {
                                             passOn.projects[4].splice(i, 1);
                                         }
@@ -1234,17 +1235,17 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                             // only only those starting within 3 months.
                             // Any non-qualified are removed from passOn.projects[5].
 
-                            var mntNow = moment();
+                            let mntNow = moment();
 
                             async.eachSeries(passOn.projects[5],
                                 function(projectIth, cb) {
 
                                     projectIth.remove = false;
-                                    var strClass1Date = JSON.parse(projectIth.schedule)[0].date;
+                                    let strClass1Date = JSON.parse(projectIth.schedule)[0].date;
                                     // This date must exist or the class could not have been made active.
                                     // As must the zipcode used below.
 
-                                    var mntClass1Date = moment(strClass1Date, "YYYY-MM-DD");
+                                    let mntClass1Date = moment(strClass1Date, "YYYY-MM-DD");
                                     if (mntClass1Date.isBefore(mntNow) || mntClass1Date.isAfter(mntNow.clone().add(3, "months"))) {
                                         
                                         // Class started in the past or starts more than 3 months from now.
@@ -1255,7 +1256,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                                 function(err) {
 
                                     // err is always null.
-                                    for (var i = passOn.projects[5].length - 1; i >= 0; i--) {
+                                    for (let i = passOn.projects[5].length - 1; i >= 0; i--) {
                                         if (passOn.projects[5][i].remove) {
                                             passOn.projects[5].splice(i, 1);
                                         }
@@ -1271,14 +1272,14 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         if (req.body.userAllowedToCreateEditPurchProjs === "0") {
                             // Loop through products left in passOn.projects[3] and add property alreadyBought by comparing to all projects in passOn.projects[1].
 
-                            for (var i = 0; i < passOn.projects[3].length; i++) {
+                            for (let i = 0; i < passOn.projects[3].length; i++) {
 
-                                var pIth = passOn.projects[3][i];
+                                let pIth = passOn.projects[3][i];
                                 pIth.alreadyBought = false;
 
-                                for (var j = 0; j < passOn.projects[1].length; j++) {
+                                for (let j = 0; j < passOn.projects[1].length; j++) {
 
-                                    var pJth = passOn.projects[1][j];
+                                    let pJth = passOn.projects[1][j];
                                     if (pJth.baseProjectId === pIth.projectId) {
 
                                         pIth.alreadyBought = true;
@@ -1297,14 +1298,14 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         if (req.body.userAllowedToCreateEditPurchProjs === "0") {
                             // Loop through online classes left in passOn.projects[5] and add property alreadyEnrolled by comparing to all projects in passOn.projects[1].
 
-                            for (var i = 0; i < passOn.projects[5].length; i++) {
+                            for (let i = 0; i < passOn.projects[5].length; i++) {
 
-                                var pIth = passOn.projects[5][i];
+                                let pIth = passOn.projects[5][i];
                                 pIth.alreadyEnrolled = false;
 
-                                for (var j = 0; j < passOn.projects[1].length; j++) {
+                                for (let j = 0; j < passOn.projects[1].length; j++) {
 
-                                    var pJth = passOn.projects[1][j];
+                                    let pJth = passOn.projects[1][j];
                                     if (pJth.baseProjectId === pIth.projectId) {
 
                                         pIth.alreadyEnrolled = true;
@@ -1323,14 +1324,14 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         if (req.body.userAllowedToCreateEditPurchProjs === "0") {
                             // Loop through classes left in passOn.projects[2] and add property alreadyEnrolled by comparing to all projects in passOn.projects[1].
 
-                            for (var i = 0; i < passOn.projects[4].length; i++) {
+                            for (let i = 0; i < passOn.projects[4].length; i++) {
 
-                                var pIth = passOn.projects[4][i];
+                                let pIth = passOn.projects[4][i];
                                 pIth.alreadyEnrolled = false;
 
-                                for (var j = 0; j < passOn.projects[1].length; j++) {
+                                for (let j = 0; j < passOn.projects[1].length; j++) {
 
-                                    var pJth = passOn.projects[1][j];
+                                    let pJth = passOn.projects[1][j];
                                     if (pJth.baseProjectId === pIth.projectId) {
 
                                         pIth.alreadyEnrolled = true;
@@ -1349,7 +1350,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         async.eachSeries(passOn.projects[4],
                             function (projectIth, cb) {
 
-                                var strQuery = "select count(*) as cnt from " + self.dbname + "projects where baseProjectId=" + projectIth.projectId + " and id<>" + projectIth.projectId + ";";
+                                let strQuery = "select count(*) as cnt from " + self.dbname + "projects where baseProjectId=" + projectIth.projectId + " and id<>" + projectIth.projectId + ";";
 
                                 sql.execute(strQuery,
                                     function (rows) {
@@ -1369,7 +1370,8 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                                         return cb(err, passOn);
                                     }
                                 );
-                            }
+                            },
+                            function(err) { return cb(err, passOn); }
                         );
                     },
                     // (6)
@@ -1378,7 +1380,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         if (!passOn.tempTableName.length) { return cb(null, passOn); }
 
                         // If this drop of the temp table fails, we ignore it. MySql will clean it up eventually.
-                        var strQuery = "drop temporary table " + self.dbname + passOn.tempTableName + ";";
+                        let strQuery = "drop temporary table " + self.dbname + passOn.tempTableName + ";";
                         sql.execute(strQuery,
                             function(rows) {
                                 return cb(null, passOn);

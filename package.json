@@ -29,6 +29,6 @@
     "xmlhttprequest": "^1.8.0"
   },
   "scripts": {
-    "start": "node --inspect app.js development"
+    "start": "node-dev --inspect app.js development"
   }
 }
