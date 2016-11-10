@@ -20,7 +20,7 @@ USE TGv1001//
 drop function if exists soundex_match //
 
 -- The soundex_match returns 1 if the soundex of needle = the soundex of any word in haystack. Else 0.
-CREATE FUNCTION `soundex_match`(needle varchar(128), haystack text, splitChar varchar(1)) 
+CREATE FUNCTION soundex_match(needle varchar(128), haystack text, splitChar varchar(1))
 	RETURNS tinyint(4)
 BEGIN
 	declare spacePos int;
@@ -29,7 +29,7 @@ BEGIN
 	declare tempStr text default haystack;
 	declare tmp text default '';
 	declare soundx1 varchar(64) default '';
-	declare soundx2 varchar(64) default '';    
+	declare soundx2 varchar(64) default '';
 
 	set searchLen = length(haystack);
 	set spacePos  = locate(splitChar, tempStr);
@@ -53,10 +53,10 @@ BEGIN
 
 			set tempStr = substr(tempStr, spacePos+1);
 			set searchLen = length(tempStr);
-		end if;      
+		end if;
 
 		set spacePos = locate(splitChar, tempStr);
-	end while;  
+	end while;
 
 	return 0;
 
@@ -68,49 +68,49 @@ drop function if exists soundex_match_all //
 -- needle is the search phrase entered by the user. haystack is the description entered by the object creator (project, resource or library).
 -- soundex_match_all as it is written needs to be called repeatedly on a lot of candidates. That should at least be
 -- optimized by restricting the number of haystacks to search.
-create function soundex_match_all(needle text, haystack text, splitChar varchar(1)) RETURNS double 
-begin 
-	DECLARE comma INT DEFAULT 0; 
+create function soundex_match_all(needle text, haystack text, splitChar varchar(1)) RETURNS double
+begin
+	DECLARE comma INT DEFAULT 0;
     DECLARE word TEXT;
     DECLARE total_score double;
-    DECLARE total_num_words double; 
-    SET comma = LOCATE(splitChar, needle); 
-    SET word = TRIM(needle); 
-    
-    if LENGTH(haystack) = 0 then 
+    DECLARE total_num_words double;
+    SET comma = LOCATE(splitChar, needle);
+    SET word = TRIM(needle);
+
+    if LENGTH(haystack) = 0 then
     	/* 0 word search term */
     	/* We could return 0 (no matches) or 1 (all match). */
     	/* Let's try it with 1. */
-		return 1; 
-	elseif comma = 0 then 
-		/* one word search term */ 
+		return 1;
+	elseif comma = 0 then
+		/* one word search term */
         return soundex_match(word, haystack, splitChar); /* Same as returning soundex_match / 1. */
-	end if; 
-    
+	end if;
+
     SET total_score = 0;
     SET total_num_words = 0;
-    SET word = trim(substr(needle, 1, comma)); 
-    
-    /* Insert each split variable into the word variable */ 
-    REPEAT 
+    SET word = trim(substr(needle, 1, comma));
+
+    /* Insert each split variable into the word variable */
+    REPEAT
     	SET total_num_words = total_num_words + 1;
 		SET total_score = total_score + soundex_match(word, haystack, splitChar);
 
-        /* get the next word */ 
-        SET needle = trim(substr(needle, comma)); 
-        SET comma = LOCATE(splitChar, needle); 
-        if comma = 0 then 
-			/* last word */ 
+        /* get the next word */
+        SET needle = trim(substr(needle, comma));
+        SET comma = LOCATE(splitChar, needle);
+        if comma = 0 then
+			/* last word */
             SET word = needle;
         else
-	        SET word = trim(substr(needle, 1, comma)); 
-		end if; 
-        
-    UNTIL length(needle) = 0 /* Used to be word. */
-	END REPEAT; 
+	        SET word = trim(substr(needle, 1, comma));
+		end if;
 
-    return total_score / total_num_words; 
-end // 
+    UNTIL length(needle) = 0 /* Used to be word. */
+	END REPEAT;
+
+    return total_score / total_num_words;
+end //
 
 DROP FUNCTION IF EXISTS getUniqueProjNameForUser//
 create FUNCTION getUniqueProjNameForUser(checkName varchar(255), userId int(11))
@@ -119,19 +119,19 @@ begin
 
 	set @uniqueName = checkName;
     set @iter = 1;
-	
+
 	rpt_loop: LOOP
 
 		SET @id := (select id from projects where name=@uniqueName and ownedByUserId=userId);
         IF @id IS NULL THEN
 			LEAVE rpt_loop;
 		END IF;
-        
+
         SET @iter = @iter + 1;
         SET @uniqueName = CONCAT(checkName, '(', @iter, ')');
 
 	END LOOP;
-    
+
     RETURN @uniqueName;
 end //
 
@@ -143,9 +143,9 @@ CREATE FUNCTION getProjectsLinkedToGivenProjectByComic(projectIdIn int(11))
 	RETURNS TEXT
 begin
 
-    set @comicId = (select comicId from projects_comics_libraries where projectId=projectIdIn LIMIT 1);
-	set @projectIds := (select group_concat(distinct projectId separator ',') from projects_comics_libraries where comicId=@comicId AND projectId<>projectIdIn);
-    
+    set @comicId = (select comicId from projects_comics where projectId=projectIdIn LIMIT 1);
+	set @projectIds := (select group_concat(distinct projectId separator ',') from projects_comics where comicId=@comicId AND projectId<>projectIdIn);
+
     RETURN @projectIds;
 
 end //
@@ -155,7 +155,7 @@ create procedure maintainDB()
 begin
 
 	set @cnt = (select count(*) from information_schema.tables where table_schema = 'TGv1001' and table_name = 'control');
-    
+
 	if @cnt = 0 THEN
 
 		CREATE TABLE `TGv1001`.`control` (
@@ -167,9 +167,9 @@ begin
 		insert `TGv1001`.`control` (id, dbstate) values (1, 0);
 
 	end if;
-    
+
 	set @dbstate := (select dbstate from `TGv1001`.`control` where id = 1);
-        
+
     if @dbstate = 0 THEN
 
     	-- For the duration of @dbstate=0 we disable any constraint enforcement,
@@ -218,7 +218,7 @@ begin
 		  `ordinal` int(11) NOT NULL,
 		  `thumbnail` varchar(255) NOT NULL
 		) ENGINE=InnoDB;
-    
+
 		CREATE TABLE `comics_libraries` (
 		  `comicId` INT UNSIGNED NOT NULL,
 		  `libraryId` INT UNSIGNED NOT NULL,
@@ -427,7 +427,7 @@ begin
     	-- For the duration of @dbstate = 1 disable all KEY checking, since we're in a screwy order.
     	set FOREIGN_KEY_CHECKS = 0;
     	ALTER TABLE `comics` DISABLE KEYS;
-		INSERT INTO `comics` 
+		INSERT INTO `comics`
 			VALUES 	(1,'TechGroms Game Project Help','',0,'tn3.png'),
 					(2,'TechGroms Console Project Help','',0,'tn3.png'),
 					(3,'TechGroms Website Project Help','',0,'tn3.png'),
@@ -437,12 +437,12 @@ begin
     	ALTER TABLE `comics` ENABLE KEYS;
 
 		ALTER TABLE `comics_libraries` DISABLE KEYS;
-		INSERT INTO `comics_libraries` 
+		INSERT INTO `comics_libraries`
 			VALUES (1,1),(2,2),(3,3),(4,4),(5,5),(6,13),(1,6),(2,7),(3,8),(4,9),(5,10),(1,11),(2,11),(3,11),(4,11),(5,11),(6,11),(1,12);
 		ALTER TABLE `comics_libraries` ENABLE KEYS;
 
 		ALTER TABLE `comics_statements` DISABLE KEYS;
-		INSERT INTO `comics_statements` 
+		INSERT INTO `comics_statements`
 			VALUES (1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8),(1,9),(1,10),(1,11),(1,12),(1,13),(1,14),(2,1),(2,2),(2,3),(2,4),(2,5),(2,6),(2,7),(2,8),(2,9),(2,10),(2,11),(2,12),(2,13),(2,14),(3,1),(3,2),(3,3),(3,4),(3,5),(3,6),(3,7),(3,8),(3,9),(3,10),(3,11),(3,12),(3,13),(3,14),(4,1),(4,2),(4,3),(4,4),(4,5),(4,6),(4,7),(4,8),(4,9),(4,10),(4,11),(4,12),(4,13),(4,14),(5,1),(5,2),(5,3),(5,4),(5,5),(5,6),(5,7),(5,8),(5,9),(5,10),(5,11),(5,12),(5,13),(5,14),(6,1),(6,2),(6,3),(6,4),(6,5),(6,6),(6,7),(6,8),(6,9),(6,10),(6,11),(6,12),(6,13),(6,14);
 		ALTER TABLE `comics_statements` ENABLE KEYS;
 
@@ -464,12 +464,12 @@ begin
 		ALTER TABLE `libraries` ENABLE KEYS;
 
 		-- ALTER TABLE `library_editors` DISABLE KEYS;
-		-- INSERT INTO `library_editors` 
+		-- INSERT INTO `library_editors`
 		-- 	VALUES (1,1),(2,1),(3,1),(4,1),(5,1),(6,1),(7,1),(8,1),(9,1),(10,1),(11,1),(12,1),(13,1);
 		-- ALTER TABLE `library_editors` ENABLE KEYS;
 
 		ALTER TABLE `permissions` DISABLE KEYS;
-		INSERT INTO `permissions` 
+		INSERT INTO `permissions`
 			VALUES (1,'can_edit_core_comics'),(2,'can_edit_base_and_system_libraries_and_types_therein'),(3,'can_make_public'),(4,'can_visit_adminzone'),(5,'can_open_free_projects'),(6,'can_buy_projects'),(7,'can_create_classes'),(8,'can_create_products'),(9,'can_create_onlineClasses'),(10,'can_edit_permissions'),(11,'can_unquarantine'),(12,'can_activate_PPs'),(13,'can_manage_site'),(14,'can_register_for_sites');
 		ALTER TABLE `permissions` ENABLE KEYS;
 
@@ -484,17 +484,17 @@ begin
 		ALTER TABLE `projects` ENABLE KEYS;
 
 		ALTER TABLE `projects_comics` DISABLE KEYS;
-		INSERT INTO `projects_comics` 
+		INSERT INTO `projects_comics`
 			VALUES (1,1),(2,2),(3,3),(4,4),(5,5),(6,6);
 		ALTER TABLE `projects_comics` ENABLE KEYS;
 
 		ALTER TABLE `projecttypes` DISABLE KEYS;
-		INSERT INTO `projecttypes` 
+		INSERT INTO `projecttypes`
 			VALUES (1,'game'),(2,'console'),(3,'website'),(4,'hololens'),(5,'map'),(6,'empty');
 		ALTER TABLE `projecttypes` ENABLE KEYS;
 
 		ALTER TABLE `resourcetypes` DISABLE KEYS;
-		INSERT INTO `resourcetypes` 
+		INSERT INTO `resourcetypes`
 			VALUES (1,'image'),(2,'sound');
 		ALTER TABLE `resourcetypes` ENABLE KEYS;
 
@@ -504,22 +504,22 @@ begin
 		ALTER TABLE `routes` ENABLE KEYS;
 
 		ALTER TABLE `statements` DISABLE KEYS;
-		INSERT INTO `statements` 
+		INSERT INTO `statements`
 			VALUES (1,'StatementBreak'),(2,'StatementContinue'),(3,'StatementExpression'),(4,'StatementFor'),(5,'StatementForIn'),(6,'StatementIf'),(7,'StatementReturn'),(8,'StatementThrow'),(9,'StatementTry'),(10,'StatementVar'),(11,'StatementWhile'),(12,'StatementComment'),(13,'StatementDebugger'),(14,'StatementFreeform');
 		ALTER TABLE `statements` ENABLE KEYS;
 
 		ALTER TABLE `ug_permissions` DISABLE KEYS;
-		INSERT INTO `ug_permissions` 
+		INSERT INTO `ug_permissions`
 			VALUES (1,1),(1,2),(1,3),(1,4),(1,5),(1,6),(1,7),(1,8),(1,9),(1,10),(1,11),(1,12),(2,3),(2,4),(2,5),(2,6),(2,7),(3,5),(3,6),(4,5),(5,13),(6,5),(6,6),(6,14);
 		ALTER TABLE `ug_permissions` ENABLE KEYS;
 
 		ALTER TABLE `user` DISABLE KEYS;
-		INSERT INTO `user` VALUES 
+		INSERT INTO `user` VALUES
 			(1,'templates@techgroms.com','System','User','$2a$10$XULC/AcP/94VUb0EdiTG4eIiLI/zaW4n/qcovbRb2/SDTLmoG2BDe',1,'10601','America/New_York','',NULL);
 		ALTER TABLE `user` ENABLE KEYS;
 
 		ALTER TABLE `usergroups` DISABLE KEYS;
-		INSERT INTO `usergroups` 
+		INSERT INTO `usergroups`
 			VALUES (1,'developer'),(2,'instructor'),(3,'registered_user'),(4,'unregistered_user'),(5,'site_teacher'),(6,'site_student');
 		ALTER TABLE `usergroups` ENABLE KEYS;
 
@@ -528,7 +528,7 @@ begin
 		UPDATE control set dbstate=@dbstate where id=1;
 
     end if;
-    
+
     if @dbstate = 222 THEN
 
 
@@ -537,15 +537,15 @@ begin
 		UPDATE control set dbstate=@dbstate where id=1;
 
     end if;
-    
+
     if @dbstate = 333 THEN
 
-    
+
 		set @dbstate := @dbstate + 1;	-- @dbstate = 4
 		UPDATE control set dbstate=@dbstate where id=1;
 
     end if;
-    
+
 end//
 
 -- Execute the procedure
