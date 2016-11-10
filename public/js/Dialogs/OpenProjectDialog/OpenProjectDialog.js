@@ -135,7 +135,7 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 								    		self.callFunctionOK(projectId, 
 								    							(stripNum === 1), 
 								    							(stripNum === 2),
-								    							stripNum === 0 ? 'editCore' : stripNum === 1 ? 'editOwn' : stripNum === 2 ? 'editOthers' : manager.userAllowedToCreateEditPurchProjs ? 'editPP' : 'buyPP'
+								    							stripNum === 0 ? 'editCore' : stripNum === 1 ? 'editOwn' : stripNum === 2 ? 'copyOthers' : manager.userAllowedToCreateEditPurchProjs ? 'editPP' : 'buyPP'
 								    		);
 								    	} else {
 

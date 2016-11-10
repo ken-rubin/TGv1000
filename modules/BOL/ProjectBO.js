@@ -149,10 +149,12 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             lastSaved: row.lastSaved,
                             chargeId: row.chargeId,
                             comics: [],
-                            specialProjectData: {},
                             currentComicIndex: row.currentComicIndex,
                             currentComicStepIndex: row.currentComicStepIndex,
-                            iFetchMode: iFetchMode
+                            specialProjectData: {
+                                strFetchMode: req.body.mode,
+                                iFetchMode: iFetchMode
+                            }
                         };
 
                         // In series:
@@ -355,7 +357,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                         function(comicIth, cbe) {
 
                             comicIth.originalComicId = comicIth.id;
-                            if (project.iFetchMode < 3) {
+                            if (project.specialProjectData.iFetchMode < 3) {
                                 comicIth.id = 0;                                
                             }
                             comicIth.comiccode = [];
@@ -484,7 +486,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             m_log('In m_functionPrepareIncomingLibrary');
 
             var libraryIth = {
-                id: (project.iFetchMode < 3) ? 0 : rowIth.id,
+                // id: (project.specialProjectData.iFetchMode < 3) ? 0 : rowIth.id,
                 originalLibraryId: rowIth.id,
                 createdByUserId: rowIth.createdByUserId,
                 imageId: rowIth.imageId,
@@ -492,6 +494,11 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             };
 
             libraryIth = Object.assign(libraryIth, JSON.parse(rowIth.libraryJSON).library);
+
+            libraryIth.id = m_functionGetIdForLibrary(project, libraryIth, rowIth);
+            if (libraryIth.id === -1) {
+                return callback(new Error('Caught error trying to determine id for library ' + libraryIth.name + ' in comic ' + comicIth.name + '.'));
+            }
 
             // libraryIth.editors was saved as a joined ('\n') string of user emails (user.userName).
             // Since the ultimate source of this property is gotten from library_editors (and saving made sure of that), we will rebuild the string.
@@ -513,6 +520,31 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             );
         } catch(e) {
             return callback(e);
+        }
+    }
+
+    var m_functionGetIdForLibrary = function(project, library, row) {
+
+        try {
+            if (project.specialProjectData.iFetchMode < 3) {
+                if (library.hasOwnProperty('types')) {
+                    if (library.types.length > 0) {
+                        if (library.types[0].name === 'App') {
+                            return 0;
+                        } else {
+                            return row.id;
+                        }
+                    } else {
+                        return row.id;
+                    }
+                } else {
+                    return row.id;
+                }
+            } else {
+                return row.id;
+            }
+        } catch(e) {
+            return -1;  // Check for this someplace.
         }
     }
 
