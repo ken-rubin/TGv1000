@@ -151,10 +151,9 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             comics: [],
                             currentComicIndex: row.currentComicIndex,
                             currentComicStepIndex: row.currentComicStepIndex,
-                            specialProjectData: {
-                                strFetchMode: req.body.mode,
-                                iFetchMode: iFetchMode
-                            }
+                            specialProjectData: {},
+                            strFetchMode: req.body.mode,
+                            iFetchMode: iFetchMode
                         };
 
                         // In series:
@@ -357,7 +356,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                         function(comicIth, cbe) {
 
                             comicIth.originalComicId = comicIth.id;
-                            if (project.specialProjectData.iFetchMode < 3) {
+                            if (project.iFetchMode < 3) {
                                 comicIth.id = 0;                                
                             }
                             comicIth.comiccode = [];
@@ -486,7 +485,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             m_log('In m_functionPrepareIncomingLibrary');
 
             var libraryIth = {
-                // id: (project.specialProjectData.iFetchMode < 3) ? 0 : rowIth.id,
+                // id is NOW set in call to m_functionGetIdForLibrary.
                 originalLibraryId: rowIth.id,
                 createdByUserId: rowIth.createdByUserId,
                 imageId: rowIth.imageId,
@@ -526,7 +525,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
     var m_functionGetIdForLibrary = function(project, library, row) {
 
         try {
-            if (project.specialProjectData.iFetchMode < 3) {
+            if (project.iFetchMode < 3) {
                 if (library.hasOwnProperty('types')) {
                     if (library.types.length > 0) {
                         if (library.types[0].name === 'App') {
@@ -576,7 +575,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             // then specialProjectData itself will have one of these 3 properties: classData, onlineClassData or productData.
             // These three properties contain the info that has to be saved to classes, onlineclasses or products, respectively.
 
-            // A privileged user can also edit and save a core project, keeping it a core project with id=1-5. In this case project.isCoreProject and
+            // A privileged user can also edit and save a core project, keeping it a core project with id=1-6. In this case project.isCoreProject and
             // project.specialProjectData.coreProject will both be true. Take your pick.
 
             // project.specialProjectData.openMode === 'new' for new projects and === 'searched' for projects opened with OpenProjectDialog.
@@ -626,7 +625,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                             m_log('Connection has a transaction');
 
-                                            m_functionDetermineTypeOfSave(connection, req, res,
+/*                                            m_functionDetermineTypeOfSave(connection, req, res,
                                                 function(err, typeOfSave) {
 
                                                     if (err) {
@@ -662,6 +661,13 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                     }
                                                 }
                                             );
+*/                                        
+                                            m_log('Going into m_functionNewSaveProject');
+                                            m_functionNewSaveProject(connection, req, res, project, 
+                                                function(err) {
+                                                    m_functionFinalCallback(err, req, res, connection, project);
+                                                }
+                                            );
                                         }
                                     } catch(e1) { 
                                         return res.json({
@@ -688,7 +694,130 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
         }
     }
 
-    var m_functionDetermineTypeOfSave = function(connection, req, res, callback) {
+    var m_functionNewSaveProject = function(connection, req, res, project, callback) {
+
+        try {
+
+            m_log('***Continuing in m_functionNewSaveProject***');
+
+            // We'll use async.series serially to (1) insert project and 
+            // (2) use async.parallel to
+            //  (2a) write the project's tags and
+            //  (2b) call off to do all of the project's comics
+            //  (2c) if applicable, write to classes, products or onlineclasses
+            async.series(
+                [
+                    // (1)
+                    function(cb) {
+
+                        var guts = {
+                            name: project.name,
+                            description: project.description,
+                            ownedByUserId: req.user.userId,
+                            public: project.public,
+                            quarantined: project.quarantined,
+                            imageId: project.imageId,
+                            altImagePath: project.altImagePath,
+                            baseProjectId: project.parentProjectId,
+                            parentPrice: project.parentPrice,
+                            priceBump: project.priceBump,
+                            projectTypeId: project.projectTypeId,
+                            isCoreProject: (project.isCoreProject ? 1 : 0),
+                            isProduct: (project.isProduct || project.specialProjectData.productProject ? 1 : 0),
+                            isClass: (project.isClass || project.specialProjectData.classProject ? 1 : 0),
+                            isOnlineClass: (project.isOnlineClass || project.specialProjectData.onlineClassProject ? 1 : 0),
+                            lastSaved: (new Date()),
+                            chargeId: project.chargeId,
+                            currentComicIndex: project.currentComicIndex,
+                            currentComicStepIndex: row.currentComicStepIndex
+                        };
+
+                        let verb = 'insert ';
+                        let where = ''
+                        if (project.id) {
+                            verb = 'update ';
+                            where = ' where id=' + project.id;
+                        }
+
+                        if (project.specialProjectData.openMode === "searched") {
+                            
+                            // Make sure firstSaved isn't changed for this case.
+                            // If we don't do this, then firstSaved won't be passed to MySql and firstSaved will be set = CURRENT_TIMESTAMP (now).
+                            guts.firstSaved = moment(project.firstSaved).format("YYYY-MM-DD HH:mm:ss");
+                        }
+
+                        var exceptionRet = m_checkGutsForUndefined('project', guts);
+                        if (exceptionRet) {
+                            return cb(exceptionRet);
+                        }
+
+                        var strQuery = verb + self.dbname + "projects SET ?" + where;
+                        m_log('Inserting or updating project record with ' + strQuery + '; fields: ' + JSON.stringify(guts));
+                        sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
+                            function(err, rows) {
+                                if (err) { return cb(err); }
+                                if (rows.length === 0) { return cb(new Error('Error saving project to database.')); }
+
+                                if (verb === 'insert ') {
+                                    project.id = rows[0].insertId;
+                                }
+
+/*                                // Check if necessary to and then, if so, update project.comicProjectId
+                                if (project.comicProjectId === 0) {
+
+                                    project.comicProjectId = project.id;
+                                    sql.queryWithCxn(connection, "UPDATE " + self.dbname + "projects SET comicProjectId=" + project.id + " WHERE id=" + project.id + ";",
+                                        function(err, rows) {
+                                            return cb(err);
+                                        }
+                                    );
+                                } else {
+                                    return cb(null);
+                                }
+*/
+                                return cb(null);
+                            }
+                        );
+                    },
+                    // (2)
+                    function(cb) {
+
+                        // Use async.parallel to save the project's possible purchasable project info and its comics in parallel.
+                        async.parallel(
+                            [
+                                function(cb) {
+                                    m_log("Calling m_saveComicsToDB");
+                                    m_saveComicsToDB(connection, req, res, project,
+                                        function(err) {
+                                            return cb(err);
+                                        }
+                                    );
+                                },
+                                function(cb) {
+                                    if (project.specialProjectData.userAllowedToCreateEditPurchProjs && (project.specialProjectData.openMode === 'new' || project.specialProjectData.openMode === 'searched')) {
+                                        m_log("Calling m_savePurchProductData");
+                                        m_savePurchProductData(connection, req, res, project,
+                                            function(err) {
+                                                return cb(err);
+                                            }
+                                        );
+                                    } else { return cb(null); }
+                                }
+                            ],
+                            // final callback for (2)
+                            function(err) { return cb(err); }
+                        );
+                    }
+                ],
+                // final callback for (1)
+                function(err) {
+                    return callback(err);
+                }
+            );
+        } catch (e) { return callback(e); }
+    }
+
+/*    var m_functionDetermineTypeOfSave = function(connection, req, res, callback) {
 
         try {
 
@@ -878,7 +1007,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             );
         } catch (e) { callback(e); }
     }
-
+*/
     ///////////////////////////////////////////////////////////////////////////////////////////
     //
     //                      Save processing
@@ -890,7 +1019,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
     //
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    var m_functionSaveProject = function (connection, req, res, project, callback) {
+/*    var m_functionSaveProject = function (connection, req, res, project, callback) {
 
         m_log("***In m_functionSaveProject***");
         try {
@@ -934,7 +1063,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             );
         } catch (e) { callback(e); }
     }
-
+*/
 
     ///////////////////////////////////////////////////////////////////////////////////////////
     //
@@ -947,7 +1076,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
     //
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    var m_functionSaveProjectAs = function (connection, req, res, project, callback) {
+/*    var m_functionSaveProjectAs = function (connection, req, res, project, callback) {
 
         try {
 
@@ -1060,7 +1189,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             );
         } catch(e) { callback(e); }
     }
-
+*/
     ///////////////////////////////////////////////////////////////////////////////////////////
     //
     //                      SaveWithSameId processing
@@ -1075,7 +1204,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
     //
     ///////////////////////////////////////////////////////////////////////////////////////////
 
-    var m_functionSaveProjectWithSameId = function (connection, req, res, project, callback) {
+/*    var m_functionSaveProjectWithSameId = function (connection, req, res, project, callback) {
 
         try {
 
@@ -1196,13 +1325,15 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             );
         } catch(e) { callback(e); }
     }
-
+*/
     var m_savePurchProductData = function(connection, req, res, project, callback) {
 
         try {
             
-            var guts = '';
-            var tblName = '';
+            let guts = '';
+            let tblName = '';
+            let verb = '';
+            let where = '';
 
             // There may be nothing to do here. Check these conditions carefully to understand.
             if (project.specialProjectData.userAllowedToCreateEditPurchProjs 
@@ -1211,11 +1342,16 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                 if (project.specialProjectData.classProject && project.specialProjectData.hasOwnProperty('classData')) {
 
                     guts = {
-                        active: (project.specialProjectData.classData.active ? 1 : 0),
-                        classDescription: project.specialProjectData.classData.classDescription,
+                        name: project.name,
+                        baseProjectId: project.id,
                         instructorFirstName: project.specialProjectData.classData.instructorFirstName,
                         instructorLastName: project.specialProjectData.classData.instructorLastName,
                         instructorPhone: project.specialProjectData.classData.instructorPhone,
+                        level: project.specialProjectData.classData.level,
+                        difficulty: project.specialProjectData.classData.difficulty,
+                        classDescription: project.specialProjectData.classData.classDescription,
+                        imageId: (project.specialProjectData.classData.imageId || 0),           // not set on client side yet
+                        price: project.specialProjectData.classData.price,
                         facility: project.specialProjectData.classData.facility,
                         address: project.specialProjectData.classData.address,
                         room: project.specialProjectData.classData.room,
@@ -1223,51 +1359,64 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                         state: project.specialProjectData.classData.state,
                         zip: project.specialProjectData.classData.zip,
                         schedule: JSON.stringify(project.specialProjectData.classData.schedule),
-                        level: project.specialProjectData.classData.level,
-                        difficulty: project.specialProjectData.classData.difficulty,
-                        price: project.specialProjectData.classData.price,
-                        imageId: (project.specialProjectData.classData.imageId || 0),           // not set on client side yet
+                        active: (project.specialProjectData.classData.active ? 1 : 0),
                         classNotes: project.specialProjectData.classData.classNotes,
-                        name: project.name,
-                        baseProjectId: project.id,
                         maxClassSize: (project.specialProjectData.classData.maxClassSize || 0),  // not set on client side yet
                         loanComputersAvailable: (project.specialProjectData.classData.loadComputersAvailable || 0)  // not set on client side yet
-                        };
+                    };
                     tblName = 'classes';
+                    if (project.specialProjectData.classData.id) {
+                        verb = 'update ';
+                        where = ' where id=' + project.specialProjectData.classData.id;
+                    } else {
+                        verb = 'insert ';
+                    }
 
                 } else if (project.specialProjectData.productProject && project.specialProjectData.hasOwnProperty('productData')) {
 
                     guts = {
-                        active: (project.specialProjectData.productData.active ? 1 : 0),
-                        productDescription: project.specialProjectData.productData.productDescription,
+                        name: project.name,
+                        baseProjectId: project.id,
                         level: project.specialProjectData.productData.level,
                         difficulty: project.specialProjectData.productData.difficulty,
-                        price: project.specialProjectData.productData.price,
+                        productDescription: project.specialProjectData.productData.productDescription,
                         imageId: (project.specialProjectData.productData.imageId || 0),           // not set on client side yet
-                        videoURL: (project.specialProjectData.productData.videoURL || ''),           // not set on client side yet
-                        name: project.name,
-                        baseProjectId: project.id
-                        };
+                        price: project.specialProjectData.productData.price,
+                        active: (project.specialProjectData.productData.active ? 1 : 0),
+                        videoURL: (project.specialProjectData.productData.videoURL || '')           // not set on client side yet
+                    };
                     tblName = 'products';
+                    if (project.specialProjectData.productData.id) {
+                        verb = 'update ';
+                        where = ' where id=' + project.specialProjectData.productData.id;
+                    } else {
+                        verb = 'insert ';
+                    }
 
                 } if (project.specialProjectData.onlineClassProject && project.specialProjectData.hasOwnProperty('onlineClassData')) {
 
                     guts = {
-                        active: (project.specialProjectData.onlineClassData.active ? 1 : 0),
-                        classDescription: project.specialProjectData.onlineClassData.classDescription,
+                        name: project.name,
+                        baseProjectId: project.id,
                         instructorFirstName: project.specialProjectData.onlineClassData.instructorFirstName,
                         instructorLastName: project.specialProjectData.onlineClassData.instructorLastName,
                         instructorEmail: project.specialProjectData.onlineClassData.instructorEmail,
-                        schedule: JSON.stringify(project.specialProjectData.onlineClassData.schedule),
                         level: project.specialProjectData.onlineClassData.level,
                         difficulty: project.specialProjectData.onlineClassData.difficulty,
-                        price: project.specialProjectData.onlineClassData.price,
-                        classNotes: project.specialProjectData.onlineClassData.classNotes,
+                        classDescription: project.specialProjectData.onlineClassData.classDescription,
                         imageId: (project.specialProjectData.onlineClassData.imageId || 0),           // not set on client side yet
-                        name: project.name,
-                        baseProjectId: project.id
-                        };
+                        price: project.specialProjectData.onlineClassData.price,
+                        schedule: JSON.stringify(project.specialProjectData.onlineClassData.schedule),
+                        active: (project.specialProjectData.onlineClassData.active ? 1 : 0),
+                        classNotes: project.specialProjectData.onlineClassData.classNotes
+                    };
                     tblName = 'onlineclasses';
+                    if (project.specialProjectData.onlineClassData.id) {
+                        verb = 'update ';
+                        where = ' where id=' + project.specialProjectData.onlineClassData.id;
+                    } else {
+                        verb = 'insert ';
+                    }
                 }
 
                 if (tblName.length > 0) {
@@ -1277,24 +1426,27 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                         return cb(exceptionRet);
                     }
 
-                    var strQuery = "INSERT " + self.dbname + tblName + " SET ?";
-                    m_log('Inserting purchasable project with ' + strQuery + '; fields: ' + JSON.stringify(guts));
+                    var strQuery = verb + self.dbname + tblName + " SET ?" + where;
+                    m_log('Inserting or updating purchasable project with ' + strQuery + '; fields: ' + JSON.stringify(guts));
                     sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
                         function(err, rows) {
                             if (err) { return callback(err); }
+                            if (rows.length === 0) { return callback(new Error('Error saving PP part of project to database.')); }
 
-                            var id = rows[0].insertId;
-                            if (tblName === 'classes') {
+                            if (verb === "insert ") {
+                                let id = rows[0].insertId;
+                                if (tblName === 'classes') {
 
-                                project.specialProjectData.classData.id = id;
+                                    project.specialProjectData.classData.id = id;
 
-                            } else if (tblName === 'products') {
+                                } else if (tblName === 'products') {
 
-                                project.specialProjectData.productData.id = id;
+                                    project.specialProjectData.productData.id = id;
 
-                            } else {
+                                } else {
 
-                                project.specialProjectData.onlineClassData.id = id;
+                                    project.specialProjectData.onlineClassData.id = id;
+                                }
                             }
                             return callback(null);
                         }

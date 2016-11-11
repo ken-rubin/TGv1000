@@ -98,7 +98,6 @@ define(["Core/errorHelper",
 								self.openProjectFromDB(6, 'new',
 									function() {
 
-										self.project.id = 0;	// just to be sure it doesn't overwrite a core project
 										self.project.isCoreProject = false;
 
 										// We could also do these things that used to be done in the BO, but we aren't--at least for now.
@@ -113,7 +112,7 @@ define(["Core/errorHelper",
 										self.project.ownedByUserId = parseInt(g_profile["userId"], 10);
 
 										// Now we'll add the fields to the project that will both tell the rest of the UI how to handle it and will affect how it gets saved to the database.
-										self.project.specialProjectData = {
+										let spd = {
 											userAllowedToCreateEditPurchProjs: manager.userAllowedToCreateEditPurchProjs,
 											userCanWorkWithSystemLibsAndTypes: manager.userCanWorkWithSystemLibsAndTypes,
 											ownedByUser: true,
@@ -127,6 +126,7 @@ define(["Core/errorHelper",
 											systemTypesEdited: false,
 											openMode: 'new'
 										};
+										self.project.specialProjectData = Object.assign(self.project.specialProjectData, spd);
 							    		var exceptionRet = manager.loadProject(self.project);
 							    		if (exceptionRet) { throw exceptionRet; }
 
@@ -422,7 +422,7 @@ define(["Core/errorHelper",
 
 						try {
 
-							// Call manager.save(). Manager will use its reference to slef.project (self = Client.js) to
+							// Call manager.save(). Manager will use its reference to self.project (self = Client.js) to
 							// update the project in client so we can go forward with the save.
 							var exceptionRet = manager.save();
 

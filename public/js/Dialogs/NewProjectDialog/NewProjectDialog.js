@@ -507,7 +507,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									}
 
 									// Now we'll add the fields to the project that will both tell the rest of the UI how to handle it and will affect how it gets saved to the database.
-									client.project.specialProjectData = {
+									// Since there's already a client.project.specialProjectData (although it may be empty), we'll merge new stuff into the existing.
+									var spd = {
 										userAllowedToCreateEditPurchProjs: manager.userAllowedToCreateEditPurchProjs,
 										userCanWorkWithSystemLibsAndTypes: manager.userCanWorkWithSystemLibsAndTypes,
 										ownedByUser: false,
@@ -521,6 +522,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 										systemTypesEdited: false,
 										openMode: 'new'
 									};
+
+									client.project.specialProjectData = Object.assign(client.project.specialProjectData, spd);
 
 									if (m_bClassProject) {
 
