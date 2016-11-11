@@ -1114,64 +1114,32 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                                         break;
                                     case 6:
                                         passOn["projects"] = rows;
-                                        // Maybe do sorting by sindex.
+                                        if (passOn.tempTableName.length) {
+
+                                            // Do sorting by sindex here on each row's sindex in DESCENDING order.
+                                            for (let i = 0; i < 6; i++) {
+
+                                                if (passOn.projects[i].length) {
+
+                                                    passOn.projects[i].sort(
+                                                        function(a,b) {
+                                                            if (a.sindex > b.sindex)
+                                                                return -1;
+                                                            if (a.sindex < b.sindex)
+                                                                return 1;
+                                                            return 0;
+                                                        }
+                                                    )
+                                                }
+                                            }
+                                        }
                                         break;
                                     default:
                                         return cb(new Error('Unknown failure of search query.'), null);
                                 }
 
                                 return cb(null, passOn);
-
-
-
-/*                                if (passOn.tempTableName.length) {
-
-                                    // rows is a jagged array with first dimension size = 6.
-                                    let totRows = 0;
-                                    for (let i = 0; i < 6; i++) { totRows += rows[i].length; }
-                                    if (totRows === 0) {
-                                        passOn.projects = rows;
-                                        return cb(null, passOn);
-                                    }
-
-                                    // Sort rows on projectName, since async retrieval doesn't let us sort in the query.
-                                    for (let i = 0; i < 6; i++) {
-                                        if (rows[i].length) {
-
-                                            rows[i].sort(function(a,b){
-
-                                                if (a.projectName > b.projectName)
-                                                    return 1;
-                                                if (a.projectName < b.projectName)
-                                                    return -1;
-                                                return 0;
-                                            });
-                                        }
-                                    }
-
-                                    passOn.projects = rows;
-                                    return cb(null, passOn);
-
-                                } else {
-
-                                    // Tags didn't match. rows has core projects for priv. user and is empty for non-priv. users.
-                                    // But we have to fill out passOn.projects so we can return success, not failure.
-                                    // And not crap out on the client side.
-
-                                    passOn.projects = Array(6);
-                                    if (req.body.userAllowedToCreateEditPurchProjs === '1') {
-                                        passOn.projects[0] = rows;
-                                    } else {
-                                        passOn.projects[0] = new Array();
-                                    }
-
-                                    for (let i = 1; i < 6; i++) {
-                                        passOn.projects[i] = new Array();
-                                    }
-
-                                    return cb(null, passOn);
-                                }
-*/                            },
+                            },
                             function(strError) { return cb(new Error(strError), null); }
                         );
                     },

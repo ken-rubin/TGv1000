@@ -236,24 +236,25 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 						    if (m_searchResultProcessedArray[stripNum].length === 0) {
 
 						    	if (manager.userAllowedToCreateEditPurchProjs) {
+									
 						    		// Core projects will always be present so no wellmessage is required for [0].
 							    	if (m_searchPhrase.length) {
 
 							    		switch(stripNum) {
 							    			case 1:
-									    		m_wellMessage("1", "None of your projects match all of the tags: " + m_searchPhrase + ".", null);
+									    		m_wellMessage("1", "None of your projects match any words in the Search phrase: " + m_searchPhrase + ".", null);
 									    		break;
 									    	case 2:
-									    		m_wellMessage("2", "None of others' projects match all of the tags: " + m_searchPhrase + ".", null);
+									    		m_wellMessage("2", "None of others' projects match any words in the Search phrase: " + m_searchPhrase + ".", null);
 									    		break;
 									    	case 3:
-									    		m_wellMessage("3", "No Products match all of the tags: " + m_searchPhrase + ".", null);
+									    		m_wellMessage("3", "No Products match any words in the Search phrase: " + m_searchPhrase + ".", null);
 									    		break;
 									    	case 4:
-									    		m_wellMessage("4", "No Classes match all of the tags: " + m_searchPhrase + ".", null);
+									    		m_wellMessage("4", "No Classes match any words in the Search phrase: " + m_searchPhrase + ".", null);
 									    		break;
 									    	case 5:
-									    		m_wellMessage("5", "No Online Classes match all of the tags: " + m_searchPhrase + ".", null);
+									    		m_wellMessage("5", "No Online Classes match any words in the Search phrase: " + m_searchPhrase + ".", null);
 									    		break;
 										}
 								    } else {
@@ -282,19 +283,19 @@ define(["Core/errorHelper", "Core/resourceHelper", "Core/ScrollRegionMulti"],
 
 							    		switch(stripNum) {
 							    			case 1:
-										    	m_wellMessage("1", "None of your projects match all of the tags: " + m_searchPhrase + ".", null);
+										    	m_wellMessage("1", "None of your projects match any words in the Search phrase: " + m_searchPhrase + ".", null);
 										    	break;
 										    case 2:
-										    	m_wellMessage("2", "None of others' projects match all of the tags: " + m_searchPhrase + ".", null);
+										    	m_wellMessage("2", "None of others' projects match any words in the Search phrase: " + m_searchPhrase + ".", null);
 										    	break;
 										    case 3:
-										    	m_wellMessage("3", "No active Products match all of the tags: " + m_searchPhrase + ".", null);
+										    	m_wellMessage("3", "No active Products match any words in the Search phrase: " + m_searchPhrase + ".", null);
 										    	break;
 										    case 4:
-										    	m_wellMessage("4", "No Classes starting in the next 3 months and within 35 miles of your zipcode match all of the tags: " + m_searchPhrase + ".", null);
+										    	m_wellMessage("4", "No Classes starting in the next 3 months and within 35 miles of your zipcode match any words in the Search phrase: " + m_searchPhrase + ".", null);
 										    	break;
 										    case 5:
-										    	m_wellMessage("5", "No Online Classes starting in the next 3 months match all of the tags: " + m_searchPhrase + ".", null);
+										    	m_wellMessage("5", "No Online Classes starting in the next 3 months match any words in the Search phrase: " + m_searchPhrase + ".", null);
 										    	break;
 										}
 								    } else {
