@@ -145,7 +145,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                 var chargeId = null;
                 var id = null;
 /* TOXXX DONE   var strQuery = "select chargeId, id from " + self.dbname + "projects where ownedByUserId=" + req.body.userId + " and comicProjectId=" + req.body.projectId + ";"; */
-                var strQuery = "select chargeId, id from " + self.dbname + "projects where ownedByUserId=" + req.body.userId + " and id in (" + self.dbname + "getProjectsLinkedToComic0OfProject(" + req.body.projectId + "));";
+                var strQuery = "select chargeId, id from " + self.dbname + "projects where ownedByUserId=" + req.body.userId + " and id in (" + self.dbname + "getProjectsLinkedToGivenProjectByComic(" + req.body.projectId + "));";
                 sql.execute(
                     strQuery,
                     function(rows) {
@@ -252,10 +252,10 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
 
 // TODO Cascading delete has become more complicated so this will need to change:
 
-                // Just do cascading delete of the project.
+                // This is the no-refund case. Just do cascading delete of the project.
                 var projectIds = null;
 /* TOXXX DONE   var strQuery = "select id from " + self.dbname + "projects where ownedByUserId=" + req.body.userId + " and comicProjectId=" + req.body.projectId + ";";                */
-                var strQuery = "select " + self.dbname + "getProjectsLinkedToComic0OfProject(" + req.body.projectId + ") as projectIds;"; // userId check has been moved below.
+                var strQuery = "select " + self.dbname + "getProjectsLinkedToGivenProjectByComic(" + req.body.projectId + ") as projectIds;"; // userId check has been moved below.
                 sql.execute(
                     strQuery,
                     function(rows) {
@@ -395,7 +395,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         // This function adds passOn.project.numEnrollees
 
 /* TOXXX DONE           var strQuery = "select count(*) as cnt from " + self.dbname + "projects where comicProjectId=" + passOn.project.id + " and id<>" + passOn.project.id + ";"; */
-                        var strQuery = "select " + self.dbname + "getProjectsLinkedToComic0OfProject(" + passOn.project.id + ") as idstring";
+                        var strQuery = "select " + self.dbname + "getProjectsLinkedToGivenProjectByComic(" + passOn.project.id + ") as idstring";
 
                         sql.execute(strQuery,
                             function(rows){
@@ -444,7 +444,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         // This function adds passOn.buyers.
 
 /* TOXXX DONE           var strQuery = "select u.*, ug.name as usergroupName from " + self.dbname + "user u inner join " + self.dbname + "usergroups ug on u.usergroupId=ug.id where u.id in (select ownedByUserId from " + self.dbname + "projects where id<>comicProjectId and comicProjectId=" + req.body.projectId + ");"; */
-                        var strQuery = "select u.*, ug.name as usergroupName from " + self.dbname + "user u inner join " + self.dbname + "usergroups ug on u.usergroupId=ug.id where u.id in (select ownedByUserId from " + self.dbname + "projects where id in (select " + self.dbname + "getProjectsLinkedToComic0OfProject(" + req.body.projectId + ")));";
+                        var strQuery = "select u.*, ug.name as usergroupName from " + self.dbname + "user u inner join " + self.dbname + "usergroups ug on u.usergroupId=ug.id where u.id in (select ownedByUserId from " + self.dbname + "projects where id in (select " + self.dbname + "getProjectsLinkedToGivenProjectByComic(" + req.body.projectId + ")));";
                         sql.execute(
                             strQuery,
                             function(rows) {
