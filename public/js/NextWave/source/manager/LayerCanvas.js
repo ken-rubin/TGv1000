@@ -68,28 +68,40 @@ define(["NextWave/source/utility/prototypes",
                             contextRender.translate(dMidX,
                                 dMidY);
 
+                            let areaBounds = new Area(new Point(-dMidX, -dMidY),
+                                self.extent);
+
                             // Loop over tg namespace, looking for visual objects.
                             var arrayInstances = window.tg.instances;
 
-                            for (var i = 0; i < arrayInstances.length; i++) {
+                            if (arrayInstances) {
 
-                                // Extract instance.
-                                var instanceIth = arrayInstances[i];
+                                for (var i = 0; i < arrayInstances.length; i++) {
 
-                                // Just continue if it is not visual.
-                                if (!window.tg ||
-                                    !window.tg.VisualObject ||
-                                    !(instanceIth instanceof window.tg.VisualObject)) {
+                                    // Extract instance.
+                                    var instanceIth = arrayInstances[i];
 
-                                    continue;
+                                    // Just continue if it is not a correctly specified visual.
+                                    if (!window.tg ||
+                                        !window.tg.KernelTypes.VisualObject ||
+                                        !(instanceIth instanceof window.tg.KernelTypes.VisualObject) ||
+                                        !instanceIth.update ||
+                                        !instanceIth.render) {
+
+                                        continue;
+                                    }
+
+                                    // Else, render.
+                                    try {
+
+                                        instanceIth.update(areaBounds);
+                                        instanceIth.render(contextRender);
+                                    } catch (e) {
+
+                                        // ....
+                                        console.log(e.message);
+                                    }
                                 }
-
-                                // Else, render.
-                                contextRender.fillStyle = "Blue";
-                                contextRender.fillRect(instanceIth.x, 
-                                    instanceIth.y, 
-                                    instanceIth.width, 
-                                    instanceIth.height);
                             }
 
                             return null;

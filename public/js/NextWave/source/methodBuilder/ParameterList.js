@@ -243,11 +243,6 @@ define(["NextWave/source/utility/prototypes",
                         let bOutputAParameter = false;
                         for (var i = 0; i < self.items.length; i++) {
 
-                            if (bOutputAParameter) {
-
-                                strParameters += " , ";
-                            }
-
                             let itemIth = self.items[i];
                             if (itemIth.payload &&
                                 (!itemIth.payload ||
@@ -256,6 +251,10 @@ define(["NextWave/source/utility/prototypes",
                                 continue;
                             }
 
+                            if (strParameters.length > 1) {
+
+                                strParameters += " , ";
+                            }
                             strParameters += itemIth.generateJavaScript();
                         }
 

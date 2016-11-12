@@ -165,22 +165,57 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Generates JavaScript string for this method.
-                    self.generateJavaScript = function () {
+                    self.generateJavaScript = function (arrayProperties, arrayEvents) {
 
                         var strMethod = "\n";
 
-                        // Save off base method, if extant.
-                        strMethod += "    var _" + self.data.name + " = ((this && this.hasOwnProperty('" + self.data.name + "')) ? this." + self.data.name + " : undefined);\n";
-                        strMethod += "    self." + self.data.name + " = function (" + self.parameters.generateJavaScript() + ") {\n\n";
+                        // Output name and signiture.
+                        strMethod += "    " + self.data.name + " (" +
+                            self.parameters.generateJavaScript() +
+                            ") {\n\n";
 
-                        // Call base, if specified.
-                        // TODO: only call if specified to do so.
-                        strMethod += "        if (_" + self.data.name + ") { _" + self.data.name + "(...arguments); }\n"
+                        // If this is construct, then get the properties and events and output.
+                        var bConstructor = false;
+                        if (self.data.name === "constructor") {
 
-                        // Statements.
-                        strMethod += self.statements.generateJavaScript() + "\n";
+                            // Remember in constructor.
+                            bConstructor = true;
 
-                        strMethod += "    };\n";
+                            // Since in constructor, render the super call 
+                            // first--this defines lexically scoped this.
+                            strMethod += self.statements.generateJavaScript(true, true) + "\n";
+
+                            // Add Properties.
+                            if (arrayProperties &&
+                                arrayProperties.length > 0) {
+
+                                // Loop over all Properties
+                                for (var i = 0; i < arrayProperties.length; i++) {
+
+                                    // Add it to the result object.
+                                    strMethod += arrayProperties[i].generateJavaScript() + "\n";
+                                }
+                            }
+ 
+                            // Add Events.
+                            if (arrayEvents &&
+                                arrayEvents.length > 0) {
+
+                                // Loop over all Events
+                                for (var i = 0; i < arrayEvents.length; i++) {
+
+                                    // Add it to the result object.
+                                    strMethod += arrayEvents[i].generateJavaScript() + "\n";
+                                }
+                            }
+                        }
+
+                        // Output statements.  If constructor 
+                        // then don't (re)output super call.
+                        strMethod += self.statements.generateJavaScript(bConstructor, false) + "\n\n";
+
+                        // Output closing squiggle.
+                        strMethod += "    }\n";
 
                         return strMethod;
                     };
@@ -219,7 +254,7 @@ define(["NextWave/source/utility/prototypes",
 
                                 return '""';
                             }
-                            return '"' + objectStatement.value + '"';
+                            return '"' + objectStatement.value.replace('"', "'") + '"';
                         } else if (strType === "Boolean") {
 
                             if (!objectStatement.value) {

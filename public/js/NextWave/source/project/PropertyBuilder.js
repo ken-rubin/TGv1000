@@ -117,17 +117,17 @@ define(["NextWave/source/utility/prototypes",
                                         }
                                     }
                                 },
-                                typeLabel: {
+                                defaultExpressionLabel: {
 
                                     type: "Label",
-                                    text: "Type",
+                                    text: "Default",
                                     x: settings.general.margin,
                                     y: settings.dialog.lineHeight + 
                                         2 * settings.general.margin,
                                     width: settings.dialog.firstColumnWidth,
                                     height: settings.dialog.lineHeight
                                 },
-                                typeEdit: {
+                                defaultExpressionEdit: {
 
                                     type: "Edit",
                                     x: 2 * settings.general.margin + 
@@ -139,37 +139,12 @@ define(["NextWave/source/utility/prototypes",
                                     width: 3 * settings.general.margin +
                                         settings.dialog.firstColumnWidth,
                                     height: settings.dialog.lineHeight,
-                                    enterFocus: function (localSelf) {
-
-                                        try {
-
-                                            // Save the original base, for resetting on invalid new name.
-                                            localSelf.saveType = localSelf.getText();
-                                        } catch (e) {
-
-                                            alert(e.message);
-                                        }
-                                    },
                                     exitFocus: function (localSelf) {
 
                                         try {
 
-                                            // Ensure the type value is a valid type:
-
-                                            // Test it.
-                                            if (!window.manager.isValidPropertyTypeName(localSelf.getText())) {
-
-                                                // Reset base class on error.
-                                                var exceptionRet = localSelf.setText(localSelf.saveType);
-                                                if (exceptionRet) {
-
-                                                    throw exceptionRet;
-                                                }
-                                            } else {
-
-                                                // Update it description.
-                                                self.currentProperty.data.typeName = localSelf.getText();
-                                            }
+                                            // Update it description.
+                                            self.currentProperty.data.defaultExpression = localSelf.getText();
                                         } catch (e) {
 
                                             alert(e.message);
@@ -260,9 +235,9 @@ define(["NextWave/source/utility/prototypes",
 
                                 self.currentProperty.data.name = "[name]";
                             }
-                            if (!self.currentProperty.data.typeName) {
+                            if (!self.currentProperty.data.defaultExpression) {
 
-                                self.currentProperty.data.typeName = "Number";
+                                self.currentProperty.data.defaultExpression = "";
                             }
                             if (!self.currentProperty.data.description) {
 
@@ -305,12 +280,12 @@ define(["NextWave/source/utility/prototypes",
 
                                 bProtected = true;
                             }
-                            exceptionRet = self.dialog.controlObject["typeEdit"].setProtected(bProtected);
+                            exceptionRet = self.dialog.controlObject["defaultExpression"].setProtected(bProtected);
                             if (exceptionRet) {
 
                                 return exceptionRet;
                             }
-                            exceptionRet = self.dialog.controlObject["typeEdit"].setText(self.currentProperty.data.typeName);
+                            exceptionRet = self.dialog.controlObject["defaultExpression"].setText(self.currentProperty.data.defaultExpression);
                             if (exceptionRet) {
 
                                 return exceptionRet;

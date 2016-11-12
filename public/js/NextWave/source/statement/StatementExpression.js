@@ -51,12 +51,7 @@ define(["NextWave/source/utility/prototypes",
                         //             )
                         //         )
                         //     );
-                        return new CodeStatementExpression(
-                                new CodeExpressionInvocation(
-                                    new CodeExpressionLiteral("..."),
-                                    new ParameterList()
-                                )
-                            );
+                        return new CodeStatementExpression(new CodeExpressionLiteral("..."));
                     };
                 } catch (e) {
 

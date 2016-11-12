@@ -234,6 +234,44 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Loop over the current Comic's Libraries, 
+                    // loop over the Libraries Types and match.
+                    self.getLibrary = function (strType) {
+
+                        // Scan the Libraries in the current Comic.
+                        for (var i = 0; i < self.currentComic.libraries.length; i++) {
+
+                            // Extract ith Library.
+                            var libraryIth = self.currentComic.libraries[i];
+
+                            for (var j = 0; j < libraryIth.types.length; j++) {
+
+                                // Extract jth Type.
+                                var typeJth = libraryIth.types[j];
+
+                                if (typeJth.data.name === strType) {
+
+                                    return libraryIth.data.name;
+                                }
+                            }
+                        }
+
+                        // Failed.
+                        return null;
+                    };
+
+                    // Method causes the Library section to open.
+                    self.openLibrarysSection = function () {
+
+                        try {
+
+                            return self.dialog.controlObject["projectAccordion"].openSection("libraries");
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Merge the specified library into dialog.
                     self.mergeLibrary = function (library) {
 
@@ -365,6 +403,18 @@ define(["NextWave/source/utility/prototypes",
 
                             // Clear dependent lists too.
                             return self.clearTypes();
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Method causes the types section to open.
+                    self.openTypesSection = function () {
+
+                        try {
+
+                            return self.dialog.controlObject["projectAccordion"].openSection("types");
                         } catch (e) {
 
                             return e;
@@ -1197,8 +1247,8 @@ define(["NextWave/source/utility/prototypes",
                                 return exceptionRet;
                             }
 
-                            // Add constructor (construct).
-                            exceptionRet = m_functionAddMethod("construct");
+                            // Add constructor.
+                            exceptionRet = m_functionAddMethod("constructor");
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -1309,6 +1359,7 @@ define(["NextWave/source/utility/prototypes",
                             var exceptionRet = propertyNew.create({
 
                                 name: strUnique,
+                                defaultExpression: "",
                                 ownedByUserId: parseInt(g_profile["userId"], 10)
                             });
                             if (exceptionRet) {

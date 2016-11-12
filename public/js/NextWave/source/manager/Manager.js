@@ -84,21 +84,6 @@ define(["NextWave/source/utility/prototypes",
                     self.userAllowedToCreateEditPurchProjs = false;
 
                     ////////////////////////
-                    // Code interface.
-
-                    // Method invoked by game base type.
-                    self.startGame = function () {
-
-                        try {
-
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    ////////////////////////
                     // Public methods.
 
                     // Initialze instance.
@@ -363,10 +348,13 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            // Hide panels, ai, and drag.
+                            /* Hide panels, ai, and drag.
                             self.canvasLayer.active = true;
                             self.panelLayer.active = false;
-                            self.dragLayer.active = false;
+                            self.dragLayer.active = false;*/
+
+                            // Cause a resize.
+                            m_functionWindowResize();
 
                             // Build all javascript code.
                             var objectModules = window.projectDialog.generateJavaScript();
@@ -382,11 +370,15 @@ define(["NextWave/source/utility/prototypes",
 
                             // Stop simulating.
                             var exceptionRet = simulator.stop();
+                            if (exceptionRet) {
 
-                            // Re-enable panels and drag.
+                                throw exceptionRet;
+                            }
+
+                            /* Re-enable panels and drag.
                             self.canvasLayer.active = false;
                             self.panelLayer.active = true;
-                            self.dragLayer.active = true;
+                            self.dragLayer.active = true;*/
 
                             // Cause a resize.
                             m_functionWindowResize();
@@ -408,6 +400,18 @@ define(["NextWave/source/utility/prototypes",
                     self.isValidPropertyTypeName = function (strProvisionalPropertyTypeName) {
 
                         return true;
+                    };
+
+                    self.isBuiltInType = function (strType) {
+
+                        for (var i = 0; i < m_arrayReserved.length; i++) {
+
+                            if (m_arrayReserved[i] === strType) {
+
+                                return true;
+                            }
+                        }
+                        return false;
                     };
 
                     // Build a unique name from the specified name.
@@ -1498,14 +1502,14 @@ define(["NextWave/source/utility/prototypes",
                         "false", "final", "finally", "float", "for", "function", "fileUpload", "focus", "form", "forms", "frame", "frames", "frameRate",
                         "goto", "getClass",
                         "hasOwnProperty", "hidden", "history", 
-                        "if", "implements", "import", "in", "instanceof", "int", "interface", "image", "images", "Infinity", "isFinite", "isNaN", "isPrototypeOf", "innerHeight", "innerWidth", 
+                        "if", "implements", "import", "in", "instanceof", "int", "interface", "Image", "images", "Infinity", "isFinite", "isNaN", "isPrototypeOf", "innerHeight", "innerWidth", 
                         "java", "JavaArray", "JavaClass", "JavaObject", "JavaPackage",
                         "let", "long", "layer", "laysers", "length", "link", "location",
                         "Math", "mimeTypes", 
-                        "native", "new", "null", "name", "NaN", "navigate", "navigator",
+                        "native", "new", "null", "name", "NaN", "navigate", "navigator", "Number", 
                         "Object", "offscreenBuffering", "open", "opener", "option", "outerHeight", "outerWidth", "onbeforeunload", "onblur", "ondragdrop", "onclick", "oncontextmenu", "onerror", "onfocus", "onkeydown", "onkeypress", "onkeyup", "onload", "onmousedown", "onmousemove", "onmouseout", "onmouseover", "onmouseup", "onreset", "onsubmit", "onunload",
                         "package", "private", "protected", "public", "packages", "pageXOffset", "pageYOffset", "parent", "pargeFloat", "parseInt", "password", "pkcs11", "plugin", "prompt", "propertyIsEnum", "prototype",
-                        "return", "radio", "reset",
+                        "return", "radio", "reset", "RegEx",
                         "short", "static", "super", "switch", "synchronized", "screenX", "screenY", "scroll", "secure", "select", "self", "setInterval", "setTimeout", "status", "String", "submit", 
                         "this", "throw", "throws", "transient", "true", "try", "typeof", "taint", "text", "textarea", "top", "toString", 
                         "undefined", "unescape", "untaint", 

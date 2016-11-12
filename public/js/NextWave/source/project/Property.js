@@ -100,7 +100,7 @@ define(["NextWave/source/utility/ListItem"],
 
                         var strProperty = "\n";
 
-                        strProperty += "    self." + self.data.name + " = null;";
+                        strProperty += "    this." + self.data.name + " = " + self.data.defaultExpression + ";";
 
                         strProperty += "\n";
 

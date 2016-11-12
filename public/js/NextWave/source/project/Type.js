@@ -224,87 +224,31 @@ define(["NextWave/source/project/Method",
 
                             // Build the constructor function for the type.
                             var strConstructorFunction = "if (!window.tg." + self.owner.data.name + ") { window.tg." + self.owner.data.name + " = {}; } \n\n" +
-                                "window.tg." + self.owner.data.name + "." + self.data.name + " = function () {\n\n" +
-                                "    // Closure.\n" +
-                                "    var self = this;\n\n";
+                                "window.tg." + self.owner.data.name + "." + self.data.name + " = class ";
 
-                            // Call parent constructor.
+                            // Extend, if derived.
                             if (self.data.baseTypeName) {
 
-                                // Fix base type name because it still has spaces?!
-                                // TODO: remove this and fix db.
-                                self.data.baseTypeName = self.data.baseTypeName.replace(/ /g, "");
+                                let strBaseTypeLibraryName = window.projectDialog.getLibrary(self.data.baseTypeName);
 
                                 strConstructorFunction += 
-                                    "    // Inherit from Base.\n" +
-                                    "    self.inherits(window.tg." + self.data.baseTypeLibraryName + "." + self.data.baseTypeName + ");\n\n";                            
-                            }
-                            strConstructorFunction += 
-                                "    // Register with system.\n" +
-                                "    if (arguments.length) { window.tg.instances.push(self); }\n\n";
-
-                            // Add Properties.
-                            if (self.properties &&
-                                self.properties.legnth > 0) {
-
-                                strConstructorFunction += 
-                                    "\n" +
-                                    "    /* Properties */\n\n";
-
-                                // Loop over all Properties
-                                for (var i = 0; i < self.properties.length; i++) {
-
-                                    // Add it to the result object.
-                                    strConstructorFunction += self.properties[i].generateJavaScript() + "\n";
-                                }
+                                    "extends window.tg." + 
+                                    strBaseTypeLibraryName + "." + 
+                                    self.data.baseTypeName + " ";                            
                             }
 
-                            // Add Events.
-                            if (self.events &&
-                                self.events.length > 0) {
-
-                                strConstructorFunction += 
-                                    "\n" +
-                                    "    /* Events */\n\n";
-
-                                // Loop over all Events
-                                for (var i = 0; i < self.events.length; i++) {
-
-                                    // Add it to the result object.
-                                    strConstructorFunction += self.events[i].generateJavaScript() + "\n";
-                                }
-                            }
+                            strConstructorFunction += "{\n\n";
 
                             // Add Methods.
-                            if (self.methods &&
-                                self.methods.length > 0) {
+                            for (var i = 0; i < self.methods.length; i++) {
 
-                                strConstructorFunction += 
-                                    "\n" +
-                                    "    /* Methods */\n\n";
-
-                                // Loop over all Methods
-                                for (var i = 0; i < self.methods.length; i++) {
-
-                                    // Add it to the result object.
-                                    strConstructorFunction += self.methods[i].generateJavaScript() + "\n";
-                                }
+                                // Add it to the result object.
+                                strConstructorFunction += self.methods[i].generateJavaScript(self.properties,
+                                    self.events) + "\n";
                             }
 
-                            // Invoke constructor--but only if this == the type and an argument is passed.
-                            strConstructorFunction += 
-                                "    // Invoke construct-chain.\n" +
-                                "    if ((this instanceof window.tg." + self.owner.data.name + "." + self.data.name + ") && (arguments.length)) { this.construct(); }\n"
-
-                            strConstructorFunction += "};\n";
-
-                            // Wire the prototype chain.
-                            if (self.data.baseTypeName) {
-
-                                strConstructorFunction += 
-                                    "// Complete inheritance from base.\n" +
-                                    "window.tg." + self.owner.data.name + "." + self.data.name + ".inheritsFrom(window.tg." + self.data.baseTypeLibraryName + "." + self.data.baseTypeName + ");\n\n";                            
-                            }
+                            strConstructorFunction += "\n\n};";
+                            console.log("Define class: " + strConstructorFunction)
 
                             // Stow.
                             arrayTypes.push({

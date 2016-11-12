@@ -121,6 +121,13 @@ define(["NextWave/source/project/Type",
                                 return exceptionRet;
                             }
 
+                            // Cause the types panel to open.
+                            exceptionRet = window.projectDialog.openTypesSection();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
                             // Select into gui.
                             return window.manager.selectLibrary(self);
                         } catch (e) {

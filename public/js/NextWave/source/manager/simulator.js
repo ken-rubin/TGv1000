@@ -33,19 +33,50 @@ define(["NextWave/source/utility/prototypes",
                             // Declare namespace.
                             window.tg = {};
                             window.tg.instances = [];
+                            window.tg.eventCollection = [];
+                            window.tg.raiseCollection = [];
+                            window.tg.app = null;
+                            window.tg.manager = window.manager;
+                            window.tg.typeNames = new Set();
 
-                            // Load up/allocate all the library instances necessary.
+                            // Load up/allocate all the Type constructor functions.
                             let libraryApp = null;
                             for (var i = 0; i < objectModules.types.length; i++) {
 
                                 let typeIth = objectModules.types[i];
+
+                                // Test the base class, if specified,  
+                                // to ensure it has already been loaded.
+                                let strBaseTypeName = typeIth.type.data.baseTypeName;
+                                if (strBaseTypeName) {
+
+                                    // Test....
+                                    if (!window.tg.typeNames.has(strBaseTypeName)) {
+
+                                        // Move this Type to the end of the Array of Types.
+                                        objectModules.types.splice(i, 1);
+                                        objectModules.types.push(typeIth);
+
+                                        // Adjust i, ...
+                                        i--;
+
+                                        // ...because about to:
+                                        continue;
+                                    }
+                                }
+
+                                // Actuate the constructor function.
                                 eval(typeIth.constructor);
 
+                                // If this is an "App"-type, then remember
+                                // the library--it is used later to auto-allocate.
                                 if (typeIth.type.data.name === "App") {
 
                                     libraryApp = typeIth.library;
                                 }
 
+                                // Add to typeNames Set.
+                                window.tg.typeNames.add(typeIth.type.data.name)
                             }
 
                             // Allocate app.
@@ -65,16 +96,20 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            // Stop rendering.
-                            if (m_renderCookie) {
+                            // If the app was found and allocated, call its destruct, if defined.
+                            if (window.tg.app &&
+                                window.tg.app.destruct) {
 
-                                clearInterval(m_renderCookie);
-                                m_renderCookie = undefined;
+                                window.tg.app.destruct();
                             }
 
                             // Clear namespace.
                             window.tg = {};
                             window.tg.instances = [];
+                            window.tg.eventCollection = [];
+                            window.tg.raiseCollection = [];
+                            window.tg.app = null;
+                            window.tg.typeNames = null;
                             return null;
                         } catch (e) {
 

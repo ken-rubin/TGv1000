@@ -593,6 +593,7 @@ define(["NextWave/source/utility/prototypes",
                                 self.text = self.text.substr(0, m_iSelectionStart) +
                                     String.fromCharCode(e.which) +
                                     self.text.substr(m_iSelectionStart + m_iSelectionLength);
+                                self.text = self.text.replace('"', "'");
            
                                 // Move the selection over one place and ensure narrow selection.
                                 m_iSelectionStart++;

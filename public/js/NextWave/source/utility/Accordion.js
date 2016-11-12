@@ -45,6 +45,31 @@ define(["NextWave/source/utility/prototypes",
                     ////////////////////////
                     // Public methods.
 
+                    // Method allows a section to be opened.
+                    self.openSection = function (strSection) {
+
+                        try {
+
+                            // Close all other sections and open the specified.
+                            self.sections.forEach(function (section) {
+
+                                if (strSection === section.name) {
+
+                                    section.opening = true;
+                                    section.closing = false;
+                                } else {
+
+                                    section.opening = false;
+                                    section.closing = true;
+                                }
+                            });
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Give derived modules a crack at the create pipeline.
                     self.innerCreate = function () {
 
@@ -273,6 +298,9 @@ define(["NextWave/source/utility/prototypes",
                                                 section.selectedArea.location.y,
                                                 section.selectedArea.extent.width);
                                         }
+                                    } else {
+
+                                        section.selectedArea = null;
                                     }
 
                                     // Draw the title.

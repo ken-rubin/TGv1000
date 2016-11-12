@@ -114,7 +114,7 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            m_area = null;
+                            //m_area = null;
 
                             return null;
                         } catch (e) {

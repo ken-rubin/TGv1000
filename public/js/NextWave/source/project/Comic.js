@@ -106,6 +106,13 @@ define(["NextWave/source/project/Library",
                                 return exceptionRet;
                             }
 
+                            // Cause the library panel to open.
+                            exceptionRet = window.projectDialog.openLibrarysSection();
+                            if (exceptionRet) {
+alert('a');
+                                return exceptionRet;
+                            }
+
                             // Select into gui.
                             return window.manager.selectComic(self);
                         } catch (e) {
