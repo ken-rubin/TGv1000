@@ -570,6 +570,8 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             m_log("***In routeSaveProject***");
             var project = req.body.projectJson;
 
+            m_log("Incoming project: " + JSON.stringify(project));
+
             // All projects now have a specialProjectData property. From both normal and privileged users.
 
             // If a privileged user is saving a Purchasable Project (whether new or opened for editing), 
@@ -665,9 +667,8 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
             // We'll use async.series serially to (1) insert project and 
             // (2) use async.parallel to
-            //  (2a) write the project's tags and
-            //  (2b) call off to do all of the project's comics
-            //  (2c) if applicable, write to classes, products or onlineclasses
+            //  (2a) call off to do all of the project's comics
+            //  (2b) if applicable, write to classes, products or onlineclasses
             async.series(
                 [
                     // (1)
@@ -681,7 +682,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             quarantined: project.quarantined,
                             imageId: project.imageId,
                             altImagePath: project.altImagePath,
-                            baseProjectId: project.parentProjectId,
+                            baseProjectId: project.baseProjectId || null,   // Somehow, if project.baseProjectId=null, just assigning it without || null was setting it = 0. This was causing a FK error. TODO
                             parentPrice: project.parentPrice,
                             priceBump: project.priceBump,
                             projectTypeId: project.projectTypeId,
@@ -692,7 +693,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             lastSaved: (new Date()),
                             chargeId: project.chargeId,
                             currentComicIndex: project.currentComicIndex,
-                            currentComicStepIndex: row.currentComicStepIndex
+                            currentComicStepIndex: project.currentComicStepIndex
                         };
 
                         let verb = 'insert ';
@@ -725,11 +726,12 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                     project.id = rows[0].insertId;
                                 }
 
-/*                                // Check if necessary to and then, if so, update project.comicProjectId
-                                if (project.comicProjectId === 0) {
+                                // Check if necessary to and then, if so, update project.baseProjectId.
+                                // We waited to do this until we knew for sure that we had a project.id.
+                                if (!project.baseProjectId) {
 
-                                    project.comicProjectId = project.id;
-                                    sql.queryWithCxn(connection, "UPDATE " + self.dbname + "projects SET comicProjectId=" + project.id + " WHERE id=" + project.id + ";",
+                                    project.baseProjectId = project.id;
+                                    sql.queryWithCxn(connection, "UPDATE " + self.dbname + "projects SET baseProjectId=" + project.id + " WHERE id=" + project.id + ";",
                                         function(err, rows) {
                                             return cb(err);
                                         }
@@ -737,8 +739,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                 } else {
                                     return cb(null);
                                 }
-*/
-                                return cb(null);
                             }
                         );
                     },
@@ -748,6 +748,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                         // Use async.parallel to save the project's possible purchasable project info and its comics in parallel.
                         async.parallel(
                             [
+                                // (2a)
                                 function(cb) {
                                     m_log("Calling m_saveComicsToDB");
                                     m_saveComicsToDB(connection, req, res, project,
@@ -756,6 +757,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                         }
                                     );
                                 },
+                                // (2b)
                                 function(cb) {
                                     if (project.specialProjectData.userAllowedToCreateEditPurchProjs && (project.specialProjectData.openMode === 'new' || project.specialProjectData.openMode === 'searched')) {
                                         m_log("Calling m_savePurchProductData");
@@ -919,21 +921,34 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
     var m_saveComicsToDB = function (connection, req, res, project, callback) {
 
         // Now the project has been inserted or updated in the DB and its id is in project.id.
-        // A row has been added to resource and tags have been handled for the project, too.
+        // A row has been added to resource, too. -- I don't think this has been done TODO -- not sure if it's needed.
 
-        // This routine will iterate through the project's comics, possibly saving (inserting) each, possibly saving its libraries, but always saving the libraries' types, etc.
-        // We use the word 'possibly', because comics and libraries themselves are saved only when a privileged user is working on a purchasable product or a core project.
-        // Otherwise, only the comics' libraries' types and lower are saved.
+        // This routine will iterate through the project's comics, saving (inserting or updating) each, possibly saving their libraries.
+        // Libraries will be saved if library.id = 0 or (library.id != 0 and req.user.userId is one of the library's editors).
+
+        // This also involves maintaining projects_comics and comics_libraries as described and implemented below.
         try {
 
             m_log("Just got into m_saveComicsToDB with this many comics to do: " + project.comics.length);
+
+            // In series:
+            // (1) We will compare the comics in project with the comics already linked to the project in the database. If this was an existing project,
+            //      
+            async.series(
+                [
+
+                ],
+                function(err) { return callback(err); }
+            );
 
             // async.eachSeries iterates over a collection, perform a single async task at a time.
             // Actually, we could process all comics in parallel. Maybe we'll change to that in the future. Or maybe it really makes no diff.
             async.eachSeries(project.comics, 
                 function(comicIth, cb) {
 
-                    // comic no longer has a projectId. All links are handled by the 3-way junction table projects_comics_libraries.
+                    // comic no longer has a projectId. Linking is handled by the projects_comics.
+                    // Remember: comics are NOT shared between projects.
+                    // We have to update existing comics, insert new comics, delete comics no longer in project (along with their guts).
 
                     // Use async.series with 2 functions: (1) for writting comics to the database; (2) for handling comic internals.
                     async.series([
