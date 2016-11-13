@@ -38,6 +38,19 @@ define(["NextWave/source/utility/prototypes",
                             window.tg.app = null;
                             window.tg.manager = window.manager;
                             window.tg.typeNames = new Set();
+                            window.tg.raiseEvent = function (strEvent, objectContext) {
+
+                                try {
+
+                                    // Add event to the list of events to invoke.
+                                    window.tg.raiseCollection[strEvent] = objectContext;
+
+                                    return null;
+                                } catch (e) {
+
+                                    return e;
+                                }
+                            };
 
                             // Load up/allocate all the Type constructor functions.
                             let libraryApp = null;
@@ -116,59 +129,11 @@ define(["NextWave/source/utility/prototypes",
                             return e;
                         }
                     };
-
-                    ///////////////////////////
-                    // Private field.
-
-                    // .
-                    var m_functionDoEvents = function () {
-
-                        try {
-
-                            // Process each of the cached raise collection elements.
-                            var arrayKeys = Object.keys(window.tg.raiseCollection);
-                            for (var i = 0; i < arrayKeys.length; i++) {
-
-                                var strEvent = arrayKeys[i];
-
-                                // Get the correct collections.
-                                var objectContext = window.tg.raiseCollection[strEvent];
-                                var listCallbacks = window.tg.eventCollection[strEvent];
-
-                                // Process each callback.
-                                for (var i = 0; i < listCallbacks.length; i++) {
-
-                                    var callback = listCallbacks[i];
-                                    var target = callback.target;
-                                    var method = callback.method;
-                                    setTimeout(function (target, method) {
-
-                                        try {
-
-                                            target[method](objectContext);
-                                        } catch (e) {
-
-                                            alert(e.message);
-                                        }
-                                    }(target, method), 10);
-                                }
-                            }
-
-                            // Clear collection.
-                            window.tg.raiseCollection = {};
-
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
                 } catch (e) {
 
                     alert(e.message);
                 }
-        	};
-
+            };
         	return new functionRet();
         } catch (e) {
 
