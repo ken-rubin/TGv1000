@@ -318,7 +318,7 @@ define(["NextWave/source/utility/prototypes",
                                 // Set loaded.
                                 self.projectLoaded = true;
 
-                                return self.panelLayer.openAndPinAllPanels();
+                                self.panelLayer.openAndPinAllPanels();
                             }
 
                             return null;

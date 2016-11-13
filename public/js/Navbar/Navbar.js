@@ -89,7 +89,7 @@ define(["Core/errorHelper"],
 														// that BuyDialog needs.
 
 														// iProjectId is the project to fetch.
-														function (iProjectId, bOnlyOwnedByUser, bOnlyOthersProjects) {
+														function (iProjectId, bOnlyOwnedByUser, bOnlyOthersProjects, strMode) {
 
 															try {
 
@@ -97,7 +97,7 @@ define(["Core/errorHelper"],
 
 																if (iProjectId > 0) {
 
-																	exceptionRet = client.openProjectFromDB(iProjectId,
+																	exceptionRet = client.openProjectFromDB(iProjectId, strMode,
 																		// This callback is called from client.loadProjectIntoManager to add specialProjectData to the project.
 																		// Note: if the project is a Product, Class or Online Class, then that extra information is already
 																		// in the project in specialProjects when it is retrieved from the BO. Thus we extend and merge here, not set =.

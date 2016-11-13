@@ -7,6 +7,7 @@ var jade = require("jade");
 var async = require("async");
 var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 var moment = require("moment-timezone");
+var mysql = require("mysql");
 var stripe = null;
 var bLocalCredit = true;
 
@@ -906,12 +907,10 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
 
     self.routeSearchProjects = function (req, res) {
 
-        // This is a search for projects based on tags.
-
         try {
 
             console.log("Entered UtilityBO/routeSearchProjects with req.body = " + JSON.stringify(req.body));
-            // req.body.tags
+            // req.body.searchPhrase
             // req.user.userId
             // req.user.userName
             // req.body.userAllowedToCreateEditPurchProjs
@@ -925,12 +924,13 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
             //  [5] online classes (if req.body.userAllowedToCreateEditPurchProjs, then all, active or not, no matter when; else just active and soon)
 
             // Will use async.waterfall to build up passOn javascript object:
-            // (1) if req.body.userAllowedToCreateEditPurchProjs === "0", retrieve user's home zipcode.
-            // (2) get string of tag id's; 
+            // (1) if req.body.userAllowedToCreateEditPurchProjs === "0", retrieve user's home zipcode;
+            // (2) set things up to do soundex match on req.body.searchPhrase; this will result in creating a temporary table of soundex indices in descending order with 0 results ignored.
             // (3) perform many select statements to get projects that both match tags and contain correct items based on req.body.userAllowedToCreateEditPurchProjs; 
             // (4) if req.body.userAllowedToCreateEditPurchProjs === "0", then winnow classes down by date and distance; onlineclasses by date; and for Products and Online Classes see if already bought.
-            // (5) Finally, for all surviving classes determine current number of users who bought the class.
-// TODO all needs changing
+            // (5) for all surviving classes determine current number of users who bought the class.
+            // (6) drop the temp table if it was created.
+
             async.waterfall(
                 [
                     // (1)
@@ -941,65 +941,48 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                             sql.execute("select zipcode from " + self.dbname + "user where id=" + req.user.userId + ";",
                                 function(rows) {
 
-                                    if (rows.length !== 1) {
-                                        return cb(new Error("Unable to read user table to determine zip code."), null);
-                                    }
+                                    if (rows.length !== 1) { return cb(new Error("Unable to read user table to determine zip code."), null); }
 
-                                    return cb(null, {zipcode:rows[0]["zipcode"]});
+                                    return cb(null, {zipcode: rows[0]["zipcode"]});
                                 },
                                 function(strError) {
                                     return cb(new Error(strError), null);
                                 }
                             );
                         } else {
-                            // priv user doesn't need zipcode
+
+                            // Priv. user doesn't need zipcode.
                             return cb(null, {zipcode: ''});
                         }
                     },
                     // (2)
                     function(passOn, cb) {
 
-                        // Add resource type description to the tags the user (may have) entered.
-                        var tags = req.body.tags + " project";
+                        if (req.body.searchPhrase.length === 0) {
 
-                        // Turn tags into string with commas between tags and tags surrounded by single quotes.
-                        var ccArray = tags.match(/([\w\-\_\@\.]+)/g);
-
-                        var ccString = '';
-                        for (var i = 0; i < ccArray.length; i++) {
-
-                            if (i > 0) { ccString = ccString + ','; }
-                            ccString = ccString + "'" + ccArray[i] + "'";
+                            passOn["tempTableName"] = '';
+                            return cb(null, passOn);
                         }
 
-                        var sqlString = "select id from " + self.dbname + "tags where description in (" + ccString + ");";
+                        let sqlString = '';
+    
+                        // Gen unique name for this call's temporary table.
+                        let guid = m_createGuid();
+                        console.log('guid=' + guid);
+                        let tempTableUniqueName = 'search_table_' + guid.replace(/-/g, '');
+                        console.log('tempTableName=' + tempTableUniqueName);
+                        passOn["tempTableName"] = tempTableUniqueName;
+                        sqlString = "create table " + tempTableUniqueName + " (projectId INT UNSIGNED, sindex DOUBLE) ENGINE=InnoDB;";
+                        sqlString += "insert " + tempTableUniqueName + " select id, soundex_match_all(" + mysql.escape(req.body.searchPhrase) + ", description, ' ') from " + self.dbname + "projects where length(description)>0;";
+
                         console.log(sqlString);
                         sql.execute(sqlString,
                             function (arrayRows) {
                             
-                                // We have to get the same number of rows back from the query as ccArray.length.
-                                // Otherwise we didn't have a complete match and nothing qualifies--except core projects for privileged users which don't user tags for retrieval.
-                                if (arrayRows.length !== ccArray.length) {
+                                // Need to debug into this and see what is returned in arrayRows--just to see if anything needs checking.
+                                // if (arrayRows.length !== 1) { return cb(new Error('PROGRAM ERROR RECEIVED matching search phrase ' + req.body.searchPhrase), null); }
 
-                                    // Success as far as the POST is concerned but an empty array of projects will be returned.
-                                    // So on to the next function in the waterfall.
-                                    passOn.idString = '';
-                                    passOn.idCount = '0';
-                                    return cb(null, passOn);
-                                }
-
-                                // We can proceed since all tags exist and their id's are in arrayRows.
-                                // Construct tagIds joined by ',' for use in main queries below. Hold in idString.
-                                var idString = '';
-                                for (var i = 0; i < arrayRows.length; i++) {
-
-                                    if (i > 0) { idString = idString + ','; }
-                                    idString = idString + arrayRows[i].id.toString();
-                                }
-
-                                passOn.idString = idString;
-                                passOn.idCount = arrayRows.length.toString();
-
+                                // We can proceed whether or not some matches came out of searchPhrase. Total failure (i.e., a temp table with no sindex values > 0) will be handled below.
                                 return cb(null, passOn);
                             },
                             function(strError) { return cb(new Error(strError), null); }
@@ -1008,113 +991,154 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                     // (3)
                     function(passOn, cb) {
 
-                        var strQuery = '';
+                        let strQuery = '';
 
                         // In the queries below, we're not retrieving the whole project rows (or the project joined with class or product).
-                        // We're just selecting enough to create the image (with project.id) in the carousel and to decide (in the case of classes and products)
-                        // if the project should be retrieved in the first place. 
-                        
-                        // Core projects for privileged users. Empty array for non.
+                        // We're just selecting: enough to create the image (with project.id) in the carousel; information for fairly
+                        // detailed tooltips for purchasable prjects; and, for classes and products, to decide if the project should be retrieved in the first place.
+
+                        // Core projects for privileged users. Empty array for non. req.body.searchPhase (actually passOn.tempTableName) isn't used.
+                        // We do this query to fill passOn.projects[0] in any case.
                         if (req.body.userAllowedToCreateEditPurchProjs === "1") {
                             strQuery = "select p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId from " + self.dbname + "projects p where p.isCoreProject=1;";
                         } else {
-                            strQuery = "select p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId from " + self.dbname + "projects p where p.isCoreProject=-1;";   // we want this to return no rows but use [0].
+                            // We want this to return no rows but use [0].
+                            strQuery = "select p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId from " + self.dbname + "projects p where p.isCoreProject=-1;";
                         }
 
-                        if (passOn.idString.length) {
+                        if (passOn.tempTableName.length === 0) {
+                            // Not including temp table in queries, since there was no req.body.searchPhrase.
+
                             // Owned by user. Same for both priv and non-priv.
-                            // In this query I'm just trying to select (as comicProjectId) the id of the purchased project.
-/* TOXXX STARTED            strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.comicProjectId from " + self.dbname + "projects p where p.ownedByUserId=" + req.user.userId + " and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));"; */
-    // TODO: for now I've just removed the selection of comicProjectId--or rather I return 0 so there's a field there.
-                            strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, 0 as comicProjectId from " + self.dbname + "projects p where p.ownedByUserId=" + req.user.userId + " and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                            // In this query I'm selecting baseProjectId as the id of the purchased project.
+                            strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.baseProjectId from " + self.dbname + "projects p where p.ownedByUserId=" + req.user.userId + ";";
 
                             // Others' accounts
                             if (req.body.userAllowedToCreateEditPurchProjs === "1") {
                                 // A privileged user doesn't care about public/private.
-                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.isOnlineClass=0 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.isOnlineClass=0;";
                             } else {
                                 // A non-privileged user can retrieve only public projects and only "normal" projects.
-                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.public=1 and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.isOnlineClass=0 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.public=1 and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.isOnlineClass=0;";
                             }
 
                             // Products
                             if (req.body.userAllowedToCreateEditPurchProjs === "1") {
                                 // A privileged user doesn't care about active.
-                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, pr.level, pr.difficulty, pr.productDescription, pr.imageId as prImageId, pr.price, pr.active, pr.videoURL from " + self.dbname + "projects p inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where p.isProduct=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, pr.level, pr.difficulty, pr.productDescription, pr.imageId as prImageId, pr.price, pr.active, pr.videoURL from " + self.dbname + "projects p inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where p.isProduct=1;";
                             } else {
                                 // A non-privileged user just sees active projects.
-                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.isProduct, pr.* from " + self.dbname + "projects p inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where pr.active=1 and p.isProduct=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.isProduct, pr.* from " + self.dbname + "projects p inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where pr.active=1 and p.isProduct=1;";
                             }
 
                             // Classes
                             if (req.body.userAllowedToCreateEditPurchProjs === "1") {
                                 // A privileged user doesn't care about active.
-                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, cl.level, cl.difficulty, cl.classDescription, cl.imageId as clImageId, cl.price, cl.schedule, cl.active, cl.classNotes, cl.zip, cl.maxClassSize from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where p.isClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, cl.level, cl.difficulty, cl.classDescription, cl.imageId as clImageId, cl.price, cl.schedule, cl.active, cl.classNotes, cl.zip, cl.maxClassSize from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where p.isClass=1;";
                             } else {
                                 // A non-privileged user just sees active classes.
-                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.isClass, cl.* from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where cl.active=1 and p.isClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.isClass, cl.* from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where cl.active=1 and p.isClass=1;";
                             }
 
                             // Online classes
                             if (req.body.userAllowedToCreateEditPurchProjs === "1") {
                                 // A privileged user doesn't care about active.
-                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, cl.level, cl.difficulty, cl.classDescription, cl.imageId as clImageId, cl.price, cl.schedule, cl.active, cl.classNotes from " + self.dbname + "projects p inner join " + self.dbname + "onlineclasses cl on cl.baseProjectId=p.id where p.isOnlineClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, cl.level, cl.difficulty, cl.classDescription, cl.imageId as clImageId, cl.price, cl.schedule, cl.active, cl.classNotes from " + self.dbname + "projects p inner join " + self.dbname + "onlineclasses cl on cl.baseProjectId=p.id where p.isOnlineClass=1;";
                             } else {
                                 // A non-privileged user just sees active classes.
-                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.isOnlineClass, cl.* from " + self.dbname + "projects p inner join " + self.dbname + "onlineclasses cl on cl.baseProjectId=p.id where cl.active=1 and p.isOnlineClass=1 and p.id in (select distinct projectId from " + self.dbname + "project_tags pt where " + passOn.idCount + "=(select count(*) from " + self.dbname + "project_tags pt2 where pt2.projectId=pt.projectId and tagId in (" + passOn.idString + ")));";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.isOnlineClass, cl.* from " + self.dbname + "projects p inner join " + self.dbname + "onlineclasses cl on cl.baseProjectId=p.id where cl.active=1 and p.isOnlineClass=1;";
+                            }
+                        } else {
+
+                            // A searchPhrase was entered by the user and some non-0-index projects were found. Include temp table in queries.
+
+                            // Owned by user. Same for both priv and non-priv.
+                            // In this query I'm selecting baseProjectId as the id of the purchased project.
+                            strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.baseProjectId, t.sindex from " + self.dbname + "projects p inner join " + passOn.tempTableName + " t on t.projectId=p.id where p.ownedByUserId=" + req.user.userId + " and p.id in (select projectId from " + passOn.tempTableName + " where sindex>0);";
+
+                            // Others' accounts
+                            if (req.body.userAllowedToCreateEditPurchProjs === "1") {
+                                // A privileged user doesn't care about public/private.
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, t.sindex from " + self.dbname + "projects p inner join " + passOn.tempTableName + " t on t.projectId=p.id where p.ownedByUserId<>" + req.user.userId + " and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.isOnlineClass=0 and p.id in (select projectId from " + passOn.tempTableName + " where sindex>0);";
+                            } else {
+                                // A non-privileged user can retrieve only public projects and only "normal" projects.
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, t.sindex from " + self.dbname + "projects p inner join " + passOn.tempTableName + " t on t.projectId=p.id where p.ownedByUserId<>" + req.user.userId + " and p.public=1 and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.isOnlineClass=0 and p.id in (select projectId from " + passOn.tempTableName + " where sindex>0);";
+                            }
+
+                            // Products
+                            if (req.body.userAllowedToCreateEditPurchProjs === "1") {
+                                // A privileged user doesn't care about active.
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, t.sindex, pr.level, pr.difficulty, pr.productDescription, pr.imageId as prImageId, pr.price, pr.active, pr.videoURL from " + self.dbname + "projects p inner join " + passOn.tempTableName + " t on t.projectId=p.id inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where p.isProduct=1 and p.id in (select projectId from " + passOn.tempTableName + " where sindex>0);";
+                            } else {
+                                // A non-privileged user just sees active projects.
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.isProduct, t.sindex, pr.* from " + self.dbname + "projects p inner join " + passOn.tempTableName + " t on t.projectId=p.id inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where pr.active=1 and p.isProduct=1 and p.id in (select projectId from " + passOn.tempTableName + " where sindex>0);";
+                            }
+
+                            // Classes
+                            if (req.body.userAllowedToCreateEditPurchProjs === "1") {
+                                // A privileged user doesn't care about active.
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, t.sindex, cl.level, cl.difficulty, cl.classDescription, cl.imageId as clImageId, cl.price, cl.schedule, cl.active, cl.classNotes, cl.zip, cl.maxClassSize from " + self.dbname + "projects p inner join " + passOn.tempTableName + " t on t.projectId=p.id inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where p.isClass=1 and p.id in (select projectId from " + passOn.tempTableName + " where sindex>0);";
+                            } else {
+                                // A non-privileged user just sees active classes.
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, t.sindex, p.isClass, cl.* from " + self.dbname + "projects p inner join " + passOn.tempTableName + " t on t.projectId=p.id inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where cl.active=1 and p.isClass=1 and p.id in (select projectId from " + passOn.tempTableName + " where sindex>0);";
+                            }
+
+                            // Online classes
+                            if (req.body.userAllowedToCreateEditPurchProjs === "1") {
+                                // A privileged user doesn't care about active.
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, t.sindex, cl.level, cl.difficulty, cl.classDescription, cl.imageId as clImageId, cl.price, cl.schedule, cl.active, cl.classNotes from " + self.dbname + "projects p inner join " + passOn.tempTableName + " t on t.projectId=p.id inner join " + self.dbname + "onlineclasses cl on cl.baseProjectId=p.id where p.isOnlineClass=1 and p.id in (select projectId from " + passOn.tempTableName + " where sindex>0);";
+                            } else {
+                                // A non-privileged user just sees active classes.
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, t.sindex, p.isOnlineClass, cl.* from " + self.dbname + "projects p inner join " + passOn.tempTableName + " t on t.projectId=p.id inner join " + self.dbname + "onlineclasses cl on cl.baseProjectId=p.id where cl.active=1 and p.isOnlineClass=1 and p.id in (select projectId from " + passOn.tempTableName + " where sindex>0);";
                             }
                         }
 
                         sql.execute(strQuery,
                             function(rows){
 
-                                if (passOn.idString.length) {
-
-                                    // rows is a jagged array with first dimension size = 6.
-                                    var totRows = 0;
-                                    for (var i = 0; i < 6; i++) { totRows += rows[i].length; }
-                                    if (totRows === 0) {
-                                        passOn.projects = rows;
-                                        return cb(null, passOn);
-                                    }
-
-                                    // Sort rows on projectName, since async retrieval doesn't let us sort in the query.
-                                    for (var i = 0; i < 6; i++) {
-                                        if (rows[i].length) {
-
-                                            rows[i].sort(function(a,b){
-
-                                                if (a.projectName > b.projectName)
-                                                    return 1;
-                                                if (a.projectName < b.projectName)
-                                                    return -1;
-                                                return 0;
-                                            });
+                                let numRows = rows.length;
+                                switch (numRows) {
+                                    case 0:
+                                        return cb(new Error('Unknown failure of search query.'), null);
+                                    case 1:
+                                        passOn.projects = Array(6);
+                                        if (req.body.userAllowedToCreateEditPurchProjs === '1') {
+                                            passOn.projects[0] = rows;
+                                        } else {
+                                            passOn.projects[0] = new Array();
                                         }
-                                    }
 
-                                    passOn.projects = rows;
-                                    return cb(null, passOn);
+                                        for (let i = 1; i < 6; i++) {
+                                            passOn.projects[i] = new Array();
+                                        }
+                                        break;
+                                    case 6:
+                                        passOn["projects"] = rows;
+                                        if (passOn.tempTableName.length) {
 
-                                } else {
+                                            // Do sorting by sindex here on each row's sindex in DESCENDING order.
+                                            for (let i = 0; i < 6; i++) {
 
-                                    // Tags didn't match. rows has core projects for priv. user and is empty for non-priv. users.
-                                    // But we have to fill out passOn.projects so we can return success, not failure.
-                                    // And not crap out on the client side.
+                                                if (passOn.projects[i].length) {
 
-                                    passOn.projects = Array(6);
-                                    if (req.body.userAllowedToCreateEditPurchProjs === '1') {
-                                        passOn.projects[0] = rows;
-                                    } else {
-                                        passOn.projects[0] = new Array();
-                                    }
-
-                                    for (var i = 1; i < 6; i++) {
-                                        passOn.projects[i] = new Array();
-                                    }
-
-                                    return cb(null, passOn);
+                                                    passOn.projects[i].sort(
+                                                        function(a,b) {
+                                                            if (a.sindex > b.sindex)
+                                                                return -1;
+                                                            if (a.sindex < b.sindex)
+                                                                return 1;
+                                                            return 0;
+                                                        }
+                                                    )
+                                                }
+                                            }
+                                        }
+                                        break;
+                                    default:
+                                        return cb(new Error('Unknown failure of search query.'), null);
                                 }
+
+                                return cb(null, passOn);
                             },
                             function(strError) { return cb(new Error(strError), null); }
                         );
@@ -1136,17 +1160,17 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                             // only only those starting within 3 months. They also must be within 35 miles of req.body.nearZip.
                             // Any non-qualified are removed from passOn.projects[4].
 
-                            var mntNow = moment();
+                            let mntNow = moment();
 
                             async.eachSeries(passOn.projects[4],
                                 function(projectIth, cb) {
 
                                     projectIth.remove = false;
-                                    var strClass1Date = JSON.parse(projectIth.schedule)[0].date;
+                                    let strClass1Date = JSON.parse(projectIth.schedule)[0].date;
                                     // This date must exist or the class could not have been made active.
                                     // As must the zipcode used below.
 
-                                    var mntClass1Date = moment(strClass1Date, "YYYY-MM-DD");
+                                    let mntClass1Date = moment(strClass1Date, "YYYY-MM-DD");
                                     if (mntClass1Date.isBefore(mntNow) || mntClass1Date.isAfter(mntNow.clone().add(3, "months"))) {
                                         
                                         // Class started in the past or starts more than 3 months from now.
@@ -1157,15 +1181,15 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
 
                                         // Class is not disqualified due to start date. We'll do the zipcode distance check.
                                         // https://www.zipcodeapi.com/rest/<zipcodekey>/distance.<format>/<zip_code1>/<zip_code2>/<units>.
-                                        var url = "https://www.zipcodeapi.com/rest/" + app.get("zipcodekey") + "/distance.json/" + projectIth.zip + "/" + passOn.zipcode + "/mile";
-                                        var xhr = new XMLHttpRequest();
+                                        let url = "https://www.zipcodeapi.com/rest/" + app.get("zipcodekey") + "/distance.json/" + projectIth.zip + "/" + passOn.zipcode + "/mile";
+                                        let xhr = new XMLHttpRequest();
                                         xhr.open("GET", url, true);     // true means async (which is default)
                                         xhr.onload = function (e) {
 
                                             if (xhr.status === 200) {
                                                 // A good result to test.
                                                 console.log("Got xhr.responseText: " + xhr.responseText);
-                                                var distanceJSON = JSON.parse(xhr.responseText);
+                                                let distanceJSON = JSON.parse(xhr.responseText);
                                                 if (distanceJSON.hasOwnProperty("distance")) {
                                                     // Has distance prop.
                                                     if (distanceJSON.distance > 35) {
@@ -1193,7 +1217,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                                 function(err) {
 
                                     // err is always null, since in all error cases, we just remove the project.
-                                    for (var i = passOn.projects[4].length - 1; i >= 0; i--) {
+                                    for (let i = passOn.projects[4].length - 1; i >= 0; i--) {
                                         if (passOn.projects[4][i].remove) {
                                             passOn.projects[4].splice(i, 1);
                                         }
@@ -1211,17 +1235,17 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                             // only only those starting within 3 months.
                             // Any non-qualified are removed from passOn.projects[5].
 
-                            var mntNow = moment();
+                            let mntNow = moment();
 
                             async.eachSeries(passOn.projects[5],
                                 function(projectIth, cb) {
 
                                     projectIth.remove = false;
-                                    var strClass1Date = JSON.parse(projectIth.schedule)[0].date;
+                                    let strClass1Date = JSON.parse(projectIth.schedule)[0].date;
                                     // This date must exist or the class could not have been made active.
                                     // As must the zipcode used below.
 
-                                    var mntClass1Date = moment(strClass1Date, "YYYY-MM-DD");
+                                    let mntClass1Date = moment(strClass1Date, "YYYY-MM-DD");
                                     if (mntClass1Date.isBefore(mntNow) || mntClass1Date.isAfter(mntNow.clone().add(3, "months"))) {
                                         
                                         // Class started in the past or starts more than 3 months from now.
@@ -1232,7 +1256,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                                 function(err) {
 
                                     // err is always null.
-                                    for (var i = passOn.projects[5].length - 1; i >= 0; i--) {
+                                    for (let i = passOn.projects[5].length - 1; i >= 0; i--) {
                                         if (passOn.projects[5][i].remove) {
                                             passOn.projects[5].splice(i, 1);
                                         }
@@ -1243,113 +1267,125 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         } else { return cb(null, passOn); }
                     },
                     // (4c)
-                    function(passOn, cb) {
+                    function (passOn, cb) {
 
                         if (req.body.userAllowedToCreateEditPurchProjs === "0") {
                             // Loop through products left in passOn.projects[3] and add property alreadyBought by comparing to all projects in passOn.projects[1].
 
-// TODO punting for now
-//                             for (var i = 0; i < passOn.projects[3].length; i++) {
+                            for (let i = 0; i < passOn.projects[3].length; i++) {
 
-//                                 var pIth = passOn.projects[3][i];
-//                                 pIth.alreadyBought = false;
+                                let pIth = passOn.projects[3][i];
+                                pIth.alreadyBought = false;
 
-//                                 for (var j = 0; j < passOn.projects[1].length; j++) {
+                                for (let j = 0; j < passOn.projects[1].length; j++) {
 
-//                                     var pJth = passOn.projects[1][j];
-// /* TOXXX */                         if (pJth.comicProjectId === pIth.projectId) {
+                                    let pJth = passOn.projects[1][j];
+                                    if (pJth.baseProjectId === pIth.projectId) {
 
-//                                         pIth.alreadyBought = true;
-//                                         break;
-//                                     }
-//                                 }
-//                             }
+                                        pIth.alreadyBought = true;
+                                        break;
+                                    }
+                                }
+                            }
 
                             return cb(null, passOn);
 
                         } else { return cb(null, passOn); }
                     },
                     // (4d)
-                    function(passOn, cb) {
+                    function (passOn, cb) {
 
                         if (req.body.userAllowedToCreateEditPurchProjs === "0") {
                             // Loop through online classes left in passOn.projects[5] and add property alreadyEnrolled by comparing to all projects in passOn.projects[1].
 
-// TODO punting for now
-//                             for (var i = 0; i < passOn.projects[5].length; i++) {
+                            for (let i = 0; i < passOn.projects[5].length; i++) {
 
-//                                 var pIth = passOn.projects[5][i];
-//                                 pIth.alreadyEnrolled = false;
+                                let pIth = passOn.projects[5][i];
+                                pIth.alreadyEnrolled = false;
 
-//                                 for (var j = 0; j < passOn.projects[1].length; j++) {
+                                for (let j = 0; j < passOn.projects[1].length; j++) {
 
-//                                     var pJth = passOn.projects[1][j];
-// /* TOXXX */                         if (pJth.comicProjectId === pIth.projectId) {
+                                    let pJth = passOn.projects[1][j];
+                                    if (pJth.baseProjectId === pIth.projectId) {
 
-//                                         pIth.alreadyEnrolled = true;
-//                                         break;
-//                                     }
-//                                 }
-//                             }
+                                        pIth.alreadyEnrolled = true;
+                                        break;
+                                    }
+                                }
+                            }
 
                             return cb(null, passOn);
 
                         } else { return cb(null, passOn); }
                     },
                     // (4e)
-                    function(passOn, cb) {
+                    function (passOn, cb) {
 
                         if (req.body.userAllowedToCreateEditPurchProjs === "0") {
                             // Loop through classes left in passOn.projects[2] and add property alreadyEnrolled by comparing to all projects in passOn.projects[1].
 
-// TODO punting for now
-//                             for (var i = 0; i < passOn.projects[4].length; i++) {
+                            for (let i = 0; i < passOn.projects[4].length; i++) {
 
-//                                 var pIth = passOn.projects[4][i];
-//                                 pIth.alreadyEnrolled = false;
+                                let pIth = passOn.projects[4][i];
+                                pIth.alreadyEnrolled = false;
 
-//                                 for (var j = 0; j < passOn.projects[1].length; j++) {
+                                for (let j = 0; j < passOn.projects[1].length; j++) {
 
-//                                     var pJth = passOn.projects[1][j];
-// /* TOXXX */                         if (pJth.comicProjectId === pIth.projectId) {
+                                    let pJth = passOn.projects[1][j];
+                                    if (pJth.baseProjectId === pIth.projectId) {
 
-//                                         pIth.alreadyEnrolled = true;
-//                                         break;
-//                                     }
-//                                 }
-//                             }
+                                        pIth.alreadyEnrolled = true;
+                                        break;
+                                    }
+                                }
+                            }
 
                             return cb(null, passOn);
 
                         } else { return cb(null, passOn); }
                     },
                     // (5)
-                    function(passOn, cb) {
+                    function (passOn, cb) {
 
                         async.eachSeries(passOn.projects[4],
-                            function(projectIth, cb) {
+                            function (projectIth, cb) {
 
-// TODO punting for now
-// /* TOXXX */                     var strQuery = "select count(*) as cnt from " + self.dbname + "projects where comicProjectId=" + projectIth.projectId + " and id<>" + projectIth.projectId + ";";
+                                let strQuery = "select count(*) as cnt from " + self.dbname + "projects where baseProjectId=" + projectIth.projectId + " and id<>" + projectIth.projectId + ";";
 
-//                                 sql.execute(strQuery,
-//                                     function(rows){
+                                sql.execute(strQuery,
+                                    function (rows) {
 
-//                                         if (rows.length === 0) {
-//                                             projectIth.numEnrollees = 0;
-//                                         } else {
-//                                             projectIth.numEnrollees = rows[0].cnt;
-//                                         }
-// TEMP:
-                                        projectIth.numEnrollees = 0;
-                                        return cb(null);
-                                    // },
-                                    // function(strError) { return cb(new Error(strError)); }
-                                // );
+                                        if (rows.length === 0) {
+                                            projectIth.numEnrollees = 0;
+                                        } else {
+                                            projectIth.numEnrollees = rows[0].cnt;
+                                        }
+
+                                        return cb(null, passOn);
+                                        // },
+                                        // function(strError) { return cb(new Error(strError)); }
+                                        // );
+                                    },
+                                    function (err) {
+                                        return cb(err, passOn);
+                                    }
+                                );
                             },
-                            function(err) {
-                                return cb(err, passOn);
-                            }
+                            function(err) { return cb(err, passOn); }
+                        );
+                    },
+                    // (6)
+                    function(passOn, cb) {
+
+                        if (!passOn.tempTableName.length) { return cb(null, passOn); }
+
+                        // If this drop of the temp table fails, we ignore it. MySql will clean it up eventually.
+                        let strQuery = "drop table " + passOn.tempTableName + ";";
+                        sql.execute(strQuery,
+                            function(rows) {
+                                return cb(null, passOn);
+                            },
+                            function(err) { return cb(null, passOn); }
                         );
                     }
                 ],
@@ -1491,5 +1527,12 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
         }
     }
 
+    var m_createGuid = function() {
+
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random()*16|0, v = c === 'x' ? r : (r&0x3|0x8);
+                return v.toString(16);
+            });
+    }
 };
 

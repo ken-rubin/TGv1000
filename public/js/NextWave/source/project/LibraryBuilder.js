@@ -274,6 +274,8 @@ define(["NextWave/source/utility/prototypes",
 
                                 self.currentLibrary.data.description = "[Description]";
                             }
+
+                            // These next two are questionable. Discuss w/Ken.
                             if (!self.currentLibrary.data.references) {
 
                                 self.currentLibrary.data.references = "KernelTypesLibrary";

@@ -75,7 +75,7 @@ define(["Core/errorHelper",
 								// If lastProjectId, fetch it and load it into manager.
 								if (lastProjectId) {
 
-									self.openProjectFromDB(lastProjectId,
+									self.openProjectFromDB(lastProjectId, 'editOwn',
 										function() {
 
 											BootstrapDialog.show({
@@ -95,10 +95,9 @@ define(["Core/errorHelper",
 							} else {
 								// Privileged user.
 
-								self.openProjectFromDB(6,
+								self.openProjectFromDB(6, 'new',
 									function() {
 
-										self.project.id = 0;	// just to be sure it doesn't overwrite a core project
 										self.project.isCoreProject = false;
 
 										// We could also do these things that used to be done in the BO, but we aren't--at least for now.
@@ -113,7 +112,7 @@ define(["Core/errorHelper",
 										self.project.ownedByUserId = parseInt(g_profile["userId"], 10);
 
 										// Now we'll add the fields to the project that will both tell the rest of the UI how to handle it and will affect how it gets saved to the database.
-										self.project.specialProjectData = {
+										let spd = {
 											userAllowedToCreateEditPurchProjs: manager.userAllowedToCreateEditPurchProjs,
 											userCanWorkWithSystemLibsAndTypes: manager.userCanWorkWithSystemLibsAndTypes,
 											ownedByUser: true,
@@ -127,6 +126,7 @@ define(["Core/errorHelper",
 											systemTypesEdited: false,
 											openMode: 'new'
 										};
+										self.project.specialProjectData = Object.assign(self.project.specialProjectData, spd);
 							    		var exceptionRet = manager.loadProject(self.project);
 							    		if (exceptionRet) { throw exceptionRet; }
 
@@ -422,7 +422,7 @@ define(["Core/errorHelper",
 
 						try {
 
-							// Call manager.save(). Manager will use its reference to slef.project (self = Client.js) to
+							// Call manager.save(). Manager will use its reference to self.project (self = Client.js) to
 							// update the project in client so we can go forward with the save.
 							var exceptionRet = manager.save();
 
@@ -592,13 +592,14 @@ define(["Core/errorHelper",
 						} catch (e) { callback(e); }
 					}
 
-					self.openProjectFromDB = function (iProjectId, callback) {
+					self.openProjectFromDB = function (iProjectId, strMode, callback) {
 
 						try {
 
 							var posting = $.post("/BOL/ProjectBO/RetrieveProject", 
 								{
-									projectId: iProjectId
+									projectId: iProjectId,
+									mode: strMode
 									// userId: g_profile["userId"] not needed; sent in JWT
 								},
 								'json');
@@ -635,13 +636,14 @@ define(["Core/errorHelper",
 					// This one is used in BuyDialog after a purchase is completed.
 					// It is also used when client is created to load latest project.
 					// callback is always present to complete the process.
-					self.openProjectFromDBNoLoadIntoManager = function (iProjectId, callback) {
+					self.openProjectFromDBNoLoadIntoManager = function (iProjectId, strMode, callback) {
 
 						try {
 
 							var posting = $.post("/BOL/ProjectBO/RetrieveProject", 
 								{
-									projectId: iProjectId
+									projectId: iProjectId,
+									mode: strMode
 									// userId: g_profile["userId"] not needed; sent in JWT
 								},
 								'json');
@@ -723,7 +725,7 @@ define(["Core/errorHelper",
 										var exceptionRet;
 										if (bFromCloseProjectMenuItem || false) {
 
-											exceptionRet = manager.loadNoProject();
+											exceptionRet = manager.loadProject(null);	// Used to be manager.loadNoProject(), but that's gone now.
 
 										} else {
 

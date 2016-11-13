@@ -107,7 +107,11 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
             m_log("Entered ProjectBO/routeRetrieveProject with req.body=" + JSON.stringify(req.body) + " req.user=" + JSON.stringify(req.user));
             // req.body.projectId
+            // req.body.mode: "new", "copyOthers", "buyPP" work one way (set most id's=0); "editCore", "editOwn", "editPP" work another (retain most id's).
+            //                  On saving, however, they affect the treatment of comics and libraries.
             // req.user.userId
+
+            var iFetchMode = ["new", "copyOthers", "buyPP", "editCore", "editOwn", "editPP"].indexOf(req.body.mode);
 
             var sqlQuery;
             sqlQuery = "select * from " + self.dbname + "projects where id=" + req.body.projectId + ";";
@@ -124,16 +128,16 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                         var row = rows[0];
                         var project = 
                         {
-                            id: row.id,
+                            id: (iFetchMode < 3) ? 0 : row.id,
                             originalProjectId: row.id,
                             name: row.name,
+                            description: row.description,
                             ownedByUserId: row.ownedByUserId,
                             public: row.public,
                             quarantined: row.quarantined,
-                            description: row.description,
                             imageId: row.imageId,
                             altImagePath: row.altImagePath,
-                            parentProjectId: row.parentProjectId,
+                            baseProjectId: row.baseProjectId,
                             parentPrice: row.parentPrice,
                             priceBump: row.priceBump,
                             projectTypeId: row.projectTypeId,
@@ -145,16 +149,16 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             lastSaved: row.lastSaved,
                             chargeId: row.chargeId,
                             comics: [],
-                            specialProjectData: {},
                             currentComicIndex: row.currentComicIndex,
-                            currentComicStepIndex: row.currentComicStepIndex
+                            currentComicStepIndex: row.currentComicStepIndex,
+                            specialProjectData: {},
+                            strFetchMode: req.body.mode,
+                            iFetchMode: iFetchMode
                         };
 
                         // In series:
                         //  1. Potentially retrieve fields from one of the tables: classes, products or onlineclasses.
-                        //  2. Retrieve project's comics and their content.
-                        //  3. Retrieve the Base Type (fleshed out) for the App type and push it to projects.systemTypes.
-                        //  4. No more. Retrieve all system types (fleshed out) and push them onto projects.systemTypes. Just public ones for a non-prileged user.
+                        //  2. Retrieve project's comics and their content (comiccode and libraries).
                         async.series(
                             [
                                 // 1. PP data, potentially.
@@ -168,7 +172,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                             return cb(null);
                                         }
 
-                                        // Privleged user is editing a project or a non-privileged user is considering buying a purchaseable prject.
+                                        // Privleged user is editing a project or a non-privileged user is considering buying a purchasable prject.
                                         // Need to read and insert special Product, Class or OnlineClass data into project.
                                         var tableName = project.isProduct ? 'products' : project.isClass ? 'classes' : 'onlineclasses';
                                         strQuery = "select * from " + self.dbname + tableName + " where baseProjectId=" + project.id + ";";
@@ -213,7 +217,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                         }
                                     } catch(e) { return cb(e); }
                                 },
-                                // 2. Comics. Since we now will have project and each comic, we can fetch libraries and then types in libraries and below.
+                                // 2. Comics.
                                 function(cb) {
 
                                     try {
@@ -294,6 +298,11 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
         try {
 
+            if (project.id === 0) {
+
+                return callback(null);
+            }
+
             // Save project.name and project.id to user row in DB.
             var sqlQuery = "update " + self.dbname + "user set lastproject=" + mysql.escape(project.name) + ", lastProjectId=" + project.id + " where id=" + req.user.userId + ";";
             sql.execute(
@@ -307,17 +316,13 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                         var bufDecoded = new Buffer(encodedToken, 'base64').toString('ascii');
                         var profile = JSON.parse(bufDecoded);
                         profile["lastProject"] = project.name;
-                        profile["lastProjectId"] = project.id;
+                        profile["lastProjectId"] = project.originalProjectId;   // In case project.id has been set = 0.
                         var token = jwt.sign(profile, app.get("jwt_secret"), { expiresIn: 60*60*5});
                         res.cookie('token', token, {maxAge: 60*60*1000, httpOnly: false, secure: false});    // Expires in 1 hour (in ms); change to secure: true in production
                     }
-
                     return callback(null);
                 },
-                function(strError) {
-
-                    return callback(new Error(strError));
-                }
+                function(strError) { return callback(new Error(strError)); }
             );
         } catch (e) {
 
@@ -329,16 +334,16 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
         try {
 
-            // m_log('In m_functionRetProjDoComics');
+            m_log('In m_functionRetProjDoComics');
 
-            var strSql = "select * from " + self.dbname + "comics where id in (select comicId from projects_comics_libraries where projectId=" + project.id + ");";
+            var strSql = "select * from " + self.dbname + "comics where id in (select comicId from projects_comics where projectId=" + project.originalProjectId + ");";
             var exceptionRet = sql.execute(strSql,
                 function(rows) {
 
                     // Every project has to have at least 1 comic.
                     if (rows.length === 0) {
 
-                        return callback(new Error("Could not retrieve comics for project with id=" + project.id));
+                        return callback(new Error("Could not retrieve comics for project with id=" + project.originalProjectId));
                     } 
 
                     // Use async to process each comic in the project and fetch their internals.
@@ -347,6 +352,9 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                         function(comicIth, cbe) {
 
                             comicIth.originalComicId = comicIth.id;
+                            if (project.iFetchMode < 3) {
+                                comicIth.id = 0;                                
+                            }
                             comicIth.comiccode = [];
                             comicIth.libraries = [];
                             comicIth.statements = [];
@@ -387,67 +395,41 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                     ) {
         try {
 
-            // Using async.parallel, load comicIth's libraries and comiccode.
+            m_log('In m_functionRetProjDoComicInternals');
+
+            // Using async.parallel, load comicIth's libraries (user and system), statements and comiccode.
             async.parallel([
                     function(cbp1) {    // libraries
 
-                        var sqlQuery = "select * from " + self.dbname + "libraries where id in (select libraryId from projects_comics_libraries where projectId=" + project.id + " and comicId=" + comicIth.id + ");";
+                        // Fetch two sets of libraries at once: user and system libraries.
+                        var sqlQuery = "select * from " + self.dbname + "libraries where id in (select libraryId from comics_libraries where comicId=" + comicIth.originalComicId + ");"; 
+
                         var exceptionRet = sql.execute(sqlQuery,
                             function(rows) {
                                 
-                                if (rows.length === 0) { return cbp1(new Error("Unable to retrieve project. Could not retrieve libraries for comic with id=" + comicIth.id)); }
+                                if (rows.length === 0) { return cbp1(new Error("Unable to retrieve project. Could not retrieve libraries for comic with id=" + comicIth.originalComicId)); }
 
-                                // Use async to process each library and fetch its internals.
-                                // After review, could change eachSeries to each perhaps.
                                 async.eachSeries(rows,
-                                    function(rowIth, cbe1) {
+                                    function(rowIth, cbpaa) {
 
-                                        var libraryIth = {
-                                            id: rowIth.id,
-                                            originalLibraryId: rowIth.id,
-                                            isSystemLibrary: (rowIth.isSystemLibrary === 1 ? true : false),
-                                            isAppLibrary: (rowIth.isAppLibrary === 1 ? true : false),
-                                            isBaseLibrary: (rowIth.isBaseLibrary === 1 ? true : false),
-                                            // If not a "special" library, then it's normal. Set it for ease of processing later.
-                                            isNormalLibrary: !(rowIth.isSystemLibrary || rowIth.isAppLibrary || rowIth.isBaseLibrary),
-                                            imageId: rowIth.imageId,
-                                            altImagePath: rowIth.altImagePath
-                                        };
-
-                                        libraryIth = Object.assign(libraryIth, JSON.parse(rowIth.libraryJSON).library);
-
-                                        // libraryIth.editors was saved as a joined ('\n') string of user emails (user.userName).
-                                        // Since the ultimate source of this property is gotten from library_users (and saving made sure of that), we will rebuild the string.
-                                        libraryIth.editors = '';
-                                        var sqlString = "select u.userName from " + self.dbname + "library_users lu inner join user u on u.id=lu.userId where lu.libraryId=" + libraryIth.id + ";";
-                                        var exRet = sql.execute(sqlString,
-                                            function(rows) {
-                                                rows.forEach(
-                                                    function(row) {
-                                                        if (libraryIth.editors.length) { libraryIth.libraryJSON.editors += '\n'; }
-                                                        libraryIth.editors += row.userName;
-                                                    }
-                                                );
-
-                                                comicIth.libraries.push(libraryIth);
-                                                return cbe1(null);
+                                        m_functionPrepareIncomingLibrary(req, res, project, comicIth, rowIth, 
+                                            function(err) {
+                                                return cbpaa(err);
                                             }
                                         );
                                     },
-                                    function(err) { // Main callback for inner async.eachSeries.
-
-                                        // But return to outer async.parallel for next step or jump to ITS error function.
+                                    function(err) { // Main callback for inner inner async.eachSeries.
                                         return cbp1(err);
                                     }
-                                );
+                                )
                             },
                             function(strError) { return cbp1(new Error(strError)); }
                         );
                         if (exceptionRet) { return cbp1(exceptionRet); }
                     },
-                    function(cb) {  // statements
+                    function(cbp2) {  // statements
 
-                        var strQuery = "select name from " + self.dbname + "statements where id in (select statementId from " + self.dbname + "comics_statements where comicId=" + comicIth.id + ") order by name asc;";
+                        var strQuery = "select name from " + self.dbname + "statements where id in (select statementId from " + self.dbname + "comics_statements where comicId=" + comicIth.originalComicId + ") order by name asc;";
                         sql.execute(
                             strQuery,
                             function(rows) {
@@ -456,16 +438,16 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                         comicIth.statements.push(rowIth.name);
                                     }
                                 );
-                                return cb(null);
+                                return cbp2(null);
                             },
                             function(strError) {
-                                return cb(new Error(strError));
+                                return cbp2(new Error(strError));
                             }
                         );
                     },
                     function(cbp3) {    // comiccode
 
-                        var exceptionRet = sql.execute("select * from " + self.dbname + "comiccode where comicId=" + comicIth.id + ";",
+                        var exceptionRet = sql.execute("select * from " + self.dbname + "comiccode where comicId=" + comicIth.originalComicId + ";",
                             function(rows) {
 
                                 // 0 rows is fine during project/comic development.
@@ -492,6 +474,80 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
         } catch(e) { return callback(e); }
     }
 
+    var m_functionPrepareIncomingLibrary = function (req, res, project, comicIth, rowIth, callback) {
+
+        try {
+
+            m_log('In m_functionPrepareIncomingLibrary');
+
+            var libraryIth = {
+                // id is NOW set in call to m_functionGetIdForLibrary.
+                originalLibraryId: rowIth.id,
+                createdByUserId: rowIth.createdByUserId,
+                imageId: rowIth.imageId,
+                altImagePath: rowIth.altImagePath
+            };
+
+            libraryIth = Object.assign(libraryIth, JSON.parse(rowIth.libraryJSON).library);
+
+            libraryIth.id = m_functionGetIdForLibrary(project, libraryIth, rowIth);
+            if (libraryIth.id === -1) {
+                return callback(new Error('Caught error trying to determine id for library ' + libraryIth.name + ' in comic ' + comicIth.name + '.'));
+            }
+
+            // libraryIth.editors was saved as a joined ('\n') string of user emails (user.userName).
+            // Since the ultimate source of this property is gotten from library_editors (and saving made sure of that), we will rebuild the string.
+            libraryIth.editors = '';
+            var sqlString = "select u.userName from " + self.dbname + "library_editors lu inner join user u on u.id=lu.userId where lu.libraryId=" + libraryIth.originalLibraryId + ";";
+            var exRet = sql.execute(sqlString,
+                function(rows) {
+                    rows.forEach(
+                        function(row) {
+
+                            if (libraryIth.editors.length) { libraryIth.libraryJSON.editors += '\n'; }
+                            libraryIth.editors += row.userName;
+                        }
+                    );
+
+                    comicIth.libraries.push(libraryIth);
+                    return callback(null);
+                }
+            );
+        } catch(e) {
+            return callback(e);
+        }
+    }
+
+    var m_functionGetIdForLibrary = function(project, library, row) {
+
+        try {
+            if (project.iFetchMode < 3) {
+                if (library.hasOwnProperty('types')) {
+                    if (library.types.length > 0) {
+                        for (let i = 0; i < library.types.length; i++) {
+                            let typeIth = library.types[i];
+                            if (typeIth.hasOwnProperty('isAppType')) {
+                                return typeIth.isAppType ? 0 : row.id;
+                            }
+                            if (typeIth.name === 'App') {
+                                return 0;
+                            }
+                        }
+                        return row.id;
+                    } else {
+                        return row.id;
+                    }
+                } else {
+                    return row.id;
+                }
+            } else {
+                return row.id;
+            }
+        } catch(e) {
+            return -1;  // Check for this someplace.
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //
     //              SaveProject & SaveProjectAs entry point
@@ -514,13 +570,15 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             m_log("***In routeSaveProject***");
             var project = req.body.projectJson;
 
+            m_log("Incoming project: " + JSON.stringify(project));
+
             // All projects now have a specialProjectData property. From both normal and privileged users.
 
             // If a privileged user is saving a Purchasable Project (whether new or opened for editing), 
             // then specialProjectData itself will have one of these 3 properties: classData, onlineClassData or productData.
             // These three properties contain the info that has to be saved to classes, onlineclasses or products, respectively.
 
-            // A privileged user can also edit and save a core project, keeping it a core project with id=1-5. In this case project.isCoreProject and
+            // A privileged user can also edit and save a core project, keeping it a core project with id=1-6. In this case project.isCoreProject and
             // project.specialProjectData.coreProject will both be true. Take your pick.
 
             // project.specialProjectData.openMode === 'new' for new projects and === 'searched' for projects opened with OpenProjectDialog.
@@ -570,40 +628,9 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                             m_log('Connection has a transaction');
 
-                                            m_functionDetermineTypeOfSave(connection, req, res,
-                                                function(err, typeOfSave) {
-
-                                                    if (err) {
-                                                        m_functionFinalCallback(new Error("Could not save project due to error: " + err.message), req, res, connection, null);
-                                                    
-                                                    } else {
-
-                                                        if (typeOfSave === 'save') {
-
-                                                            m_log('Going into m_functionSaveProject');
-                                                            m_functionSaveProject(connection, req, res, project, 
-                                                                function(err) {
-                                                                    m_functionFinalCallback(err, req, res, connection, project);
-                                                                }
-                                                            );
-                                                        } else if (typeOfSave === 'saveWithSameId') {
-
-                                                            m_log('Going into m_functionSaveProjectWithSameId');
-                                                            m_functionSaveProjectWithSameId(connection, req, res, project, 
-                                                                function(err) {
-                                                                    m_functionFinalCallback(err, req, res, connection, project);
-                                                                }
-                                                            );
-                                                        } else {    // 'saveAs'
-
-                                                            m_log('Going into m_functionSaveProjectAs');
-                                                            m_functionSaveProjectAs(connection, req, res, project, 
-                                                                function(err) {
-                                                                    m_functionFinalCallback(err, req, res, connection, project);
-                                                                }
-                                                            );
-                                                        }
-                                                    }
+                                            m_functionNewSaveProject(connection, req, res, project, 
+                                                function(err) {
+                                                    m_functionFinalCallback(err, req, res, connection, project);
                                                 }
                                             );
                                         }
@@ -632,276 +659,16 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
         }
     }
 
-    var m_functionDetermineTypeOfSave = function(connection, req, res, callback) {
+    var m_functionNewSaveProject = function(connection, req, res, project, callback) {
 
         try {
 
-            m_log("***In m_functionDetermineTypeOfSave***");
-
-            // Return with callback(err, typeOfSave);
-            // typeOfSave:
-            //  'saveAs' INSERTs new rows for everything.
-            //  'save' DELETES (cascading the project from the database) and then calls SaveAs to insert it.
-            //  'saveWithSameId' UPDATEs.
-
-            // The project's name must be unique to the user's projects, but can be the same as another user's project name.
-            // This doesn't have to be checked if we're returning typeOfSave === 'save', but it will have to be checked for 'new' or 'save as' saves.
-            
-            // What would normally result in a 'save' will be changed to a 'saveAs' if it's a new project or the user is saving a project gotten from another user.
-            // What would normally result in a 'saveAs' will be changed to a 'save' if the name and id are the same as one of the user's existing projects.
-            
-            // Also, if req.body.changeableName is true, then a name conflict will be resolved (without user intervention) by appending an incremented integer until there is no conflict
-            // within the user's projects and typeOfSave will be returned as 'SaveAs'. This will only happen on a project with project.specialProjectData.openMode === "bought".
-
-            // A privileged user can also edit and save a core project with the same id. In this case project.isCoreProject And
-            // project.specialProjectData.coreProject will both be true. Take your pick regarding which to check.
-
-            // We'll find project.specialProjectData.openMode === 'new' for new projects and 'searched' for projects opened with OpenProjectDialog.
-            // 'new' projects are always INSERTed into the database. 'searched' projects may be INSERTed or UPDATEd. More on these below.
-
-            // A purchasable project that has just been bought by a normal user came in as a 'new' with specialProjectData containing
-            // one of the product subproperties so that we could display BuyDialog to the user. We will recognize that this project has to be INSERTed as new because 
-            // its project.specialProjectData.openMode will have been changed to 'bought'.
-            
-            // project.specialProjectData.openMode === 'loaded' requires some extra digging to determine what to do in this save, since it could already
-            // have been saved to the DB--or not. It may even belong to someone else and have been sent via email to the user trying to save it now.
-
-            // We'll use async waterfall to retrieve various data (in sucessive functions that add to and pass along a growing status-containing object),
-            // and in its final function we'll use it to set typeOfSave.
-            async.waterfall(
-                [
-                    // Simple settings to get started
-                    function(cb) {
-
-                        var project = req.body.projectJson;
-                        return cb(null, 
-                            {
-                                project: project,
-                                newProj: (project.specialProjectData.openMode === "new" || project.specialProjectData.openMode === "bought"), 
-                                notMine: project.specialProjectData.othersProjects,
-                                editingCoreProject: (project.specialProjectData.userAllowedToCreateEditPurchProjs && project.specialProjectData.coreProject)
-                            }
-                        );
-                    },
-                    // Getting id of any of user's projects with same name as in project. See note on req.body.changeableName above.
-                    function(resultArray, cb) {
-
-                        if (req.body.changeableName) {
-
-                            // Use UDF getUniqueProjNameForUser to make sure result.project.name or its derivative is unique for req.user.userId.
-                            var strQuery = "select " + self.dbname + "getUniqueProjNameForUser(" + connection.escape(resultArray.project.name) + "," + req.user.userId + ") as uniqueName;";
-                            sql.queryWithCxn(connection, strQuery,
-                                function(err, rows) {
-                                    
-                                    if (err) { return cb(err, null); }
-
-                                    if (rows.length !== 1) { return cb(new Error("Error checking/getting unique name for purchase."), null); }
-
-                                    resultArray.project.name = rows[0].uniqueName;
-                                    resultArray["idOfUsersProjWithThisName"] = -1;
-                                    return cb(null, resultArray);
-                                }
-                            );
-                        } else {
-
-                            var strQuery = "select id from " + self.dbname + "projects where name=" + connection.escape(resultArray.project.name) + " and ownedByUserId=" + req.user.userId + ";";
-                            sql.queryWithCxn(connection, strQuery,
-                                function(err, rows) {
-                                    
-                                    if (err) { return cb(err, null); } 
-                                    
-                                    if (rows.length === 1) {
-
-                                        resultArray["idOfUsersProjWithThisName"] = rows[0].id;
-
-                                    } else {
-
-                                        resultArray["idOfUsersProjWithThisName"] = -1;
-                                    }
-
-                                    return cb(null, resultArray);
-                                }
-                            );
-                        }
-                    },
-                    // Getting name of any of user's projects with this project's id.
-                    function(resultArray, cb) {
-
-                        var strQuery = "select name from " + self.dbname + "projects where id=" + resultArray.project.id + " and ownedByUserId=" + req.user.userId + ";";
-                        sql.queryWithCxn(connection, strQuery,
-                            function(err, rows) {
-
-                                if (err) { return cb(err, null); }
-                                
-                                var nameOfUsersProjWithThisId = null;   // null if none exists 
-                                if (rows.length === 1) {
-                                    nameOfUsersProjWithThisId = rows[0].name;
-                                }
-                                resultArray["nameOfUsersProjWithThisId"] = nameOfUsersProjWithThisId;
-                                return cb(null, resultArray);
-                            }
-                        );
-                    },
-                    // Finding out if this is a privileged user editing a Purchasable Project and anyone has already purchased it.
-                    // We'll do this by looking for any projects other than resultArray.project that have the same comicID in
-                    // projects_comics_libraries as resultArray.project.comics[0].id.
-                    function(resultArray, cb) {
-
-                        if (resultArray.project.specialProjectData.userAllowedToCreateEditPurchProjs && resultArray.project.specialProjectData.openMode === 'searched') {
-
-                            var strQuery = "select count(*) as cnt from " + self.dbname + "projects_comics_libraries where comicId=" + resultArray.project.comic[0].id + " and projectId<>" + resultArray.project.id + ";";
-                            sql.queryWithCxn(connection, strQuery,
-                                function(err, rows) {
-                                    if (err) { return cb(err, null); }
-                                    resultArray["savingPurchasableProjectThatsBeenBought"] = (rows[0]['cnt'] > 1);
-                                    return cb(null, resultArray);
-                                }
-                            );
-                        } else { return cb(null, resultArray); }
-                    }
-                ],
-                // The waterfall falls through to here.
-                // new properties in resultArray: editingCoreProject, savingPurchasableProjectThatsBeenBought
-                function(err, resultArray) {
-
-                    if (err) { 
-                        m_log("Came into end of waterfall with err non-null."); 
-                        return callback(err); 
-                    }
-
-                    if (resultArray.project.specialProjectData.openMode === 'loaded') {
-
-                        return callback(new Error("Not prepared to save project loaded from JSON files yet. Soon."));
-                    }
-
-                    var typeOfSave = null;
-
-                    if ((resultArray.editingCoreProject || resultArray.savingPurchasableProjectThatsBeenBought) && resultArray.project.id > 0) {
-
-                        typeOfSave = "saveWithSameId";
-                    
-                    } else {
-
-                        // New project or saving someone else's project must have a unique name for current user.
-                        if (resultArray.newProj || resultArray.notMine ) {
-                            
-                            if (resultArray.idOfUsersProjWithThisName > -1) {
-
-                                return callback(new Error("You already have a project with this name."));
-
-                            } else {
-
-                                typeOfSave = "saveAs";
-
-                            }
-                        } else {
-
-                            // If saving project with same id as another of user's projects with same name, then save.
-                            if (resultArray.idOfUsersProjWithThisName === resultArray.project.id) {
-
-                                typeOfSave = "save";
-                            }
-                        }
-
-                        if (!typeOfSave) {  // no decision yet
-
-                            // If saving project with same id and name then save; else saveAs.
-                            if (resultArray.nameOfUsersProjWithThisId === resultArray.project.name) {
-
-                                typeOfSave = "save";
-
-                            } else {
-
-                                typeOfSave = "saveAs";
-                            }
-                        }
-                    }
-
-                    return callback(null, typeOfSave);
-                }
-            );
-        } catch (e) { callback(e); }
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    //
-    //                      Save processing
-    //
-    // Saving consists of deleting the old project then then re-inserting it
-    // using saveAs processing. It WILL change the project's id along with ids of every part of the project.
-    //
-    // When saving a project with same id as another of user's project with same name, we'll save.
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////////
-
-    var m_functionSaveProject = function (connection, req, res, project, callback) {
-
-        m_log("***In m_functionSaveProject***");
-        try {
-            // async.series runs each of an array of functions in order, waiting for each to finish in turn.
-            // (1) Delete the old project.
-            // (2) Call m_functionSaveProjectAs to insert the new project.
-            async.series(
-                [
-                    // (1)
-                    function(cb) {
-// TODO: WORK NEEDED                        
-                        // The following will delete the former project completely from the database.
-                        var strQuery = "delete from " + self.dbname + "comics where id in (select comicId from projects_comics_libraries where projectId=" + project.id + "); ";
-                        strQuery += "delete from " + self.dbname + "types where libraryId in (select pcl.libraryId from " + self.dbname + "projects_comics_libraries pcl inner join " + self.dbname + "libraries l on l.id=pcl.libraryId where isSystemLibrary=0 and isBaseLibrary=0 and projectId=" + project.id + "); ";
-                        strQuery += "delete from " + self.dbname + "libraries where isSystemLibrary=0 and isBaseLibrary=0 and id in (select libraryId from " + self.dbname + "projects_comics_libraries where projectId=" + project.id + "); ";
-                        strQuery += "delete from " + self.dbname + "projects where id=" + project.id + "; ";
-                        m_log('Doing save project step 1: deleting old version with ' + strQuery);
-                        
-                        // Note: sql.queryWithCxn returns err in its callback as a string, not an exception.
-                        sql.queryWithCxn(connection, 
-                            strQuery, 
-                            function(err, rows) {   
-                                // rows is ignored for deletion. err will be null if delete worked. That will cause part (2) to run.
-                                return cb(err);
-                            }
-                        );
-                    },
-                    // (2)
-                    function(cb) {
-                        // Now we can just INSERT the project as passed from the client side.
-                        m_log("Going off to m_functionSaveProjectAs");
-                        m_functionSaveProjectAs(connection, req, res, project, 
-                            function(err) { 
-                                return cb(err); 
-                            }
-                        );
-                    }
-                ],
-                // final callback for series
-                function(err){ return callback(err); }
-            );
-        } catch (e) { callback(e); }
-    }
-
-
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    //
-    //                      SaveAs processing
-    //
-    // SaveAs processing INSERTs everything for the project.
-    //
-    // New project or saving someone else's project which must have a unique name for current user.
-    // A fallthrough case: If saving project with different id or name then saveAs.
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////////
-
-    var m_functionSaveProjectAs = function (connection, req, res, project, callback) {
-
-        try {
-
-            m_log('***Continuing in m_functionSaveProjectAs***');
+            m_log('***Continuing in m_functionNewSaveProject***');
 
             // We'll use async.series serially to (1) insert project and 
             // (2) use async.parallel to
-            //  (2a) write the project's tags and
-            //  (2b) call off to do all of the project's comics
-            //  (2c) if applicable, write to classes, products or onlineclasses
+            //  (2a) call off to do all of the project's comics
+            //  (2b) if applicable, write to classes, products or onlineclasses
             async.series(
                 [
                     // (1)
@@ -909,13 +676,13 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                         var guts = {
                             name: project.name,
+                            description: project.description,
                             ownedByUserId: req.user.userId,
                             public: project.public,
                             quarantined: project.quarantined,
-                            description: project.description,
                             imageId: project.imageId,
                             altImagePath: project.altImagePath,
-                            parentProjectId: project.parentProjectId,
+                            baseProjectId: project.baseProjectId || null,   // Somehow, if project.baseProjectId=null, just assigning it without || null was setting it = 0. This was causing a FK error. TODO
                             parentPrice: project.parentPrice,
                             priceBump: project.priceBump,
                             projectTypeId: project.projectTypeId,
@@ -926,8 +693,15 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             lastSaved: (new Date()),
                             chargeId: project.chargeId,
                             currentComicIndex: project.currentComicIndex,
-                            currentComicStepIndex: row.currentComicStepIndex
+                            currentComicStepIndex: project.currentComicStepIndex
                         };
+
+                        let verb = 'insert ';
+                        let where = ''
+                        if (project.id) {
+                            verb = 'update ';
+                            where = ' where id=' + project.id;
+                        }
 
                         if (project.specialProjectData.openMode === "searched") {
                             
@@ -941,22 +715,23 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             return cb(exceptionRet);
                         }
 
-                        var strQuery = "INSERT " + self.dbname + "projects SET ?";
-                        m_log('Inserting project record with ' + strQuery + '; fields: ' + JSON.stringify(guts));
+                        var strQuery = verb + self.dbname + "projects SET ?" + where;
+                        m_log('Inserting or updating project record with ' + strQuery + '; fields: ' + JSON.stringify(guts));
                         sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
                             function(err, rows) {
                                 if (err) { return cb(err); }
                                 if (rows.length === 0) { return cb(new Error('Error saving project to database.')); }
 
-                                project.id = rows[0].insertId;
+                                if (verb === 'insert ') {
+                                    project.id = rows[0].insertId;
+                                }
 
-//  TOXXX MUST CHANGE comicProjectId no longer exists.
-// TODO: WORK NEEDED                        
-                                // Check if necessary to and then, if so, update project.comicProjectId
-                                if (project.comicProjectId === 0) {
+                                // Check if necessary to and then, if so, update project.baseProjectId.
+                                // We waited to do this until we knew for sure that we had a project.id.
+                                if (!project.baseProjectId) {
 
-                                    project.comicProjectId = project.id;
-                                    sql.queryWithCxn(connection, "UPDATE " + self.dbname + "projects SET comicProjectId=" + project.id + " WHERE id=" + project.id + ";",
+                                    project.baseProjectId = project.id;
+                                    sql.queryWithCxn(connection, "UPDATE " + self.dbname + "projects SET baseProjectId=" + project.id + " WHERE id=" + project.id + ";",
                                         function(err, rows) {
                                             return cb(err);
                                         }
@@ -973,6 +748,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                         // Use async.parallel to save the project's possible purchasable project info and its comics in parallel.
                         async.parallel(
                             [
+                                // (2a)
                                 function(cb) {
                                     m_log("Calling m_saveComicsToDB");
                                     m_saveComicsToDB(connection, req, res, project,
@@ -981,6 +757,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                         }
                                     );
                                 },
+                                // (2b)
                                 function(cb) {
                                     if (project.specialProjectData.userAllowedToCreateEditPurchProjs && (project.specialProjectData.openMode === 'new' || project.specialProjectData.openMode === 'searched')) {
                                         m_log("Calling m_savePurchProductData");
@@ -1002,151 +779,17 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     return callback(err);
                 }
             );
-        } catch(e) { callback(e); }
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    //
-    //                      SaveWithSameId processing
-    //
-    // SaveWithSameId retains the project id by UPDATEing but deletes from comics and types on down and
-    // INSERTs them.
-    //
-    // This method was chosen because resultArray.editingCoreProject || resultArray.savingPurchasableProjectThatsBeenBought.
-    // Both are possible only with a privileged user. The first means that one of the core projects has been edited and is being saved.
-    // The second means that a Purchasable Project that has already been purchased by a user has been edited and is being saved.
-    // This special path must keep the same project.id, but can delete and re-insert everything else.
-    //
-    ///////////////////////////////////////////////////////////////////////////////////////////
-
-    var m_functionSaveProjectWithSameId = function (connection, req, res, project, callback) {
-
-        try {
-
-            m_log('***Continuing in m_functionSaveProjectWithSameId***');
-
-            // We'll use async.series serially to (1) update project;
-            // (2) Delete everything related to it using a combination of async.parallel and cascading deletes;
-            //     (a) We can do this by deleting comics pointing to project--this will delete comiccode, types and below.
-            //     (b) We also have to delete from classes, products and onlineclasses where they point to project.
-            //         And, since we're UPDATEing the project and therefore we're not cascading delete from project_tags, we'll manually delete them, too.
-            // (3) use async.parallel to
-            //     (a) write the project's tags and
-            //     (b) call off to do all of the project's comics
-            //     (c) potentially write to classes, products, onlineclasses
-            async.series(
-                [
-                    // (1)
-                    function(cb) {
-
-                        var guts = {
-                            name: project.name,
-                            ownedByUserId: req.user.userId,
-                            public: project.public,
-                            quarantined: project.quarantined,
-                            description: project.description,
-                            imageId: project.imageId,
-                            altImagePath: project.altImagePath,
-                            parentProjectId: project.parentProjectId,
-                            parentPrice: project.parentPrice,
-                            priceBump: project.priceBump,
-                            projectTypeId: project.projectTypeId,
-                            isCoreProject: (project.isCoreProject ? 1 : 0),
-                            isProduct: (project.isProduct || project.specialProjectData.productProject ? 1 : 0),
-                            isClass: (project.isClass || project.specialProjectData.classProject ? 1 : 0),
-                            isOnlineClass: (project.isOnlineClass || project.specialProjectData.onlineClassProject ? 1 : 0),
-                            firstSaved: moment(project.firstSaved).format("YYYY-MM-DD HH:mm:ss"),
-                            lastSaved: (new Date()),
-                            chargeId: project.chargeId,
-                            currentComicIndex: project.currentComicIndex,
-                            currentComicStepIndex: row.currentComicStepIndex
-                        };
-
-                        var exceptionRet = m_checkGutsForUndefined('project', guts);
-                        if (exceptionRet) {
-                            return cb(exceptionRet);
-                        }
-
-                        var strQuery = "UPDATE " + self.dbname + "projects SET ? where id=" + project.id;
-                        m_log('Updating project record with id ' + project.id + ' with query ' + strQuery + '; fields: ' + JSON.stringify(guts));
-                        sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
-                            function(err, rows) {
-                                if (err) { return cb(err); }
-                                return cb(null);
-                            }
-                        );
-                    },
-                    // (2)
-                    function(cb) {
-// TOXXX HERE DOWN HAS TO CHANGE
-// TODO: WORK NEEDED                        
-                        async.parallel(
-                            [
-                                // (2a)
-                                function(cb) {
-                                    sql.queryWithCxn(connection, "delete from " + self.dbname + "comics where projectId=" + project.id + ";",
-                                        function(err, rows) {
-                                            return cb(err); // null or not
-                                        }
-                                    );
-                                },
-                                // (2b)
-                                function(cb) {
-                                    sql.queryWithCxn(connection, "delete from " + self.dbname + "classes where baseProjectId=" + project.id + ";" + "delete from " + self.dbname + "products where baseProjectId=" + project.id + ";" + "delete from " + self.dbname + "onlineclasses where baseProjectId=" + project.id + ";" + "delete from " + self.dbname + "project_tags where projectId=" + project.id + ";",
-                                        function(err, rows) {
-                                            return cb(err); // null or not
-                                        }
-                                    );
-                                }
-                            ],
-                            function(err) { return cb(err); }
-                        );
-                    },
-                    // (3)
-                    function(cb) {
-
-                        // Use async.parallel to save the project's comics and possible purchasable project data in parallel.
-                        async.parallel(
-                            [
-                                function(cb) {
-                                    m_log("Calling m_saveComicsToDB");
-                                    m_saveComicsToDB(connection, req, res, project,
-                                        function(err) {
-                                            return cb(err);
-                                        }
-                                    );
-                                },
-                                function(cb) {
-                                    if (project.specialProjectData.userAllowedToCreateEditPurchProjs && (project.specialProjectData.openMode === 'new' || project.specialProjectData.openMode === 'searched')) {
-
-                                        m_log("Calling m_savePurchProductData");
-                                        m_savePurchProductData(connection, req, res, project,
-                                            function(err) {
-                                                return cb(err);
-                                            }
-                                        );
-                                    } else { return cb(null); }
-                                }
-                            ],
-                            // final callback for async.parallel
-                            function(err) { return cb(err); }
-                        );
-                    }
-                ],
-                // final callback for async.series
-                function(err) {
-                    return callback(err);
-                }
-            );
-        } catch(e) { callback(e); }
+        } catch (e) { return callback(e); }
     }
 
     var m_savePurchProductData = function(connection, req, res, project, callback) {
 
         try {
             
-            var guts = '';
-            var tblName = '';
+            let guts = '';
+            let tblName = '';
+            let verb = '';
+            let where = '';
 
             // There may be nothing to do here. Check these conditions carefully to understand.
             if (project.specialProjectData.userAllowedToCreateEditPurchProjs 
@@ -1155,11 +798,16 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                 if (project.specialProjectData.classProject && project.specialProjectData.hasOwnProperty('classData')) {
 
                     guts = {
-                        active: (project.specialProjectData.classData.active ? 1 : 0),
-                        classDescription: project.specialProjectData.classData.classDescription,
+                        name: project.name,
+                        baseProjectId: project.id,
                         instructorFirstName: project.specialProjectData.classData.instructorFirstName,
                         instructorLastName: project.specialProjectData.classData.instructorLastName,
                         instructorPhone: project.specialProjectData.classData.instructorPhone,
+                        level: project.specialProjectData.classData.level,
+                        difficulty: project.specialProjectData.classData.difficulty,
+                        classDescription: project.specialProjectData.classData.classDescription,
+                        imageId: (project.specialProjectData.classData.imageId || 0),           // not set on client side yet
+                        price: project.specialProjectData.classData.price,
                         facility: project.specialProjectData.classData.facility,
                         address: project.specialProjectData.classData.address,
                         room: project.specialProjectData.classData.room,
@@ -1167,51 +815,64 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                         state: project.specialProjectData.classData.state,
                         zip: project.specialProjectData.classData.zip,
                         schedule: JSON.stringify(project.specialProjectData.classData.schedule),
-                        level: project.specialProjectData.classData.level,
-                        difficulty: project.specialProjectData.classData.difficulty,
-                        price: project.specialProjectData.classData.price,
-                        imageId: (project.specialProjectData.classData.imageId || 0),           // not set on client side yet
+                        active: (project.specialProjectData.classData.active ? 1 : 0),
                         classNotes: project.specialProjectData.classData.classNotes,
-                        name: project.name,
-                        baseProjectId: project.id,
                         maxClassSize: (project.specialProjectData.classData.maxClassSize || 0),  // not set on client side yet
                         loanComputersAvailable: (project.specialProjectData.classData.loadComputersAvailable || 0)  // not set on client side yet
-                        };
+                    };
                     tblName = 'classes';
+                    if (project.specialProjectData.classData.id) {
+                        verb = 'update ';
+                        where = ' where id=' + project.specialProjectData.classData.id;
+                    } else {
+                        verb = 'insert ';
+                    }
 
                 } else if (project.specialProjectData.productProject && project.specialProjectData.hasOwnProperty('productData')) {
 
                     guts = {
-                        active: (project.specialProjectData.productData.active ? 1 : 0),
-                        productDescription: project.specialProjectData.productData.productDescription,
+                        name: project.name,
+                        baseProjectId: project.id,
                         level: project.specialProjectData.productData.level,
                         difficulty: project.specialProjectData.productData.difficulty,
-                        price: project.specialProjectData.productData.price,
+                        productDescription: project.specialProjectData.productData.productDescription,
                         imageId: (project.specialProjectData.productData.imageId || 0),           // not set on client side yet
-                        videoURL: (project.specialProjectData.productData.videoURL || ''),           // not set on client side yet
-                        name: project.name,
-                        baseProjectId: project.id
-                        };
+                        price: project.specialProjectData.productData.price,
+                        active: (project.specialProjectData.productData.active ? 1 : 0),
+                        videoURL: (project.specialProjectData.productData.videoURL || '')           // not set on client side yet
+                    };
                     tblName = 'products';
+                    if (project.specialProjectData.productData.id) {
+                        verb = 'update ';
+                        where = ' where id=' + project.specialProjectData.productData.id;
+                    } else {
+                        verb = 'insert ';
+                    }
 
                 } if (project.specialProjectData.onlineClassProject && project.specialProjectData.hasOwnProperty('onlineClassData')) {
 
                     guts = {
-                        active: (project.specialProjectData.onlineClassData.active ? 1 : 0),
-                        classDescription: project.specialProjectData.onlineClassData.classDescription,
+                        name: project.name,
+                        baseProjectId: project.id,
                         instructorFirstName: project.specialProjectData.onlineClassData.instructorFirstName,
                         instructorLastName: project.specialProjectData.onlineClassData.instructorLastName,
                         instructorEmail: project.specialProjectData.onlineClassData.instructorEmail,
-                        schedule: JSON.stringify(project.specialProjectData.onlineClassData.schedule),
                         level: project.specialProjectData.onlineClassData.level,
                         difficulty: project.specialProjectData.onlineClassData.difficulty,
-                        price: project.specialProjectData.onlineClassData.price,
-                        classNotes: project.specialProjectData.onlineClassData.classNotes,
+                        classDescription: project.specialProjectData.onlineClassData.classDescription,
                         imageId: (project.specialProjectData.onlineClassData.imageId || 0),           // not set on client side yet
-                        name: project.name,
-                        baseProjectId: project.id
-                        };
+                        price: project.specialProjectData.onlineClassData.price,
+                        schedule: JSON.stringify(project.specialProjectData.onlineClassData.schedule),
+                        active: (project.specialProjectData.onlineClassData.active ? 1 : 0),
+                        classNotes: project.specialProjectData.onlineClassData.classNotes
+                    };
                     tblName = 'onlineclasses';
+                    if (project.specialProjectData.onlineClassData.id) {
+                        verb = 'update ';
+                        where = ' where id=' + project.specialProjectData.onlineClassData.id;
+                    } else {
+                        verb = 'insert ';
+                    }
                 }
 
                 if (tblName.length > 0) {
@@ -1221,24 +882,27 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                         return cb(exceptionRet);
                     }
 
-                    var strQuery = "INSERT " + self.dbname + tblName + " SET ?";
-                    m_log('Inserting purchasable project with ' + strQuery + '; fields: ' + JSON.stringify(guts));
+                    var strQuery = verb + self.dbname + tblName + " SET ?" + where;
+                    m_log('Inserting or updating purchasable project with ' + strQuery + '; fields: ' + JSON.stringify(guts));
                     sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
                         function(err, rows) {
                             if (err) { return callback(err); }
+                            if (rows.length === 0) { return callback(new Error('Error saving PP part of project to database.')); }
 
-                            var id = rows[0].insertId;
-                            if (tblName === 'classes') {
+                            if (verb === "insert ") {
+                                let id = rows[0].insertId;
+                                if (tblName === 'classes') {
 
-                                project.specialProjectData.classData.id = id;
+                                    project.specialProjectData.classData.id = id;
 
-                            } else if (tblName === 'products') {
+                                } else if (tblName === 'products') {
 
-                                project.specialProjectData.productData.id = id;
+                                    project.specialProjectData.productData.id = id;
 
-                            } else {
+                                } else {
 
-                                project.specialProjectData.onlineClassData.id = id;
+                                    project.specialProjectData.onlineClassData.id = id;
+                                }
                             }
                             return callback(null);
                         }
@@ -1257,21 +921,35 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
     var m_saveComicsToDB = function (connection, req, res, project, callback) {
 
         // Now the project has been inserted or updated in the DB and its id is in project.id.
-        // A row has been added to resource and tags have been handled for the project, too.
+        // A row has been added to resource, too. -- I don't think this has been done TODO -- not sure if it's needed.
 
-        // This routine will iterate through the project's comics, possibly saving (inserting) each, possibly saving its libraries, but always saving the libraries' types, etc.
-        // We use the word 'possibly', because comics and libraries themselves are saved only when a privileged user is working on a purchasable product or a core project.
-        // Otherwise, only the comics' libraries' types and lower are saved.
+        // This routine will iterate through the project's comics, saving (inserting or updating) each, possibly saving their libraries.
+        // Libraries will be saved if library.id = 0 or (library.id != 0 and req.user.userId is one of the library's editors).
+
+        // This also involves maintaining projects_comics and comics_libraries as described and implemented below.
         try {
 
             m_log("Just got into m_saveComicsToDB with this many comics to do: " + project.comics.length);
+return callback(null);
+
+            // In series:
+            // (1) We will compare the comics in project with the comics already linked to the project in the database. If this was an existing project,
+            //      
+            async.series(
+                [
+
+                ],
+                function(err) { return callback(err); }
+            );
 
             // async.eachSeries iterates over a collection, perform a single async task at a time.
             // Actually, we could process all comics in parallel. Maybe we'll change to that in the future. Or maybe it really makes no diff.
             async.eachSeries(project.comics, 
                 function(comicIth, cb) {
 
-                    // comic no longer has a projectId. All links are handled by the 3-way junction table projects_comics_libraries.
+                    // comic no longer has a projectId. Linking is handled by the projects_comics.
+                    // Remember: comics are NOT shared between projects.
+                    // We have to update existing comics, insert new comics, delete comics no longer in project (along with their guts).
 
                     // Use async.series with 2 functions: (1) for writting comics to the database; (2) for handling comic internals.
                     async.series([
