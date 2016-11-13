@@ -930,6 +930,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
         try {
 
             m_log("Just got into m_saveComicsToDB with this many comics to do: " + project.comics.length);
+return callback(null);
 
             // In series:
             // (1) We will compare the comics in project with the comics already linked to the project in the database. If this was an existing project,
