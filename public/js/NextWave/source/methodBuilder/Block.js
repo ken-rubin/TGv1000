@@ -52,6 +52,22 @@ define(["NextWave/source/utility/prototypes",
                     ////////////////////////
                     // Public methods.
 
+                    // External parse call, invoked when loaded.
+                    self.parse = function () {
+
+                        // Loop over all blocks and parse.
+                        for (let i = 0; i < self.statements.length; i++) {
+
+                            let exceptionRet = self.statements[i].parse();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+                        }
+
+                        return null;
+                    };
+
                     // Get all argument lists.
                     self.accumulateExpressionPlacements = function (arrayAccumulator) {
 

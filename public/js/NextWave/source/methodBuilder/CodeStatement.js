@@ -57,7 +57,23 @@ define(["NextWave/source/utility/prototypes",
                     // External parse call, invoked when loaded.
                     self.parse = function () {
 
-                        return m_functionParse();
+                        let exceptionRet = m_functionParse();
+                        if (exceptionRet) {
+
+                            return exceptionRet;
+                        }
+
+                        // Loop over all blocks and parse.
+                        for (let i = 0; i < self.blocks.length; i++) {
+
+                            exceptionRet = self.blocks[i].parse();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+                        }
+
+                        return null;
                     };
 
                     // Get all argument lists.

@@ -348,10 +348,10 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            /* Hide panels, ai, and drag.
+                            // Hide panels, ai, and drag.
                             self.canvasLayer.active = true;
                             self.panelLayer.active = false;
-                            self.dragLayer.active = false;*/
+                            self.dragLayer.active = false;
 
                             // Cause a resize.
                             m_functionWindowResize();
@@ -375,10 +375,10 @@ define(["NextWave/source/utility/prototypes",
                                 throw exceptionRet;
                             }
 
-                            /* Re-enable panels and drag.
+                            // Re-enable panels and drag.
                             self.canvasLayer.active = false;
                             self.panelLayer.active = true;
-                            self.dragLayer.active = true;*/
+                            self.dragLayer.active = true;
 
                             // Cause a resize.
                             m_functionWindowResize();

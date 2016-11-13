@@ -121,37 +121,6 @@ define(["NextWave/source/utility/prototypes",
                     // Private field.
 
                     // .
-                    var m_functionAnimate = function () {
-
-                        try {
-
-                            var exceptionRet = m_functionUpdate();
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }
-
-                            /* Clear the surface before rendering everything.
-                            m_context.clearRect(0,0,800,600);
-
-                            exceptionRet = m_functionRender();
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }*/
-
-                            /*exceptionRet = m_functionDoEvents();
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }*/
-                        } catch (e) {
-
-                            alert(e.message);
-                        }
-                    };
-
-                    // .
                     var m_functionDoEvents = function () {
 
                         try {
@@ -194,80 +163,6 @@ define(["NextWave/source/utility/prototypes",
                             return e;
                         }
                     };
-
-                    // .
-                    var m_functionUpdate = function () {
-
-                        try {
-
-                            // Update each of the objects that has an update.
-                            for (var i = 0; i < window.tg.instances.length; i++) {
-
-                                // Get the ith instance.
-                                var instanceIth = window.tg.instances[i];
-                                if (!instanceIth) {
-
-                                    continue;
-                                }
-
-                                // Check if it has an update.
-                                if (instanceIth.update) {
-
-                                    // Call update if it exists.
-                                    var exceptionRet = instanceIth.update();
-                                    if (exceptionRet) {
-
-                                        throw exceptionRet;
-                                    }
-                                }
-                            }
-
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    /* .
-                    var m_functionRender = function () {
-
-                        try {
-
-                            // Render each of the objects that has a render.
-                            for (var i = 0; i < window.instances.length; i++) {
-
-                                // Get the ith instance.
-                                var instanceIth = window.instances[i];
-                                if (!instanceIth) {
-
-                                    continue;
-                                }
-
-                                // Check if it has an render.
-                                if (instanceIth.render) {
-
-                                    // Call update if it exists.
-                                    var exceptionRet = instanceIth.render(m_context);
-                                    if (exceptionRet) {
-
-                                        throw exceptionRet;
-                                    }
-                                }
-                            }
-
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };*/
-
-                    ///////////////////////////
-                    // Private field.
-
-                    // .
-                    var m_renderCookie = null;
                 } catch (e) {
 
                     alert(e.message);
