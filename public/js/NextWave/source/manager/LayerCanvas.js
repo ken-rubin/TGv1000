@@ -101,7 +101,7 @@ define(["NextWave/source/utility/prototypes",
                                     // Else, render.
                                     try {
 
-                                        instanceIth.update(areaBounds);
+                                        instanceIth.update(areaBounds, iMS);
                                         instanceIth.render(contextRender);
                                     } catch (e) {
 

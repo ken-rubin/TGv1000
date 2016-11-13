@@ -98,11 +98,7 @@ define(["NextWave/source/utility/ListItem"],
                     // Generates JavaScript string for this property.
                     self.generateJavaScript = function () {
 
-                        var strProperty = "\n";
-
-                        strProperty += "    this." + self.data.name + " = " + self.data.defaultExpression + ";";
-
-                        strProperty += "\n";
+                        var strProperty = " this." + self.data.name + " = " + self.data.defaultExpression + "; ";
 
                         return strProperty;
                     };

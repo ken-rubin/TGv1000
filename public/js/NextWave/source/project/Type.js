@@ -223,8 +223,8 @@ define(["NextWave/source/project/Method",
                             self.data.name = self.data.name.replace(/ /g, "");
 
                             // Build the constructor function for the type.
-                            var strConstructorFunction = "if (!window.tg." + self.owner.data.name + ") { window.tg." + self.owner.data.name + " = {}; } \n\n" +
-                                "window.tg." + self.owner.data.name + "." + self.data.name + " = class ";
+                            var strConstructorFunction = //" if (!window.tg." + self.owner.data.name + ") { window.tg." + self.owner.data.name + " = {}; } " +
+                                " window.tg." + self.owner.data.name + "." + self.data.name + " = class ";
 
                             // Extend, if derived.
                             if (self.data.baseTypeName) {
@@ -237,18 +237,25 @@ define(["NextWave/source/project/Method",
                                     self.data.baseTypeName + " ";                            
                             }
 
-                            strConstructorFunction += "{\n\n";
+                            strConstructorFunction += " { ";
 
                             // Add Methods.
                             for (var i = 0; i < self.methods.length; i++) {
 
                                 // Add it to the result object.
                                 strConstructorFunction += self.methods[i].generateJavaScript(self.properties,
-                                    self.events) + "\n";
+                                    self.events) + " ";
                             }
 
-                            strConstructorFunction += "\n\n};";
-                            console.log("Define class: " + strConstructorFunction)
+                            strConstructorFunction += " }; ";
+                            strConstructorFunction = js_beautify(strConstructorFunction, {
+                                  'indent_size': 1,
+                                  'indent_char': '\t',
+                                  'end_with_newline': true,
+                                  'brace_style': 'end-expand',
+                                  'space_after_anon_function': true
+                                });
+                            console.log("Define class: \n\n" + strConstructorFunction);
 
                             // Stow.
                             arrayTypes.push({

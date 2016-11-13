@@ -273,6 +273,22 @@ define(["NextWave/source/utility/prototypes",
                         // Add them all.
                         for (var i = 0; i < self.items.length; i++) {
 
+                            // Except the empties.
+                            let editor = self.items[i].payload;
+                            if (editor) {
+
+                                // Get the current text.
+                                let strPayload = editor.text;
+                                if (!strPayload  ||
+                                    strPayload === "...") {
+
+                                    continue;
+                                }
+                            } else {
+
+                                continue;
+                            }
+
                             arrayParameters.push(self.items[i].save());
                         }
 

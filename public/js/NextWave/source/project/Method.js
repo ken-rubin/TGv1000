@@ -178,12 +178,12 @@ define(["NextWave/source/utility/prototypes",
                     // Generates JavaScript string for this method.
                     self.generateJavaScript = function (arrayProperties, arrayEvents) {
 
-                        var strMethod = "\n";
+                        var strMethod = " ";
 
                         // Output name and signiture.
-                        strMethod += "    " + self.data.name + " (" +
+                        strMethod += " " + self.data.name + " (" +
                             self.parameters.generateJavaScript() +
-                            ") {\n\n";
+                            ") { ";
 
                         // If this is construct, then get the properties and events and output.
                         var bConstructor = false;
@@ -194,7 +194,7 @@ define(["NextWave/source/utility/prototypes",
 
                             // Since in constructor, render the super call 
                             // first--this defines lexically scoped this.
-                            strMethod += self.statements.generateJavaScript(true, true) + "\n";
+                            strMethod += self.statements.generateJavaScript(true, true) + " ";
 
                             // Add Properties.
                             if (arrayProperties &&
@@ -204,7 +204,7 @@ define(["NextWave/source/utility/prototypes",
                                 for (var i = 0; i < arrayProperties.length; i++) {
 
                                     // Add it to the result object.
-                                    strMethod += arrayProperties[i].generateJavaScript() + "\n";
+                                    strMethod += arrayProperties[i].generateJavaScript() + " ";
                                 }
                             }
  
@@ -216,17 +216,17 @@ define(["NextWave/source/utility/prototypes",
                                 for (var i = 0; i < arrayEvents.length; i++) {
 
                                     // Add it to the result object.
-                                    strMethod += arrayEvents[i].generateJavaScript() + "\n";
+                                    strMethod += arrayEvents[i].generateJavaScript() + " ";
                                 }
                             }
                         }
 
                         // Output statements.  If constructor 
                         // then don't (re)output super call.
-                        strMethod += self.statements.generateJavaScript(bConstructor, false) + "\n\n";
+                        strMethod += self.statements.generateJavaScript(bConstructor, false) + " ";
 
                         // Output closing squiggle.
-                        strMethod += "    }\n";
+                        strMethod += " } ";
 
                         return strMethod;
                     };

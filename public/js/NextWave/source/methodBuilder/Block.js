@@ -435,7 +435,7 @@ define(["NextWave/source/utility/prototypes",
 
                         for (var i = 0; i < self.statements.length; i++) {
 
-                            strBlock += self.statements[i].generateJavaScript() + "\n";
+                            strBlock += self.statements[i].generateJavaScript() + " ";
                         }
 
                         strBlock += " } ";

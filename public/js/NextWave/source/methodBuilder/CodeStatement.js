@@ -496,7 +496,7 @@ define(["NextWave/source/utility/prototypes",
                     // Generate JavaScript for this statement.
                     self.generateJavaScript = function () {
 
-                        var strStatement = "    ";
+                        var strStatement = " ";
 
                         // Process display template:
                         var arrayDisplayTemplate = self.displayTemplate.split(/(.*?)(\[.*?\])/g).filter(function (strItem) { return (strItem.length > 0); });
@@ -571,7 +571,7 @@ define(["NextWave/source/utility/prototypes",
                         }
 
                         // Now, recompose the allocations back into a statement.
-                        strStatement = "    " + arrayAllocations.join(" new ") + " ";
+                        strStatement = " " + arrayAllocations.join(" new ") + " ";
 
                         for (var i = 0; i < self.blocks.length; i++) {
 

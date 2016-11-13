@@ -254,11 +254,11 @@ define(["NextWave/source/utility/prototypes",
                     // Generates JavaScript string for this statement list.
                     self.generateJavaScript = function (bConstructor, bRenderSuper) {
 
-                        var strStatements = "\n";
+                        var strStatements = " ";
 
                         for (var i = 0; i < self.items.length; i++) {
 
-                            var strStatement = self.items[i].generateJavaScript() + "\n";
+                            var strStatement = self.items[i].generateJavaScript() + " ";
 
                             if (bConstructor) {
 
@@ -277,7 +277,7 @@ define(["NextWave/source/utility/prototypes",
                             }
                         }
 
-                        strStatements += "\n";
+                        strStatements += " ";
 
                         return strStatements;
                     };

@@ -37,6 +37,7 @@ define(["NextWave/source/utility/prototypes",
                             window.tg.raiseCollection = [];
                             window.tg.app = null;
                             window.tg.manager = window.manager;
+                            window.tg.libraryNames = new Set();
                             window.tg.typeNames = new Set();
                             window.tg.raiseEvent = function (strEvent, objectContext) {
 
@@ -76,6 +77,17 @@ define(["NextWave/source/utility/prototypes",
                                         // ...because about to:
                                         continue;
                                     }
+                                }
+
+                                // Ensure the library is defined in window.tg and window.tg.libraryNames.
+                                let strLibraryName = typeIth.library.data.name;
+                                if (!window.tg[strLibraryName]) {
+
+                                    window.tg[strLibraryName] = {};
+                                }
+                                if (!window.tg.libraryNames.has(strLibraryName)) {
+
+                                    window.tg.libraryNames.add(strLibraryName)
                                 }
 
                                 // Actuate the constructor function.
@@ -123,6 +135,14 @@ define(["NextWave/source/utility/prototypes",
                             window.tg.raiseCollection = [];
                             window.tg.app = null;
                             window.tg.typeNames = null;
+
+                            // Clear out all the libraries.
+                            //for (let strLibraryName of window.tg.libraryNames) {
+
+                            //    delete window.tg[strLibraryName];
+                            //}
+
+                            window.tg.libraryNames = null;
                             return null;
                         } catch (e) {
 
