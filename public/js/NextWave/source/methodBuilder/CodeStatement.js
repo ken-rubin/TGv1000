@@ -54,6 +54,12 @@ define(["NextWave/source/utility/prototypes",
                     ////////////////////////
                     // Public methods.
 
+                    // External parse call, invoked when loaded.
+                    self.parse = function () {
+
+                        return m_functionParse();
+                    };
+
                     // Get all argument lists.
                     self.accumulateExpressionPlacements = function (arrayAccumulator) {
 
@@ -549,7 +555,7 @@ define(["NextWave/source/utility/prototypes",
                         }
 
                         // Now, recompose the allocations back into a statement.
-                        strStatement = " " + arrayAllocations.join(" new ") + " ";
+                        strStatement = "    " + arrayAllocations.join(" new ") + " ";
 
                         for (var i = 0; i < self.blocks.length; i++) {
 

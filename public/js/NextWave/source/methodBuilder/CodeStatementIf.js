@@ -29,7 +29,7 @@ define(["NextWave/source/utility/prototypes",
 
                     self.condition = new CodeExpressionStub(ceCondition);
                     self.thenBlock = blockTruthy || new Block("then");
-                    self.elseBlock = blockFalsey || new Block("else");
+                    self.elseBlock = blockFalsey || new Block("else", "\nelse\n");
 
                     // Inherit from CodeStatement.
                     self.inherits(CodeStatement,

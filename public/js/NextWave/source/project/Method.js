@@ -110,7 +110,18 @@ define(["NextWave/source/utility/prototypes",
                                     var objectStatementIth = arrayStatements[i];
                                     var strAllocationString = m_functionRecurseGenerateAllocationString(objectStatementIth);
                                     strAllocationString = strAllocationString.replace(/\r?\n|\r/g, " ");
-                                    var exceptionRet = self.statements.addItem(eval(strAllocationString));
+
+                                    let statementNew = eval(strAllocationString);
+
+                                    // Parse structure....
+                                    var exceptionRet = statementNew.parse();
+                                    if (exceptionRet) {
+
+                                        return exceptionRet;
+                                    }
+
+                                    // Add to the statement list.
+                                    exceptionRet = self.statements.addItem(statementNew);
                                     if (exceptionRet) {
 
                                         return exceptionRet;

@@ -21,7 +21,7 @@ define(["NextWave/source/utility/prototypes",
         try {
 
             // Constructor function.
-        	var functionRet = function Block(strName, arrayStatements) {
+        	var functionRet = function Block(strName, strRenderPrefix, arrayStatements) {
 
                 try {
 
@@ -36,6 +36,8 @@ define(["NextWave/source/utility/prototypes",
                     self.open = true;
                     // The name of this block.
                     self.name = strName || "default";
+                    // The name of this block.
+                    self.renderPrefix = strRenderPrefix || "";
 
                     // If there are statements, then need to parent them.
                     if (self.statements.length) {
@@ -413,7 +415,7 @@ define(["NextWave/source/utility/prototypes",
                     // Generate JavaScript for this expression.
                     self.generateJavaScript = function () {
 
-                        var strBlock = " { ";
+                        var strBlock = self.renderPrefix + " { ";
 
                         for (var i = 0; i < self.statements.length; i++) {
 
@@ -444,6 +446,10 @@ define(["NextWave/source/utility/prototypes",
 
                                         type: "String", 
                                         value: self.name
+                                    }, { 
+
+                                        type: "String", 
+                                        value: self.renderPrefix
                                     }, {
 
                                         type: "Array",
