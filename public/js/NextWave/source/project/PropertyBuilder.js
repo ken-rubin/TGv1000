@@ -280,12 +280,12 @@ define(["NextWave/source/utility/prototypes",
 
                                 bProtected = true;
                             }
-                            exceptionRet = self.dialog.controlObject["defaultExpression"].setProtected(bProtected);
+                            exceptionRet = self.dialog.controlObject["defaultExpressionEdit"].setProtected(bProtected);
                             if (exceptionRet) {
 
                                 return exceptionRet;
                             }
-                            exceptionRet = self.dialog.controlObject["defaultExpression"].setText(self.currentProperty.data.defaultExpression);
+                            exceptionRet = self.dialog.controlObject["defaultExpressionEdit"].setText(self.currentProperty.data.defaultExpression);
                             if (exceptionRet) {
 
                                 return exceptionRet;

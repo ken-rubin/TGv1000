@@ -11,13 +11,14 @@
 // Require-AMD, and dependencies.
 define(["NextWave/source/utility/prototypes",
     "NextWave/source/methodBuilder/CodeExpression",
-    "NextWave/source/methodBuilder/CodeLiteral"],
-    function (prototypes, CodeExpression, CodeLiteral) {
+    "NextWave/source/methodBuilder/CodeLiteral",
+    "NextWave/source/methodBuilder/LiteralList"],
+    function (prototypes, CodeExpression, CodeLiteral, LiteralList) {
 
         try {
 
             // Constructor function.
-            var functionRet = function CodeExpressionLiteral(clPayload) {
+            var functionRet = function CodeExpressionLiteral(llPayload) {
 
                 try {
 
@@ -28,13 +29,19 @@ define(["NextWave/source/utility/prototypes",
 
                     // If payload is a string, then convert
                     // it to a CodeLiteral containing it.
-                    if (clPayload &&
-                        typeof clPayload === "string") {
+                    if (llPayload &&
+                        typeof llPayload === "string") {
 
-                        clPayload = new CodeLiteral(clPayload);
+                        llPayload = new CodeLiteral(llPayload);
                     }
 
-                    self.payload = clPayload || new CodeLiteral();
+                    if (llPayload &&
+                        llPayload instanceof CodeLiteral) {
+
+                        llPayload = new LiteralList([llPayload]);
+                    }
+
+                    self.payload = llPayload || new LiteralList();
 
                     if (self.payload) {
 

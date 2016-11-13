@@ -1,8 +1,8 @@
 ///////////////////////////////////////
-// ParameterList module.
+// LiteralList module.
 //
 // Gui component responsible for showing 
-//      a list of method parameters.
+//      a list of literals.
 //
 // Return constructor function.
 //
@@ -21,7 +21,7 @@ define(["NextWave/source/utility/prototypes",
         try {
 
             // Constructor function.
-        	var functionRet = function ParameterList(arrayParameters) {
+        	var functionRet = function LiteralList(arrayLiterals) {
 
                 try {
 
@@ -31,12 +31,12 @@ define(["NextWave/source/utility/prototypes",
                     self.inherits(List,
                     	false);
 
-                    // Play parameters, if specified.
-                    if (arrayParameters) {
+                    // Play literals, if specified.
+                    if (arrayLiterals) {
 
-                        for (var i = 0; i < arrayParameters.length; i++) {
+                        for (var i = 0; i < arrayLiterals.length; i++) {
 
-                            self.addItem(arrayParameters[i]);
+                            self.addItem(arrayLiterals[i]);
                         }
                     }
 
@@ -117,9 +117,9 @@ define(["NextWave/source/utility/prototypes",
                     ////////////////////////
                     // Public methods.
 
-                    // Add in parameters around all elements in the 
+                    // Add in literals around all elements in the 
                     // self.methodStatements list and all sub-blocks.
-                    self.accumulateParameterDragStubInsertionPoints = function (arrayAccumulator, parameterDragStub, areaMethodBuilder) {
+                    self.accumulateLiteralDragStubInsertionPoints = function (arrayAccumulator, literalDragStub, areaMethodBuilder) {
 
                         try {
 
@@ -133,37 +133,37 @@ define(["NextWave/source/utility/prototypes",
                                     index: 0,
                                     x: self.areaMaximal().location.x,
                                     collection: self,
-                                    type: (self.items.length > 0 ? self.items[0].parameterDragStub : false)
+                                    type: (self.items.length > 0 ? self.items[0].literalDragStub : false)
                                 });
                             }
 
-                            // Loop over each parameter.
+                            // Loop over each literal.
                             for (var i = 0; i < self.items.length; i++) {
 
-                                // Extract the ith Parameter.
-                                var parameterIth = self.items[i];
-                                if (!parameterIth ||
-                                    !parameterIth.area) {
+                                // Extract the ith Literal.
+                                var literalIth = self.items[i];
+                                if (!literalIth ||
+                                    !literalIth.area) {
 
                                     continue;
                                 }
 
-                                // Also check after each parameters.
+                                // Also check after each literals.
 
-                                // Add after fully visible Parameters.
-                                var areaParameter = parameterIth.area();
-                                if (areaParameter) {
+                                // Add after fully visible Literals.
+                                var areaLiteral = literalIth.area();
+                                if (areaLiteral) {
 
-                                    if (areaParameter.location.x + areaParameter.extent.width > 
+                                    if (areaLiteral.location.x + areaLiteral.extent.width > 
                                         self.areaMaximal().location.x) {
 
                                         arrayAccumulator.push({
 
                                             index: i + 1,
-                                            x: areaParameter.location.x + areaParameter.extent.width,
+                                            x: areaLiteral.location.x + areaLiteral.extent.width,
                                             collection: self,
-                                            type: (parameterIth.parameterDragStub ||
-                                                ((self.items.length > i + 1) ? self.items[i + 1].parameterDragStub : false))
+                                            type: (literalIth.literalDragStub ||
+                                                ((self.items.length > i + 1) ? self.items[i + 1].literalDragStub : false))
                                         });
                                     }
                                 }
@@ -184,19 +184,19 @@ define(["NextWave/source/utility/prototypes",
                             10 * settings.general.margin);
                     };
 
-                    // Remove parameter stubs from around all elements.
-                    self.purgeParameterDragStubs = function () {
+                    // Remove literal stubs from around all elements.
+                    self.purgeLiteralDragStubs = function () {
 
                         try {
 
-                            // Loop over each Parameter.
+                            // Loop over each Literal.
                             for (var i = 0; i < self.items.length; i++) {
 
                                 // Extract the ith element.
                                 var itemIth = self.items[i];
 
                                 // If it is a SDS...
-                                if (itemIth.parameterDragStub) {
+                                if (itemIth.literalDragStub) {
 
                                     // ...then remove it (via splice, not removeItem)...
                                     self.items.splice(i, 1);
@@ -219,13 +219,13 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // Return a new instance of a Parameter.
+                    // Return a new instance of a Literal.
                     self.clone = function () {
 
                         // Allocate the clone.
                         var plClone = new self.constructor();
 
-                        // Clone the parameters.
+                        // Clone the literals.
                         for (var i = 0; i < self.items.length; i++) {
 
                             plClone.items.push(self.items[i].clone());
@@ -233,13 +233,13 @@ define(["NextWave/source/utility/prototypes",
                         return plClone;
                     };
 
-                    // Generates JavaScript string for this parameterlist.
+                    // Generates JavaScript string for this literallist.
                     self.generateJavaScript = function () {
 
-                        var strParameters = " ";
+                        var strLiterals = " ";
 
-                        // Clone the parameters.
-                        let bOutputAParameter = false;
+                        // Clone the literals.
+                        let bOutputALiteral = false;
                         for (var i = 0; i < self.items.length; i++) {
 
                             let itemIth = self.items[i];
@@ -250,14 +250,14 @@ define(["NextWave/source/utility/prototypes",
                                 continue;
                             }
 
-                            if (strParameters.length > 1) {
+                            if (strLiterals.length > 1) {
 
-                                strParameters += " , ";
+                                strLiterals += " ";
                             }
-                            strParameters += itemIth.generateJavaScript();
+                            strLiterals += itemIth.generateJavaScript();
                         }
 
-                        return strParameters;
+                        return strLiterals;
                     };
 
                     // Save.
@@ -266,8 +266,8 @@ define(["NextWave/source/utility/prototypes",
                         // Return a normal, anonymously constructable 
                         // object (array) with constructor arguments.
 
-                        // Pre-allocate array of parameters for this Array.
-                        var arrayParameters = [];
+                        // Pre-allocate array of literals for this Array.
+                        var arrayLiterals = [];
 
                         // Add them all.
                         for (var i = 0; i < self.items.length; i++) {
@@ -288,16 +288,16 @@ define(["NextWave/source/utility/prototypes",
                                 continue;
                             }
 
-                            arrayParameters.push(self.items[i].save());
+                            arrayLiterals.push(self.items[i].save());
                         }
 
-                        // Return array of the name and the Array of parameters.
+                        // Return array of the name and the Array of literals.
                         var objectRet = {
 
                             type: self.constructor.name,
-                            parameters: [{ 
+                            literals: [{ 
                                 type: "Array",
-                                parameters: arrayParameters
+                                literals: arrayLiterals
                             }]
                         };
                         return objectRet;

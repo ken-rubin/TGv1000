@@ -17,8 +17,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/glyphs",
     "NextWave/source/methodBuilder/CodeLiteral",
     "NextWave/source/methodBuilder/CodeName",
-    "NextWave/source/methodBuilder/CodeVar"
-    ],
+    "NextWave/source/methodBuilder/CodeVar"],
     function (prototypes, settings, Point, Size, Area, glyphs, CodeLiteral, CodeName, CodeVar) {
 
         try {
