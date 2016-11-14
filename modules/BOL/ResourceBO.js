@@ -185,7 +185,7 @@ module.exports = function ResourceBO(app, sql, logger, mailWrapper) {
 
         try {
 
-            console.log("******Entered AdminBO/routeSaveResource with req.body=" + JSON.stringify(req.body));
+            console.log("******Entered ResourceBO/routeSaveResource with req.body=" + JSON.stringify(req.body));
             // req.user.userId
             // req.user.userName
             // req.body.resourceTypeId
@@ -213,8 +213,8 @@ module.exports = function ResourceBO(app, sql, logger, mailWrapper) {
                     } else {
 
                         var id = rows[0].insertId;
-
-                        m_setUpAndDoTags(id, req.body.resourceTypeId, req.user.userName, req.body.tags, req.body.resourceName, function(err) {
+                        var resourcePath = 'public/resources/' + id.toString() + '.' + ext;
+                        fs.rename(req.body.filePath, resourcePath, function(err){
 
                             if (err) {
 
@@ -224,23 +224,10 @@ module.exports = function ResourceBO(app, sql, logger, mailWrapper) {
                                 });
                             } else {
 
-                                var resourcePath = 'public/resources/' + id.toString() + '.' + ext;
-                                fs.rename(req.body.filePath, resourcePath, function(err){
-
-                                    if (err) {
-
-                                        res.json({
-                                            success:false,
-                                            message: err.message
-                                        });
-                                    } else {
-
-                                        // The original file has been placed into the resources folder.
-                                        res.json({
-                                            success:true,
-                                            id: id
-                                        });
-                                    }
+                                // The original file has been placed into the resources folder.
+                                res.json({
+                                    success:true,
+                                    id: id
                                 });
                             }
                         });
