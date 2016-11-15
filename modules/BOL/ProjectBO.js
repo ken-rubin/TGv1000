@@ -1249,10 +1249,13 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                     function(cb) {
                                         try{
 
-                                            let arrEditors = libraryIth.libraryJSON.library.editors.split('\n');
+                                            let arrEditors = libraryIth.editors.split('\n');
                                             if (arrEditors.length === 0) {
                                                 // Shouldn't happened
                                                 return cb(null);
+                                            }
+                                            for (let i = 0; i < arrEditors.length; i++) {
+                                                arrEditors[i] = "'" + arrEditors[i] + "'";
                                             }
                                             let strEditors = arrEditors.join();
                                             // This query will give us a string of userIds separated by commas, corresponding to libraryJSON.library.editors.
@@ -1273,16 +1276,23 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                     function(cb) {
 
                                         if (idstring.indexOf(req.user.userId.toString()) === -1) {
-                                            return cb(null);
+                                            // Running user is not amongst editors.
+                                            if (libraryIth.id) {
+                                                // Library has an id. So we skip writing it out. Current user was not permitted to edit it.
+                                                return cb(null);
+                                            }
+
+                                            libraryIth.editors += '\n' + req.user.userName;
+                                            ids.push(req.user.userId.toString());
                                         }
 
                                         var guts = {
                                             name: libraryIth.name,
-                                            description: libraryIth.libraryJSON.library.description,
-                                            createdByUserId: (libraryIth.libraryJSON.library.id !== 0 && libraryIth.createdByUserId !== 0) ? libraryIth.createdByUserId : req.user.userId,
+                                            description: libraryIth.description,
+                                            createdByUserId: (libraryIth.id !== 0 && libraryIth.createdByUserId !== 0) ? libraryIth.createdByUserId : req.user.userId,
                                             imageId: libraryIth.imageId,
                                             altImagePath: libraryIth.altImagePath,
-                                            libraryJSON: JSON.stringify(libraryIth.libraryJSON)
+                                            libraryJSON: JSON.stringify(libraryIth)
                                         };
 
                                         let verb = '';
@@ -1290,7 +1300,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                         if (libraryIth.id) {
                                             verb = 'update ';
-                                            where = ' where id=' + libraryIth.libraryJSON.library.id;
+                                            where = ' where id=' + libraryIth.id;
                                         } else {
                                             verb = 'insert ';
                                         }
