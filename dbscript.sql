@@ -464,10 +464,10 @@ begin
 					(13,'App_Library','This library is the place to put all your initialization code. We\'ve started you off with an App type containing a constructor method. You take it from here.',1,'{"library": {"id": 13, "name": "EmptyLibrary", "types": [{"name": "App", "baseTypeName": "", "description": "This type\'s constructor method will run first.", "methods": [{"name": "constructor", "parameters": [], "statements": [], "comment": "All app initialization should be in this method.", "arguments": {"type": "ParameterList", "parameters": [{"type": "Array", "parameters": [{"type": "CodeLiteral", "parameters": [{"type": "String", "value": "..." }, {"type": "Boolean", "value": false}, {"type": "Boolean", "value": false}]}]}]}}],"properties": [],"events": [],"isSystemType": 0,"public": 0}],"editors": "","references": "KernelTypesLibrary","description": "This library is the place to put all your initialization code. We\'ve started you off with an App type containing a constructor method. You take it from here."}}');
 		ALTER TABLE `libraries` ENABLE KEYS;
 
-		-- ALTER TABLE `library_editors` DISABLE KEYS;
-		-- INSERT INTO `library_editors`
-		-- 	VALUES (1,1),(2,1),(3,1),(4,1),(5,1),(6,1),(7,1),(8,1),(9,1),(10,1),(11,1),(12,1),(13,1);
-		-- ALTER TABLE `library_editors` ENABLE KEYS;
+		ALTER TABLE `library_editors` DISABLE KEYS;
+		INSERT INTO `library_editors`
+			VALUES (1,1),(2,1),(3,1),(4,1),(5,1),(6,1),(7,1),(8,1),(9,1),(10,1),(11,1),(12,1),(13,1);
+		ALTER TABLE `library_editors` ENABLE KEYS;
 
 		ALTER TABLE `permissions` DISABLE KEYS;
 		INSERT INTO `permissions`
