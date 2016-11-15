@@ -58,6 +58,13 @@ define(["NextWave/source/utility/prototypes",
                         
                         try {
 
+                            // First, call off to the events.
+                            let exceptionRet = m_functionDoEvents();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
                             // Save state of rendering context.
                             contextRender.save();
 
@@ -68,26 +75,40 @@ define(["NextWave/source/utility/prototypes",
                             contextRender.translate(dMidX,
                                 dMidY);
 
+                            let areaBounds = new Area(new Point(-dMidX, -dMidY),
+                                self.extent);
+
                             // Loop over tg namespace, looking for visual objects.
                             var arrayInstances = window.tg.instances;
 
-                            for (var i = 0; i < arrayInstances.length; i++) {
+                            if (arrayInstances) {
 
-                                // Extract instance.
-                                var instanceIth = arrayInstances[i];
+                                for (var i = 0; i < arrayInstances.length; i++) {
 
-                                // Just continue if it is not visual.
-                                if (!(instanceIth instanceof window.tg.VisualObject)) {
+                                    // Extract instance.
+                                    var instanceIth = arrayInstances[i];
 
-                                    continue;
+                                    // Just continue if it is not a correctly specified visual.
+                                    if (!window.tg ||
+                                        !window.tg.KernelTypes.VisualObject ||
+                                        !(instanceIth instanceof window.tg.KernelTypes.VisualObject) ||
+                                        !instanceIth.update ||
+                                        !instanceIth.render) {
+
+                                        continue;
+                                    }
+
+                                    // Else, render.
+                                    try {
+
+                                        instanceIth.update(areaBounds, iMS);
+                                        instanceIth.render(contextRender);
+                                    } catch (e) {
+
+                                        // ....
+                                        console.log(e.message);
+                                    }
                                 }
-
-                                // Else, render.
-                                contextRender.fillStyle = "Blue";
-                                contextRender.fillRect(instanceIth.x, 
-                                    instanceIth.y, 
-                                    instanceIth.width, 
-                                    instanceIth.height);
                             }
 
                             return null;
@@ -97,6 +118,53 @@ define(["NextWave/source/utility/prototypes",
                         } finally {
 
                             contextRender.restore();
+                        }
+                    };
+
+                    //////////////////////////
+                    // Private methods.
+
+                    // .
+                    var m_functionDoEvents = function () {
+
+                        try {
+
+                            // Process each of the cached raise collection elements.
+                            var arrayKeys = Object.keys(window.tg.raiseCollection);
+                            for (var i = 0; i < arrayKeys.length; i++) {
+
+                                var strEvent = arrayKeys[i];
+
+                                // Get the correct collections.
+                                var objectContext = window.tg.raiseCollection[strEvent];
+                                var listCallbacks = window.tg.eventCollection[strEvent];
+
+                                // Process each callback.
+                                for (var i = 0; i < listCallbacks.length; i++) {
+
+                                    var callback = listCallbacks[i];
+                                    var target = callback.target;
+                                    var method = callback.method;
+                                    setTimeout(function (target, method) {
+
+                                        try {
+
+                                            target[method](objectContext);
+                                        } catch (e) {
+
+                                            alert(e.message);
+                                        }
+                                    }(target, method), 10);
+                                }
+                            }
+
+                            // Clear collection.
+                            window.tg.raiseCollection = {};
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
                         }
                     };
 

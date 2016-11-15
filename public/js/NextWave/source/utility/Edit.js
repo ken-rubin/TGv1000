@@ -55,6 +55,9 @@ define(["NextWave/source/utility/prototypes",
                     // Field is used to tell CodeName.js's self.payload.exitFocus function
                     // whether we're in the assignment property of an CodeStatementVar.
                     self.inVarAssignment = bInVarAssignment || false;
+                    // Event handler passed when a key is pressed in this control.
+                    // Method passes self as the only parameter to the callback.
+                    self.onKeyPressed = null;
 
                     ///////////////////////
                     // Public methods.
@@ -554,6 +557,7 @@ define(["NextWave/source/utility/prototypes",
                         try {
 
                             if (self.protected) {
+
                                 e.stopPropagation();
                                 return null;
                             }
@@ -568,6 +572,7 @@ define(["NextWave/source/utility/prototypes",
                                 clearInterval(m_cookieBlinkTimer);
                                 m_cookieBlinkTimer = null;
                             }
+
                             // Do startup work.
                             m_cookieBlinkTimer = setInterval(m_functionBlinkTimerTick,
                                 settings.general.blinkMS);
@@ -588,10 +593,18 @@ define(["NextWave/source/utility/prototypes",
                                 self.text = self.text.substr(0, m_iSelectionStart) +
                                     String.fromCharCode(e.which) +
                                     self.text.substr(m_iSelectionStart + m_iSelectionLength);
+                                self.text = self.text.replace('"', "'");
            
                                 // Move the selection over one place and ensure narrow selection.
                                 m_iSelectionStart++;
                                 m_iSelectionLength = 0;
+                            }
+
+                            // If handler attached.
+                            if (self.onKeyPressed) {
+
+                                // Call callback.
+                                self.onKeyPressed(self);
                             }
 
                             // Ensure caret is visible.

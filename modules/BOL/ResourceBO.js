@@ -63,7 +63,7 @@ module.exports = function ResourceBO(app, sql, logger, mailWrapper) {
             // req.user.userId
             // req.user.userName
             // req.body.url             image or sound to retrieve
-            // req.body.tags            tags to associate with resource (in addition to resourceName and 'sound' or 'image')
+            // req.body.description     description to allow fuzzy string search -- used to be: tags to associate with resource (in addition to resourceName and 'sound' or 'image')
             // req.body.resourceTypeId
             // req.body.resourceName
 
@@ -128,7 +128,7 @@ module.exports = function ResourceBO(app, sql, logger, mailWrapper) {
 
                     // body is a buffer containing the resource.
 
-                    var sqlString = "insert " + self.dbname + "resources (createdByUserId,resourceTypeId,public,name) values (" + req.user.userId + "," + req.body.resourceTypeId + ",0," + mysql.escape(req.body.resourceName) + ");";
+                    var sqlString = "insert " + self.dbname + "resources (createdByUserId,resourceTypeId,public,name,description) values (" + req.user.userId + "," + req.body.resourceTypeId + ",0," + mysql.escape(req.body.resourceName) + "," + mysql.escape(req.body.description) + ");";
                     sql.execute(sqlString,
                         function(rows){
 
@@ -142,9 +142,8 @@ module.exports = function ResourceBO(app, sql, logger, mailWrapper) {
 
                                 var id = rows[0].insertId;
 
-                                // We have the tags for this new resource, we have to add unique ones to the tags table, returning their new ids along 
-                                // with found tags' ids. These ids will be added to records in the resources_tags table since we now know the id of the new resource.
-                                m_setUpAndDoTags(id, req.body.resourceTypeId, req.user.userName, req.body.tags, req.body.resourceName, function(err) {
+                                var resourcePath = 'public/resources/' + id.toString() + '.' + ext;
+                                fs.writeFile(resourcePath, body, function(err) {
 
                                     if (err) {
 
@@ -154,23 +153,10 @@ module.exports = function ResourceBO(app, sql, logger, mailWrapper) {
                                         });
                                     } else {
 
-                                        var resourcePath = 'public/resources/' + id.toString() + '.' + ext;
-                                        fs.writeFile(resourcePath, body, function(err) {
-
-                                            if (err) {
-
-                                                res.json({
-                                                    success:false,
-                                                    message: err.message
-                                                });
-                                            } else {
-
-                                                // The original file has been placed into the resources folder.
-                                                res.json({
-                                                    success: true,
-                                                    id: id
-                                                });
-                                            }
+                                        // The original file has been placed into the resources folder.
+                                        res.json({
+                                            success: true,
+                                            id: id
                                         });
                                     }
                                 });
@@ -199,12 +185,12 @@ module.exports = function ResourceBO(app, sql, logger, mailWrapper) {
 
         try {
 
-            console.log("******Entered AdminBO/routeSaveResource with req.body=" + JSON.stringify(req.body));
+            console.log("******Entered ResourceBO/routeSaveResource with req.body=" + JSON.stringify(req.body));
             // req.user.userId
             // req.user.userName
             // req.body.resourceTypeId
             // req.body.filePath        name assigned by multer with folder; e.g., "uploads\\xyz123456789.png"
-            // req.body.tags            tags to associate with resource (in addition to resourceName and 'sound' or 'image')
+            // req.body.description     description for fuzzy search -- used to be: tags to associate with resource (in addition to resourceName and 'sound' or 'image')
             // req.body.resourceName
 
             // Notes: 
@@ -214,7 +200,7 @@ module.exports = function ResourceBO(app, sql, logger, mailWrapper) {
 
             var ext = (req.body.resourceTypeId === "1") ? 'png' : "mp3";
 
-            var sqlString = "insert " + self.dbname + "resources (createdByUserId,resourceTypeId,public,name) values (" + req.user.userId + "," + req.body.resourceTypeId + ",0," + mysql.escape(req.body.resourceName) + ");";
+            var sqlString = "insert " + self.dbname + "resources (createdByUserId,resourceTypeId,public,name,description) values (" + req.user.userId + "," + req.body.resourceTypeId + ",0," + mysql.escape(req.body.resourceName) + "," + mysql.escape(req.body.description) + ");";
             sql.execute(sqlString,
                 function(rows){
 
@@ -227,8 +213,8 @@ module.exports = function ResourceBO(app, sql, logger, mailWrapper) {
                     } else {
 
                         var id = rows[0].insertId;
-
-                        m_setUpAndDoTags(id, req.body.resourceTypeId, req.user.userName, req.body.tags, req.body.resourceName, function(err) {
+                        var resourcePath = 'public/resources/' + id.toString() + '.' + ext;
+                        fs.rename(req.body.filePath, resourcePath, function(err){
 
                             if (err) {
 
@@ -238,23 +224,10 @@ module.exports = function ResourceBO(app, sql, logger, mailWrapper) {
                                 });
                             } else {
 
-                                var resourcePath = 'public/resources/' + id.toString() + '.' + ext;
-                                fs.rename(req.body.filePath, resourcePath, function(err){
-
-                                    if (err) {
-
-                                        res.json({
-                                            success:false,
-                                            message: err.message
-                                        });
-                                    } else {
-
-                                        // The original file has been placed into the resources folder.
-                                        res.json({
-                                            success:true,
-                                            id: id
-                                        });
-                                    }
+                                // The original file has been placed into the resources folder.
+                                res.json({
+                                    success:true,
+                                    id: id
                                 });
                             }
                         });
@@ -1217,139 +1190,139 @@ module.exports = function ResourceBO(app, sql, logger, mailWrapper) {
     //     }
     // }
 
-    var m_createTagJunctions = function(resourceId, tagIds) {
+    // var m_createTagJunctions = function(resourceId, tagIds) {
 
-        var strSql = "insert into " + self.dbname + "resources_tags (resourceId,tagId) values";
-        for (var j = 0; j < tagIds.length; j++) {
+    //     var strSql = "insert into " + self.dbname + "resources_tags (resourceId,tagId) values";
+    //     for (var j = 0; j < tagIds.length; j++) {
 
-            strSql = strSql + "(" + resourceId.toString() + "," + tagIds[j].toString() + ")";
-            if (j !== tagIds.length - 1){
+    //         strSql = strSql + "(" + resourceId.toString() + "," + tagIds[j].toString() + ")";
+    //         if (j !== tagIds.length - 1){
 
-                strSql = strSql + ",";
-            }
-        }
-        strSql = strSql + ";";
-        sql.execute(strSql,
-            function(rows){
+    //             strSql = strSql + ",";
+    //         }
+    //     }
+    //     strSql = strSql + ";";
+    //     sql.execute(strSql,
+    //         function(rows){
 
-                return null;
-            },
-            function(strErr){
+    //             return null;
+    //         },
+    //         function(strErr){
 
-                return {message:'Error received inserting into resources_tags: ' + strErr};
-            }
-        );
-    }
+    //             return {message:'Error received inserting into resources_tags: ' + strErr};
+    //         }
+    //     );
+    // }
 
-    var m_setUpAndDoTags = function(resourceId, strResourceTypeId, userName, strTags, strName, callback) {
+    // var m_setUpAndDoTags = function(resourceId, strResourceTypeId, userName, strTags, strName, callback) {
 
-        try {
+    //     try {
             
-            console.log("In m_setUpAndDoTags with resourceId=" + resourceId);
+    //         console.log("In m_setUpAndDoTags with resourceId=" + resourceId);
 
-            // Start tagArray with resource type description, userName and resource name (with internal spaces replaced by '_').
-            var tagArray = [];
-            tagArray.push(m_resourceTypes[parseInt(strResourceTypeId, 10)]);
-            tagArray.push(userName);
-            if (strName.length > 0) {
+    //         // Start tagArray with resource type description, userName and resource name (with internal spaces replaced by '_').
+    //         var tagArray = [];
+    //         tagArray.push(m_resourceTypes[parseInt(strResourceTypeId, 10)]);
+    //         tagArray.push(userName);
+    //         if (strName.length > 0) {
 
-                tagArray.push(strName.trim().replace(/\s/g, '_'));
-            }
+    //             tagArray.push(strName.trim().replace(/\s/g, '_'));
+    //         }
 
-            // Get optional user-entered tags ready to combine with above three tags.
-            var ccArray = [];
-            if (strTags) {
+    //         // Get optional user-entered tags ready to combine with above three tags.
+    //         var ccArray = [];
+    //         if (strTags) {
 
-                ccArray = strTags.toLowerCase().match(/([\w\-]+)/g);
+    //             ccArray = strTags.toLowerCase().match(/([\w\-]+)/g);
 
-                if (ccArray){
-                    tagArray = tagArray.concat(ccArray);
-                }
-            }
+    //             if (ccArray){
+    //                 tagArray = tagArray.concat(ccArray);
+    //             }
+    //         }
 
-            // Remove possible dups from tagArray.
-            var uniqueArray = [];
-            uniqueArray.push(tagArray[0]);
-            for (var i = 1; i < tagArray.length; i++) {
-                var compIth = tagArray[i];
-                var found = false;
-                for (var j = 0; j < uniqueArray.length; j++) {
-                    if (uniqueArray[j] === compIth){
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    uniqueArray.push(compIth);
-                }
-            }
+    //         // Remove possible dups from tagArray.
+    //         var uniqueArray = [];
+    //         uniqueArray.push(tagArray[0]);
+    //         for (var i = 1; i < tagArray.length; i++) {
+    //             var compIth = tagArray[i];
+    //             var found = false;
+    //             for (var j = 0; j < uniqueArray.length; j++) {
+    //                 if (uniqueArray[j] === compIth){
+    //                     found = true;
+    //                     break;
+    //                 }
+    //             }
+    //             if (!found) {
+    //                 uniqueArray.push(compIth);
+    //             }
+    //         }
 
-            m_doTags(uniqueArray, resourceId, callback);
+    //         m_doTags(uniqueArray, resourceId, callback);
 
-        } catch(e) {
+    //     } catch(e) {
 
-            callback(e);
-            return;
-        }
-    }
+    //         callback(e);
+    //         return;
+    //     }
+    // }
 
-    var m_doTags = function(tagArray, resourceId, callback){
+    // var m_doTags = function(tagArray, resourceId, callback){
 
-        var tagIds = [];
-        var iCtr = tagArray.length;
-        // For each string in tagArry:
-        //      if it already exists in table tags, push its id onto tagIds.
-        //      else, add it and push the new array.
-        // Then write as many records to resources_tags using resourceId and tagIds[i] as called for.
+    //     var tagIds = [];
+    //     var iCtr = tagArray.length;
+    //     // For each string in tagArry:
+    //     //      if it already exists in table tags, push its id onto tagIds.
+    //     //      else, add it and push the new array.
+    //     // Then write as many records to resources_tags using resourceId and tagIds[i] as called for.
 
-        tagArray.forEach(function(tag) {
+    //     tagArray.forEach(function(tag) {
 
-            var strSql = "select id from " + self.dbname + "tags where description='" + tag + "';";
-            sql.execute(strSql,
-                function(rows){
+    //         var strSql = "select id from " + self.dbname + "tags where description='" + tag + "';";
+    //         sql.execute(strSql,
+    //             function(rows){
 
-                    if (rows.length > 0) {
+    //                 if (rows.length > 0) {
 
-                        tagIds.push(rows[0].id);
-                        if (--iCtr === 0){
+    //                     tagIds.push(rows[0].id);
+    //                     if (--iCtr === 0){
 
-                            callback(m_createTagJunctions(resourceId, tagIds));
-                            return;
-                        }
+    //                         callback(m_createTagJunctions(resourceId, tagIds));
+    //                         return;
+    //                     }
 
-                    } else {
+    //                 } else {
 
-                        strSql = "insert into " + self.dbname + "tags (description) values (" + mysql.escape(tag) + ");";
-                        sql.execute(strSql,
-                            function(rows){
+    //                     strSql = "insert into " + self.dbname + "tags (description) values (" + mysql.escape(tag) + ");";
+    //                     sql.execute(strSql,
+    //                         function(rows){
 
-                                if (rows.length === 0) {
+    //                             if (rows.length === 0) {
 
-                                    callback({message:'Could not insert tag into database.'});
-                                    return;
+    //                                 callback({message:'Could not insert tag into database.'});
+    //                                 return;
                                 
-                                } else {
+    //                             } else {
 
-                                    tagIds.push(rows[0].insertId);
-                                    if (--iCtr === 0){
+    //                                 tagIds.push(rows[0].insertId);
+    //                                 if (--iCtr === 0){
 
-                                        callback(m_createTagJunctions(resourceId, tagIds));
-                                        return;
-                                    }
-                                }
-                            },
-                            function(err){
+    //                                     callback(m_createTagJunctions(resourceId, tagIds));
+    //                                     return;
+    //                                 }
+    //                             }
+    //                         },
+    //                         function(err){
 
-                                callback({message:err});
-                                return;
-                            });
-                    }
-                },
-                function(err){
+    //                             callback({message:err});
+    //                             return;
+    //                         });
+    //                 }
+    //             },
+    //             function(err){
 
-                    callback({message:err});
-                    return;
-                });
-        });
-    }
+    //                 callback({message:err});
+    //                 return;
+    //             });
+    //     });
+    // }
 };

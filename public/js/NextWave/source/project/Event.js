@@ -97,18 +97,18 @@ define(["NextWave/source/utility/ListItem"],
                     // Generates JavaScript string for this property.
                     self.generateJavaScript = function () {
 
-                        var strEvent = "\n";
-
                         // if (!window.tg.eventCollection.hasOwnProperty(self.name)) {
                         //
                         //      window.tg.eventCollection[self.name] = [];
                         // }
 
-                        // Add the empty collection of subscribers.
-                        strEvent += "    if (!window.tg.eventCollection.hasOwnProperty('" + self.data.name + "')) {\n\n" +
-                            "        window.tg.eventCollection['" + self.data.name + "'] = []; }\n";
+                        var strEvent = " ";
 
-                        strEvent += "\n";
+                        // Add the empty collection of subscribers.
+                        strEvent += " if (!window.tg.eventCollection.hasOwnProperty('" + self.data.name + "')) { " +
+                            " window.tg.eventCollection['" + self.data.name + "'] = []; } ";
+
+                        strEvent += " ";
 
                         return strEvent;
                     };

@@ -54,6 +54,28 @@ define(["NextWave/source/utility/prototypes",
                     ////////////////////////
                     // Public methods.
 
+                    // External parse call, invoked when loaded.
+                    self.parse = function () {
+
+                        let exceptionRet = m_functionParse();
+                        if (exceptionRet) {
+
+                            return exceptionRet;
+                        }
+
+                        // Loop over all blocks and parse.
+                        for (let i = 0; i < self.blocks.length; i++) {
+
+                            exceptionRet = self.blocks[i].parse();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+                        }
+
+                        return null;
+                    };
+
                     // Get all argument lists.
                     self.accumulateExpressionPlacements = function (arrayAccumulator) {
 
@@ -496,6 +518,60 @@ define(["NextWave/source/utility/prototypes",
                                 strStatement += " " + strIth + " ";
                             }
                         }
+
+                        // Scan for allocations...
+                        let arrayAllocations = strStatement.split("new");
+
+                        // "let fred = new Person(new PersonName('Fred'));"
+                        // 1) "let fred = "
+                        // 2) " Person("
+                        // 3) " PersonName('Fred'));"
+
+                        for (let i = 1; i < arrayAllocations.length; i++) {
+
+                            // Get the ith chunk.
+                            let strChunkIth = arrayAllocations[i];
+
+                            // Find the following Paren.
+                            let iParenIndex = strChunkIth.indexOf("(");
+
+                            // Extract from the beginning of the string to the "(".
+                            let strType = strChunkIth.substr(0,
+                                iParenIndex);
+                            strType = strType.trim();
+
+                            // Classify type.
+
+                            // First, see if the type is one of the built-ins.
+                            let bBuiltIn = window.manager.isBuiltInType(strType);
+                            if (!bBuiltIn) {
+
+                                let arrayParts = strType.split(".");
+                                if (arrayParts.length === 1) {
+
+                                    // Lookup (first) containing library in current comic.
+                                    let strLibrary = window.projectDialog.getLibrary(strType);
+
+                                    // Compose the fully qualified Type name.
+                                    strType = "window.tg." + 
+                                        strLibrary + "." +
+                                        strType;
+                                } else {
+
+                                    // Assume the last is the Type and 
+                                    // the second from the last is Library.
+                                    strType = "window.tg." +
+                                        arrayParts[arrayParts.length - 2] + "." +
+                                        arrayParts[arrayParts.length - 1];
+                                }
+                            }
+
+                            // Recompose the part.
+                            arrayAllocations[i] = strType + strChunkIth.substr(iParenIndex);
+                        }
+
+                        // Now, recompose the allocations back into a statement.
+                        strStatement = " " + arrayAllocations.join(" new ") + " ";
 
                         for (var i = 0; i < self.blocks.length; i++) {
 

@@ -27,9 +27,9 @@ define(["NextWave/source/utility/prototypes",
                     ////////////////////////
                     // Public properties.
 
-                    self.tryBlock = blockTry || new Block("try");
-                    self.catchBlock = blockCatch || new Block("catch (e)");
-                    self.finallyBlock = blockFinally || new Block("finally");
+                    self.tryBlock = blockTry || new Block("try", "\ntry\n");
+                    self.catchBlock = blockCatch || new Block("catch (e)", "\ncatch (e)\n");
+                    self.finallyBlock = blockFinally || new Block("finally", "\nfinally\n");
 
                     // Inherit from CodeStatement.
                     self.inherits(CodeStatement,

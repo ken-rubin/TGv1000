@@ -143,7 +143,7 @@ define(["Core/snippetHelper", "Core/errorHelper"],
 									// userId: g_profile["userId"], not needed; sent in JWT
 									// userName: g_profile["userName"], not needed; sent in JWT
 									url: m_url,
-									tags: tags,
+									description: tags,
 									resourceTypeId: 1,
 									resourceName: strResourceName
 								}, 

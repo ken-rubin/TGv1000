@@ -517,9 +517,13 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							client.setBrowserTabAndBtns();
 
 							// Save to DB and load into manager.
-							exceptionRet = client.saveProjectToDB();
-							if (exceptionRet) { throw exceptionRet; }
-
+							client.saveProjectToDB(
+								function(err) {
+									if (err) {
+										errorHelper.show(err);
+									}
+								}
+							);
 						} catch(e) { errorHelper.show(e); }
 					}
 

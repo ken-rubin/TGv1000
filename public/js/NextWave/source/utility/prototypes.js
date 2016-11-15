@@ -102,7 +102,7 @@ define([],
                         }
                         else {
 
-                            // Just call default constuctor.
+                            // Just call default constructor.
                             parent.call(this);
                         }
                     },

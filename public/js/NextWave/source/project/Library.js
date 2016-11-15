@@ -46,20 +46,36 @@ define(["NextWave/source/project/Type",
                             // First, save off the data.
                             self.data = objectLibrary;
 
+                            // Possibly convert references and editors.
+                            if (self.data.references &&
+                                self.data.references.push) {
+
+                                self.data.references = self.data.references.join("\n");
+                            }
+                            if (self.data.editors &&
+                                self.data.editors.push) {
+
+                                self.data.editors = self.data.editors.join("\n");
+                            }
+
                             // Then loop over Types and create children.
-                            for (var i = 0; i < objectLibrary.types.length; i++) {
+                            self.types = [];
+                            if (self.data.types.length > 0) {
 
-                                // Get the ith Type.
-                                var objectTypeIth = objectLibrary.types[i];
+                                for (var i = 0; i < objectLibrary.types.length; i++) {
 
-                                // Allocate and create a new Type and add to collection.
-                                var typeIth = new Type(self);
-                                var exceptionRet = typeIth.create(objectTypeIth);
-                                if (exceptionRet) {
+                                    // Get the ith Type.
+                                    var objectTypeIth = objectLibrary.types[i];
 
-                                    return exceptionRet;
+                                    // Allocate and create a new Type and add to collection.
+                                    var typeIth = new Type(self);
+                                    var exceptionRet = typeIth.create(objectTypeIth);
+                                    if (exceptionRet) {
+
+                                        return exceptionRet;
+                                    }
+                                    self.types.push(typeIth);
                                 }
-                                self.types.push(typeIth);
                             }
 
                             // Generate ListItem for this instance.
@@ -100,6 +116,13 @@ define(["NextWave/source/project/Type",
 
                             // Load up this library into the ProjectDialog.
                             exceptionRet = window.projectDialog.loadLibrary(self);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Cause the types panel to open.
+                            exceptionRet = window.projectDialog.openTypesSection();
                             if (exceptionRet) {
 
                                 return exceptionRet;

@@ -17,8 +17,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/glyphs",
     "NextWave/source/methodBuilder/CodeLiteral",
     "NextWave/source/methodBuilder/CodeName",
-    "NextWave/source/methodBuilder/CodeVar"
-    ],
+    "NextWave/source/methodBuilder/CodeVar"],
     function (prototypes, settings, Point, Size, Area, glyphs, CodeLiteral, CodeName, CodeVar) {
 
         try {
@@ -66,7 +65,7 @@ define(["NextWave/source/utility/prototypes",
                                 var itemIth = self.children[i];
 
                                 // If stub, ...
-                                if (itemIth.constructor.name === "ArgumentList") {
+                                if (itemIth.constructor.name === "ParameterList") {
 
                                     // ...add one, and...
                                     arrayAccumulator.push({
@@ -137,7 +136,7 @@ define(["NextWave/source/utility/prototypes",
                                         // else, got one!
                                         arrayAccumulator.push(itemIth);
                                     }
-                                } else if (itemIth.constructor.name === "ArgumentList") {
+                                } else if (itemIth.constructor.name === "ParameterList") {
 
                                     // Scan it as well.
                                     var exceptionRet = itemIth.accumulateDragTargets(arrayAccumulator);
@@ -695,9 +694,7 @@ define(["NextWave/source/utility/prototypes",
                                     // requires this type (cyclic reference), thus....
                                     objectIth.constructor.name === "CodeExpressionStub" ||
                                     // Also....
-                                    objectIth.constructor.name === "ParameterList" ||
-                                    // Last....
-                                    objectIth.constructor.name === "ArgumentList")) {
+                                    objectIth.constructor.name === "ParameterList")) {
 
                                     // Add the item.
                                     var exceptionRet = self.addItem(objectIth);

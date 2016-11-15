@@ -15,7 +15,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/ListItem",
     "NextWave/source/utility/Edit",
 
-    "NextWave/source/methodBuilder/ArgumentList",
+    "NextWave/source/methodBuilder/ParameterList",
     "NextWave/source/methodBuilder/Block",
     "NextWave/source/methodBuilder/CodeExpressionGroup",
     "NextWave/source/methodBuilder/CodeExpressionInfix",
@@ -46,14 +46,9 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/methodBuilder/CodeStatementTry",
     "NextWave/source/methodBuilder/CodeStatementVar",
     "NextWave/source/methodBuilder/CodeStatementWhile",
-
     "NextWave/source/methodBuilder/CodeType",
-
-    "NextWave/source/methodBuilder/Parameter",
-    "NextWave/source/methodBuilder/ParameterList",
-
     "NextWave/source/methodBuilder/StatementList"],
-    function (prototypes, ListItem, Edit, ArgumentList, Block, CodeExpressionGroup, CodeExpressionInfix, CodeExpressionInvocation, CodeExpressionLiteral, CodeExpressionName, CodeExpressionPostfix, CodeExpressionPrefix, CodeExpressionRefinement, CodeExpressionTernary, CodeExpressionType, CodeLiteral, CodeName, CodeVar, CodeStatementBreak, CodeStatementContinue, CodeStatementComment, CodeStatementDebugger, CodeStatementExpression, CodeStatementFor, CodeStatementForIn, CodeStatementFreeform, CodeStatementIf, CodeStatementReturn, CodeStatementThrow, CodeStatementTry, CodeStatementVar, CodeStatementWhile, CodeType, Parameter, ParameterList, StatementList) {
+    function (prototypes, ListItem, Edit, ParameterList, Block, CodeExpressionGroup, CodeExpressionInfix, CodeExpressionInvocation, CodeExpressionLiteral, CodeExpressionName, CodeExpressionPostfix, CodeExpressionPrefix, CodeExpressionRefinement, CodeExpressionTernary, CodeExpressionType, CodeLiteral, CodeName, CodeVar, CodeStatementBreak, CodeStatementContinue, CodeStatementComment, CodeStatementDebugger, CodeStatementExpression, CodeStatementFor, CodeStatementForIn, CodeStatementFreeform, CodeStatementIf, CodeStatementReturn, CodeStatementThrow, CodeStatementTry, CodeStatementVar, CodeStatementWhile, CodeType, StatementList) {
 	
 		try {
 
@@ -115,7 +110,18 @@ define(["NextWave/source/utility/prototypes",
                                     var objectStatementIth = arrayStatements[i];
                                     var strAllocationString = m_functionRecurseGenerateAllocationString(objectStatementIth);
                                     strAllocationString = strAllocationString.replace(/\r?\n|\r/g, " ");
-                                    var exceptionRet = self.statements.addItem(eval(strAllocationString));
+
+                                    let statementNew = eval(strAllocationString);
+
+                                    // Parse structure....
+                                    var exceptionRet = statementNew.parse();
+                                    if (exceptionRet) {
+
+                                        return exceptionRet;
+                                    }
+
+                                    // Add to the statement list.
+                                    exceptionRet = self.statements.addItem(statementNew);
                                     if (exceptionRet) {
 
                                         return exceptionRet;
@@ -170,22 +176,57 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Generates JavaScript string for this method.
-                    self.generateJavaScript = function () {
+                    self.generateJavaScript = function (arrayProperties, arrayEvents) {
 
-                        var strMethod = "\n";
+                        var strMethod = " ";
 
-                        // Save off base method, if extant.
-                        strMethod += "    var _" + self.data.name + " = ((this && this.hasOwnProperty('" + self.data.name + "')) ? this." + self.data.name + " : undefined);\n";
-                        strMethod += "    self." + self.data.name + " = function (" + self.parameters.generateJavaScript() + ") {\n\n";
+                        // Output name and signiture.
+                        strMethod += " " + self.data.name + " (" +
+                            self.parameters.generateJavaScript() +
+                            ") { ";
 
-                        // Call base, if specified.
-                        // TODO: only call if specified to do so.
-                        strMethod += "        if (_" + self.data.name + ") { _" + self.data.name + "(...arguments); }\n"
+                        // If this is construct, then get the properties and events and output.
+                        var bConstructor = false;
+                        if (self.data.name === "constructor") {
 
-                        // Statements.
-                        strMethod += self.statements.generateJavaScript() + "\n";
+                            // Remember in constructor.
+                            bConstructor = true;
 
-                        strMethod += "    };\n";
+                            // Since in constructor, render the super call 
+                            // first--this defines lexically scoped this.
+                            strMethod += self.statements.generateJavaScript(true, true) + " ";
+
+                            // Add Properties.
+                            if (arrayProperties &&
+                                arrayProperties.length > 0) {
+
+                                // Loop over all Properties
+                                for (var i = 0; i < arrayProperties.length; i++) {
+
+                                    // Add it to the result object.
+                                    strMethod += arrayProperties[i].generateJavaScript() + " ";
+                                }
+                            }
+ 
+                            // Add Events.
+                            if (arrayEvents &&
+                                arrayEvents.length > 0) {
+
+                                // Loop over all Events
+                                for (var i = 0; i < arrayEvents.length; i++) {
+
+                                    // Add it to the result object.
+                                    strMethod += arrayEvents[i].generateJavaScript() + " ";
+                                }
+                            }
+                        }
+
+                        // Output statements.  If constructor 
+                        // then don't (re)output super call.
+                        strMethod += self.statements.generateJavaScript(bConstructor, false) + " ";
+
+                        // Output closing squiggle.
+                        strMethod += " } ";
 
                         return strMethod;
                     };
@@ -224,7 +265,7 @@ define(["NextWave/source/utility/prototypes",
 
                                 return '""';
                             }
-                            return '"' + objectStatement.value + '"';
+                            return '"' + objectStatement.value.replace('"', "'") + '"';
                         } else if (strType === "Boolean") {
 
                             if (!objectStatement.value) {

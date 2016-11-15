@@ -441,7 +441,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 														}
 
 														// m_ppData doesn't have a full project. We have to go get the correct project so that we can convert it into a "bought" project with suitable data changes.
-														var exceptionRet = client.openProjectFromDBNoLoadIntoManager(m_ppData.projectId,
+														var exceptionRet = client.openProjectFromDBNoLoadIntoManager(m_ppData.projectId, 'new',
 															function() {
 
 																client.project.ownedByUserId = parseInt(g_profile['userId'], 10);

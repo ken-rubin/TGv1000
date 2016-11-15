@@ -111,7 +111,7 @@ define(["NextWave/source/utility/prototypes",
                                     x: 2 * settings.general.margin + 
                                         settings.dialog.firstColumnWidth,
                                     y: settings.general.margin,
-                                    width: settings.dialog.firstColumnWidth,
+                                    width: settings.dialog.firstColumnWidth * 1.5,
                                     height: settings.dialog.lineHeight,
                                     enterFocus: function (localSelf) {
 
@@ -171,12 +171,12 @@ define(["NextWave/source/utility/prototypes",
 
                                     type: "ParameterListHost",
                                     x: 2 * settings.general.margin + 
-                                        settings.dialog.firstColumnWidth * 2,
+                                        settings.dialog.firstColumnWidth * 2.5,
                                     y: -settings.general.margin,
                                     widthType: "reserve",           // Reserve means: subtract the width from
                                                                     //  the total width on calculateLayout.
                                     width: 3 * settings.general.margin +
-                                        settings.dialog.firstColumnWidth * 2,
+                                        settings.dialog.firstColumnWidth * 2.5,
                                     height: settings.dialog.lineHeight + 
                                         4 * settings.general.margin
                                 },

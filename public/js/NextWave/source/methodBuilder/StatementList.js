@@ -252,16 +252,32 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Generates JavaScript string for this statement list.
-                    self.generateJavaScript = function () {
+                    self.generateJavaScript = function (bConstructor, bRenderSuper) {
 
-                        var strStatements = "\n";
+                        var strStatements = " ";
 
                         for (var i = 0; i < self.items.length; i++) {
 
-                            strStatements += self.items[i].generateJavaScript() + "\n";
+                            var strStatement = self.items[i].generateJavaScript() + " ";
+
+                            if (bConstructor) {
+
+                                // Determine if the statement is a super call.
+                                var bSuper = strStatement.indexOf("super") != -1;
+
+                                if ((bSuper && bRenderSuper) ||
+                                    (!bSuper && !bRenderSuper)) {
+
+                                    strStatements += strStatement;
+                                }
+                            } else {
+
+                                // Since not constructor, call super whereever.
+                                strStatements += strStatement;
+                            }
                         }
 
-                        strStatements += "\n";
+                        strStatements += " ";
 
                         return strStatements;
                     };

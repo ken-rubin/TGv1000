@@ -35,11 +35,13 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/methodBuilder/ParameterList",
     "NextWave/source/methodBuilder/StatementList",
     "NextWave/source/project/Project",
+    "NextWave/source/project/Comic",
+    "NextWave/source/project/Library",
     "NextWave/source/project/Type",
     "NextWave/source/project/Method",
     "NextWave/source/project/Property",
     "NextWave/source/project/Event"],
-    function (prototypes, settings, simulator, Area, Point, Size, Layer, LayerBackground, LayerCanvas, LayerPanels, LayerDebug, LayerDrag, LayerAl, Expression, Literal, Statement, Name, CodeExpression, CodeStatement, Parameter, ParameterList, StatementList, Project, Type, Method, Property, Event) {
+    function (prototypes, settings, simulator, Area, Point, Size, Layer, LayerBackground, LayerCanvas, LayerPanels, LayerDebug, LayerDrag, LayerAl, Expression, Literal, Statement, Name, CodeExpression, CodeStatement, Parameter, ParameterList, StatementList, Project, Comic, Library, Type, Method, Property, Event) {
 
         try {
 
@@ -69,8 +71,6 @@ define(["NextWave/source/utility/prototypes",
                     self.projectData = null;
                     // Directly set focus object, overrides dragObject.
                     self.alternateFocus = null;
-                    // Collection of types available in the current context.
-                    self.types = [];
 
                     // Only one of the following can be true, but both can be false.
                     // Indicates there is a project which has been loaded up into this manager.
@@ -82,27 +82,6 @@ define(["NextWave/source/utility/prototypes",
                     
                     // Indicates that the current user is allowed to create or edit classes, products or online classes.
                     self.userAllowedToCreateEditPurchProjs = false;
-                    // Current type/method.
-                    self.context = {
-
-                        type: null,
-                        method: null
-                    };
-
-                    ////////////////////////
-                    // Code interface.
-
-                    // Method invoked by game base type.
-                    self.startGame = function () {
-
-                        try {
-
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
 
                     ////////////////////////
                     // Public methods.
@@ -272,53 +251,23 @@ define(["NextWave/source/utility/prototypes",
                                     self.dragLayer
                                 ];
 
-                            // Collection of types available in the current context.
-                            self.types = [];
-                            // Current type/method.
-                            self.context = {
-
-                                type: null,
-                                method: null
-                            };
-
                             // Reset *Loaded.
                             self.projectLoaded = false;
 
                             // Clear panel data.
-                            var exceptionRet = self.panelLayer.clearTypes();
-                            if (exceptionRet) { return exceptionRet; }
-                            // exceptionRet = self.panelLayer.clearStatements();
-                            // if (exceptionRet) { return exceptionRet; }
-                            // exceptionRet = self.panelLayer.clearExpressions();
-                            // if (exceptionRet) { return exceptionRet; }
-                            // exceptionRet = self.panelLayer.clearNames();
-                            // if (exceptionRet) { return exceptionRet; }
-                            exceptionRet = self.panelLayer.clearCenter();
-                            if (exceptionRet) { return exceptionRet; }
-                            // exceptionRet = self.panelLayer.clearLiterals();
-                            // if (exceptionRet) { return exceptionRet; }
-
-                            return null;
-
+                            return self.panelLayer.clearCenter();
                         } catch (e) {
 
                             return e;
                         }
                     }
 
-                    // Clear out project.
-                    self.loadNoProject = function () {
+                    // Load the new library into the current comic.
+                    self.loadLibrary = function (library) {
 
                         try {
 
-                            var exceptionRet = self.clearPanels(0);
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-
-                            return null;
-
+                            return window.projectDialog.mergeLibrary(library);
                         } catch (e) {
 
                             return e;
@@ -369,7 +318,7 @@ define(["NextWave/source/utility/prototypes",
                                 // Set loaded.
                                 self.projectLoaded = true;
 
-                                return self.panelLayer.openAndPinAllPanels();
+                                self.panelLayer.openAndPinAllPanels();
                             }
 
                             return null;
@@ -404,8 +353,11 @@ define(["NextWave/source/utility/prototypes",
                             self.panelLayer.active = false;
                             self.dragLayer.active = false;
 
+                            // Cause a resize.
+                            m_functionWindowResize();
+
                             // Build all javascript code.
-                            var objectModules = self.generateJavaScript();
+                            var objectModules = window.projectDialog.generateJavaScript();
                             return simulator.start(objectModules);
                         } catch(e) {
 
@@ -418,6 +370,10 @@ define(["NextWave/source/utility/prototypes",
 
                             // Stop simulating.
                             var exceptionRet = simulator.stop();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
 
                             // Re-enable panels and drag.
                             self.canvasLayer.active = false;
@@ -446,15 +402,16 @@ define(["NextWave/source/utility/prototypes",
                         return true;
                     };
 
-                    // Determines if the method is selected.
-                    self.getSelected = function (method) {
+                    self.isBuiltInType = function (strType) {
 
-                        if (!self.context ||
-                            !self.context.method) {
+                        for (var i = 0; i < m_arrayReserved.length; i++) {
 
-                            return false;
+                            if (m_arrayReserved[i] === strType) {
+
+                                return true;
+                            }
                         }
-                        return (self.context.method === method);
+                        return false;
                     };
 
                     // Build a unique name from the specified name.
@@ -586,6 +543,46 @@ define(["NextWave/source/utility/prototypes",
 
                         return self.panelLayer.saveLiterals();
                     };
+
+                    // Helper method clears out the center panel and sets it up for a Project.
+                    self.selectProject = function (project) {
+
+                        try {
+
+                            // Clear data out from previous context.
+                            var exceptionRet = self.panelLayer.clearCenter("Project");
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Load up the Project into the Project builder.
+                            return window.projectBuilder.loadProject(project);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    }
+
+                    // Helper method clears out the center panel and sets it up for a Comic.
+                    self.selectComic = function (comic) {
+
+                        try {
+
+                            // Clear data out from previous context.
+                            var exceptionRet = self.panelLayer.clearCenter("Comic");
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Load up the Comic into the Comic builder.
+                            return window.comicBuilder.loadComic(comic);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    }
 
                     // Helper method clears out the center panel and sets it up for a Library.
                     self.selectLibrary = function (library) {
@@ -1505,14 +1502,14 @@ define(["NextWave/source/utility/prototypes",
                         "false", "final", "finally", "float", "for", "function", "fileUpload", "focus", "form", "forms", "frame", "frames", "frameRate",
                         "goto", "getClass",
                         "hasOwnProperty", "hidden", "history", 
-                        "if", "implements", "import", "in", "instanceof", "int", "interface", "image", "images", "Infinity", "isFinite", "isNaN", "isPrototypeOf", "innerHeight", "innerWidth", 
+                        "if", "implements", "import", "in", "instanceof", "int", "interface", "Image", "images", "Infinity", "isFinite", "isNaN", "isPrototypeOf", "innerHeight", "innerWidth", 
                         "java", "JavaArray", "JavaClass", "JavaObject", "JavaPackage",
                         "let", "long", "layer", "laysers", "length", "link", "location",
                         "Math", "mimeTypes", 
-                        "native", "new", "null", "name", "NaN", "navigate", "navigator",
+                        "native", "new", "null", "name", "NaN", "navigate", "navigator", "Number", 
                         "Object", "offscreenBuffering", "open", "opener", "option", "outerHeight", "outerWidth", "onbeforeunload", "onblur", "ondragdrop", "onclick", "oncontextmenu", "onerror", "onfocus", "onkeydown", "onkeypress", "onkeyup", "onload", "onmousedown", "onmousemove", "onmouseout", "onmouseover", "onmouseup", "onreset", "onsubmit", "onunload",
                         "package", "private", "protected", "public", "packages", "pageXOffset", "pageYOffset", "parent", "pargeFloat", "parseInt", "password", "pkcs11", "plugin", "prompt", "propertyIsEnum", "prototype",
-                        "return", "radio", "reset",
+                        "return", "radio", "reset", "RegEx",
                         "short", "static", "super", "switch", "synchronized", "screenX", "screenY", "scroll", "secure", "select", "self", "setInterval", "setTimeout", "status", "String", "submit", 
                         "this", "throw", "throws", "transient", "true", "try", "typeof", "taint", "text", "textarea", "top", "toString", 
                         "undefined", "unescape", "untaint", 
@@ -1531,587 +1528,3 @@ define(["NextWave/source/utility/prototypes",
             alert(e.message);
         }
     });
-
-
-
-
-                    /* Method adds a new name to NameList and to NamesPanel.
-                    self.addName = function (strName) {
-
-                        try {
-
-                            return self.panelLayer.addName(strName);
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Method changes a name of a CodeVar or a parameter.
-                    // In both of these cases change the name everyplace it's used in the current method.
-                    self.changeName = function (strOriginalName, strNewName) {
-
-                        try {
-
-                            // Update in the names panel by getting panelLayer to do the work.
-                            var exceptionRet = self.panelLayer.changeName(strOriginalName, 
-                                strNewName);
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-
-                            // Propagate the name change throughout the current method.
-                            for (var i = 0; i < self.context.method.statements.items.length; i++) {
-
-                                var stmt = self.context.method.statements.items[i];
-
-                                var expressionRet = stmt.changeName(strOriginalName, strNewName);
-                                if (expressionRet) {
-
-                                    return expressionRet;
-                                }
-                            }
-
-                            return null;
-
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Create a new, empty type.
-                    self.createType = function () {
-
-                        try {
-
-                            // Generate a new type-name.
-                            var strName = self.getUniqueName("MyType",
-                                self.types,
-                                "name");
-
-                            // Create type.
-                            var typeNew = new Type();
-                            var exceptionRet = typeNew.create({
-
-                                name: strName,
-                                ownedByUserId: parseInt(g_profile["userId"], 10),
-                                typeTypeId: 1
-                            });
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-
-                            exceptionRet = self.addType(typeNew);
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-
-                            // Select it into the GUI.
-                            return self.selectType(typeNew);
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Create a new, empty method.
-                    self.createMethod = function (typeContaining) {
-
-                        try {
-
-                            // Generate a new method-name.
-                            var strName = self.getUniqueName("MyMethod",
-                                typeContaining.methods.parts,
-                                "name");
-
-                            // Create method.
-                            var methodNew = new Method(typeContaining,
-                                strName);
-
-                            // Specify some default values...:
-                            var exceptionRet = methodNew.create({
-
-                                name: strName,
-                                ownedByUserId: parseInt(g_profile["userId"], 10)
-                            });
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-
-                            exceptionRet = typeContaining.methods.addPart(methodNew);
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-
-                            // Select it into the GUI.
-                            return self.setContext(typeContaining, 
-                                methodNew);
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Create a new, empty property.
-                    self.createProperty = function (typeContaining) {
-
-                        try {
-
-                            // Generate a new property-name.
-                            var strName = self.getUniqueName("MyProperty",
-                                typeContaining.properties.parts,
-                                "name");
-
-                            // Create type.
-                            var propertyNew = new Property(typeContaining,
-                                strName);
-
-                            // Specify some default values...:
-                            var exceptionRet = propertyNew.create({
-
-                                name: strName,
-                                ownedByUserId: parseInt(g_profile["userId"], 10)
-                            });
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-
-                            exceptionRet = typeContaining.properties.addPart(propertyNew);
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-
-                            // Select it into the GUI.
-                            return self.selectProperty(typeContaining, 
-                                propertyNew);
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Create a new, empty Event.
-                    self.createEvent = function (typeContaining) {
-
-                        try {
-
-                            // Generate a new Event-name.
-                            var strName = self.getUniqueName("MyEvent",
-                                typeContaining.events.parts,
-                                "name");
-
-                            // Create Event.
-                            var eventNew = new Event(typeContaining,
-                                strName);
-
-                            // Specify some default values...:
-                            var exceptionRet = eventNew.create({
-
-                                name: strName,
-                                ownedByUserId: parseInt(g_profile["userId"], 10)
-                            });
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-
-                            exceptionRet = typeContaining.events.addPart(eventNew);
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-
-                            // Select it into the GUI.
-                            return self.selectEvent(typeContaining, 
-                                eventNew);
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Method changes a type name.
-                    self.changeTypeName = function (strOriginalName, strNewName) {
-
-                        try {
-
-                            var type = null;
-
-                            // Cannot use the concat trick here because the concatenated array doesn't maintain reference.
-                            for (var i = 0; i < self.types.length; i++) {
-
-                                var typeIth = self.types[i];
-
-                                // Find match...
-                                if (self.types[i].name === strOriginalName) {
-
-                                    // ...and update.
-                                    typeIth.name = strNewName;
-                                    type = typeIth;
-                                    break;
-                                }
-                            }
-
-                            if (!type) {
-
-                                return new Error("Strangely, could not locate type with name: " + strOriginalName + ".");
-                            }
-
-                            var j = type.stowage.typeTypeId;
-                            // 1 for App type or normal (user-added type)
-                            // 3 for App base types
-                            // The construct and initialize methods cannot be renamed.
-
-                            // Always do self.types.
-                            for (var i = 0; i < self.types.length; i++) {
-
-                                var exceptionRet = self.types[i].changeTypeName(strOriginalName, strNewName);
-                                if (exceptionRet) {
-
-                                    return exceptionRet;
-                                }
-                            }
-
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Remove type from manager/project.
-                    self.removeType = function (typeToRemove) {
-
-                        try {
-
-                            var indexRemoved;
-                            var nameRemoved = typeToRemove.name;
-
-                            // Search for type.
-                            for (var i = 0; i < self.types.length; i++) {
-
-                                // Find match...
-                                if (self.types[i].name === nameRemoved) {
-
-                                    // ...and remove.
-                                    self.types.splice(i, 1);
-                                    indexRemoved = i;
-                                    break;
-                                }
-                            }
-
-                            // Also remove from panel layer.
-                            var exceptionRet = self.panelLayer.removeType(typeToRemove);
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-
-                            // Select a different type if the deleted one was the one in the center panel.
-                            if (window.typeBuilder.typeContext.name === nameRemoved) {
-
-                                var newTypeIndex = m_functionGetNewIndex(self.types, indexRemoved);
-                                if (newTypeIndex > -1) {
-
-                                    return self.selectType(self.types[newTypeIndex]);
-                                }
-
-                                // Nothing left -- cannot happen in Types, actually, because no one can delete App type.
-                                // But can happen in similar code in types panel.
-                                self.panelLayer.clearCenter("Type");
-                            }
-
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Remove method from specified type.
-                    self.removeMethod = function (typeOwner, methodToRemove) {
-
-                        try {
-
-                            // Will have to see if this way works.
-                            return typeOwner.methods.removePart(methodToRemove);
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Remove property from specified type.
-                    self.removeProperty = function (typeOwner, propertyToRemove) {
-
-                        try {
-
-                            // Will have to see if this way works.
-                            return typeOwner.properties.removePart(propertyToRemove);
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Remove event from specified type.
-                    self.removeEvent = function (typeOwner, eventToRemove) {
-
-                        try {
-
-                            // Will have to see if this way works.
-                            return typeOwner.events.removePart(eventToRemove);
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Changes a Method name.
-                    // It then has to loop through all Types
-                    // or through all types (if Method is in a user or App type) and update
-                    // uses throughout.
-                    self.changeMethodName = function (type, strOriginalMethodName, strNewMethodName) {
-
-                        try {
-
-                            var bMethodNameChanged = false;
-
-                            // Update in place.
-                            for (var i = 0; i < type.methods.parts.length; i++) {
-
-                                // Find match...
-                                if (type.methods.parts[i].name === strOriginalMethodName) {
-
-                                    // ...and update.
-                                    type.methods.parts[i].name = strNewMethodName;
-                                    bMethodNameChanged = true;
-                                    break;
-                                }
-                            }
-
-                            if (bMethodNameChanged) {
-
-                                // Propagate the method name change.
-
-                                var j = type.stowage.typeTypeId;
-                                // 1 for App type or normal (user-added type)
-                                // 3 for App base types
-                                // The construct and initialize methods cannot be renamed.
-
-                                // Always do self.types.
-                                for (var i = 0; i < self.types.length; i++) {
-
-                                    var exceptionRet = self.types[i].changeMethodName(type.name,
-                                        strOriginalMethodName,
-                                        strNewMethodName);
-                                    if (exceptionRet) {
-
-                                        return exceptionRet;
-                                    }
-                                }
-                            }
-
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Method edits a Property name.
-                    self.editPropertyName = function (type, strOriginalName, strNewName) {
-
-                        try {
-
-                            // Update in place.
-                            for (var i = 0; i < type.properties.parts.length; i++) {
-
-                                // Find match...
-                                if (type.properties.parts[i].name === strOriginalName) {
-
-                                    // ...and update.
-                                    type.properties.parts[i].name = strNewName;
-
-                                    break;
-                                }
-                            }
-
-                            // TODO: Update any allocation associated with this property.
-
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Method edits an Event name.
-                    self.editEventName = function (type, strOriginalName, strNewName) {
-
-                        try {
-
-                            // Update in place.
-                            for (var i = 0; i < type.events.parts.length; i++) {
-
-                                // Find match...
-                                if (type.events.parts[i].name === strOriginalName) {
-
-                                    // ...and update.
-                                    type.events.parts[i].name = strNewName;
-
-                                    break;
-                                }
-                            }
-
-                            // TODO: Update any allocation associated with this property.
-
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Method removes an existing name.
-                    self.removeName = function (strName) {
-
-                        try {
-
-                            // Update in the panel.
-                            return self.panelLayer.removeName(strName);
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-*/
-
-                    /* Set a new context.  A type and the index into its method collection, 
-                    // or iIndex can be mis-used as the name of the method for which to search.
-                    self.setContext = function (type, method) {
-
-                        try {
-
-                            // Setting dirty causes the next render to calculate layout.
-                            m_bDirty[self.iPanelArrangement] = true;
-
-                            // Set context, load method builder.
-                            self.context = {
-
-                                type: type,
-                                method: method
-                            };
-
-                            // Clear data out from previous context.
-                            var exceptionRet = self.panelLayer.clearCenter("Method");
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-
-                            // Load up the method into the method builder.
-                            exceptionRet = window.methodBuilder.loadTypeMethod(self.context);
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Method adds a new Type.
-                    self.addType = function (typeNew) {
-
-                        try {
-
-                            // If there are no types, then set context to this type,
-                            // unless this type has no methods, in which case, wait.
-                            if (self.context.type === null &&
-                                typeNew &&
-                                typeNew.methods &&
-                                typeNew.methods.parts &&
-                                typeNew.methods.parts.length > 0) {
-
-                                // Set context.
-                                var exceptionRet = self.setContext(typeNew,
-                                    0);
-                                if (exceptionRet) { return exceptionRet; }
-                            }
-
-                            // Add to list.
-                            self.types.push(typeNew);
-
-                            return self.panelLayer.addType(typeNew);
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Clear the list of types.
-                    self.clearTypes = function () {
-
-                        try {
-
-                            self.types = [];
-
-                            return self.panelLayer.clearTypes();
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Load up a set of types.
-                    self.loadTypes = function (arrayList) {
-
-                        try {
-
-                            // Start with a clean slate.
-                            var exceptionRet = self.clearTypes();
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-
-                            // "Play" the list of Types.
-                            for (var i = 0; i < arrayList.length; i++) {
-
-                                // Extract the type.
-                                var objectTypeIth = arrayList[i];
-
-                                var typeNew = new Type();
-                                exceptionRet = typeNew.create(objectTypeIth);
-                                if (exceptionRet) {
-
-                                    return exceptionRet;
-                                }
-
-                                // Add it to the system.
-                                exceptionRet = self.addType(typeNew);
-                                if (exceptionRet) {
-
-                                    return exceptionRet;
-                                }
-                            }
-
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    }*/
-

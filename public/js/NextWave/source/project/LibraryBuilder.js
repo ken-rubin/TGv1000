@@ -151,6 +151,72 @@ define(["NextWave/source/utility/prototypes",
                                             alert(e.message);
                                         }
                                     }
+                                },
+                                referencesLabel: {
+
+                                    type: "Label",
+                                    text: "References",
+                                    x: settings.general.margin,
+                                    y: 6 * settings.dialog.lineHeight + 
+                                        3 * settings.general.margin,
+                                    width: settings.dialog.firstColumnWidth,
+                                    height: settings.dialog.lineHeight
+                                },
+                                referencesEdit: {
+
+                                    type: "Edit",
+                                    x: 2 * settings.general.margin + 
+                                        settings.dialog.firstColumnWidth,
+                                    y: 6 * settings.dialog.lineHeight + 
+                                        3 * settings.general.margin,
+                                    widthType: "reserve",
+                                    width: 3 * settings.general.margin +
+                                        settings.dialog.firstColumnWidth,
+                                    height: settings.dialog.lineHeight * 3,
+                                    exitFocus: function (localSelf) {
+
+                                        try {
+
+                                            // Update Library's references.
+                                            self.currentLibrary.data.references = localSelf.getText();
+                                        } catch (e) {
+
+                                            alert(e.message);
+                                        }
+                                    }
+                                },
+                                editorsLabel: {
+
+                                    type: "Label",
+                                    text: "Editors",
+                                    x: settings.general.margin,
+                                    y: 9 * settings.dialog.lineHeight + 
+                                        4 * settings.general.margin,
+                                    width: settings.dialog.firstColumnWidth,
+                                    height: settings.dialog.lineHeight
+                                },
+                                editorsEdit: {
+
+                                    type: "Edit",
+                                    x: 2 * settings.general.margin + 
+                                        settings.dialog.firstColumnWidth,
+                                    y: 9 * settings.dialog.lineHeight + 
+                                        4 * settings.general.margin,
+                                    widthType: "reserve",
+                                    width: 3 * settings.general.margin +
+                                        settings.dialog.firstColumnWidth,
+                                    height: settings.dialog.lineHeight * 3,
+                                    exitFocus: function (localSelf) {
+
+                                        try {
+
+                                            // Update Library's editors.
+                                            self.currentLibrary.data.editors = localSelf.getText();
+                                        } catch (e) {
+
+                                            alert(e.message);
+                                        }
+                                    }
                                 }
                             };
 
@@ -209,6 +275,16 @@ define(["NextWave/source/utility/prototypes",
                                 self.currentLibrary.data.description = "[Description]";
                             }
 
+                            // These next two are questionable. Discuss w/Ken.
+                            if (!self.currentLibrary.data.references) {
+
+                                self.currentLibrary.data.references = "KernelTypesLibrary";
+                            }
+                            if (!self.currentLibrary.data.editors) {
+
+                                self.currentLibrary.data.editors = g_profile["userName"].toString();
+                            }
+
                             // Update controls:
                             
                             // Name edit.
@@ -231,7 +307,33 @@ define(["NextWave/source/utility/prototypes",
 
                                 return exceptionRet;
                             }
-                            return self.dialog.controlObject["descriptionEdit"].setText(self.currentLibrary.data.description);
+                            exceptionRet = self.dialog.controlObject["descriptionEdit"].setText(self.currentLibrary.data.description);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Description.
+                            bProtected = false;
+                            exceptionRet = self.dialog.controlObject["referencesEdit"].setProtected(bProtected);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+                            exceptionRet = self.dialog.controlObject["referencesEdit"].setText(self.currentLibrary.data.references);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+
+                            // Description.
+                            bProtected = false;
+                            exceptionRet = self.dialog.controlObject["editorsEdit"].setProtected(bProtected);
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+                            return self.dialog.controlObject["editorsEdit"].setText(self.currentLibrary.data.editors);
                         } catch (e) {
 
                             return e;

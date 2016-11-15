@@ -33,40 +33,82 @@ define(["NextWave/source/utility/prototypes",
                             // Declare namespace.
                             window.tg = {};
                             window.tg.instances = [];
+                            window.tg.eventCollection = [];
+                            window.tg.raiseCollection = [];
+                            window.tg.app = null;
+                            window.tg.manager = window.manager;
+                            window.tg.libraryNames = new Set();
+                            window.tg.typeNames = new Set();
+                            window.tg.raiseEvent = function (strEvent, objectContext) {
 
-                            // Ensure that types are instantiated
-                            // in reverse dependency order.
+                                try {
 
-                            // Load each module into the environment.
-                            for (var i = 0; i < objectModules.systemTypes.length; i++) {
+                                    // Add event to the list of events to invoke.
+                                    window.tg.raiseCollection[strEvent] = objectContext;
 
-                                var strTypeIth = objectModules.systemTypes[i];
-                                eval(strTypeIth);
-                            }
+                                    return null;
+                                } catch (e) {
 
-                            // Load each module into the environment.
+                                    return e;
+                                }
+                            };
+
+                            // Load up/allocate all the Type constructor functions.
+                            let libraryApp = null;
                             for (var i = 0; i < objectModules.types.length; i++) {
 
-                                var strTypeIth = objectModules.types[i];
-                                eval(strTypeIth);
+                                let typeIth = objectModules.types[i];
+
+                                // Test the base class, if specified,  
+                                // to ensure it has already been loaded.
+                                let strBaseTypeName = typeIth.type.data.baseTypeName;
+                                if (strBaseTypeName) {
+
+                                    // Test....
+                                    if (!window.tg.typeNames.has(strBaseTypeName)) {
+
+                                        // Move this Type to the end of the Array of Types.
+                                        objectModules.types.splice(i, 1);
+                                        objectModules.types.push(typeIth);
+
+                                        // Adjust i, ...
+                                        i--;
+
+                                        // ...because about to:
+                                        continue;
+                                    }
+                                }
+
+                                // Ensure the library is defined in window.tg and window.tg.libraryNames.
+                                let strLibraryName = typeIth.library.data.name;
+                                if (!window.tg[strLibraryName]) {
+
+                                    window.tg[strLibraryName] = {};
+                                }
+                                if (!window.tg.libraryNames.has(strLibraryName)) {
+
+                                    window.tg.libraryNames.add(strLibraryName)
+                                }
+
+                                // Actuate the constructor function.
+                                eval(typeIth.constructor);
+
+                                // If this is an "App"-type, then remember
+                                // the library--it is used later to auto-allocate.
+                                if (typeIth.type.data.name === "App") {
+
+                                    libraryApp = typeIth.library;
+                                }
+
+                                // Add to typeNames Set.
+                                window.tg.typeNames.add(typeIth.type.data.name)
                             }
 
                             // Allocate app.
-                            window.tg.app = new window.tg.App(true);
-                            window.tg.app.initialize();
+                            if (libraryApp) {
 
-                            // Begin the rendering.
-                            if (m_renderCookie) {
-
-                                var exceptionRet = self.stop();
-                                if (exceptionRet) {
-
-                                    return exceptionRet;
-                                }
+                                window.tg.app = new window.tg[libraryApp.data.name].App(true);
                             }
-                            m_renderCookie = setInterval(m_functionAnimate,
-                                self.refreshInterval);
-
                             return null;
                         } catch (e) {
 
@@ -79,180 +121,39 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            // Stop rendering.
-                            if (m_renderCookie) {
+                            // If the app was found and allocated, call its destruct, if defined.
+                            if (window.tg.app &&
+                                window.tg.app.destruct) {
 
-                                clearInterval(m_renderCookie);
-                                m_renderCookie = undefined;
+                                window.tg.app.destruct();
                             }
 
                             // Clear namespace.
                             window.tg = {};
                             window.tg.instances = [];
+                            window.tg.eventCollection = [];
+                            window.tg.raiseCollection = [];
+                            window.tg.app = null;
+                            window.tg.typeNames = null;
+
+                            // Clear out all the libraries.
+                            //for (let strLibraryName of window.tg.libraryNames) {
+
+                            //    delete window.tg[strLibraryName];
+                            //}
+
+                            window.tg.libraryNames = null;
                             return null;
                         } catch (e) {
 
                             return e;
                         }
                     };
-
-                    ///////////////////////////
-                    // Private field.
-
-                    // .
-                    var m_functionAnimate = function () {
-
-                        try {
-
-                            var exceptionRet = m_functionUpdate();
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }
-
-                            /* Clear the surface before rendering everything.
-                            m_context.clearRect(0,0,800,600);
-
-                            exceptionRet = m_functionRender();
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }*/
-
-                            /*exceptionRet = m_functionDoEvents();
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }*/
-                        } catch (e) {
-
-                            alert(e.message);
-                        }
-                    };
-
-                    // .
-                    var m_functionDoEvents = function () {
-
-                        try {
-
-                            // Process each of the cached raise collection elements.
-                            var arrayKeys = Object.keys(window.tg.raiseCollection);
-                            for (var i = 0; i < arrayKeys.length; i++) {
-
-                                var strEvent = arrayKeys[i];
-
-                                // Get the correct collections.
-                                var objectContext = window.tg.raiseCollection[strEvent];
-                                var listCallbacks = window.tg.eventCollection[strEvent];
-
-                                // Process each callback.
-                                for (var i = 0; i < listCallbacks.length; i++) {
-
-                                    var callback = listCallbacks[i];
-                                    var target = callback.target;
-                                    var method = callback.method;
-                                    setTimeout(function (target, method) {
-
-                                        try {
-
-                                            target[method](objectContext);
-                                        } catch (e) {
-
-                                            alert(e.message);
-                                        }
-                                    }(target, method), 10);
-                                }
-                            }
-
-                            // Clear collection.
-                            window.tg.raiseCollection = {};
-
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // .
-                    var m_functionUpdate = function () {
-
-                        try {
-
-                            // Update each of the objects that has an update.
-                            for (var i = 0; i < window.tg.instances.length; i++) {
-
-                                // Get the ith instance.
-                                var instanceIth = window.tg.instances[i];
-                                if (!instanceIth) {
-
-                                    continue;
-                                }
-
-                                // Check if it has an update.
-                                if (instanceIth.update) {
-
-                                    // Call update if it exists.
-                                    var exceptionRet = instanceIth.update();
-                                    if (exceptionRet) {
-
-                                        throw exceptionRet;
-                                    }
-                                }
-                            }
-
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    /* .
-                    var m_functionRender = function () {
-
-                        try {
-
-                            // Render each of the objects that has a render.
-                            for (var i = 0; i < window.instances.length; i++) {
-
-                                // Get the ith instance.
-                                var instanceIth = window.instances[i];
-                                if (!instanceIth) {
-
-                                    continue;
-                                }
-
-                                // Check if it has an render.
-                                if (instanceIth.render) {
-
-                                    // Call update if it exists.
-                                    var exceptionRet = instanceIth.render(m_context);
-                                    if (exceptionRet) {
-
-                                        throw exceptionRet;
-                                    }
-                                }
-                            }
-
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };*/
-
-                    ///////////////////////////
-                    // Private field.
-
-                    // .
-                    var m_renderCookie = null;
                 } catch (e) {
 
                     alert(e.message);
                 }
-        	};
-
+            };
         	return new functionRet();
         } catch (e) {
 

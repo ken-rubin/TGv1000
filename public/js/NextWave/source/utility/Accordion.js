@@ -45,6 +45,31 @@ define(["NextWave/source/utility/prototypes",
                     ////////////////////////
                     // Public methods.
 
+                    // Method allows a section to be opened.
+                    self.openSection = function (strSection) {
+
+                        try {
+
+                            // Close all other sections and open the specified.
+                            self.sections.forEach(function (section) {
+
+                                if (strSection === section.name) {
+
+                                    section.opening = true;
+                                    section.closing = false;
+                                } else {
+
+                                    section.opening = false;
+                                    section.closing = true;
+                                }
+                            });
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Give derived modules a crack at the create pipeline.
                     self.innerCreate = function () {
 
@@ -112,6 +137,19 @@ define(["NextWave/source/utility/prototypes",
                     self.render = function (contextRender) {
 
                         try {
+
+                            // Generate the path.
+                            var exceptionRet = m_area.generateRoundedRectPath(contextRender);
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
+                            // Fill and stroke the path.
+                            contextRender.fillStyle = "rgba(255,100,100,0.3)";
+                            contextRender.strokeStyle = settings.general.strokeBackground;
+                            contextRender.fill();
+                            contextRender.stroke();
 
                             // Render the sections:
 
@@ -185,12 +223,92 @@ define(["NextWave/source/utility/prototypes",
                                         section.addGlyphArea = null;
                                     }
 
+                                    // Render the save glyph, if specified.
+                                    if ($.isFunction(section.saveGlyphClickHandler)) {
+
+                                        dSpaceForAddGlyph += settings.glyphs.width + settings.general.margin;
+
+                                        // Calculate where the icon is, also used for hittesting.
+                                        section.saveGlyphArea = new Area(
+                                            new Point(m_area.location.x + m_area.extent.width - dSpaceForAddGlyph,
+                                                dY + settings.general.margin),
+                                            new Size(settings.glyphs.smallWidth,
+                                                settings.glyphs.smallHeight));
+
+                                        // Render pushpin.
+                                        exceptionRet = glyphs.render(contextRender,
+                                            section.saveGlyphArea,
+                                            glyphs.save,
+                                            settings.manager.showIconBackgrounds);
+                                        if (exceptionRet) {
+
+                                            throw exceptionRet;
+                                        }
+                                    } else {
+
+                                        section.saveGlyphArea = null;
+                                    }
+
+                                    // Render the search glyph, if specified.
+                                    if ($.isFunction(section.searchGlyphClickHandler)) {
+
+                                        dSpaceForAddGlyph += settings.glyphs.width + settings.general.margin;
+
+                                        // Calculate where the icon is, also used for hittesting.
+                                        section.searchGlyphArea = new Area(
+                                            new Point(m_area.location.x + m_area.extent.width - dSpaceForAddGlyph,
+                                                dY + settings.general.margin),
+                                            new Size(settings.glyphs.smallWidth,
+                                                settings.glyphs.smallHeight));
+
+                                        // Render pushpin.
+                                        exceptionRet = glyphs.render(contextRender,
+                                            section.searchGlyphArea,
+                                            glyphs.search,
+                                            settings.manager.showIconBackgrounds);
+                                        if (exceptionRet) {
+
+                                            throw exceptionRet;
+                                        }
+                                    } else {
+
+                                        section.searchGlyphArea = null;
+                                    }
+
+                                    // Draw the current selection if one is mapped and specified.
+                                    if (section.selectionAccessorProperty) {
+
+                                        // Get the selected item.
+                                        let objectSelected = window.projectDialog[section.selectionAccessorProperty];
+                                        if (objectSelected) {
+
+                                            contextRender.font = settings.general.smallFont;
+                                            contextRender.fillStyle = settings.general.fillText;
+
+                                            let dTextWidth = contextRender.measureText(objectSelected.data.name).width;
+                                            dSpaceForAddGlyph += dTextWidth + settings.general.margin;
+
+                                            section.selectedArea = new Area(
+                                                    new Point(m_area.location.x  + m_area.extent.width - dSpaceForAddGlyph,
+                                                        dY + 2 * settings.general.margin),
+                                                    new Size(dTextWidth,
+                                                        settings.dialog.lineHeight));
+                                            contextRender.fillText(objectSelected.data.name,
+                                                section.selectedArea.location.x,
+                                                section.selectedArea.location.y,
+                                                section.selectedArea.extent.width);
+                                        }
+                                    } else {
+
+                                        section.selectedArea = null;
+                                    }
+
                                     // Draw the title.
                                     contextRender.font = settings.general.font;
                                     contextRender.fillStyle = settings.general.fillText;
                                     section.titleArea = new Area(
                                             new Point(m_area.location.x + settings.general.margin,
-                                                dY),
+                                                dY + settings.general.margin),
                                             new Size(m_area.extent.width - 2 * settings.general.margin - dSpaceForAddGlyph,
                                                 settings.dialog.lineHeight));
                                     contextRender.fillText(section.title,
@@ -303,6 +421,40 @@ define(["NextWave/source/utility/prototypes",
                                                 type: "addGlyph"
                                             };
                                             objectReference.cursor = "cell";
+                                        } else if (section.saveGlyphArea &&
+                                            section.saveGlyphArea.pointInArea(objectReference.contextRender,
+                                                objectReference.pointCursor,
+                                                true)) {
+
+                                            m_objectMoveState = {
+
+                                                section: section,
+                                                type: "saveGlyph"
+                                            };
+                                            objectReference.cursor = "cell";
+                                        } else if (section.searchGlyphArea &&
+                                            section.searchGlyphArea.pointInArea(objectReference.contextRender,
+                                                objectReference.pointCursor,
+                                                true)) {
+
+                                            m_objectMoveState = {
+
+                                                section: section,
+                                                type: "searchGlyph"
+                                            };
+                                            objectReference.cursor = "cell";
+                                        } else if (section.selectedArea &&
+                                            section.selectedArea.pointInArea(objectReference.contextRender,
+                                                objectReference.pointCursor,
+                                                true)) {
+
+                                            m_objectMoveState = {
+
+                                                section: section,
+                                                type: "title"
+                                            };
+                                            objectReference.cursor = "cell";
+
                                         } else if (section.listArea &&
                                             section.listArea.pointInArea(objectReference.contextRender,
                                                 objectReference.pointCursor,
@@ -376,6 +528,40 @@ define(["NextWave/source/utility/prototypes",
                                         section.opening = true;
                                         section.closing = false;
                                     }
+                                } else if (m_objectMoveState.type === "saveGlyph") {
+
+                                    // Call the callback.
+                                    section.saveGlyphClickHandler(objectReference);
+
+                                    // Also, open this section, if not open.
+                                    if (section.openPercent < 1) {
+
+                                        // Close all other sections.
+                                        self.sections.forEach(function (section) {
+
+                                            section.opening = false;
+                                            section.closing = true;
+                                        });
+                                        section.opening = true;
+                                        section.closing = false;
+                                    }
+                                } else if (m_objectMoveState.type === "searchGlyph") {
+
+                                    // Call the callback.
+                                    section.searchGlyphClickHandler(objectReference);
+
+                                    // Also, open this section, if not open.
+                                    if (section.openPercent < 1) {
+
+                                        // Close all other sections.
+                                        self.sections.forEach(function (section) {
+
+                                            section.opening = false;
+                                            section.closing = true;
+                                        });
+                                        section.opening = true;
+                                        section.closing = false;
+                                    }
                                 } else {
 
                                     // Pass to the list.
@@ -408,6 +594,8 @@ define(["NextWave/source/utility/prototypes",
 
                                 } else if (m_objectMoveState.type === "addGlyph") {
 
+                                } else if (m_objectMoveState.type === "saveGlyph") {
+
                                 } else {
 
                                     // Pass to the list.
@@ -439,6 +627,8 @@ define(["NextWave/source/utility/prototypes",
                                 if (m_objectMoveState.type === "title") {
 
                                 } else if (m_objectMoveState.type === "addGlyph") {
+
+                                } else if (m_objectMoveState.type === "saveGlyph") {
 
                                 } else {
 
@@ -475,6 +665,8 @@ define(["NextWave/source/utility/prototypes",
 
                                 } else if (m_objectMoveState.type === "addGlyph") {
 
+                                } else if (m_objectMoveState.type === "saveGlyph") {
+
                                 } else {
 
                                     // Pass to the list.
@@ -506,6 +698,8 @@ define(["NextWave/source/utility/prototypes",
                                 if (m_objectMoveState.type === "title") {
 
                                 } else if (m_objectMoveState.type === "addGlyph") {
+
+                                } else if (m_objectMoveState.type === "saveGlyph") {
 
                                 } else {
 

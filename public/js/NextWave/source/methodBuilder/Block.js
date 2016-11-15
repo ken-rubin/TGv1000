@@ -21,7 +21,7 @@ define(["NextWave/source/utility/prototypes",
         try {
 
             // Constructor function.
-        	var functionRet = function Block(strName, arrayStatements) {
+        	var functionRet = function Block(strName, strRenderPrefix, arrayStatements) {
 
                 try {
 
@@ -36,6 +36,8 @@ define(["NextWave/source/utility/prototypes",
                     self.open = true;
                     // The name of this block.
                     self.name = strName || "default";
+                    // The name of this block.
+                    self.renderPrefix = strRenderPrefix || "";
 
                     // If there are statements, then need to parent them.
                     if (self.statements.length) {
@@ -49,6 +51,22 @@ define(["NextWave/source/utility/prototypes",
 
                     ////////////////////////
                     // Public methods.
+
+                    // External parse call, invoked when loaded.
+                    self.parse = function () {
+
+                        // Loop over all blocks and parse.
+                        for (let i = 0; i < self.statements.length; i++) {
+
+                            let exceptionRet = self.statements[i].parse();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+                        }
+
+                        return null;
+                    };
 
                     // Get all argument lists.
                     self.accumulateExpressionPlacements = function (arrayAccumulator) {
@@ -413,11 +431,11 @@ define(["NextWave/source/utility/prototypes",
                     // Generate JavaScript for this expression.
                     self.generateJavaScript = function () {
 
-                        var strBlock = " { ";
+                        var strBlock = self.renderPrefix + " { ";
 
                         for (var i = 0; i < self.statements.length; i++) {
 
-                            strBlock += self.statements[i].generateJavaScript() + "\n";
+                            strBlock += self.statements[i].generateJavaScript() + " ";
                         }
 
                         strBlock += " } ";
@@ -444,6 +462,10 @@ define(["NextWave/source/utility/prototypes",
 
                                         type: "String", 
                                         value: self.name
+                                    }, { 
+
+                                        type: "String", 
+                                        value: self.renderPrefix
                                     }, {
 
                                         type: "Array",

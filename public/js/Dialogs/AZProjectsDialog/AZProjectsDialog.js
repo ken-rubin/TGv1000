@@ -165,8 +165,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 										// Set up the modified project.
 										// specialProjectData.openMode might be "new". Change to "loaded". It's no longer new.
-										// This will get saving to work correctly down the road.
-										objectData.specialProjectData.openMode = "loaded";
+										// This will get saving to the DB to acknowledge the fact that this project might be new or might already have been saved.
+										objectData.specialProjectData.openMode = 'loaded';
 										client.project = objectData;
 										client.loadProjectIntoManager();
 										client.setBrowserTabAndBtns();

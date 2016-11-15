@@ -18,8 +18,8 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/methodBuilder/CodeExpressionLiteral",
     "NextWave/source/methodBuilder/CodeExpressionName",
     "NextWave/source/methodBuilder/CodeExpressionType",
-    "NextWave/source/methodBuilder/ArgumentList"],
-    function (prototypes, Statement, CodeStatementExpression, CodeExpressionStub, CodeExpressionInvocation, CodeExpressionRefinement, CodeExpressionLiteral, CodeExpressionName, CodeExpressionType, ArgumentList) {
+    "NextWave/source/methodBuilder/ParameterList"],
+    function (prototypes, Statement, CodeStatementExpression, CodeExpressionStub, CodeExpressionInvocation, CodeExpressionRefinement, CodeExpressionLiteral, CodeExpressionName, CodeExpressionType, ParameterList) {
 
         try {
 
@@ -51,12 +51,7 @@ define(["NextWave/source/utility/prototypes",
                         //             )
                         //         )
                         //     );
-                        return new CodeStatementExpression(
-                                new CodeExpressionInvocation(
-                                    new CodeExpressionLiteral("..."),
-                                    new ArgumentList([])
-                                )
-                            );
+                        return new CodeStatementExpression(new CodeExpressionLiteral("..."));
                     };
                 } catch (e) {
 

@@ -1,8 +1,8 @@
 ///////////////////////////////////////
-// PropertyBuilder module.
+// ProjectBuilder module.
 //
 // Gui component responsible for showing 
-// a property and all its parts and
+// an Project and all its parts and
 // allowing for their modification.
 //
 // Return constructor function.
@@ -22,7 +22,7 @@ define(["NextWave/source/utility/prototypes",
         try {
 
             // Constructor function.
-            var functionRet = function PropertyBuilder() {
+            var functionRet = function ProjectBuilder() {
 
                 try {
 
@@ -34,8 +34,8 @@ define(["NextWave/source/utility/prototypes",
                     ///////////////////////
                     // Public fields.
 
-                    // Property being edited.
-                    self.currentProperty = null;
+                    // Project being edited.
+                    self.currentProject = null;
 
                     ///////////////////////
                     // Public methods.
@@ -48,7 +48,7 @@ define(["NextWave/source/utility/prototypes",
                             // Can only create an uncreated instance.
                             if (m_bCreated) {
 
-                                throw { message: "PropertyBuilder: Instance already created!" };
+                                throw { message: "ProjectBuilder: Instance already created!" };
                             }
 
                             // Create the dialog.
@@ -79,7 +79,7 @@ define(["NextWave/source/utility/prototypes",
                                         try {
 
                                             // Store the current value for comparison after.
-                                            localSelf.savePropertyName = localSelf.getText();
+                                            localSelf.saveProjectName = localSelf.getText();
                                         } catch (e) {
 
                                             alert(e.message);
@@ -90,13 +90,13 @@ define(["NextWave/source/utility/prototypes",
                                         try {
 
                                             // If the name has changed, update the name.
-                                            if (localSelf.savePropertyName !== localSelf.getText()) {
+                                            if (localSelf.saveProjectName !== localSelf.getText()) {
 
                                                 // Generate an unique name.
-                                                var strUnique = window.manager.getUniqueName(localSelf.getText(),
-                                                    self.currentProperty.owner.properties,
+                                                var strUnique = localSelf.getText();/*window.manager.getUniqueName(localSelf.getText(),
+                                                    self.currentProject.owner.projects,
                                                     "data",
-                                                    "name");
+                                                    "name");*/
 
                                                 // Update GUI.
                                                 var exceptionRet = localSelf.setText(strUnique);
@@ -105,46 +105,12 @@ define(["NextWave/source/utility/prototypes",
                                                     throw exceptionRet;
                                                 }
 
-                                                // Update the other GUI.
-                                                self.currentProperty.listItem.name = strUnique;
+                                                // Update the other GUI (in the project dialog).
+                                                self.currentProject.listItem.name = strUnique;
 
                                                 // Update data too.
-                                                self.currentProperty.data.name = strUnique;
+                                                self.currentProject.data.name = strUnique;
                                             }
-                                        } catch (e) {
-
-                                            alert(e.message);
-                                        }
-                                    }
-                                },
-                                defaultExpressionLabel: {
-
-                                    type: "Label",
-                                    text: "Default",
-                                    x: settings.general.margin,
-                                    y: settings.dialog.lineHeight + 
-                                        2 * settings.general.margin,
-                                    width: settings.dialog.firstColumnWidth,
-                                    height: settings.dialog.lineHeight
-                                },
-                                defaultExpressionEdit: {
-
-                                    type: "Edit",
-                                    x: 2 * settings.general.margin + 
-                                        settings.dialog.firstColumnWidth,
-                                    y: settings.dialog.lineHeight + 
-                                        2 * settings.general.margin,
-                                    widthType: "reserve",           // Reserve means: subtract the width from
-                                                                    //  the total width on calculateLayout.
-                                    width: 3 * settings.general.margin +
-                                        settings.dialog.firstColumnWidth,
-                                    height: settings.dialog.lineHeight,
-                                    exitFocus: function (localSelf) {
-
-                                        try {
-
-                                            // Update it description.
-                                            self.currentProperty.data.defaultExpression = localSelf.getText();
                                         } catch (e) {
 
                                             alert(e.message);
@@ -156,8 +122,8 @@ define(["NextWave/source/utility/prototypes",
                                     type: "Label",
                                     text: "Description",
                                     x: settings.general.margin,
-                                    y: 2 * settings.dialog.lineHeight + 
-                                        3 * settings.general.margin,
+                                    y: settings.dialog.lineHeight + 
+                                        2 * settings.general.margin,
                                     width: settings.dialog.firstColumnWidth,
                                     height: settings.dialog.lineHeight
                                 },
@@ -166,10 +132,9 @@ define(["NextWave/source/utility/prototypes",
                                     type: "Edit",
                                     x: 2 * settings.general.margin + 
                                         settings.dialog.firstColumnWidth,
-                                    y: 2 * settings.dialog.lineHeight + 
-                                        3 * settings.general.margin,
-                                    widthType: "reserve",           // Reserve means: subtract the width from
-                                                                    //  the total width on calculateLayout.
+                                    y: settings.dialog.lineHeight + 
+                                        2 * settings.general.margin,
+                                    widthType: "reserve",
                                     width: 3 * settings.general.margin +
                                         settings.dialog.firstColumnWidth,
                                     height: settings.dialog.lineHeight * 5,
@@ -177,8 +142,8 @@ define(["NextWave/source/utility/prototypes",
 
                                         try {
 
-                                            // Update it description.
-                                            self.currentProperty.data.description = localSelf.getText();
+                                            // Update Project's description.
+                                            self.currentProject.data.description = localSelf.getText();
                                         } catch (e) {
 
                                             alert(e.message);
@@ -208,7 +173,7 @@ define(["NextWave/source/utility/prototypes",
                                 throw { message: "Instance not created!" };
                             }
 
-                            window.PropertyBuilder = null;
+                            window.projectBuilder = null;
                             m_bCreated = false;
 
                             return null;
@@ -218,92 +183,49 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // Load Property into property builder.
-                    self.loadProperty = function (property) {
+                    // Load Project into Project builder.
+                    self.loadProject = function (projectPart) {
 
                         try {
 
                             // Store the context.
-                            self.currentProperty = property;
+                            self.currentProject = projectPart;
 
-                            // Ensure the type has the requisit attributes.
-                            if (!self.currentProperty.data) {
+                            // Ensure the project has the requisit attributes.
+                            if (!self.currentProject.data) {
 
-                                self.currentProperty.data = {};
+                                self.currentProject.data = {};
                             }
-                            if (!self.currentProperty.data.name) {
+                            if (!self.currentProject.data.name) {
 
-                                self.currentProperty.data.name = "[name]";
+                                self.currentProject.data.name = "[name goes here]";
                             }
-                            if (!self.currentProperty.data.defaultExpression) {
+                            if (!self.currentProject.data.description) {
 
-                                self.currentProperty.data.defaultExpression = "";
-                            }
-                            if (!self.currentProperty.data.description) {
-
-                                self.currentProperty.data.description = "[description]";
+                                self.currentProject.data.description = "[description goes here]";
                             }
 
                             // Update controls.
 
                             var bProtected = false;
-                            // Protect against editing property name in these cases:
-                            //      if in system types or App base types and !manager.userCanWorkWithSystemTypesAndAppBaseTypes.
-                            //      for all users: x, y, width, height of system type VisualObject.
-                            if (
-                                (!manager.userCanWorkWithSystemTypesAndAppBaseTypes && self.currentProperty.owner.data.typeTypeId > 1) ||
-                                (self.currentProperty.owner.data.name === "VisualObject" && ['x','y','width','height'].indexOf(self.currentProperty.data.name) > -1 )
-                                ) {
-
-                                bProtected = true;
-                            }
                             var exceptionRet = self.dialog.controlObject["nameEdit"].setProtected(bProtected);
                             if (exceptionRet) {
 
                                 return exceptionRet;
                             }
-                            exceptionRet = self.dialog.controlObject["nameEdit"].setText(self.currentProperty.data.name);
+                            exceptionRet = self.dialog.controlObject["nameEdit"].setText(self.currentProject.data.name);
                             if (exceptionRet) {
 
                                 return exceptionRet;
                             }
 
-                            var bProtected = false;
-                            // Protect against changing/editing type name of property cases:
-                            //      if in system types or App base types and !manager.userCanWorkWithSystemTypesAndAppBaseTypes.
-                            //      for all users: the properties x, y, width, height of system type VisualObject.
-                            // Same code as above, but it mightneed tweaking some day.
-                            if (
-                                (!manager.userCanWorkWithSystemTypesAndAppBaseTypes && self.currentProperty.owner.data.typeTypeId > 1) ||
-                                (self.currentProperty.owner.data.name === "VisualObject" && ['x','y','width','height'].indexOf(self.currentProperty.data.name) > -1 )
-                                ) {
-
-                                bProtected = true;
-                            }
-                            exceptionRet = self.dialog.controlObject["defaultExpressionEdit"].setProtected(bProtected);
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-                            exceptionRet = self.dialog.controlObject["defaultExpressionEdit"].setText(self.currentProperty.data.defaultExpression);
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-
-                            var bProtected = false;
-                            // Protect against editing property description in these cases:
-                            //      if in system types or App base types and !manager.userCanWorkWithSystemTypesAndAppBaseTypes.
-                            if (!manager.userCanWorkWithSystemTypesAndAppBaseTypes && self.currentProperty.owner.data.typeTypeId > 1) {
-
-                                bProtected = true;
-                            }
+                            bProtected = false;
                             exceptionRet = self.dialog.controlObject["descriptionEdit"].setProtected(bProtected);
                             if (exceptionRet) {
                                 return exceptionRet;
                             }
 
-                            return self.dialog.controlObject["descriptionEdit"].setText(self.currentProperty.data.description);
+                            return self.dialog.controlObject["descriptionEdit"].setText(self.currentProject.data.description);
                         } catch (e) {
 
                             return e;
@@ -320,9 +242,6 @@ define(["NextWave/source/utility/prototypes",
                     alert(e.message);
                 }
             };
-
-            // Inherit from List.
-            functionRet.inheritsFrom(DialogHost);
 
             return functionRet;
         } catch (e) {

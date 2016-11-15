@@ -75,7 +75,7 @@ define(["Core/errorHelper",
 								// If lastProjectId, fetch it and load it into manager.
 								if (lastProjectId) {
 
-									self.openProjectFromDB(lastProjectId,
+									self.openProjectFromDB(lastProjectId, 'editOwn',
 										function() {
 
 											BootstrapDialog.show({
@@ -90,14 +90,49 @@ define(["Core/errorHelper",
 									);
 								} else {
 
-									// manager.loadNoProject();
 									if ($.isFunction(callback)) { callback(); }
 								}
 							} else {
 								// Privileged user.
 
-								// self.loadSystemTypesAndPinPanels(callback);
-								if ($.isFunction(callback)) { callback(); }
+								self.openProjectFromDB(6, 'new',
+									function() {
+
+										self.project.isCoreProject = false;
+
+										// We could also do these things that used to be done in the BO, but we aren't--at least for now.
+						                        //     comicIth.id = 0; 
+
+										self.project.name = 'noname';
+										self.project.tags = '';
+										self.project.description = '';
+										if (self.project.imageId) {
+											self.project.altImagePath = '';
+										}
+										self.project.ownedByUserId = parseInt(g_profile["userId"], 10);
+
+										// Now we'll add the fields to the project that will both tell the rest of the UI how to handle it and will affect how it gets saved to the database.
+										let spd = {
+											userAllowedToCreateEditPurchProjs: manager.userAllowedToCreateEditPurchProjs,
+											userCanWorkWithSystemLibsAndTypes: manager.userCanWorkWithSystemLibsAndTypes,
+											ownedByUser: true,
+											othersProjects: false,
+											normalProject: true,
+											coreProject: false,
+											classProject: false,
+											productProject: false,
+											onlineClassProject: false,
+											comicsEdited: false,
+											systemTypesEdited: false,
+											openMode: 'new'
+										};
+										self.project.specialProjectData = Object.assign(self.project.specialProjectData, spd);
+							    		var exceptionRet = manager.loadProject(self.project);
+							    		if (exceptionRet) { throw exceptionRet; }
+
+										if ($.isFunction(callback)) { callback(); }
+									}
+								);
 							}
 
 							return null;
@@ -383,11 +418,11 @@ define(["Core/errorHelper",
 					// Not all of these come back through client. Some places handle the processing internally.
 
 					// Called by SaveProjectAsDialog.
-					self.saveProjectToDB = function () {
+					self.saveProjectToDB = function (callback) {
 
 						try {
 
-							// Call manager.save(). Manager will use its reference to slef.project (self = Client.js) to
+							// Call manager.save(). Manager will use its reference to self.project (self = Client.js) to
 							// update the project in client so we can go forward with the save.
 							var exceptionRet = manager.save();
 
@@ -420,18 +455,7 @@ define(["Core/errorHelper",
 
 									if (objectData.success) {
 
-										if (!objectData.project.specialProjectData.systemTypesEdited) {
-
-											errorHelper.show('You project, ' + objectData.project.name + ', was saved.', 2000);
-
-										} else {
-											
-											if (objectData.scriptSuccess) {
-												errorHelper.show("Your project was saved to the database and the System Type script ST.sql was created.", 5000);
-											} else {
-												errorHelper.show("Your project was saved to the database, but the System Type script COULD NOT be created. Writing the script failed with message: " + objectData.saveError.message + ".");
-											}
-										}
+										errorHelper.show('Your project, ' + objectData.project.name + ', was saved.', 2000);
 
 										// objectData holds a completely filled in (likely modified) project: objectData.project.
 										// We need to replace this with that. Let's try:
@@ -450,7 +474,7 @@ define(["Core/errorHelper",
 										self.loadProjectIntoManager();
 										self.setBrowserTabAndBtns();
 
-										return null;
+										return callback(null);
 
 									} else {
 
@@ -458,19 +482,16 @@ define(["Core/errorHelper",
 										// self.closeCurrentDialog();
 										// self.unloadProject(null, false);
 
-										return new Error(objectData.message);
+										return callback(new Error(objectData.message));
 									}
 								},
 								error: function (jqxhr, strTextStatus, strError) {
 
 									// Non-computational error in strError
-									return new Error(strError);
+									return new callback(new Error(strError));
 								}
 							});
-
-							return null;
-
-						} catch (e) { return e; }
+						} catch (e) { return callback(e); }
 					}
 
 					// strWhatToSave = 'project' saves self.project.
@@ -571,13 +592,14 @@ define(["Core/errorHelper",
 						} catch (e) { callback(e); }
 					}
 
-					self.openProjectFromDB = function (iProjectId, callback) {
+					self.openProjectFromDB = function (iProjectId, strMode, callback) {
 
 						try {
 
 							var posting = $.post("/BOL/ProjectBO/RetrieveProject", 
 								{
-									projectId: iProjectId
+									projectId: iProjectId,
+									mode: strMode
 									// userId: g_profile["userId"] not needed; sent in JWT
 								},
 								'json');
@@ -588,7 +610,7 @@ define(["Core/errorHelper",
 									self.project = data.project;
 
 									// This might be a temporary work-around.
-									if (iProjectId < 6) {
+									if (iProjectId <= 6) {
 
 										callback();
 
@@ -614,13 +636,14 @@ define(["Core/errorHelper",
 					// This one is used in BuyDialog after a purchase is completed.
 					// It is also used when client is created to load latest project.
 					// callback is always present to complete the process.
-					self.openProjectFromDBNoLoadIntoManager = function (iProjectId, callback) {
+					self.openProjectFromDBNoLoadIntoManager = function (iProjectId, strMode, callback) {
 
 						try {
 
 							var posting = $.post("/BOL/ProjectBO/RetrieveProject", 
 								{
-									projectId: iProjectId
+									projectId: iProjectId,
+									mode: strMode
 									// userId: g_profile["userId"] not needed; sent in JWT
 								},
 								'json');
@@ -702,7 +725,7 @@ define(["Core/errorHelper",
 										var exceptionRet;
 										if (bFromCloseProjectMenuItem || false) {
 
-											exceptionRet = manager.loadNoProject();
+											exceptionRet = manager.loadProject(null);	// Used to be manager.loadNoProject(), but that's gone now.
 
 										} else {
 
