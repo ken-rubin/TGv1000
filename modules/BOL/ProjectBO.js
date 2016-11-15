@@ -490,7 +490,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                 altImagePath: rowIth.altImagePath
             };
 
-            libraryIth = Object.assign(libraryIth, JSON.parse(rowIth.libraryJSON).library);
+            libraryIth = Object.assign(libraryIth, JSON.parse(rowIth.libraryJSON));
 
             libraryIth.id = m_functionGetIdForLibrary(project, libraryIth, rowIth);
             if (libraryIth.id === -1) {
@@ -760,11 +760,13 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                 }
                             ],
                             // final callback for (2)
-                            function(err) { return cb(err); }
+                            function(err) { 
+                                return cb(err); 
+                            }
                         );
                     }
                 ],
-                // final callback for (1)
+                // final callback for outer async.series.
                 function(err) {
                     return callback(err);
                 }
@@ -1319,6 +1321,8 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                     if (verb === "insert ") {
 
                                                         libraryIth.id = rows[0].insertId;
+
+                                                        // This id will have to be updated into the just-saved library.libraryJSON's id property.
                                                     }
 
                                                     async.parallel(
