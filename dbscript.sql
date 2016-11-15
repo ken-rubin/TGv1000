@@ -222,6 +222,7 @@ begin
 		CREATE TABLE `comics_libraries` (
 		  `comicId` INT UNSIGNED NOT NULL,
 		  `libraryId` INT UNSIGNED NOT NULL,
+		  `ordinal` int(11) NOT NULL,
 		  PRIMARY KEY (`comicId`,`libraryId`),
 		  CONSTRAINT `FK_comics_lib1` FOREIGN KEY (`comicId`) REFERENCES `comics` (`id`) ON DELETE CASCADE,
 		  CONSTRAINT `FK_comics_lib2` FOREIGN KEY (`libraryId`) REFERENCES `libraries` (`id`) ON DELETE CASCADE
@@ -438,7 +439,7 @@ begin
 
 		ALTER TABLE `comics_libraries` DISABLE KEYS;
 		INSERT INTO `comics_libraries`
-			VALUES (1,1),(2,2),(3,3),(4,4),(5,5),(6,13),(1,6),(2,7),(3,8),(4,9),(5,10),(1,11),(2,11),(3,11),(4,11),(5,11),(6,11),(1,12);
+			VALUES (1,1,0),(1,6,1),(1,11,2),(1,12,3),(2,2,0),(2,7,1),(2,11,2),(3,3,0),(3,8,1),(3,11,2),(4,4,0),(4,9,1),(4,11,2),(5,5,0),(5,10,1),(5,11,2),(6,13,0),(6,11,1);
 		ALTER TABLE `comics_libraries` ENABLE KEYS;
 
 		ALTER TABLE `comics_statements` DISABLE KEYS;
