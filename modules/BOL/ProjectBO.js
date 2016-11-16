@@ -1101,6 +1101,17 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             }
                         );
                     },
+                    // Delete from comics_statements so we can write anew.
+                    function(cb) {
+                        try {
+
+                            let strSql = "delete from " + self.dbname + "comics_statements where comicId=" + comicIth.id + ";";
+                            sql.queryWithCxn(connection,
+                                strSql,
+                                function(err, rows) { return cb(err); }
+                            );
+                        } catch (e) { return cb(e); }
+                    },
                     // Save to comics_statements, using items array to look up statementId.
                     function(cb) {
 
@@ -1159,39 +1170,53 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
         try {
 
             m_log("***In m_saveComiccodeInComicIthToDB***");
-            // async.eachSeries iterates over a collection, perform a single async task at a time.
-            // Actually, we could process all types in parallel, but we'd have to pre-assign their ordinals.
-            // Maybe we'll change to that in the future.
 
             var ord = 1;
+            
+            // Before writing out the comic's comiccode, need to delete any possible pre-existing rows.
+            async.series([
 
-            async.eachSeries(comicIth.comiccode, 
-                function(ccIth, cb) {
+                function(cb) {
+                    try {
+                        let strQuery = "delete from " + self.dbname + "comiccode where comicId=" + comicIth.id + ";";
+                        sql.queryWithCxn(
+                            connection,
+                            strQuery,
+                            function(err, rows) { return cb(err); }
+                        );
+                    } catch(e) { return cb(e); }
+                },
+                function(cb) {
+                    async.eachSeries(comicIth.comiccode, 
+                        function(ccIth, cb) {
 
-                    ccIth.comicId = comicIth.id;
-                    ccIth.ordinal = ord++;
-                    var guts = {
-                        comicId: ccIth.comicId,
-                        ordinal: ccIth.ordinal,
-                        description: ccIth.description,
-                        stepsJSON: JSON.stringify(ccIth.stepsJSON)
-                    };
+                            ccIth.comicId = comicIth.id;
+                            ccIth.ordinal = ord++;
+                            var guts = {
+                                comicId: ccIth.comicId,
+                                ordinal: ccIth.ordinal,
+                                description: ccIth.description,
+                                stepsJSON: JSON.stringify(ccIth.stepsJSON)
+                            };
 
-                    var strQuery = "INSERT " + self.dbname + "comiccode SET ?";
-                    sql.queryWithCxnWithPlaceholders(connection,
-                        strQuery,
-                        guts,
-                        function(err, rows) {
+                            var strQuery = "INSERT " + self.dbname + "comiccode SET ?";
+                            sql.queryWithCxnWithPlaceholders(connection,
+                                strQuery,
+                                guts,
+                                function(err, rows) {
 
-                            if (err) {return cb(err); }
-                            if (rows.length === 0) { return cb(new Error("Error adding comiccode to DB")); }
-                            ccIth.id = rows[0].insertId;
-                            return cb(null);
-                        }
+                                    if (err) {return cb(err); }
+                                    if (rows.length === 0) { return cb(new Error("Error adding comiccode to DB")); }
+                                    ccIth.id = rows[0].insertId;
+                                    return cb(null);
+                                }
+                            );
+                        }, 
+                        // final callback
+                        function(err) { return cb(err); }
                     );
-                }, 
-                // final callback
-                function(err) { return callback(err); }
+                }],
+                function(err) { callback(err); }
             );
         } catch(e) { callback(e); }
     }
@@ -1325,8 +1350,18 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                         // This id will have to be updated into the just-saved library.libraryJSON's id property.
                                                     }
 
-                                                    async.parallel(
+                                                    async.series(
                                                         [
+                                                            // (3b-0)
+                                                            function(cb) {
+                                                                if (verb === "insert ") {
+                                                                    let strQuery = "update " + self.dbname + "libraries set libraryJSON=JSON_SET(libraryJSON, '$.id'," + libraryIth.id + ") where id=" + libraryIth.id + ";";
+                                                                    sql.queryWithCxn(connection,
+                                                                        strQuery,
+                                                                        function(err, rows) { return cb(err); }
+                                                                    );
+                                                                }
+                                                            },
                                                             // (3b-1)
                                                             function(cb){
                                                                 let strQuery = "delete from " + self.dbname + "library_editors where libraryId=" + libraryIth.id + ";";
