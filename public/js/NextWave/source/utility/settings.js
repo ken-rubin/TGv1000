@@ -51,6 +51,7 @@ define(["NextWave/source/utility/prototypes"],
                         maximumCharacters: 32,
                         smallFont: "15px Arial",
                         font: "20px Arial",
+                        largeFont: "30px Arial",
                         monoSpaceFont: "30px Courier New"
                     };
                     self.dialog = {
@@ -58,6 +59,12 @@ define(["NextWave/source/utility/prototypes"],
                         firstColumnWidth: 200,
                         lineHeight: 34,
                         font: "24px Arial"
+                    };
+                    self.button = {
+
+                        background: "rgba(200, 200, 140, 0.5)",
+                        backgroundMouseIn: "rgba(200, 200, 140, 0.75)",
+                        backgroundMouseDown: "rgba(200, 200, 140, 1)"
                     };
                     self.area = {
 

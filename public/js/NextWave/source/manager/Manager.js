@@ -604,6 +604,19 @@ define(["NextWave/source/utility/prototypes",
                         }
                     }
 
+                    // Helper method clears out the center panel and sets it up for a Library search.
+                    self.searchForLibrary = function () {
+
+                        try {
+
+                            // Clear data out from previous context.
+                            return self.panelLayer.clearCenter("LibrarySearch");
+                        } catch (e) {
+
+                            return e;
+                        }
+                    }
+
                     // Helper method clears out the center panel and sets it up for a type.
                     self.selectType = function (type) {
 
