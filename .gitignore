@@ -2,7 +2,6 @@
 node_modules
 .DS_Store
 uploads
-.vscode
 
 # Ignore public/resources but not in public/resources/keepme.rtf.
 public/resources

@@ -238,8 +238,11 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                 project.comics.forEach(
                                                     function(comic) {
 
-                                                        // Finally, sort the comic's comiccode.
+                                                        // Sort the comic's comiccode.
                                                         comic.comiccode.sort(function(a,b){return a.ordinal - b.ordinal;});
+
+                                                        // Sort the comic's libraries.
+                                                        comic.libraries.sort(function(a,b){return a.ordinal - b.ordinal;});
                                                     }
                                                 );
 
@@ -397,12 +400,11 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
             m_log('In m_functionRetProjDoComicInternals');
 
-            // Using async.parallel, load comicIth's libraries (user and system), statements and comiccode.
+            // Using async.parallel, load comicIth's libraries, statements and comiccode.
             async.parallel([
                     function(cbp1) {    // libraries
 
-                        // Fetch two sets of libraries at once: user and system libraries.
-                        var sqlQuery = "select * from " + self.dbname + "libraries where id in (select libraryId from comics_libraries where comicId=" + comicIth.originalComicId + ");"; 
+                        var sqlQuery = "select l.*, cl.ordinal from " + self.dbname + "libraries l inner join " + self.dbname + "comics_libraries cl on cl.comicId=" + comicIth.originalComicId + " and cl.libraryId=l.id where l.id in (select libraryId from comics_libraries where comicId=" + comicIth.originalComicId + ");"; 
 
                         var exceptionRet = sql.execute(sqlQuery,
                             function(rows) {
@@ -488,7 +490,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                 altImagePath: rowIth.altImagePath
             };
 
-            libraryIth = Object.assign(libraryIth, JSON.parse(rowIth.libraryJSON).library);
+            libraryIth = Object.assign(libraryIth, JSON.parse(rowIth.libraryJSON));
 
             libraryIth.id = m_functionGetIdForLibrary(project, libraryIth, rowIth);
             if (libraryIth.id === -1) {
@@ -580,18 +582,6 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
             // A privileged user can also edit and save a core project, keeping it a core project with id=1-6. In this case project.isCoreProject and
             // project.specialProjectData.coreProject will both be true. Take your pick.
-
-            // project.specialProjectData.openMode === 'new' for new projects and === 'searched' for projects opened with OpenProjectDialog.
-            // 'new' projects are always INSERTed into the database.
-            // 'searched' projects may be INSERTed or UPDATEd. More on this below in m_functionDetermineTypeOfSave.
-
-            // A purchasable project that has just been bought by a normal user came in as a 'new' with specialProjectData containing
-            // one of the product subproperties so that we could display BuyDialog to the user. We will recognize that this project has to be INSERTed as new because 
-            // its project.specialProjectData.openMode will have been changed to 'bought' by ??? (on the client side).
-
-            // Saving data to table products, classes or onlineclasses if this is a Purchasable Project (as opposed to an edited core project).
-
-            // Updating without changing project id or comic id.
 
             /////////////////////////////////////////////////////////////////////////////////////////////////
             //
@@ -770,11 +760,13 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                 }
                             ],
                             // final callback for (2)
-                            function(err) { return cb(err); }
+                            function(err) { 
+                                return cb(err); 
+                            }
                         );
                     }
                 ],
-                // final callback for (1)
+                // final callback for outer async.series.
                 function(err) {
                     return callback(err);
                 }
@@ -921,121 +913,163 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
     var m_saveComicsToDB = function (connection, req, res, project, callback) {
 
         // Now the project has been inserted or updated in the DB and its id is in project.id.
-        // A row has been added to resource, too. -- I don't think this has been done TODO -- not sure if it's needed.
 
         // This routine will iterate through the project's comics, saving (inserting or updating) each, possibly saving their libraries.
-        // Libraries will be saved if library.id = 0 or (library.id != 0 and req.user.userId is one of the library's editors).
-
-        // This also involves maintaining projects_comics and comics_libraries as described and implemented below.
+        // This also involves maintaining projects_comics as described and implemented below.
         try {
 
             m_log("Just got into m_saveComicsToDB with this many comics to do: " + project.comics.length);
-return callback(null);
 
-            // In series:
-            // (1) We will compare the comics in project with the comics already linked to the project in the database. If this was an existing project,
-            //      
+            // (1) Delete from projects_comics where projectId=project.id.
+            // (2) Delete from comics where it's in the database but no longer in the project.
+            // (3) Using async.eachSeries, process each comic. In the async.series inside each iteration of the eachSeries:
+            //  (3a) Write the comic to the db using insert or update. If insert, set comicIth.id.
+            //      (3a-1) Write the comic's comiccode records.
+            //      (3a-2) Write the comic's comics_statements.
+            //  (3b) Write a record to projects_comics.
+            //  (3c) Call method to handle each comic's libraries.
             async.series(
                 [
+                    // (1)
+                    function(cb) {
 
-                ],
-                function(err) { return callback(err); }
-            );
+                        try {
 
-            // async.eachSeries iterates over a collection, perform a single async task at a time.
-            // Actually, we could process all comics in parallel. Maybe we'll change to that in the future. Or maybe it really makes no diff.
-            async.eachSeries(project.comics, 
-                function(comicIth, cb) {
-
-                    // comic no longer has a projectId. Linking is handled by the projects_comics.
-                    // Remember: comics are NOT shared between projects.
-                    // We have to update existing comics, insert new comics, delete comics no longer in project (along with their guts).
-
-                    // Use async.series with 2 functions: (1) for writting comics to the database; (2) for handling comic internals.
-                    async.series([
-                        // (1)
-                        function(cb) {
-
-                            // comics themselves are saved only for core projects and purchasable projects.
-                            if (project.specialProjectData.userAllowedToCreateEditPurchProjs && (project.specialProjectData.coreProject || project.specialProjectData.productProject || project.specialProjectData.classProject || project.specialProjectData.onlineClassProject)) {
-                                
-                                var guts = {
-                                    ordinal: comicIth.ordinal,
-                                    thumbnail: comicIth.thumbnail,
-                                    name: comicIth.name
-                                };
-                                var strQuery = "insert " + self.dbname + "comics SET ?";
-
-                                m_log("Writing comicIth with " + strQuery + '; fields: ' + JSON.stringify(guts));
-                                // Turn these into a series?
-                                sql.queryWithCxnWithPlaceholders(connection,
-                                    strQuery,
-                                    guts,
-                                    function(err, rows) {
-                                        try {
-                                            if (err) { return cb(err); }
-                                            if (rows.length === 0) { return cb(new Error("Error writing comic to database.")); }
-                                            
-                                            comicIth.id = rows[0].insertId;
-
-                                            // Do content of comic: comiccode, libraries and the junction table for statements in parallel. ;)
-
-                                            async.parallel(
-                                                [
-                                                    function(cb){
-
-                                                        m_log("Going to m_saveComiccodeInComicIthToDB");
-                                                        m_saveComiccodeInComicIthToDB(connection, req, res, project, comicIth, 
-                                                            function(err) {
-                                                                return cb(err); 
-                                                            }
-                                                        );
-                                                    },
-                                                    function(cb){
-
-                                                        m_log("Going to m_saveComics_XInComicIthToDB for statements");
-                                                        m_saveComics_XInComicIthToDB(connection, req, res, project, comicIth,
-                                                            'statements',
-                                                            function(err) {
-                                                                return cb(err); 
-                                                            }
-                                                        );
-                                                    }
-                                                ],
-                                                function(err) {
-                                                    return cb(err);
-                                                }
-                                            );
-                                        } catch (eq) {
-                                            return cb(eq);
-                                        }
-                                    }
-                                );
-                            } else {
-                                return cb(null);
-                            }
-                        },
-                        // (2)
-                        function(cb) {
-
-                            m_log("Going to m_saveLibrariesInComicIthToDB");
-                            m_saveLibrariesInComicIthToDB(connection, req, res, project, comicIth, 
-                                function(err) {
-                                    return cb(err); 
+                            let strQuery = "delete from " + self.dbname + "projects_comics where projectId=" + project.id + ";";
+                            sql.queryWithCxn(connection,
+                                strQuery,
+                                function(err, rows) {
+                                    return cb(err);
                                 }
                             );
-                        }
-                    ],
-                    // final callback for async.series
-                    function(err) {
-                        return cb(err);
-                    });
+                        } catch (e) { return cb(e); }
+                    },
+                    // (2)
+                    function(cb) {
+/* TODO */              return cb(null);
+                    },
+                    // (3)
+                    function(cb) {
 
-                },
-                // final callback for async.seriesEach
-                function(err) {
-                    return callback(err);
-                }
+                        let ord = 0;
+
+                        // async.eachSeries iterates over a collection, perform a single async task at a time.
+                        async.eachSeries(project.comics, 
+                            function(comicIth, cb) {
+
+                                async.series([
+                                    // (3a)
+                                    function(cb) {
+
+                                        var guts = {
+                                            name: comicIth.name,
+                                            description: comicIth.description,
+                                            ordinal: ord++,
+                                            thumbnail: comicIth.thumbnail
+                                        };
+
+                                        let verb = '';
+                                        let where = '';
+
+                                        if (comicIth.id) {
+                                            verb = 'update ';
+                                            where = ' where id=' + comicIth.id;
+                                        } else {
+                                            verb = 'insert ';
+                                        }
+                                        
+                                        var strQuery = verb + self.dbname + "comics SET ?" + where;
+
+                                        m_log('Inserting or updating comic with ' + strQuery + '; fields: ' + JSON.stringify(guts));
+                                        sql.queryWithCxnWithPlaceholders(connection,
+                                            strQuery,
+                                            guts,
+                                            function(err, rows) {
+                                                try {
+                                                    if (err) { return cb(err); }
+                                                    if (rows.length === 0) { return cb(new Error("Error writing comic to database.")); }
+                                                    
+                                                    if (verb === "insert ") {
+
+                                                        comicIth.id = rows[0].insertId;
+                                                    }
+
+                                                    // Do content of comic--comiccode and the junction table for statements--in parallel. ;)
+                                                    async.parallel(
+                                                        [
+                                                            // (3a-1)
+                                                            function(cb){
+
+                                                                m_log("Going to m_saveComiccodeInComicIthToDB");
+                                                                m_saveComiccodeInComicIthToDB(connection, req, res, project, comicIth, 
+                                                                    function(err) {
+                                                                        return cb(err); 
+                                                                    }
+                                                                );
+                                                            },
+                                                            // (3a-2)
+                                                            function(cb){
+
+                                                                m_log("Going to m_saveComics_XInComicIthToDB for statements");
+                                                                m_saveComics_XInComicIthToDB(connection, req, res, project, comicIth,
+                                                                    'statements',
+                                                                    function(err) {
+                                                                        return cb(err); 
+                                                                    }
+                                                                );
+                                                            }
+                                                        ],
+                                                        function(err) {
+                                                            return cb(err);
+                                                        }
+                                                    );
+                                                } catch (eq) {
+                                                    return cb(eq);
+                                                }
+                                            }
+                                        );
+                                    },
+                                    // (3b)
+                                    function(cb) {
+
+                                        let guts = {
+                                            projectId: project.id,
+                                            comicId: comicIth.id
+                                        };
+                                        let strQuery = "insert " + self.dbname + "projects_comics SET ?";
+                                        sql.queryWithCxnWithPlaceholders(connection,
+                                            strQuery,
+                                            guts,
+                                            function(err, rows) {
+                                                return cb(err);
+                                            }
+                                        );
+                                    },
+                                    // (3c)
+                                    function(cb) {
+
+                                        m_log("Going to m_saveLibrariesInComicIthToDB");
+                                        m_saveLibrariesInComicIthToDB(connection, req, res, comicIth, 
+                                            function(err) {
+                                                return cb(err); 
+                                            }
+                                        );
+                                    }
+                                ],
+                                // final callback for async.series
+                                function(err) {
+                                    return cb(err);
+                                });
+
+                            },
+                            // final callback for async.seriesEach
+                            function(err) {
+                                return callback(err);
+                            }
+                        );
+                    }
+                ],
+                function(err) { return callback(err); }
             );
         } catch (e) { callback(e); }
     }
@@ -1162,130 +1196,212 @@ return callback(null);
         } catch(e) { callback(e); }
     }
 
-    var m_saveLibrariesInComicIthToDB = function (connection, req, res, project, comicIth, callback) {
+    var m_saveLibrariesInComicIthToDB = function (connection, req, res, comicIth, callback) {
 
+        // Now the comicIth has been inserted or updated in the DB and its id is in comicIth.id.
+
+        // This routine will iterate through the comic's libraries, saving (inserting or updating) each.
+        // Libraries will be saved if library.id = 0 or (library.id != 0 and req.user.userId--or the userName we get from it--is one of the library's editors).
+        // Even if the library isn't being updated in the database, it still has to be linked to the comic in comics_libraries.
+        // Finally, library_editors has to match what's in the editors property of libraryJSON. 
         try {
 
-            m_log("***In m_saveLibrariesInComicIthToDB***");
+            m_log("Just got into m_saveLibrariesInComicIthToDB with this many libraries to do: " + comicIth.libraries.length);
 
-            async.eachSeries(
-                comicIth.libraries,
-                function(libraryIth, cb) {
+            // (1) Delete from comics_libraries where comicId=comicIth.id.
+            // (2) Delete from libraries where it's in the database but no longer in the comic--if no other comics_libraries points to it. -- I THINK WE WILL NOT DO THIS. Old libraries may prove useful.
+            // (3) Using async.eachSeries over comicIth.libraries, process each library. In the async.series inside each iteration of the eachSeries:
+            //  (3a) Convert libraryJSON.library.editors into an array of userIds.
+            //  (3b) If req.user.userId is in the concatenated string of userIds corresponding to libraryJSON.library.editors, write the library to the db using insert or update. If insert, set libraryIth.id. In the sql callback, in parallel:
+            //      (3b-1) Delete from library_editors where libraryId=libraryIth.id.
+            //      (3b-2) For all editors in libraryIth.libraryJSON, insert a row to library_editors.
+            //  (3c) Write a record to comics_libraries, incrementing ordinal.
+            async.series(
+                [
+                    // (1)
+                    function(cb) {
 
-                    // The are lots of options for the set of libraries in a comic:
-                    // (1) A library can be a system or a base type library and the saving user may be a normal user. 
-                    //     These libraries are not written (since they couldn't have been modified and cannot be new), but they do have to be
-                    //     joined to the project and comic in projects_comics_libraries.
-                    // (2) A library can be an app type library. This is inserted in full into the database and an entry is made in projects_comics_libraries.
-                    // (3) A library can be a "normal" (i.e., not system, not base and not app--but very similar to app) library. This is handled just like in case (2).
-                    // (4) For a user with permission 'can_edit_base_and_system_libraries_and_types_therein' saving a not-normal project (i.e., a core project or a product),
-                    //     we will update pre-existing libraries and insert new ones.
+                        try {
 
-                    // Still, the decision of whether to insert or update is not at all straightforward.
-                    // (1) If libraryIth.id === 0, then, of course, we insert.
-                    // (2) However, existing libraries (id > 0) may be
-                    //      (a) skipped over: normal user and base library or system library;
-                    //      (b) updated: libraryIth.id > 0;
-                    // 
-                    var whatToDo = '';
-
-                    if (!project.specialProjectData.userCanWorkWithSystemLibsAndTypes && (libraryIth.isBaseLibrary || libraryIth.isSystemLibrary)) {
-
-                        whatToDo = "skipLibButDoJuncTbl";
-
-                    } else if (libraryIth.id) {
-
-                        whatToDo = "updateLibAndDoJuncTbl";
-
-                    } else if (!libraryIth.id) {
-
-                        whatToDo = "insertLibAndDoJuncTbl";
-                    }
-
-                    var guts = {
-                        name: libraryIth.name,
-                        createdByUserId: req.user.userId,
-                        isSystemLibrary: (libraryIth.isSystemLibrary ? 1 : 0),
-                        isBaseLibrary: (libraryIth.isBaseLibrary ? 1 : 0),
-                        isAppLibrary: (libraryIth.isAppLibrary ? 1 : 0),
-                        imageId: 0,
-                        altImagePath: '',
-                        description: ''
-                    };
-
-                    var exceptionRet = m_checkGutsForUndefined('Library', guts);
-                    if (exceptionRet) { return cb(exceptionRet); }
-
-                    var strQuery;
-                    var weInserted;
-                    if (libraryIth.id) {
-
-                        // Assuming for now that library wasn't deleted by cascading delete of the project.
-                        strQuery = "update " + self.dbname + "libraries SET ? where id=" + libraryIth.id + ";";
-                        strQuery += "delete from " + self.dbname + "library_tags where libraryId=" + libraryIth.id + ";";
-                        strQuery += "delete from " + self.dbname + "types where libraryId=" + libraryIth.id + ";";  // This should delete from type_tags, methods, method_tags, propertys, events, too.
-
-                        weInserted = false;
-
-                    } else {
-
-                        strQuery = "insert " + self.dbname + "libraries SET ?";
-                        weInserted = true;
-                    }
-
-                    sql.queryWithCxnWithPlaceholders(connection, strQuery, guts,
-                        function(err, rows) {
-
-                            if (err) { return cb(err); }
-                            if (rows.length === 0) { return cb(new Error("Error writing library to the database.")); }
-
-                            if (weInserted) {
-
-                                libraryIth.id = rows[0].insertId;
-                            }
-
-                            // // Now do library_tags and the types within the library. Finally, return cb(null);
-                            // async.parallel(
-                            //     [
-                            //         function(cb) {
-                            //             m_log("Going to write library tags");
-                            //             m_setUpAndWriteTags(connection, res, libraryIth.id, 'library', req.user.userName, libraryIth.tags, libraryIth.name, 
-                            //                 function(err) {
-                            //                     return cb(err);
-                            //                 }
-                            //             );
-                            //         },
-                            //         function(cb) {
-                            //             m_log("Going to m_saveTypesInLibraryIthToDB");
-                            //             m_saveTypesInLibraryIthToDB(connection, req, res, project, comicIth, libraryIth,
-                            //                 function(err) {
-                            //                     return cb(err);
-                            //                 }
-                            //             );
-                            //         },
-                            //         function(cb) {
-                            // Write record to projects_comics_libraries.
-                            var juncguts = {
-                                projectId: project.id,
-                                comicId: comicIth.id,
-                                libraryId: libraryIth.id
-                            };
-                            var juncquery = "insert " + self.dbname + "projects_comics_libraries SET ?";
-                            sql.queryWithCxnWithPlaceholders(connection, juncquery, juncguts,
+                            let strQuery = "delete from " + self.dbname + "comics_libraries where comicId=" + comicIth.id + ";";
+                            sql.queryWithCxn(connection,
+                                strQuery,
                                 function(err, rows) {
                                     return cb(err);
                                 }
                             );
-                            //         }
-                            //     ],
-                            //     function(err) { return cb(err); }
-                            // );
-                        }
-                    );
-                },
+                        } catch (e) { return cb(e); }
+                    },
+                    // (2)
+                    function(cb) {
+/* See note above */   return cb(null);
+                    },
+                    // (3)
+                    function(cb) {
+
+                        let ord = 0;
+                        let idstring = '';
+                        let ids = [];
+
+                        async.eachSeries(comicIth.libraries, 
+                            function(libraryIth, cb) {
+
+                                async.series([
+                                    // (3a)
+                                    function(cb) {
+                                        try{
+
+                                            let arrEditors = libraryIth.editors.split('\n');
+                                            if (arrEditors.length === 0) {
+                                                // Shouldn't happened
+                                                return cb(null);
+                                            }
+                                            for (let i = 0; i < arrEditors.length; i++) {
+                                                arrEditors[i] = "'" + arrEditors[i] + "'";
+                                            }
+                                            let strEditors = arrEditors.join();
+                                            // This query will give us a string of userIds separated by commas, corresponding to libraryJSON.library.editors.
+                                            let strQuery = "select group_concat(id separator ',') as idstring from " + self.dbname + "user where userName in (" + strEditors + ");";
+                                            sql.queryWithCxn(connection,
+                                                strQuery,
+                                                function(err, rows) {
+                                                    if (err) { return cb(err); }
+                                                    if (rows.length !== 1) { return cb(new Error('Error received processing editors.'))}
+                                                    idstring = rows[0].idstring; 
+                                                    ids = idstring.split(',');
+                                                    return cb(null);
+                                                }
+                                            );
+                                        } catch(e) { return cb(e); }
+                                    },
+                                    // (3b)
+                                    function(cb) {
+
+                                        if (idstring.indexOf(req.user.userId.toString()) === -1) {
+                                            // Running user is not amongst editors.
+                                            if (libraryIth.id) {
+                                                // Library has an id. So we skip writing it out. Current user was not permitted to edit it.
+                                                return cb(null);
+                                            }
+
+                                            libraryIth.editors += '\n' + req.user.userName;
+                                            ids.push(req.user.userId.toString());
+                                        }
+
+                                        var guts = {
+                                            name: libraryIth.name,
+                                            description: libraryIth.description,
+                                            createdByUserId: (libraryIth.id !== 0 && libraryIth.createdByUserId !== 0) ? libraryIth.createdByUserId : req.user.userId,
+                                            imageId: libraryIth.imageId,
+                                            altImagePath: libraryIth.altImagePath,
+                                            libraryJSON: JSON.stringify(libraryIth)
+                                        };
+
+                                        let verb = '';
+                                        let where = '';
+
+                                        if (libraryIth.id) {
+                                            verb = 'update ';
+                                            where = ' where id=' + libraryIth.id;
+                                        } else {
+                                            verb = 'insert ';
+                                        }
+                                        
+                                        var strQuery = verb + self.dbname + "libraries SET ?" + where;
+
+                                        m_log('Inserting or updating library with ' + strQuery + '; fields: ' + JSON.stringify(guts));
+                                        sql.queryWithCxnWithPlaceholders(connection,
+                                            strQuery,
+                                            guts,
+                                            function(err, rows) {
+                                                try {
+                                                    if (err) { return cb(err); }
+                                                    if (rows.length === 0) { return cb(new Error("Error writing library to database.")); }
+                                                    
+                                                    if (verb === "insert ") {
+
+                                                        libraryIth.id = rows[0].insertId;
+
+                                                        // This id will have to be updated into the just-saved library.libraryJSON's id property.
+                                                    }
+
+                                                    async.parallel(
+                                                        [
+                                                            // (3b-1)
+                                                            function(cb){
+                                                                let strQuery = "delete from " + self.dbname + "library_editors where libraryId=" + libraryIth.id + ";";
+                                                                sql.queryWithCxn(connection,
+                                                                    strQuery,
+                                                                    function(err, rows) {
+                                                                        return cb(err);
+                                                                    }
+                                                                );
+                                                            },
+                                                            // (3b-2)
+                                                            function(cb){
+                                                                async.eachSeries(ids,
+                                                                    function(id, cb) {
+                                                                        let guts = {
+                                                                            libraryId: libraryIth.id,
+                                                                            userId: id
+                                                                        };
+                                                                        let strQuery = "insert " + self.dbname + "library_editors SET ?";
+                                                                        sql.queryWithCxnWithPlaceholders(connection,
+                                                                            strQuery,
+                                                                            guts,
+                                                                            function(err, rows) {
+                                                                                return cb(err);
+                                                                            }
+                                                                        );
+                                                                    },
+                                                                    function(err) { return cb(err); }
+                                                                );
+                                                            }
+                                                        ],
+                                                        function(err) {
+                                                            return cb(err);
+                                                        }
+                                                    );
+                                                } catch (eq) {
+                                                    return cb(eq);
+                                                }
+                                            }
+                                        );
+                                    },
+                                    // (3c)
+                                    function(cb) {
+
+                                        let guts = {
+                                            comicId: comicIth.id,
+                                            libraryId: libraryIth.id,
+                                            ordinal: ord++
+                                        };
+                                        let strQuery = "insert " + self.dbname + "comics_libraries SET ?";
+                                        sql.queryWithCxnWithPlaceholders(connection,
+                                            strQuery,
+                                            guts,
+                                            function(err, rows) {
+                                                return cb(err);
+                                            }
+                                        );
+                                    }
+                                ],
+                                // final callback for async.series
+                                function(err) {
+                                    return cb(err);
+                                });
+
+                            },
+                            // final callback for async.seriesEach
+                            function(err) {
+                                return callback(err);
+                            }
+                        );
+                    }
+                ],
                 function(err) { return callback(err); }
             );
-        } catch(e) { callback(e); }
+        } catch (e) { callback(e); }
     }
 
     var m_checkGutsForUndefined = function(ident, guts) {
