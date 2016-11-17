@@ -953,6 +953,17 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
 
             sql.execute(strQuery,
                 function (arrayRows) {
+                    if (arrayRows[2].length) {
+                        arrayRows[2].sort(
+                            function(a,b) {
+                                if (a.sindex > b.sindex)
+                                    return -1;
+                                if (a.sindex < b.sindex)
+                                    return 1;
+                                return 0;
+                            }
+                        )
+                    }
                     return res.json({
                         success: true,
                         libraries: arrayRows[2]
