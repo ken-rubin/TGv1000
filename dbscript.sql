@@ -530,9 +530,10 @@ begin
 
     end if;
 
-    if @dbstate = 222 THEN
+    if @dbstate = 2 THEN
 
-
+		INSERT INTO `routes` (`path`,`moduleName`,`route`,`verb`,`method`,`requiresJWT`,`JWTerrorMsg`)
+			VALUES ('./modules/BOL/','UtilityBO','/BOL/UtilityBO/SearchLibraries','post','routeSearchLibraries',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.');
 
 		set @dbstate := @dbstate + 1;	-- @dbstate = 3
 		UPDATE control set dbstate=@dbstate where id=1;

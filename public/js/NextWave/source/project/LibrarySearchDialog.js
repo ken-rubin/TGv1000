@@ -103,7 +103,17 @@ define(["NextWave/source/utility/prototypes",
                                     height: settings.dialog.lineHeight * 3,
                                     click: function () {
                                     
-                                        // Go off to the server, select data, display result in dialog.    
+                                        // Go off to the server, select data, display result in dialog.
+                                        client.searchLibraries(
+                                            m_searchPhrase,
+                                            function(err, libraries) {
+                                                if (err) {
+                                                    alert(err.message);
+                                                } else {
+                                                    alert(JSON.stringify(libraries));
+                                                }
+                                            }
+                                        );   
                                     }
                                 },
                                 criteriaLabel: {
@@ -131,8 +141,8 @@ define(["NextWave/source/utility/prototypes",
                                     exitFocus: function (localSelf) {
 
                                         try {
-
                                             // Save off criteria.
+                                            m_searchPhrase = localSelf.text;
                                         } catch (e) {
 
                                             alert(e.message);
@@ -177,6 +187,7 @@ define(["NextWave/source/utility/prototypes",
 
                     // Indicates this instance is already created.
                     var m_bCreated = false;
+                    var m_searchPhrase = "";
                 } catch (e) {
 
                     alert(e.message);

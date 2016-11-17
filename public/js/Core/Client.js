@@ -592,6 +592,29 @@ define(["Core/errorHelper",
 						} catch (e) { callback(e); }
 					}
 
+					self.searchLibraries = function (searchPhrase, callback) {
+
+						try {
+
+							var posting = $.post("/BOL/UtilityBO/SearchLibraries", 
+								{
+									searchPhrase: searchPhrase
+								},
+								'json');
+							posting.done(function(data){
+
+								if (data.success) {
+
+									return callback(null, data.libraries);
+								} else {
+
+									// !data.success
+									return callback(new Error(data.message), null);
+								}
+							});
+						} catch (e) { return callback(e, null); }
+					}
+
 					self.openProjectFromDB = function (iProjectId, strMode, callback) {
 
 						try {
