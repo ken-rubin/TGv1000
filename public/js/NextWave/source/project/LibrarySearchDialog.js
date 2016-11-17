@@ -116,7 +116,7 @@ define(["NextWave/source/utility/prototypes",
                                     width: settings.dialog.firstColumnWidth,
                                     height: settings.dialog.lineHeight
                                 },
-                                criteriEdit: {
+                                criteriaEdit: {
 
                                     type: "Edit",
                                     x: 2 * settings.general.margin + 
