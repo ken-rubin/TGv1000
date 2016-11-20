@@ -15,8 +15,11 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/Point",
     "NextWave/source/utility/Size",
     "NextWave/source/utility/Area",
-    "NextWave/source/utility/DialogHost"],
-    function (prototypes, settings, Point, Size, Area, DialogHost) {
+    "NextWave/source/utility/DialogHost",
+    "NextWave/source/utility/List",
+    "NextWave/source/utility/ListItem"
+    ],
+    function (prototypes, settings, Point, Size, Area, DialogHost, List, ListItem) {
 
         try {
 
@@ -109,9 +112,27 @@ define(["NextWave/source/utility/prototypes",
                                             function(err, libraries) {
                                                 if (err) {
                                                     alert(err.message);
-                                                } else {
-                                                    alert(JSON.stringify(libraries));
+                                                    return;
                                                 }
+
+                                                let lhLibraryResult = self.dialog.controlObject["libraryResult"];
+                                                let listLibraryResult = lhLibraryResult.list;
+                                                
+                                                // Don't check result because if destroy fails, that's because it hadn't been created, so it's ok.
+                                                listLibraryResult.destroy();
+                                                let arrayOutput = libraries.map((library) => {
+
+                                                    let liNew = new ListItem(library.name);
+                                                    liNew.data = library;
+                                                    liNew.clickHandler = () => {
+
+                                                        alert("From liNew: " + liNew.name);
+                                                    };
+                                                    return liNew;
+                                                })
+
+                                                listLibraryResult.create(arrayOutput);
+
                                             }
                                         );   
                                     }
@@ -147,6 +168,21 @@ define(["NextWave/source/utility/prototypes",
 
                                             alert(e.message);
                                         }
+                                    }
+                                },
+                                libraryResult: {
+
+                                    type: "ListHost",
+                                    constructorParameterString: "true",
+                                    x: settings.general.margin,
+                                    y: settings.general.margin * 4 + 
+                                        settings.dialog.lineHeight * 11,
+                                    widthType: "reserve",
+                                    width: 3 * settings.general.margin +
+                                        settings.dialog.firstColumnWidth,
+                                    heightType: "callback",
+                                    height: function(area) {
+                                        return area.extent.height - (settings.general.margin * 5 + settings.dialog.lineHeight * 11);
                                     }
                                 }
                             });
