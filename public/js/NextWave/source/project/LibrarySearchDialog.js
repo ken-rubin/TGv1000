@@ -51,6 +51,7 @@ define(["NextWave/source/utility/prototypes",
                             let elementInput = document.createElement("input");
                             elementInput.id = "ProjectDialogInput";
                             elementInput.type = "file";
+                            elementInput.accept = ".json";
                             elementInput.style = "display:none;";
                             elementInput.addEventListener("change", 
                                 function (event) {
@@ -126,7 +127,9 @@ define(["NextWave/source/utility/prototypes",
                                                     liNew.data = library;
                                                     liNew.clickHandler = () => {
 
-                                                        alert("From liNew: " + liNew.name);
+                                                        // alert("From liNew: " + liNew.name);
+                                                        let objectLibrary = JSON.parse(library.libraryJSON);
+                                                        window.projectDialog.mergeLibrary(objectLibrary);                                                    
                                                     };
                                                     return liNew;
                                                 })
