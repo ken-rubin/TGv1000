@@ -617,6 +617,45 @@ define(["NextWave/source/utility/prototypes",
                         }
                     }
 
+                    // Helper method clears out the center panel and sets it up for New Project.
+                    self.createNewProject = function () {
+
+                        try {
+
+                            // Clear data out from previous context.
+                            return self.panelLayer.clearCenter("NewProject");
+                        } catch (e) {
+
+                            return e;
+                        }
+                    }
+
+                    // Helper method clears out the center panel and sets it up for Save Project.
+                    self.saveProject = function () {
+
+                        try {
+
+                            // Clear data out from previous context.
+                            return self.panelLayer.clearCenter("SaveProject");
+                        } catch (e) {
+
+                            return e;
+                        }
+                    }
+
+                    // Helper method clears out the center panel and sets it up for Open Project.
+                    self.openProject = function () {
+
+                        try {
+
+                            // Clear data out from previous context.
+                            return self.panelLayer.clearCenter("OpenProject");
+                        } catch (e) {
+
+                            return e;
+                        }
+                    }
+
                     // Helper method clears out the center panel and sets it up for a type.
                     self.selectType = function (type) {
 

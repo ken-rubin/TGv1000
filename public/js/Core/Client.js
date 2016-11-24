@@ -196,6 +196,10 @@ define(["Core/errorHelper",
 							var exceptionRet = m_openDialog.create(arrayAvailProjTypes);
 							if (exceptionRet) { throw exceptionRet; }
 
+							// Also switch center panel to what will replace NewProjectDialog.
+							exceptionRet = manager.createNewProject();
+							if (exceptionRet) { throw exceptionRet; }
+
 							return null;
 
 						} catch (e) { return e; }
@@ -224,7 +228,11 @@ define(["Core/errorHelper",
 
 							m_openDialog = new OpenProjectDialog();
 							var exceptionRet = m_openDialog.create(functionOK);
-							return exceptionRet;
+							if (exceptionRet) { throw exceptionRet; }
+
+							// Also show OpenProject in center panel. It will replace OpenProjectDialog.
+							exceptionRet = manager.openProject();
+							if (exceptionRet) { throw exceptionRet; }
 
 						} catch (e) { return e; }
 					}
@@ -273,6 +281,10 @@ define(["Core/errorHelper",
 
 							m_openDialog = new SaveProjectAsDialog();
 							var exceptionRet = m_openDialog.create();
+							if (exceptionRet) { throw exceptionRet; }
+
+							// Also show new SaveProject in center panel until it replaces SaveProjectAsDialog.
+							exceptionRet = manager.saveProject();
 							if (exceptionRet) { throw exceptionRet; }
 
 							return null;
