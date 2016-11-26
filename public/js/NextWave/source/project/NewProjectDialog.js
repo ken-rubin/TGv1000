@@ -50,6 +50,15 @@ define(["NextWave/source/utility/prototypes",
                             // Create the dialog.
                             var exceptionRet = self.dialog.create({
 
+                                projectTypes: {
+
+                                    type: "ListHost",
+                                    constructorParameterString: "false",
+                                    x: 100,
+                                    y: 100,
+                                    width: 300,
+                                    height: 60
+                                }
                             });
 
                             // Because it is!
