@@ -48,18 +48,79 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Create the dialog.
-                            var exceptionRet = self.dialog.create({
+                            if (!manager.userAllowedToCreateEditPurchProjs) {
 
-                                projectTypes: {
+                                let exceptionRet = self.dialog.create({
 
-                                    type: "ListHost",
-                                    constructorParameterString: "false",
-                                    x: 100,
-                                    y: 100,
-                                    width: 300,
-                                    height: 60
-                                }
-                            });
+                                    instructions: {
+
+                                        type: "Label",
+                                        text: "Click on a project type image to begin building your own project of that type.",
+                                        x: settings.general.margin + 8,
+                                        y: 70,
+                                        widthType: "reserve",
+                                        width: 2 * settings.general.margin,
+                                        height: settings.dialog.lineHeight                                  
+                                    },
+                                    projectTypes: {
+
+                                        type: "ListHost",
+                                        constructorParameterString: "false",
+                                        x: settings.general.margin,
+                                        y: 100,
+                                        widthType: "reserve",
+                                        width: 2 * settings.general.margin,
+                                        height: 100,
+                                        clickBehavior: "fetchNewProject"
+                                    }
+                                });
+                            } else {
+
+                                let exceptionRet = self.dialog.create({
+
+                                    instructions: {
+
+                                        type: "Label",
+                                        text: "Click on a project type image to begin building your own project of that type. Then click a button to continue.",
+                                        x: settings.general.margin + 8,
+                                        y: 70,
+                                        widthType: "reserve",
+                                        width: 2 * settings.general.margin,
+                                        height: settings.dialog.lineHeight                                    
+                                    },
+                                    projectTypes: {
+
+                                        type: "ListHost",
+                                        constructorParameterString: "false",
+                                        x: settings.general.margin,
+                                        y: 100,
+                                        widthType: "reserve",
+                                        width: 2 * settings.general.margin,
+                                        height: 100,
+                                        clickBehavior: "outlineAndWaitForButtonClick"
+                                    },
+                                    normal: {
+
+                                        type: "Button",
+                                        text: "Normal"
+                                    },
+                                    class: {
+
+                                        type: "Button",
+                                        text: "Class"
+                                    },
+                                    onlineClass: {
+
+                                        type: "Button",
+                                        text: "Online Class"
+                                    },
+                                    product: {
+
+                                        type: "Button",
+                                        text: "Product"
+                                    },
+                                });
+                            }
 
                             // Because it is!
                             m_bCreated = true;
