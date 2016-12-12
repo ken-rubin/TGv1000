@@ -48,6 +48,28 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Create the dialog.
+                            // Creation modes:
+                            //      1   For non-privileged user only. Sees horizontal scroll bar of images of available project types.
+                            //          Moving mouse over the images displays a project type description tooltip.
+                            //          Clicking on an image switches to mode 2 with that project type having been selected.
+                            //      2   Either a normal user or a privileged user who elected to create a normal project
+                            //          sees this mode after selecting a project type in mode 1 or mode 3.
+                            //          User sees name and description edits (the description is used for project searching)
+                            //          and sees the project image (defaults to same as the project type if not yet chosen) and
+                            //          three buttons to select or change the project image: (1) Search for an image using a description match;
+                            //          (2) Load an image from a URL; (3) Load an image accessible to this computer (local or network drive).
+                            //          Image loading is done in a separate pop-over dialog. Has buttons to Create Project or Cancel.
+                            //      3   For privileged users only. Like mode 1 with the horizontal scroll bar of project type images, but with
+                            //          four (initially disabled) buttons beneath: (1) Create normal project; (2) Create a class; (3) Create an online class; (4) Create a product.
+                            //          In mode 3 the scroll bar of images doesn't switch modes like in mode 1. It highlights (outlines the image) and
+                            //          enables the four buttons.
+                            //      4   For privileged users only. Like mode 2, but with fields for a class added. Has Create Project and Cancel buttons.  
+                            //      5   For privileged users only. Like mode 2, but with fields for an online class added. Has Create Project and Cancel buttons.  
+                            //      6   For privileged users only. Like mode 2, but with fields for a product added. Has Create Project and Cancel buttons.
+                            // Summary:
+                            //      A normal user starts in mode 1 and goes to mode 2 on image click.
+                            //      A privileged user starts in mode 3 and goes to mode 2, 4, 5 or 6, depending on the button clicked.
+                              
                             if (!manager.userAllowedToCreateEditPurchProjs) {
 
                                 let exceptionRet = self.dialog.create({
@@ -74,6 +96,9 @@ define(["NextWave/source/utility/prototypes",
                                         clickBehavior: "fetchNewProject"
                                     }
                                 });
+
+                                if (exceptionRet) { throw exceptionRet; }
+                                
                             } else {
 
                                 let exceptionRet = self.dialog.create({
@@ -120,6 +145,8 @@ define(["NextWave/source/utility/prototypes",
                                         text: "Product"
                                     },
                                 });
+
+                                if (exceptionRet) { throw exceptionRet; }
                             }
 
                             // Because it is!
