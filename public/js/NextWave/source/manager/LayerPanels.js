@@ -235,7 +235,8 @@ define(["NextWave/source/utility/prototypes",
                     }
 
                     // Clear the center panel.
-                    self.clearCenter = function(strActiveCenterPanel) {
+                    // extraCenterPanelData is currently used only for NewProjectDialog. If that's the one, pass it along.'
+                    self.clearCenter = function(strActiveCenterPanel, extraCenterPanelData) {
 
                         try {
 
@@ -303,7 +304,7 @@ define(["NextWave/source/utility/prototypes",
 
                                 return exceptionRet;
                             }
-                            exceptionRet = m_functionAllocateNewProject();
+                            exceptionRet = m_functionAllocateNewProject(extraCenterPanelData);
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -876,7 +877,7 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Allocate new project instance.
-                    var m_functionAllocateNewProject = function() {
+                    var m_functionAllocateNewProject = function(extraCenterPanelData) {
 
                         try {
 
@@ -888,7 +889,7 @@ define(["NextWave/source/utility/prototypes",
 
                             // Allocate and create the New Project Dialog.
                             window.newProjectDialog = new NewProjectDialog();
-                            var exceptionRet = window.newProjectDialog.create();
+                            var exceptionRet = window.newProjectDialog.create(arrayAvailProjTypes);
                             if (exceptionRet) {
 
                                 throw exceptionRet;

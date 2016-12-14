@@ -618,12 +618,12 @@ define(["NextWave/source/utility/prototypes",
                     }
 
                     // Helper method clears out the center panel and sets it up for New Project.
-                    self.createNewProject = function () {
+                    self.createNewProject = function (arrayAvailProjTypes) {
 
                         try {
 
                             // Clear data out from previous context.
-                            return self.panelLayer.clearCenter("NewProject");
+                            return self.panelLayer.clearCenter("NewProject", arrayAvailProjTypes);
                         } catch (e) {
 
                             return e;

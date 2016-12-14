@@ -197,7 +197,7 @@ define(["Core/errorHelper",
 							if (exceptionRet) { throw exceptionRet; }
 
 							// Also switch center panel to what will replace NewProjectDialog.
-							exceptionRet = manager.createNewProject();
+							exceptionRet = manager.createNewProject(arrayAvailProjTypes);
 							if (exceptionRet) { throw exceptionRet; }
 
 							return null;

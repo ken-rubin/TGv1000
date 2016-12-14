@@ -37,7 +37,15 @@ define(["NextWave/source/utility/prototypes",
                     // Public methods.
 
                     // Attach instance to DOM and initialize state.
-                    self.create = function () {
+                    // arrayAvailProjTypes is used to get the images from which the user chooses the project type to create.
+                    // It is an int array containing one or more of 1-6, corresponding to 
+                    // 1 game project
+                    // 2 console project
+                    // 3 website project
+                    // 4 hololens project
+                    // 5 mapping project
+                    // 6 empty project
+                    self.create = function (arrayAvailProjTypes) {
 
                         try {
 
@@ -48,6 +56,7 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Create the dialog.
+
                             // Creation modes:
                             //      1   For non-privileged user only. Sees horizontal scroll bar of images of available project types.
                             //          Moving mouse over the images displays a project type description tooltip.
@@ -72,30 +81,33 @@ define(["NextWave/source/utility/prototypes",
                               
                             if (!manager.userAllowedToCreateEditPurchProjs) {
 
-                                let exceptionRet = self.dialog.create({
+                                let exceptionRet = self.dialog.create(
+                                    {
 
-                                    instructions: {
+                                        instructions: {
 
-                                        type: "Label",
-                                        text: "Click on a project type image to begin building your own project of that type.",
-                                        x: settings.general.margin + 8,
-                                        y: 70,
-                                        widthType: "reserve",
-                                        width: 2 * settings.general.margin,
-                                        height: settings.dialog.lineHeight                                  
+                                            type: "Label",
+                                            text: "Click on a project type image to begin building your own project of that type.",
+                                            x: settings.general.margin + 8,
+                                            y: 70,
+                                            widthType: "reserve",
+                                            width: 2 * settings.general.margin,
+                                            height: settings.dialog.lineHeight                                  
+                                        },
+                                        projectTypes: {
+
+                                            type: "ListHost",
+                                            constructorParameterString: "false",
+                                            x: settings.general.margin,
+                                            y: 100,
+                                            widthType: "reserve",
+                                            width: 2 * settings.general.margin,
+                                            height: 100,
+                                            clickBehavior: "fetchNewProject"
+                                        }
                                     },
-                                    projectTypes: {
-
-                                        type: "ListHost",
-                                        constructorParameterString: "false",
-                                        x: settings.general.margin,
-                                        y: 100,
-                                        widthType: "reserve",
-                                        width: 2 * settings.general.margin,
-                                        height: 100,
-                                        clickBehavior: "fetchNewProject"
-                                    }
-                                });
+                                    !manager.userAllowedToCreateEditPurchProjs ? 1 : 3
+                                );
 
                                 if (exceptionRet) { throw exceptionRet; }
                                 
