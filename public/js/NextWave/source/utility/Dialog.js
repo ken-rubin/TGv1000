@@ -410,11 +410,14 @@ define(["NextWave/source/utility/prototypes",
                                 // Get the ith control.
                                 var controlIth = self.controls[i];
 
-                                // Set the layout for the controls.
-                                var exceptionRet = controlIth.render(contextRender);
-                                if (exceptionRet) {
+                                if (!m_mode || (m_mode && controlIth.hasOwnProperty("modes") && controlIth.modes.includes(m_mode))) {
 
-                                    return exceptionRet;
+                                    // Set the layout for the controls.
+                                    var exceptionRet = controlIth.render(contextRender);
+                                    if (exceptionRet) {
+
+                                        return exceptionRet;
+                                    }
                                 }
                             }
                             return null;
@@ -430,7 +433,7 @@ define(["NextWave/source/utility/prototypes",
                         m_mode = mode;
 
                         // With m_mode changed, we want to reset and re-render all objects.
-                        
+                        // That may happen automatically in the render loop.
                     }
 
                     //////////////////////

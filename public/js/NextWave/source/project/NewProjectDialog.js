@@ -90,8 +90,59 @@ define(["NextWave/source/utility/prototypes",
                             // Summary:
                             //      A normal user starts in mode 1 and goes to mode 2 on image click.
                             //      A privileged user starts in mode 3 and goes to mode 2, 4, 5 or 6, depending on the button clicked.
-                              
-                            if (!manager.userAllowedToCreateEditPurchProjs) {
+
+                            let exceptionRet = self.dialog.create(
+                                {
+                                    toggle1to3: {
+                                        type: "Button",
+                                        modes: [1],
+                                        text: "Toggle to 3",
+                                        click: function() {
+                                            self.dialog.setMode(3);
+                                        }
+                                    },
+                                    toggle3to1: {
+                                        type: "Button",
+                                        modes: [3],
+                                        text: "Toggle to 1",
+                                        click: function() {
+                                            self.dialog.setMode(1);
+                                        }
+                                    },
+                                    instructions: {
+                                        type: "Label",
+                                        modes: [1,3],
+                                        text: "Choose the type of Project you wish to create by clicking on its picture.",
+                                        x: settings.general.margin + 8,
+                                        y: 70,
+                                        widthType: "reserve",
+                                        width: 2 * settings.general.margin,
+                                        height: settings.dialog.lineHeight                                  
+                                    },
+                                    normal: {
+                                        type: "Button",
+                                        modes: [3],
+                                        text: "Normal"
+                                    },
+                                    class: {
+                                        type: "Button",
+                                        modes: [3],
+                                        text: "Class"
+                                    },
+                                    onlineClass: {
+                                        type: "Button",
+                                        modes: [3],
+                                        text: "Online Class"
+                                    },
+                                    product: {
+                                        type: "Button",
+                                        modes: [3],
+                                        text: "Product"
+                                    },
+                                },
+                                !manager.userAllowedToCreateEditPurchProjs ? 1 : 3
+                            );
+/*                            if (!manager.userAllowedToCreateEditPurchProjs) {
 
                                 let exceptionRet = self.dialog.create(
                                     {
@@ -172,7 +223,7 @@ define(["NextWave/source/utility/prototypes",
 
                                 if (exceptionRet) { throw exceptionRet; }
                             }
-
+*/
                             // Because it is!
                             m_bCreated = true;
 

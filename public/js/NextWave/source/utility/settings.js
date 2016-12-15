@@ -374,6 +374,9 @@ define(["NextWave/source/utility/prototypes"],
                             font: "18px Arial",
                             lineHeight: 26,
                             fillBackground: "#aaf"
+                        },
+                        image: {
+                            
                         }
                     };
                     self.tree = {
