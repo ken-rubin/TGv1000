@@ -61,13 +61,25 @@ define(["NextWave/source/utility/prototypes",
                             //      1   For non-privileged user only. Sees horizontal scroll bar of images of available project types.
                             //          Moving mouse over the images displays a project type description tooltip.
                             //          Clicking on an image switches to mode 2 with that project type having been selected.
+                            //        objectConfiguration elements:
+                            //          - "Choose Project Type" header label. modes=[1,3]
+                            //          - "Choose the type of Project you wish to create by clicking on its picture." label. modes=[1,3]
+                            //          - Strip of images built from arrayAvailProjTypes. modes=[1]
                             //      2   Either a normal user or a privileged user who elected to create a normal project
                             //          sees this mode after selecting a project type in mode 1 or mode 3.
-                            //          User sees name and description edits (the description is used for project searching)
-                            //          and sees the project image (defaults to same as the project type if not yet chosen) and
-                            //          three buttons to select or change the project image: (1) Search for an image using a description match;
-                            //          (2) Load an image from a URL; (3) Load an image accessible to this computer (local or network drive).
-                            //          Image loading is done in a separate pop-over dialog. Has buttons to Create Project or Cancel.
+                            //        objectConfiguration elements:
+                            //          - "New xxx Project" header label. modes=[2,4,5,6]
+                            //          - "Enter details for your new Project." label. modes=[2,4,5,6]
+                            //          - "Only Name is required." label. modes=[2,4,5,6]
+                            //          - "Name" rt-just. label. Bold. modes=[2,4,5,6]
+                            //          - "Enter project name." edit. Screened back. modes=[2,4,5,6]
+                            //          - "Description" label. Bold. modes=[2,4,5,6]
+                            //          - "Will be used both to describe your project and to search for it later." edit. Screened back. modes=[2,4,5,6]
+                            //          - "Project image" label. Bold. modes=[2,4,5,6]
+                            //          - Image for project. (May be a hor. scroll region of 1 image.) modes=[2,4,5,6]
+                            //          - "Search icon" button. modes=[2,4,5,6]
+                            //          - "Cloud icon" button. modes=[2,4,5,6]
+                            //          - "Disk icon" button. modes=[2,4,5,6]
                             //      3   For privileged users only. Like mode 1 with the horizontal scroll bar of project type images, but with
                             //          four (initially disabled) buttons beneath: (1) Create normal project; (2) Create a class; (3) Create an online class; (4) Create a product.
                             //          In mode 3 the scroll bar of images doesn't switch modes like in mode 1. It highlights (outlines the image) and

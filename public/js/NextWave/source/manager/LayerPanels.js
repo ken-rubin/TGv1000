@@ -889,7 +889,7 @@ define(["NextWave/source/utility/prototypes",
 
                             // Allocate and create the New Project Dialog.
                             window.newProjectDialog = new NewProjectDialog();
-                            var exceptionRet = window.newProjectDialog.create(arrayAvailProjTypes);
+                            var exceptionRet = window.newProjectDialog.create(extraCenterPanelData);
                             if (exceptionRet) {
 
                                 throw exceptionRet;

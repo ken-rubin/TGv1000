@@ -65,7 +65,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
             m_log("Entered ProjectBO/routeFetchNormalUserNewProjectTypes");
 
-            sql.execute("select projectTypeId from " + self.dbname + "projects where public=1;",
+            sql.execute("select projectTypeId from " + self.dbname + "projects where baseProjectId is null order by projectTypeId;",
                 function(rows) {
 
                     if (rows.length === 0) {
