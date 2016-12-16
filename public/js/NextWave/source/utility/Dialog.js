@@ -131,6 +131,12 @@ define(["NextWave/source/utility/prototypes",
                                 // Set self in control.
                                 controlIth.dialog = self;
 
+                                // If modes was set in obectConfiguration property, add it here.
+                                if (objectControlIth.hasOwnProperty("modes")) {
+
+                                    controlIth.modes = objectControlIth.modes;
+                                }
+
                                 // Add control to collection of controls.
                                 self.controls.push(controlIth);
 

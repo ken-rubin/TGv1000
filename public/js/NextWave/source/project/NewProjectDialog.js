@@ -97,6 +97,10 @@ define(["NextWave/source/utility/prototypes",
                                         type: "Button",
                                         modes: [1],
                                         text: "Toggle to 3",
+                                        x: 50,
+                                        y: 20,
+                                        width: 190,
+                                        height: 40,
                                         click: function() {
                                             self.dialog.setMode(3);
                                         }
@@ -105,6 +109,10 @@ define(["NextWave/source/utility/prototypes",
                                         type: "Button",
                                         modes: [3],
                                         text: "Toggle to 1",
+                                        x: 350,
+                                        y: 20,
+                                        width: 190,
+                                        height: 40,
                                         click: function() {
                                             self.dialog.setMode(1);
                                         }
@@ -122,22 +130,50 @@ define(["NextWave/source/utility/prototypes",
                                     normal: {
                                         type: "Button",
                                         modes: [3],
-                                        text: "Normal"
+                                        text: "Normal",
+                                        x: 50,
+                                        y: 300,
+                                        width: 190,
+                                        height: 40,
+                                        click: function() {
+                                            self.dialog.setMode(2);
+                                        }
                                     },
                                     class: {
                                         type: "Button",
                                         modes: [3],
-                                        text: "Class"
+                                        text: "Class",
+                                        x: 50,
+                                        y: 350,
+                                        width: 190,
+                                        height: 40,
+                                        click: function() {
+                                            self.dialog.setMode(4);
+                                        }
                                     },
                                     onlineClass: {
                                         type: "Button",
                                         modes: [3],
-                                        text: "Online Class"
+                                        text: "Online Class",
+                                        x: 50,
+                                        y: 400,
+                                        width: 190,
+                                        height: 40,
+                                        click: function() {
+                                            self.dialog.setMode(5);
+                                        }
                                     },
                                     product: {
                                         type: "Button",
                                         modes: [3],
-                                        text: "Product"
+                                        text: "Product",
+                                        x: 50,
+                                        y: 450,
+                                        width: 190,
+                                        height: 40,
+                                        click: function() {
+                                            self.dialog.setMode(6);
+                                        }
                                     },
                                 },
                                 !manager.userAllowedToCreateEditPurchProjs ? 1 : 3

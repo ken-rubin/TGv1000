@@ -184,7 +184,8 @@ define(["NextWave/source/utility/prototypes",
 
                                 throw exceptionRet;
                             }
-                            exceptionRet = m_functionAllocateNewProject();
+                            // Not allocating these three center panels yet.
+/*                            exceptionRet = m_functionAllocateNewProject();
                             if (exceptionRet) {
 
                                 throw exceptionRet;
@@ -199,7 +200,7 @@ define(["NextWave/source/utility/prototypes",
 
                                 throw exceptionRet;
                             }
-
+*/
                             // Indicate current state.
                             m_bCreated = true;
 
@@ -228,10 +229,10 @@ define(["NextWave/source/utility/prototypes",
                         window.methodBuilder.destroy();
                         window.propertyBuilder.destroy();
                         window.eventBuilder.destroy();
-                        window.librarySearch.destroy();
-                        window.newProject.destroy();
-                        window.saveProject.destroy();
-                        window.openProject.destroy();
+                        window.librarySearchDialog.destroy();
+                        window.newProjectDialog.destroy();
+                        window.saveProjectDialog.destroy();
+                        window.openProjectDialog.destroy();
                     }
 
                     // Clear the center panel.
@@ -257,10 +258,10 @@ define(["NextWave/source/utility/prototypes",
                             window.methodBuilder = null;
                             window.propertyBuilder = null;
                             window.eventBuilder = null;
-                            window.librarySearch = null;
-                            window.newProject = null;
-                            window.saveProject = null;
-                            window.openProject = null;
+                            window.librarySearchDialog = null;
+                            window.newProjectDialog = null;
+                            window.saveProjectDialog = null;
+                            window.openProjectDialog = null;
 
                             // Clear out the three possible 
                             // payloads for the center panel.
@@ -991,9 +992,15 @@ define(["NextWave/source/utility/prototypes",
                             window.comicBuilder.visible = false;
                             window.projectBuilder.visible = true;
                             window.librarySearchDialog.visible = false;
-                            window.newProjectDialog.visible = false;
-                            window.saveProjectDialog.visible = false;
-                            window.openProjectDialog.visible = false;
+                            if (window.newProjectDialog) {
+                                window.newProjectDialog.visible = false;
+                            }
+                            if (window.newProjectDialog) {
+                                window.saveProjectDialog.visible = false;
+                            }
+                            if (window.newProjectDialog) {
+                                window.openProjectDialog.visible = false;
+                            }
 
                             // Set it in the center panel.
                             return self.centerPanel.setPayload("Project",
@@ -1018,9 +1025,15 @@ define(["NextWave/source/utility/prototypes",
                             window.comicBuilder.visible = true;
                             window.projectBuilder.visible = false;
                             window.librarySearchDialog.visible = false;
-                            window.newProjectDialog.visible = false;
-                            window.saveProjectDialog.visible = false;
-                            window.openProjectDialog.visible = false;
+                            if (window.newProjectDialog) {
+                                window.newProjectDialog.visible = false;
+                            }
+                            if (window.newProjectDialog) {
+                                window.saveProjectDialog.visible = false;
+                            }
+                            if (window.newProjectDialog) {
+                                window.openProjectDialog.visible = false;
+                            }
 
                             // Set it in the center panel.
                             return self.centerPanel.setPayload("Comic",
@@ -1045,9 +1058,15 @@ define(["NextWave/source/utility/prototypes",
                             window.comicBuilder.visible = false;
                             window.projectBuilder.visible = false;
                             window.librarySearchDialog.visible = false;
-                            window.newProjectDialog.visible = false;
-                            window.saveProjectDialog.visible = false;
-                            window.openProjectDialog.visible = false;
+                            if (window.newProjectDialog) {
+                                window.newProjectDialog.visible = false;
+                            }
+                            if (window.newProjectDialog) {
+                                window.saveProjectDialog.visible = false;
+                            }
+                            if (window.newProjectDialog) {
+                                window.openProjectDialog.visible = false;
+                            }
 
                             // Set it in the center panel.
                             return self.centerPanel.setPayload("Library",
@@ -1072,9 +1091,15 @@ define(["NextWave/source/utility/prototypes",
                             window.comicBuilder.visible = false;
                             window.projectBuilder.visible = false;
                             window.librarySearchDialog.visible = false;
-                            window.newProjectDialog.visible = false;
-                            window.saveProjectDialog.visible = false;
-                            window.openProjectDialog.visible = false;
+                            if (window.newProjectDialog) {
+                                window.newProjectDialog.visible = false;
+                            }
+                            if (window.newProjectDialog) {
+                                window.saveProjectDialog.visible = false;
+                            }
+                            if (window.newProjectDialog) {
+                                window.openProjectDialog.visible = false;
+                            }
 
                             // Set it in the center panel.
                             return self.centerPanel.setPayload("Type",
@@ -1099,9 +1124,15 @@ define(["NextWave/source/utility/prototypes",
                             window.comicBuilder.visible = false;
                             window.projectBuilder.visible = false;
                             window.librarySearchDialog.visible = false;
-                            window.newProjectDialog.visible = false;
-                            window.saveProjectDialog.visible = false;
-                            window.openProjectDialog.visible = false;
+                            if (window.newProjectDialog) {
+                                window.newProjectDialog.visible = false;
+                            }
+                            if (window.newProjectDialog) {
+                                window.saveProjectDialog.visible = false;
+                            }
+                            if (window.newProjectDialog) {
+                                window.openProjectDialog.visible = false;
+                            }
 
                             // Set it in the center panel.
                             return self.centerPanel.setPayload("Method",
@@ -1126,9 +1157,15 @@ define(["NextWave/source/utility/prototypes",
                             window.comicBuilder.visible = false;
                             window.projectBuilder.visible = false;
                             window.librarySearchDialog.visible = false;
-                            window.newProjectDialog.visible = false;
-                            window.saveProjectDialog.visible = false;
-                            window.openProjectDialog.visible = false;
+                            if (window.newProjectDialog) {
+                                window.newProjectDialog.visible = false;
+                            }
+                            if (window.newProjectDialog) {
+                                window.saveProjectDialog.visible = false;
+                            }
+                            if (window.newProjectDialog) {
+                                window.openProjectDialog.visible = false;
+                            }
 
                             // Set it in the center panel.
                             return self.centerPanel.setPayload("Property",
@@ -1153,9 +1190,15 @@ define(["NextWave/source/utility/prototypes",
                             window.comicBuilder.visible = false;
                             window.projectBuilder.visible = false;
                             window.librarySearchDialog.visible = true;
-                            window.newProjectDialog.visible = false;
-                            window.saveProjectDialog.visible = false;
-                            window.openProjectDialog.visible = false;
+                            if (window.newProjectDialog) {
+                                window.newProjectDialog.visible = false;
+                            }
+                            if (window.newProjectDialog) {
+                                window.saveProjectDialog.visible = false;
+                            }
+                            if (window.newProjectDialog) {
+                                window.openProjectDialog.visible = false;
+                            }
 
                             // Set it in the center panel.
                             return self.centerPanel.setPayload("Library Search",
@@ -1180,9 +1223,15 @@ define(["NextWave/source/utility/prototypes",
                             window.comicBuilder.visible = false;
                             window.projectBuilder.visible = false;
                             window.librarySearchDialog.visible = false;
-                            window.newProjectDialog.visible = true;
-                            window.saveProjectDialog.visible = false;
-                            window.openProjectDialog.visible = false;
+                            if (window.newProjectDialog) {
+                                window.newProjectDialog.visible = true;
+                            }
+                            if (window.newProjectDialog) {
+                                window.saveProjectDialog.visible = false;
+                            }
+                            if (window.newProjectDialog) {
+                                window.openProjectDialog.visible = false;
+                            }
 
                             // Set it in the center panel.
                             return self.centerPanel.setPayload("New Project",
@@ -1207,9 +1256,15 @@ define(["NextWave/source/utility/prototypes",
                             window.comicBuilder.visible = false;
                             window.projectBuilder.visible = false;
                             window.librarySearchDialog.visible = false;
-                            window.newProjectDialog.visible = false;
-                            window.saveProjectDialog.visible = true;
-                            window.openProjectDialog.visible = false;
+                            if (window.newProjectDialog) {
+                                window.newProjectDialog.visible = false;
+                            }
+                            if (window.newProjectDialog) {
+                                window.saveProjectDialog.visible = true;
+                            }
+                            if (window.newProjectDialog) {
+                                window.openProjectDialog.visible = false;
+                            }
 
                             // Set it in the center panel.
                             return self.centerPanel.setPayload("Save Project",
@@ -1234,9 +1289,15 @@ define(["NextWave/source/utility/prototypes",
                             window.comicBuilder.visible = false;
                             window.projectBuilder.visible = false;
                             window.librarySearchDialog.visible = false;
-                            window.newProjectDialog.visible = false;
-                            window.saveProjectDialog.visible = false;
-                            window.openProjectDialog.visible = true;
+                            if (window.newProjectDialog) {
+                                window.newProjectDialog.visible = false;
+                            }
+                            if (window.newProjectDialog) {
+                                window.saveProjectDialog.visible = false;
+                            }
+                            if (window.newProjectDialog) {
+                                window.openProjectDialog.visible = true;
+                            }
 
                             // Set it in the center panel.
                             return self.centerPanel.setPayload("Open Project",
@@ -1261,9 +1322,15 @@ define(["NextWave/source/utility/prototypes",
                             window.comicBuilder.visible = false;
                             window.projectBuilder.visible = false;
                             window.librarySearchDialog.visible = false;
-                            window.newProjectDialog.visible = false;
-                            window.saveProjectDialog.visible = false;
-                            window.openProjectDialog.visible = false;
+                            if (window.newProjectDialog) {
+                                window.newProjectDialog.visible = false;
+                            }
+                            if (window.newProjectDialog) {
+                                window.saveProjectDialog.visible = false;
+                            }
+                            if (window.newProjectDialog) {
+                                window.openProjectDialog.visible = false;
+                            }
 
                             // Set it in the center panel.
                             return self.centerPanel.setPayload("Event",
