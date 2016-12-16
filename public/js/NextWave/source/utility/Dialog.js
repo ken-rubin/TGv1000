@@ -16,12 +16,13 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/Area",
     "NextWave/source/utility/Label",
     "NextWave/source/utility/Edit",
+    "NextWave/source/utility/Button",
     "NextWave/source/utility/GlyphHost",
     "NextWave/source/utility/ListHost",
     "NextWave/source/utility/Accordion",
     "NextWave/source/utility/ParameterListHost",
     "NextWave/source/utility/StatementListHost"],
-    function (prototypes, settings, Point, Size, Area, Label, Edit, GlyphHost, ListHost, Accordion, ParameterListHost, StatementListHost) {
+    function (prototypes, settings, Point, Size, Area, Label, Edit, Button, GlyphHost, ListHost, Accordion, ParameterListHost, StatementListHost) {
 
         try {
 
@@ -76,7 +77,7 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Create this dialog
-                    self.create = function (objectConfiguration) {
+                    self.create = function (objectConfiguration, mode) {
 
                         try {
 
@@ -84,6 +85,13 @@ define(["NextWave/source/utility/prototypes",
 
                                 throw { message: "One may only create once." };
                             }
+
+                            // Mode is optionally used with the objects in objectConfiguration.
+                            // If !m_node, then all the objects behave normally, being created, always drawing, etc.
+                            // If m_mode and objectControlIth.hasOwnProperty("modes"),
+                            // then objectControlIth will be created and rendered only if m_mode is in objectControlIth.modes (an array of ints).
+
+                            m_mode = mode || null;
 
                             // Process configuration.
                             var arrayKeys = Object.keys(objectConfiguration);
@@ -402,11 +410,14 @@ define(["NextWave/source/utility/prototypes",
                                 // Get the ith control.
                                 var controlIth = self.controls[i];
 
-                                // Set the layout for the controls.
-                                var exceptionRet = controlIth.render(contextRender);
-                                if (exceptionRet) {
+                                if (!m_mode || (m_mode && controlIth.hasOwnProperty("modes") && controlIth.modes.includes(m_mode))) {
 
-                                    return exceptionRet;
+                                    // Set the layout for the controls.
+                                    var exceptionRet = controlIth.render(contextRender);
+                                    if (exceptionRet) {
+
+                                        return exceptionRet;
+                                    }
                                 }
                             }
                             return null;
@@ -416,11 +427,22 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Change m_mode due to user action in derived class.
+                    self.setMode = function(mode) {
+
+                        m_mode = mode;
+
+                        // With m_mode changed, we want to reset and re-render all objects.
+                        // That may happen automatically in the render loop.
+                    }
+
                     //////////////////////
                     // Private fields.
 
                     // Indicates so.
                     var m_bCreated = false;
+                    var m_mode = null;
+
                 } catch (e) {
 
                     alert(e.message);

@@ -196,6 +196,10 @@ define(["Core/errorHelper",
 							var exceptionRet = m_openDialog.create(arrayAvailProjTypes);
 							if (exceptionRet) { throw exceptionRet; }
 
+							// Also switch center panel to what will replace NewProjectDialog.
+							exceptionRet = manager.createNewProject(arrayAvailProjTypes);
+							if (exceptionRet) { throw exceptionRet; }
+
 							return null;
 
 						} catch (e) { return e; }
@@ -224,7 +228,11 @@ define(["Core/errorHelper",
 
 							m_openDialog = new OpenProjectDialog();
 							var exceptionRet = m_openDialog.create(functionOK);
-							return exceptionRet;
+							if (exceptionRet) { throw exceptionRet; }
+
+							// Also show OpenProject in center panel. It will replace OpenProjectDialog.
+							exceptionRet = manager.openProject();
+							if (exceptionRet) { throw exceptionRet; }
 
 						} catch (e) { return e; }
 					}
@@ -273,6 +281,10 @@ define(["Core/errorHelper",
 
 							m_openDialog = new SaveProjectAsDialog();
 							var exceptionRet = m_openDialog.create();
+							if (exceptionRet) { throw exceptionRet; }
+
+							// Also show new SaveProject in center panel until it replaces SaveProjectAsDialog.
+							exceptionRet = manager.saveProject();
 							if (exceptionRet) { throw exceptionRet; }
 
 							return null;
@@ -590,6 +602,29 @@ define(["Core/errorHelper",
 								}
 							});
 						} catch (e) { callback(e); }
+					}
+
+					self.searchLibraries = function (searchPhrase, callback) {
+
+						try {
+
+							var posting = $.post("/BOL/UtilityBO/SearchLibraries", 
+								{
+									searchPhrase: searchPhrase
+								},
+								'json');
+							posting.done(function(data){
+
+								if (data.success) {
+
+									return callback(null, data.libraries);
+								} else {
+
+									// !data.success
+									return callback(new Error(data.message), null);
+								}
+							});
+						} catch (e) { return callback(e, null); }
 					}
 
 					self.openProjectFromDB = function (iProjectId, strMode, callback) {

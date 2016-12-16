@@ -481,7 +481,7 @@ begin
 					(3,'New Website Project','This is the core project from which all web sites are derived.',1,1,1,0,'media/images/websiteProject.png',3,1),
 					(4,'New Hololens Project','This is the core project from which all Microsoft HoloLens projects are derived.',1,1,1,0,'media/images/hololensProject.png',4,1),
 					(5,'New Map Project','This is the core project from which all mapping projects are derived.',1,1,1,0,'media/images/mappingProject.png',5,1),
-					(6,'New Empty Project','This is the core project from which you should derive a project where you want full control over libraries and types. It is empty until you fill it.',1,1,1,0,'media/images/emptyProject.png',1,1);
+					(6,'New Empty Project','This is the core project from which you should derive a project where you want full control over libraries and types. It is empty until you fill it.',1,1,1,0,'media/images/emptyProject.png',6,1);
 		ALTER TABLE `projects` ENABLE KEYS;
 
 		ALTER TABLE `projects_comics` DISABLE KEYS;
@@ -530,9 +530,10 @@ begin
 
     end if;
 
-    if @dbstate = 222 THEN
+    if @dbstate = 2 THEN
 
-
+		INSERT INTO `routes` (`path`,`moduleName`,`route`,`verb`,`method`,`requiresJWT`,`JWTerrorMsg`)
+			VALUES ('./modules/BOL/','UtilityBO','/BOL/UtilityBO/SearchLibraries','post','routeSearchLibraries',1,'We encountered a validation error. Please try one more time. If you receive this message again, re-login and retry. Sorry.');
 
 		set @dbstate := @dbstate + 1;	-- @dbstate = 3
 		UPDATE control set dbstate=@dbstate where id=1;

@@ -866,37 +866,6 @@ define(["NextWave/source/utility/prototypes",
                                 throw { message: "ProjectDialog: Instance already created!" };
                             }
 
-                            // Add input element.
-                            let elementInput = document.createElement("input");
-                            elementInput.id = "ProjectDialogInput";
-                            elementInput.type = "file";
-                            elementInput.style = "display:none;";
-                            elementInput.addEventListener("change", 
-                                function (event) {
-
-                                    try {
-
-                                        // .
-                                        var reader = new FileReader();
-
-                                        reader.onload = function(e) {
-
-                                            var text = reader.result;
-                                            let objectLibrary = JSON.parse(text);
-                                            //alert(text);
-                                            m_functionAddLibrary(objectLibrary);
-                                        }
-
-                                        reader.readAsText(this.files[0]);
-                                        this.value = "";
-
-                                    } catch (e) {
-
-                                        alert(e.message);
-                                    }
-                                });
-                            document.body.appendChild(elementInput);
-
                             // Create the dialog.
                             var exceptionRet = self.dialog.create({
 
@@ -1177,10 +1146,8 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            // Click the hidden input to dropdown the select file browser facility.
-                            document.getElementById("ProjectDialogInput").click();
-
-                            return null;
+                            // Select into gui.
+                            return window.manager.searchForLibrary(self);
                         } catch (e) {
 
                             return e;

@@ -102,7 +102,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								title: "Choose Project Type",
 								size: BootstrapDialog.SIZE_WIDE,
 					            message: $(htmlData),
-					            draggable: false,
+					            draggable: true,	// was false
 					            onshown: m_functionOnShownDialog1,
 					            buttons: buttons
 					        });

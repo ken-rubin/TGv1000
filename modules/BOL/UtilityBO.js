@@ -905,6 +905,87 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
         }
     }
 
+    self.routeSearchLibraries = function (req, res) {
+
+        try {
+
+            console.log("Entered UtilityBO/routeSearchLibraries with req.body = " + JSON.stringify(req.body));
+            // req.body.searchPhrase
+
+            let strQuery = '';
+
+            if (req.body.searchPhrase.length === 0) {
+
+                // Return all libraries.
+                strQuery = "select * from " + self.dbname + "libraries order by name asc;";
+                sql.execute(strQuery,
+                    function(rows) {
+
+                        if (rows.length === 0) { 
+                            return res.json({
+                                success: false,
+                                message: "Fetch of libraries from the database failed"
+                            });
+                        }
+
+                        return res.json({
+                            success: true,
+                            libraries: rows
+                        });
+                    },
+                    function(strError) {
+                        return res.json({
+                            success: false,
+                            message: "Fetch of libraries failed with message: " + strError
+                        });
+                    }
+                );
+            } else {
+
+                // Return matching libraries.
+                // Gen unique name for this call's temporary table.
+                let guid = m_createGuid();
+                let tempTableUniqueName = 'search_table_' + guid.replace(/-/g, '');
+                strQuery = "create table " + self.dbname + tempTableUniqueName + " (libraryId INT UNSIGNED, sindex DOUBLE) ENGINE=InnoDB;";
+                strQuery += "insert " + tempTableUniqueName + " select id, soundex_match_all(" + mysql.escape(req.body.searchPhrase) + ", description, ' ') from " + self.dbname + "libraries where length(description)>0;";
+                strQuery += "select l.*, t.sindex from " + self.dbname + "libraries l inner join " + tempTableUniqueName + " t on t.libraryId=l.id where l.id in (select libraryId from " + tempTableUniqueName + " where sindex>0);";
+                strQuery += "drop table " + self.dbname + tempTableUniqueName + ";";
+
+                sql.execute(strQuery,
+                    function (arrayRows) {
+                        if (arrayRows[2].length) {
+                            arrayRows[2].sort(
+                                function(a,b) {
+                                    if (a.sindex > b.sindex)
+                                        return -1;
+                                    if (a.sindex < b.sindex)
+                                        return 1;
+                                    return 0;
+                                }
+                            )
+                        }
+                        return res.json({
+                            success: true,
+                            libraries: arrayRows[2]
+                        });
+                    },
+                    function(strError) { 
+                        return res.json({
+                            success: false,
+                            message: "Fetch of libraries failed with message: " + strError
+                        });
+                    }
+                );
+            }
+        } catch (e) {
+
+            return res.json({
+                success: false,
+                message: e.message
+            });
+        }
+    }
+
     self.routeSearchProjects = function (req, res) {
 
         try {
@@ -971,7 +1052,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         console.log('guid=' + guid);
                         let tempTableUniqueName = 'search_table_' + guid.replace(/-/g, '');
                         console.log('tempTableName=' + tempTableUniqueName);
-                        passOn["tempTableName"] = tempTableUniqueName;
+                        passOn["tempTableName"] = self.dbname + tempTableUniqueName;
                         sqlString = "create table " + tempTableUniqueName + " (projectId INT UNSIGNED, sindex DOUBLE) ENGINE=InnoDB;";
                         sqlString += "insert " + tempTableUniqueName + " select id, soundex_match_all(" + mysql.escape(req.body.searchPhrase) + ", description, ' ') from " + self.dbname + "projects where length(description)>0;";
 
