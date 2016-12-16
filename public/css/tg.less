@@ -4,12 +4,15 @@
 //
 
 
-@base: #000;
-
+@base: #ffffff;
+@DarkGray: #242424;
 @NewColor: #aa0;
 @OpenColor: #a0a;
 @TemplatesColor: #0aa;
 @SearchColor: #a66;
+@WhiteText: #ffffff;
+@BlackText: #000000;
+@Whitebluetext: #d5fff6;
 
 @HoverAdditive: #222;
 
@@ -22,20 +25,143 @@
 
 body
 {
-	background-color:@base;
+	background-color: @base;
+	color:@BlackText;
+	font-family: 'Lato', sans-serif;
 }
 
+#home
+{
+	padding-top:0
+}
 
+// Navbar styling
 .navbar-brand
 {
-	padding:13.5px 15px 12.5px
+	padding:5px 2px 5px;//13.5px 15px 12.5px
 }
 
-#home navbar-brand>img
+.navbar-brand>img
 {
 	display:inline;
 	margin:0 10px;
-	height:100%
+	height: 100%;
+}
+
+.TgNavbar
+{
+	font-size:18px;
+	margin-top:7px;
+	margin-bottom:12px;
+	margin-right:30px;
+}
+
+.navbar-default
+{
+	border-style: solid;
+	border-top:10px #ffffff;
+	background-color:rgba(0,51,128,.70)
+}
+
+.navbar-default .navbar-nav > li > a 
+{
+    color: #ffffff;
+	font-weight: bold;
+}
+
+.navbar-default .navbar-nav > li > a:hover, .navbar-default .navbar-nav > li > a:focus 
+{
+    //background-color: #FFFF00;
+    color: #FF6600;
+	font-weight: bold;
+}
+
+.navbar-default .navbar-nav>.open>a, .navbar-default .navbar-nav>.open>a:focus, .navbar-default .navbar-nav>.open>a:hover {
+    color: #FF6600;
+    background-color: @Whitebluetext;
+	border-radius:3px;
+}
+
+// Styling for the dropdown sign in menu item that shows the sign in panel
+.dropdown-menu
+{
+  background:#0051cd;
+
+  .enabled
+  {
+    a
+    {
+      color:#005380 !important;
+
+      &:hover
+      {
+        color:#005380 !important;
+      }
+    }
+    a.dropdown-toggle
+    {
+      background:#0051cd !important;
+    }
+  }
+}
+
+.TgLoginForm
+{
+	color:#0051cd;//#0047b3;
+	background-color: #ffffff;
+	padding: 5px 20px 10px 20px;
+	border-radius:4px;
+	border-color:#0051cd;
+	border-style:solid;
+	border-width:3px 2px 3px 2px;
+	
+	h3
+	{
+		text-align: center;
+		font-size:1.3em;
+	}
+
+	
+	a:link 
+	{
+		color:#ffffff;
+	}
+
+	a:visited 
+	{
+		color:#BBBBBB;
+	}
+	
+	a:hover 
+	{
+		color:#000000;
+	}
+}
+
+.TgLoginInput
+{
+	margin:3px 2px 3px 2px;
+	background-color:#ffffff;
+	font-size: 1.2em;
+	text-indent:3px;
+}
+
+.TgLoginButton
+{
+	color:white;
+	font-size:1.2em;
+	background-color:#003380;
+	background-image:linear-gradient(to bottom, #003380, #0051cd);
+	height:auto;
+	width:auto;
+	padding: 7px 35x 7px 35px;
+	align-self: center;
+	border-radius:4px;
+	border-style:solid;
+	border-color:#0051cd;
+	
+	margin-top: 5px;
+	margin-bottom: 5px;
 }
 
 // The gzsections are the code and designer regions.
@@ -122,33 +248,6 @@ body
 	}
 }
 
-// Style navbar menu with a black background, 
-// light enabled items and dim disabled items 
-// with inverse highlighting on enabled items.
-/*
-.dropdown-menu
-{
-  background:black;
-
-  .enabled
-  {
-    a
-    {
-      color:#ccc !important;
-
-      &:hover
-      {
-        color:#444 !important;
-      }
-    }
-    a.dropdown-toggle
-    {
-      background:#000 !important;
-    }
-  }
-}
-*/
-
 .toGetLeftCol
 {
 	position:fixed;
@@ -182,41 +281,45 @@ body
 
 }
 
-.TgNavbar
-{
-	font-size:18px;
-	margin-top:10px;
-	margin-bottom:15px;
-	margin-right:30px;
-}
-
-.navbar-default
-{
-	border-style: solid;
-	border-top: thick double #0000ff;
-	background-color:rgba(0,0,0,.70)
-}
-
-.navbar-default .navbar-nav > li > a 
-{
-    color: #0000ff;
-	font-weight: bold;
-}
-
-.navbar-default .navbar-nav > li > a:hover, .navbar-default .navbar-nav > li > a:focus 
-{
-    //background-color: #FFFF00;
-    color: #FF6600;
-	font-weight: bold;
-}
 
 //***************Marketing Page**************
+.splash
+{
+	padding:9em 0 2em;
+	background-color:#141d27;
+	background-image:url(../media/images/digitalhead.jpg);
+	//background-size:100% 85%;//cover;
+	background-repeat: no-repeat;
+	background-attachment:fixed;
+	background-size: cover;
+	color:@WhiteText;
+	text-align:center;
+	height: 80%;
+	
+}
+
+.splash .logo
+{
+	width:160px
+}
+
+.splash h1
+{
+	font-size:3em;
+	padding-top: 5%;
+}
+
+.splash h2
+{
+	font-size:2em;
+}
+
 .bannerbutton
 {
 	color:white;
 	font-size:18px;
 	background-color:orange;
-	background-image:linear-gradient(to bottom, #fad29e, #F39317);
+	background-image:linear-gradient(to bottom, #f3ca17, #f36e17);//#F3a517
 	height:auto;
 	width:auto;
 	padding: 7px 40px 7px 40px;
@@ -228,15 +331,71 @@ body
 	margin-bottom: 190px;
 }
 
-.learnsection
+.infosection
 {
-	background-color:rgba(211,211,211,.90);//#10A0B6;
-	color:#ffffff;
-	padding: 10px 10px 10px 10px;
-	margin: 5px 5px 5px 5px;
+	background-color: transparent;
+	color:#f0f0f0;
+	padding: 20px 90px 40px 50px;
+	//margin: 0px 40px 0px 40px;
 	//border-style:solid;
 	//border-color:#fff;
 	//border-width:1px 1px 0px 1px;	
+	text-align:left;
+}
+
+.datasection
+{
+	background-color:transparent;
+	color:#001380;
+	padding: 5px 55px 5px 5px;
+	//margin: 0px 40px 0px 40px;
+	//height: 30%;
+	//border-style:solid;
+	//border-color:#fff;
+	//border-width:1px 1px 0px 1px;	
+	//text-align:left;
+}
+
+.learntitle
+{
+	font-family: 'Fredericka the Great', cursive;
+	font-size: 4em;
+	font-weight: 400;
+	color: #ffffff;
+	background-color: transparent;
+	text-align: center;
+}
+
+.breaksection
+{
+	background-color:inherit;
+	color:#ffffff;//#001380;
+	//padding: 10px 5px 5px 5px;
+	margin:5px 10% 5px 10%;
+	border-bottom-color:#ffffff;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	h3{
+//		background-color: #000000;
+		padding:10px 5px 10px 5px;
+		margin: 0px;
+		font-weight: 600;
+		text-align: center;
+	}
+}
+
+.learnsection
+{
+	background-color:@DarkGray;
+	background-image: url("../media/images/green_chalkboard.jpg");
+	background-repeat: no-repeat;
+	background-attachment:scroll;
+	background-size: 100% 100%;
+	color:#ffffff;
+	padding: 10px 10px 10px 10px;
+	border-style:solid;
+	border-color:saddlebrown;
+	border-width:0px 4px 4px 4px;	
 	text-align:left;
 }
 
@@ -262,14 +421,6 @@ body
 	border-width:1px 1px 0px 1px;	
 }
 
-.breaksection
-{
-	background-color:#242424;
-//	background-image:url("../media/images/underwater_texture.jpg");
-//	background-repeat:no-repeat;
-//	background-size:100% 100%;
-	color:#ffffff;
-}
 
 .teachsection
 {
@@ -307,100 +458,11 @@ body
 	border-color:#C83131;   
 }
 
-.TgLoginForm
-{
-	background-color:#0B863C;
-	padding: 10px 10px 10px 10px;
-	border-radius:4px;
-	
-	a:link 
-	{
-		color:#ffffff;
-	}
-
-	a:visited 
-	{
-		color:#BBBBBB;
-	}
-	
-	a:hover 
-	{
-		color:#000000;
-	}
-}
-
-.TgLoginInput
-{
-	margin:3px 2px 3px 2px;
-	background-color:blue;
-	text-indent:3px;
-}
-
-.TgLoginButton
-{
-	color:white;
-	font-size:12px;
-	background-color:orange;
-	background-image:linear-gradient(to bottom, #fad29e, #F39317);
-	height:auto;
-	width:auto;
-	padding: 7px 15x 7px 15px;
-	border-radius:4px;
-	border-style:solid;
-	border-color:orange;
-	
-	margin-top: 5px;
-	margin-bottom: 5px;
-}
-
-//***************BOOTSWATCH STUFF**************
-body
-{
-	padding-top:50px
-}
-
-body>.navbar
-{
-	-webkit-transition:background-color .3s ease-in;
-	transition:background-color .3s ease-in
-}
-
-@media (min-width:768px)
-{
-	body>.navbar-transparent
-	{
-		background-color:transparent
-	}
-	body>.navbar-transparent .navbar-nav>.open>a
-	{
-		background-color:transparent!important
-	}
-}
-
-#home
-{
-	padding-top:0
-}
-
-#home .navbar-brand
-{
-	padding:5px 2px 5px
-	//padding:13.5px 15px 12.5px
-}
-
-#home .navbar-brand>img
-{
-	display:inline;
-	margin:0 10px;
-	height:100%
-}
-
 #banner
 {
 	min-height:300px;
 	border-bottom:none
 }
-
 
 
 .table-of-contents
@@ -472,43 +534,13 @@ body>.navbar
 	margin-bottom:10px
 }
 
-footer
+.footer
 {
-	margin:5em 0
-}
-
-footer li
-{
-	float:left;
-	margin-right:1.5em;
-	margin-bottom:1.5em
-}
-
-footer p
-{
-	clear:left;
-	margin-bottom:0
-}
-
-.splash
-{
-	padding:9em 0 2em;
-	background-color:#141d27;
-	background-image:url(../media/images/keyboardgreen.jpg);
-	background-size:cover;
-	background-attachment:fixed;
+	margin:2em 0;
 	color:#ffffff;
-	text-align:center
-}
-
-.splash .logo
-{
-	width:160px
-}
-
-.splash h1
-{
-	font-size:3em;
+    border-top-color:#ffffff;
+	border-top-width: 1px;
+	border-top-style: solid;
 }
 
 .container h1
@@ -600,26 +632,6 @@ footer p
 	{
 		width:100%
 	}
-}
-
-.sponsor #carbonads
-{
-	max-width:240px;
-	margin:0 auto
-}
-
-.sponsor .carbon-text
-{	
-	display:block;
-	margin-top:1em;
-	font-size:12px
-}
-
-.sponsor .carbon-poweredby
-{
-	float:right;
-	margin-top:1em;
-	font-size:10px
 }
 
 @media (max-width:767px)
