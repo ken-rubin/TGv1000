@@ -226,7 +226,7 @@ define(["NextWave/source/utility/prototypes",
                             // Store the context.
                             self.currentProperty = property;
 
-                            // Ensure the type has the requisit attributes.
+                            // Ensure the type has the requisite attributes.
                             if (!self.currentProperty.data) {
 
                                 self.currentProperty.data = {};

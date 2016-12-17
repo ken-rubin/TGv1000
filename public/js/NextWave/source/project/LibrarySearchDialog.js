@@ -135,7 +135,6 @@ define(["NextWave/source/utility/prototypes",
                                                 })
 
                                                 listLibraryResult.create(arrayOutput);
-
                                             }
                                         );   
                                     }

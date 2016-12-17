@@ -97,7 +97,7 @@ define(["NextWave/source/utility/prototypes",
                                         type: "Button",
                                         modes: [1],
                                         text: "Toggle to 3",
-                                        x: 50,
+                                        x: settings.general.margin + 8,
                                         y: 20,
                                         width: 190,
                                         height: 40,
@@ -109,7 +109,7 @@ define(["NextWave/source/utility/prototypes",
                                         type: "Button",
                                         modes: [3],
                                         text: "Toggle to 1",
-                                        x: 350,
+                                        x: settings.dialog.firstColumnWidth + 8,
                                         y: 20,
                                         width: 190,
                                         height: 40,
@@ -117,7 +117,7 @@ define(["NextWave/source/utility/prototypes",
                                             self.dialog.setMode(1);
                                         }
                                     },
-                                    instructions: {
+                                    instructions1: {
                                         type: "Label",
                                         modes: [1,3],
                                         text: "Choose the type of Project you wish to create by clicking on its picture.",
@@ -127,11 +127,35 @@ define(["NextWave/source/utility/prototypes",
                                         width: 2 * settings.general.margin,
                                         height: settings.dialog.lineHeight                                  
                                     },
+                                    projectTypes: {
+                                        type: "ListHost",
+                                        modes: [1,3],
+                                        constructorParameterString: "false",
+                                        x: settings.general.margin,
+                                        y: 100,
+                                        widthType: "reserve",
+                                        width: 2 * settings.general.margin,
+                                        height: 100,
+                                        click: function() {
+
+                                        }
+                                    },
+                                    instructions2: {
+                                        type: "Label",
+                                        modes: [3],
+                                        text: "As a privileged user, besides being able to create Normal projects, you are allowed to create a Class, an Online Class or a Product. Choose here:",
+                                        x: settings.general.margin + 8,
+                                        y: 250,
+                                        widthType: "reserve",
+                                        width: 2 * settings.general.margin,
+                                        height: settings.dialog.lineHeight                                  
+                                    },
+                                    // I want the next 4 buttons to be protected to started. Protection is removed when an image in projectTypes is clicked and highlighted.
                                     normal: {
                                         type: "Button",
                                         modes: [3],
                                         text: "Normal",
-                                        x: 50,
+                                        x: settings.general.margin + 8,
                                         y: 300,
                                         width: 190,
                                         height: 40,
@@ -143,7 +167,7 @@ define(["NextWave/source/utility/prototypes",
                                         type: "Button",
                                         modes: [3],
                                         text: "Class",
-                                        x: 50,
+                                        x: settings.general.margin + 8,
                                         y: 350,
                                         width: 190,
                                         height: 40,
@@ -155,7 +179,7 @@ define(["NextWave/source/utility/prototypes",
                                         type: "Button",
                                         modes: [3],
                                         text: "Online Class",
-                                        x: 50,
+                                        x: settings.general.margin + 8,
                                         y: 400,
                                         width: 190,
                                         height: 40,
@@ -167,7 +191,7 @@ define(["NextWave/source/utility/prototypes",
                                         type: "Button",
                                         modes: [3],
                                         text: "Product",
-                                        x: 50,
+                                        x: settings.general.margin + 8,
                                         y: 450,
                                         width: 190,
                                         height: 40,
@@ -178,88 +202,11 @@ define(["NextWave/source/utility/prototypes",
                                 },
                                 !manager.userAllowedToCreateEditPurchProjs ? 1 : 3
                             );
-/*                            if (!manager.userAllowedToCreateEditPurchProjs) {
 
-                                let exceptionRet = self.dialog.create(
-                                    {
-
-                                        instructions: {
-
-                                            type: "Label",
-                                            text: "Click on a project type image to begin building your own project of that type.",
-                                            x: settings.general.margin + 8,
-                                            y: 70,
-                                            widthType: "reserve",
-                                            width: 2 * settings.general.margin,
-                                            height: settings.dialog.lineHeight                                  
-                                        },
-                                        projectTypes: {
-
-                                            type: "ListHost",
-                                            constructorParameterString: "false",
-                                            x: settings.general.margin,
-                                            y: 100,
-                                            widthType: "reserve",
-                                            width: 2 * settings.general.margin,
-                                            height: 100,
-                                            clickBehavior: "fetchNewProject"
-                                        }
-                                    },
-                                    !manager.userAllowedToCreateEditPurchProjs ? 1 : 3
-                                );
-
-                                if (exceptionRet) { throw exceptionRet; }
-                                
-                            } else {
-
-                                let exceptionRet = self.dialog.create({
-
-                                    instructions: {
-
-                                        type: "Label",
-                                        text: "Click on a project type image to begin building your own project of that type. Then click a button to continue.",
-                                        x: settings.general.margin + 8,
-                                        y: 70,
-                                        widthType: "reserve",
-                                        width: 2 * settings.general.margin,
-                                        height: settings.dialog.lineHeight                                    
-                                    },
-                                    projectTypes: {
-
-                                        type: "ListHost",
-                                        constructorParameterString: "false",
-                                        x: settings.general.margin,
-                                        y: 100,
-                                        widthType: "reserve",
-                                        width: 2 * settings.general.margin,
-                                        height: 100,
-                                        clickBehavior: "outlineAndWaitForButtonClick"
-                                    },
-                                    normal: {
-
-                                        type: "Button",
-                                        text: "Normal"
-                                    },
-                                    class: {
-
-                                        type: "Button",
-                                        text: "Class"
-                                    },
-                                    onlineClass: {
-
-                                        type: "Button",
-                                        text: "Online Class"
-                                    },
-                                    product: {
-
-                                        type: "Button",
-                                        text: "Product"
-                                    },
-                                });
-
-                                if (exceptionRet) { throw exceptionRet; }
+                            if (exceptionRet) {
+                                return exceptionRet;
                             }
-*/
+
                             // Because it is!
                             m_bCreated = true;
 
