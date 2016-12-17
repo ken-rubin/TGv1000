@@ -688,7 +688,11 @@ define(["NextWave/source/utility/prototypes",
                                 return exceptionRet;
                             }
 
-                            // Load up the type into the type builder.
+                            if (!method) {
+                                return null;
+                            }
+                            
+                            // Load up the method into the method builder.
                             return window.methodBuilder.loadMethod(method);
                         } catch (e) {
 
