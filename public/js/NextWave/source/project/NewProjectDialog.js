@@ -150,7 +150,7 @@ define(["NextWave/source/utility/prototypes",
                                         width: 2 * settings.general.margin,
                                         height: settings.dialog.lineHeight                                  
                                     },
-                                    // I want the next 4 buttons to be protected to started. Protection is removed when an image in projectTypes is clicked and highlighted.
+                                    // TODO: I want the next 4 buttons to be protected to start. Protection is removed when an image in projectTypes is clicked and highlighted.
                                     normal: {
                                         type: "Button",
                                         modes: [3],
@@ -199,6 +199,171 @@ define(["NextWave/source/utility/prototypes",
                                             self.dialog.setMode(6);
                                         }
                                     },
+                                    instructions3: {
+                                        type: "Label",
+                                        modes: [2,4,5,6],
+                                        text: "Enter details for your new Project.",
+                                        x: settings.general.margin + 8,
+                                        y: 50,
+                                        widthType: "reserve",
+                                        width: 2 * settings.general.margin,
+                                        height: settings.dialog.lineHeight                                  
+                                    },
+                                    instructions4: {
+                                        type: "Label",
+                                        modes: [2,4,5,6],
+                                        text: "Only Name is required. However, consider changing the default image for id purposes.",
+                                        x: settings.general.margin + 8,
+                                        y: 50 + settings.dialog.lineHeight + 10,
+                                        widthType: "reserve",
+                                        width: 2 * settings.general.margin,
+                                        height: settings.dialog.lineHeight                                  
+                                    },
+                                    nameLabel: {
+                                        type: "Label",
+                                        modes: [2,4,5,6],
+                                        text: "Name",
+                                        x: settings.general.margin + 8,
+                                        y: 50 + 2 * settings.dialog.lineHeight + 30,
+                                        widthType: "reserve",
+                                        width: 2 * settings.general.margin,
+                                        height: settings.dialog.lineHeight                                  
+                                    },
+                                    nameEdit: {
+                                        type: "Edit",
+                                        modes: [2,4,5,6],
+                                        x: 2 * settings.general.margin + 
+                                            settings.dialog.firstColumnWidth,
+                                        y: 50 + 2 * settings.dialog.lineHeight + 30,
+                                        width: settings.dialog.firstColumnWidth,
+                                        height: settings.dialog.lineHeight,
+                                        exitFocus: function (localSelf) {
+                                            try {
+                                                // Save off criteria.
+                                                m_projectName = localSelf.text;
+                                            } catch (e) {
+                                                alert(e.message);
+                                            }
+                                        }
+                                    },
+                                    descriptionLabel: {
+                                        type: "Label",
+                                        modes: [2,4,5,6],
+                                        text: "Description",
+                                        x: settings.general.margin + 8,
+                                        y: 50 + 3 * settings.dialog.lineHeight + 40,
+                                        widthType: "reserve",
+                                        width: 2 * settings.general.margin,
+                                        height: settings.dialog.lineHeight                                  
+                                    },
+                                    descriptionEdit: {
+                                        type: "Edit",
+                                        modes: [2,4,5,6],
+                                        x: 2 * settings.general.margin + 
+                                            settings.dialog.firstColumnWidth,
+                                        y: 50 + 3 * settings.dialog.lineHeight + 40,
+                                        widthType: "reserve",           // Reserve means: subtract the width from
+                                                                        //  the total width on calculateLayout.
+                                        width: 3 * settings.general.margin +
+                                            settings.dialog.firstColumnWidth,
+                                        height: settings.dialog.lineHeight * 5,
+                                        exitFocus: function (localSelf) {
+                                            try {
+                                                // Save off criteria.
+                                                m_projectDescription = localSelf.text;
+                                            } catch (e) {
+                                                alert(e.message);
+                                            }
+                                        }
+                                    },
+                                    projectImageLabel: {
+                                        type: "Label",
+                                        modes: [2,4,5,6],
+                                        text: "Project image",
+                                        x: settings.general.margin + 8,
+                                        y: 50 + 8 * settings.dialog.lineHeight + 50,
+                                        widthType: "reserve",
+                                        width: 2 * settings.general.margin,
+                                        height: settings.dialog.lineHeight                                  
+                                    },
+                                    willBeImage: {
+                                        type: "Edit",   // TODO will change
+                                        modes: [2,4,5,6],
+                                        x: 2 * settings.general.margin + settings.dialog.firstColumnWidth,
+                                        y: 50 + 8 * settings.dialog.lineHeight + 50,
+                                        width: settings.dialog.firstColumnWidth,
+                                        height: settings.dialog.lineHeight * 5
+                                    },
+                                    imageSearchButton: {
+                                        type: "Button",
+                                        modes: [2,4,5,6],
+                                        text: "S",
+                                        x: 2 * settings.general.margin + settings.dialog.firstColumnWidth + settings.dialog.firstColumnWidth + 20,
+                                        y: 50 + 8 * settings.dialog.lineHeight + 50 + (settings.dialog.lineHeight * 5 - 40) / 2,
+                                        width: 40,
+                                        height: 40,
+                                        click: function() {
+
+                                            try {
+
+                                                var exceptionRet = client.showImageSearchDialog(true, m_functionSetImageSrc);
+                                                if (exceptionRet) {
+
+                                                    throw exceptionRet;
+                                                }
+                                            } catch(e) {
+
+                                                errorHelper.show(e);
+                                            }
+                                        }
+                                    },
+                                    urlSearchButton: {
+                                        type: "Button",
+                                        modes: [2,4,5,6],
+                                        text: "U",
+                                        x: 2 * settings.general.margin + settings.dialog.firstColumnWidth + settings.dialog.firstColumnWidth + 70,
+                                        y: 50 + 8 * settings.dialog.lineHeight + 50 + (settings.dialog.lineHeight * 5 - 40) / 2,
+                                        width: 40,
+                                        height: 40,
+                                        click: function() {
+
+                                            try {
+
+                                                var exceptionRet = client.showImageURLDialog(true, m_functionSetImageSrc);
+                                                if (exceptionRet) {
+
+                                                    throw exceptionRet;
+                                                }
+                                            } catch(e) {
+
+                                                errorHelper.show(e);
+                                            }
+                                        }
+                                    },
+                                    fileSearchButton: {
+                                        type: "Button",
+                                        modes: [2,4,5,6],
+                                        text: "F",
+                                        x: 2 * settings.general.margin + settings.dialog.firstColumnWidth + settings.dialog.firstColumnWidth + 120,
+                                        y: 50 + 8 * settings.dialog.lineHeight + 50 + (settings.dialog.lineHeight * 5 - 40) / 2,
+                                        width: 40,
+                                        height: 40,
+                                        click: function() {
+
+                                            try {
+
+                                                var exceptionRet = client.showImageDiskDialog(true, m_functionSetImageSrc);
+                                                if (exceptionRet) {
+
+                                                    throw exceptionRet;
+                                                }
+                                            } catch(e) {
+
+                                                errorHelper.show(e);
+                                            }
+                                        }
+                                    },
+                                    
                                 },
                                 !manager.userAllowedToCreateEditPurchProjs ? 1 : 3
                             );
@@ -239,10 +404,22 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     ///////////////////////
+                    // Private methods - will they be accessible with current structure??
+					// Display the chosen image.
+					var m_functionSetImageSrc = function (imageId) {
+
+						m_imageId = imageId;
+//						$("#ProjectImage").attr("src", resourceHelper.toURL("resources", m_imageId, "image"));
+					}
+
+                    ///////////////////////
                     // Private fields.
 
                     // Indicates this instance is already created.
                     var m_bCreated = false;
+                    var m_projectName = null;
+                    var m_projectDescription = null;
+                    var m_imageId = null;
 
                 } catch (e) {
 
