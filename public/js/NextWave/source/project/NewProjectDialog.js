@@ -59,69 +59,38 @@ define(["NextWave/source/utility/prototypes",
 
                             // Create the dialog.
 
-                            // Creation modes:
-                            //      1   For non-privileged user only. Sees horizontal scroll bar of images of available project types.
-                            //          Moving mouse over the images displays a project type description tooltip.
-                            //          Clicking on an image switches to mode 2 with that project type having been selected.
-                            //        objectConfiguration elements:
-                            //          - "Choose Project Type" header label. modes=[1,3]
-                            //          - "Choose the type of Project you wish to create by clicking on its picture." label. modes=[1,3]
-                            //          - Strip of images built from arrayAvailProjTypes. modes=[1]
-                            //      2   Either a normal user or a privileged user who elected to create a normal project
-                            //          sees this mode after selecting a project type in mode 1 or mode 3.
-                            //        objectConfiguration elements:
-                            //          - "New xxx Project" header label. modes=[2,4,5,6]
-                            //          - "Enter details for your new Project." label. modes=[2,4,5,6]
-                            //          - "Only Name is required." label. modes=[2,4,5,6]
-                            //          - "Name" rt-just. label. Bold. modes=[2,4,5,6]
-                            //          - "Enter project name." edit. Screened back. modes=[2,4,5,6]
-                            //          - "Description" label. Bold. modes=[2,4,5,6]
-                            //          - "Will be used both to describe your project and to search for it later." edit. Screened back. modes=[2,4,5,6]
-                            //          - "Project image" label. Bold. modes=[2,4,5,6]
-                            //          - Image for project. (May be a hor. scroll region of 1 image.) modes=[2,4,5,6]
-                            //          - "Search icon" button. modes=[2,4,5,6]
-                            //          - "Cloud icon" button. modes=[2,4,5,6]
-                            //          - "Disk icon" button. modes=[2,4,5,6]
-                            //      3   For privileged users only. Like mode 1 with the horizontal scroll bar of project type images, but with
-                            //          four (initially disabled) buttons beneath: (1) Create normal project; (2) Create a class; (3) Create an online class; (4) Create a product.
-                            //          In mode 3 the scroll bar of images doesn't switch modes like in mode 1. It highlights (outlines the image) and
-                            //          enables the four buttons.
-                            //      4   For privileged users only. Like mode 2, but with fields for a class added. Has Create Project and Cancel buttons.  
-                            //      5   For privileged users only. Like mode 2, but with fields for an online class added. Has Create Project and Cancel buttons.  
-                            //      6   For privileged users only. Like mode 2, but with fields for a product added. Has Create Project and Cancel buttons.
-                            // Summary:
-                            //      A normal user starts in mode 1 and goes to mode 2 on image click.
-                            //      A privileged user starts in mode 3 and goes to mode 2, 4, 5 or 6, depending on the button clicked.
+                            //      A normal user starts in mode 'Sel Proj Type-normal user' and goes to mode 'Normal proj' on image click.
+                            //      A privileged user starts in mode 'Sel Proj Type-priv user' and goes to mode 'Normal proj', 'Class proj', 'Online class proj' or 'Product proj', depending on the button clicked.
 
                             let exceptionRet = self.dialog.create(
                                 {
                                     toggle1to3: {
                                         type: "Button",
-                                        modes: [1],
-                                        text: "Toggle to 3",
+                                        modes: ['Sel Proj Type-normal user'],
+                                        text: "Toggle to 'Sel Proj Type-priv user'",
                                         x: settings.general.margin + 8,
                                         y: 20,
-                                        width: 190,
+                                        width: 490,
                                         height: 40,
                                         click: function() {
-                                            self.dialog.setMode(3);
+                                            self.dialog.setMode('Sel Proj Type-priv user');
                                         }
                                     },
                                     toggle3to1: {
                                         type: "Button",
-                                        modes: [3],
-                                        text: "Toggle to 1",
-                                        x: settings.dialog.firstColumnWidth + 8,
+                                        modes: ['Sel Proj Type-priv user'],
+                                        text: "Toggle to 'Sel Proj Type-normal user'",
+                                        x: settings.dialog.firstColumnWidth * 3 + 8,
                                         y: 20,
-                                        width: 190,
+                                        width: 490,
                                         height: 40,
                                         click: function() {
-                                            self.dialog.setMode(1);
+                                            self.dialog.setMode('Sel Proj Type-normal user');
                                         }
                                     },
                                     instructions1: {
                                         type: "Label",
-                                        modes: [1,3],
+                                        modes: ['Sel Proj Type-normal user','Sel Proj Type-priv user'],
                                         text: "Choose the type of Project you wish to create by clicking on its picture.",
                                         x: settings.general.margin + 8,
                                         y: 70,
@@ -131,7 +100,7 @@ define(["NextWave/source/utility/prototypes",
                                     },
                                     projectTypes: {
                                         type: "ListHost",
-                                        modes: [1,3],
+                                        modes: ['Sel Proj Type-normal user','Sel Proj Type-priv user'],
                                         constructorParameterString: "false",
                                         x: settings.general.margin,
                                         y: 100,
@@ -144,7 +113,7 @@ define(["NextWave/source/utility/prototypes",
                                     },
                                     instructions2: {
                                         type: "Label",
-                                        modes: [3],
+                                        modes: ['Sel Proj Type-priv user'],
                                         text: "As a privileged user, besides being able to create Normal projects, you are allowed to create a Class, an Online Class or a Product. Choose here:",
                                         x: settings.general.margin + 8,
                                         y: 250,
@@ -155,55 +124,55 @@ define(["NextWave/source/utility/prototypes",
                                     // TODO: I want the next 4 buttons to be protected to start. Protection is removed when an image in projectTypes is clicked and highlighted.
                                     normal: {
                                         type: "Button",
-                                        modes: [3],
+                                        modes: ['Sel Proj Type-priv user'],
                                         text: "Normal",
                                         x: settings.general.margin + 8,
                                         y: 300,
                                         width: 190,
                                         height: 40,
                                         click: function() {
-                                            self.dialog.setMode(2);
+                                            self.dialog.setMode('Normal proj');
                                         }
                                     },
                                     class: {
                                         type: "Button",
-                                        modes: [3],
+                                        modes: ['Sel Proj Type-priv user'],
                                         text: "Class",
                                         x: settings.general.margin + 8,
                                         y: 350,
                                         width: 190,
                                         height: 40,
                                         click: function() {
-                                            self.dialog.setMode(4);
+                                            self.dialog.setMode('Class proj');
                                         }
                                     },
                                     onlineClass: {
                                         type: "Button",
-                                        modes: [3],
+                                        modes: ['Sel Proj Type-priv user'],
                                         text: "Online Class",
                                         x: settings.general.margin + 8,
                                         y: 400,
                                         width: 190,
                                         height: 40,
                                         click: function() {
-                                            self.dialog.setMode(5);
+                                            self.dialog.setMode('Online class proj');
                                         }
                                     },
                                     product: {
                                         type: "Button",
-                                        modes: [3],
+                                        modes: ['Sel Proj Type-priv user'],
                                         text: "Product",
                                         x: settings.general.margin + 8,
                                         y: 450,
                                         width: 190,
                                         height: 40,
                                         click: function() {
-                                            self.dialog.setMode(6);
+                                            self.dialog.setMode('Product proj');
                                         }
                                     },
                                     instructions3: {
                                         type: "Label",
-                                        modes: [2,4,5,6],
+                                        modes: ['Normal proj','Class proj','Online class proj','Product proj'],
                                         text: "Enter details for your new Project.",
                                         x: settings.general.margin + 8,
                                         y: 50,
@@ -213,7 +182,7 @@ define(["NextWave/source/utility/prototypes",
                                     },
                                     instructions4: {
                                         type: "Label",
-                                        modes: [2,4,5,6],
+                                        modes: ['Normal proj','Class proj','Online class proj','Product proj'],
                                         text: "Only Name is required. However, consider changing the default image for id purposes.",
                                         x: settings.general.margin + 8,
                                         y: 50 + settings.dialog.lineHeight + 10,
@@ -223,7 +192,7 @@ define(["NextWave/source/utility/prototypes",
                                     },
                                     nameLabel: {
                                         type: "Label",
-                                        modes: [2,4,5,6],
+                                        modes: ['Normal proj','Class proj','Online class proj','Product proj'],
                                         text: "Name",
                                         x: settings.general.margin + 8,
                                         y: 50 + 2 * settings.dialog.lineHeight + 30,
@@ -233,7 +202,7 @@ define(["NextWave/source/utility/prototypes",
                                     },
                                     nameEdit: {
                                         type: "Edit",
-                                        modes: [2,4,5,6],
+                                        modes: ['Normal proj','Class proj','Online class proj','Product proj'],
                                         x: 2 * settings.general.margin + 
                                             settings.dialog.firstColumnWidth,
                                         y: 50 + 2 * settings.dialog.lineHeight + 30,
@@ -250,7 +219,7 @@ define(["NextWave/source/utility/prototypes",
                                     },
                                     descriptionLabel: {
                                         type: "Label",
-                                        modes: [2,4,5,6],
+                                        modes: ['Normal proj','Class proj','Online class proj','Product proj'],
                                         text: "Description",
                                         x: settings.general.margin + 8,
                                         y: 50 + 3 * settings.dialog.lineHeight + 40,
@@ -260,7 +229,7 @@ define(["NextWave/source/utility/prototypes",
                                     },
                                     descriptionEdit: {
                                         type: "Edit",
-                                        modes: [2,4,5,6],
+                                        modes: ['Normal proj','Class proj','Online class proj','Product proj'],
                                         x: 2 * settings.general.margin + 
                                             settings.dialog.firstColumnWidth,
                                         y: 50 + 3 * settings.dialog.lineHeight + 40,
@@ -280,7 +249,7 @@ define(["NextWave/source/utility/prototypes",
                                     },
                                     projectImageLabel: {
                                         type: "Label",
-                                        modes: [2,4,5,6],
+                                        modes: ['Normal proj','Class proj','Online class proj','Product proj'],
                                         text: "Project image",
                                         x: settings.general.margin + 8,
                                         y: 50 + 8 * settings.dialog.lineHeight + 50,
@@ -290,7 +259,7 @@ define(["NextWave/source/utility/prototypes",
                                     },
                                     willBeImage: {
                                         type: "Edit",   // TODO will change
-                                        modes: [2,4,5,6],
+                                        modes: ['Normal proj','Class proj','Online class proj','Product proj'],
                                         x: 2 * settings.general.margin + settings.dialog.firstColumnWidth,
                                         y: 50 + 8 * settings.dialog.lineHeight + 50,
                                         width: settings.dialog.firstColumnWidth,
@@ -298,7 +267,7 @@ define(["NextWave/source/utility/prototypes",
                                     },
                                     imageSearchButton: {
                                         type: "Button",
-                                        modes: [2,4,5,6],
+                                        modes: ['Normal proj','Class proj','Online class proj','Product proj'],
                                         text: "S",
                                         x: 2 * settings.general.margin + settings.dialog.firstColumnWidth + settings.dialog.firstColumnWidth + 20,
                                         y: 50 + 8 * settings.dialog.lineHeight + 50 + (settings.dialog.lineHeight * 5 - 40) / 2,
@@ -321,7 +290,7 @@ define(["NextWave/source/utility/prototypes",
                                     },
                                     urlSearchButton: {
                                         type: "Button",
-                                        modes: [2,4,5,6],
+                                        modes: ['Normal proj','Class proj','Online class proj','Product proj'],
                                         text: "U",
                                         x: 2 * settings.general.margin + settings.dialog.firstColumnWidth + settings.dialog.firstColumnWidth + 70,
                                         y: 50 + 8 * settings.dialog.lineHeight + 50 + (settings.dialog.lineHeight * 5 - 40) / 2,
@@ -344,7 +313,7 @@ define(["NextWave/source/utility/prototypes",
                                     },
                                     fileSearchButton: {
                                         type: "Button",
-                                        modes: [2,4,5,6],
+                                        modes: ['Normal proj','Class proj','Online class proj','Product proj'],
                                         text: "F",
                                         x: 2 * settings.general.margin + settings.dialog.firstColumnWidth + settings.dialog.firstColumnWidth + 120,
                                         y: 50 + 8 * settings.dialog.lineHeight + 50 + (settings.dialog.lineHeight * 5 - 40) / 2,
@@ -368,7 +337,7 @@ define(["NextWave/source/utility/prototypes",
                                     // TODO: I want the next button to be protected to start. Protection is removed all fields are validate.
                                     createProjectButton: {
                                         type: "Button",
-                                        modes: [2,4,5,6],
+                                        modes: ['Normal proj','Class proj','Online class proj','Product proj'],
                                         text: "Create Project",
                                         xType: "reserve",
                                         x: 2 * settings.dialog.firstColumnWidth + 20,
@@ -564,7 +533,7 @@ define(["NextWave/source/utility/prototypes",
                                     },
                                     cancelButton: {
                                         type: "Button",
-                                        modes: [2,4,5,6],
+                                        modes: ['Normal proj','Class proj','Online class proj','Product proj'],
                                         text: "Cancel",
                                         xType: "reserve",
                                         x: settings.dialog.firstColumnWidth,
@@ -588,7 +557,7 @@ define(["NextWave/source/utility/prototypes",
                                         }
                                     }
                                 },
-                                !manager.userAllowedToCreateEditPurchProjs ? 1 : 3
+                                !manager.userAllowedToCreateEditPurchProjs ? 'Sel Proj Type-normal user' : 'Sel Proj Type-priv user'
                             );
 
                             if (exceptionRet) {
