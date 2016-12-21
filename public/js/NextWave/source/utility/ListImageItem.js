@@ -1,5 +1,5 @@
 ///////////////////////////////////////
-// ListImage base module.
+// ListImageItem base module.
 //
 // Base class for all list items.
 //
@@ -20,7 +20,7 @@ define(["NextWave/source/utility/prototypes",
         try {
 
             // Constructor function.
-        	var functionRet = function ListImage(strName, strSettingsNode) {
+        	var functionRet = function ListImageItem(strName, strSettingsNode) {
 
                 try {
 

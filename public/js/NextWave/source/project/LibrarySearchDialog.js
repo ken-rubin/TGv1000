@@ -127,7 +127,6 @@ define(["NextWave/source/utility/prototypes",
                                                     liNew.data = library;
                                                     liNew.clickHandler = () => {
 
-                                                        // alert("From liNew: " + liNew.name);
                                                         let objectLibrary = JSON.parse(library.libraryJSON);
                                                         window.projectDialog.mergeLibrary(objectLibrary);                                                    
                                                     };

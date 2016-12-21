@@ -121,6 +121,12 @@ define(["NextWave/source/utility/prototypes",
                         return null;
                     };
 
+                    // Used when a Control-derived object has to do so.
+                    self.recreate = function () {
+
+                        return self.innerCreate();
+                    }
+
                     // Give derived modules a crack at the create pipeline.
                     self.innerCreate = function () {
 

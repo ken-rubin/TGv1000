@@ -21,8 +21,9 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/ListHost",
     "NextWave/source/utility/Accordion",
     "NextWave/source/utility/ParameterListHost",
-    "NextWave/source/utility/StatementListHost"],
-    function (prototypes, settings, Point, Size, Area, Label, Edit, Button, GlyphHost, ListHost, Accordion, ParameterListHost, StatementListHost) {
+    "NextWave/source/utility/StatementListHost",
+    "NextWave/source/utility/Picture"],
+    function (prototypes, settings, Point, Size, Area, Label, Edit, Button, GlyphHost, ListHost, Accordion, ParameterListHost, StatementListHost, Picture) {
 
         try {
 
@@ -147,7 +148,7 @@ define(["NextWave/source/utility/prototypes",
                                 var exceptionRet = controlIth.create(objectControlIth);
                                 if (exceptionRet) {
 
-                                    return exceptionRet;
+                                    return new Error(objectControlIth.type + objectControlIth.text); // exceptionRet;
                                 }
                             }
 
@@ -416,6 +417,8 @@ define(["NextWave/source/utility/prototypes",
                                 // Get the ith control.
                                 var controlIth = self.controls[i];
 
+                                // Render controlIth iff it doesn't have the property "modes" or it does and m_mode matches one controlIth.modes's array elements.
+                                // Otherwise, just skip it for this render loop.
                                 if (!m_mode || (m_mode && controlIth.hasOwnProperty("modes") && controlIth.modes.includes(m_mode))) {
 
                                     // Set the layout for the controls.
@@ -440,6 +443,12 @@ define(["NextWave/source/utility/prototypes",
 
                         // With m_mode changed, we want to reset and re-render all objects.
                         // That may happen automatically in the render loop.
+                    }
+
+                    // Return m_mode to someone.
+                    self.getMode = function () {
+
+                        return m_mode;
                     }
 
                     //////////////////////
