@@ -40,7 +40,7 @@ define(["NextWave/source/utility/prototypes",
 
                     // Attach instance to DOM and initialize state.
                     // arrayAvailProjTypes is used to get the images from which the user chooses the project type to create.
-                    // It is an int array containing one or more of 1-6, corresponding to 
+                    // It is an int array containing 1-6 (perhaps a subset for normal users; all 6 for priv. users), corresponding to 
                     // 1 game project
                     // 2 console project
                     // 3 website project
@@ -56,6 +56,8 @@ define(["NextWave/source/utility/prototypes",
 
                                 throw { message: "NewProjectDialog: Instance already created!" };
                             }
+
+
 
                             // Create the dialog.
 
@@ -129,7 +131,7 @@ define(["NextWave/source/utility/prototypes",
                                             
                                             } else {
 
-                                                // Highlight the selected project type and enable the continue button.
+                                                // Highlight this Picture and enable the 4 "continue" buttons.
 
                                             }
                                         }
@@ -152,7 +154,7 @@ define(["NextWave/source/utility/prototypes",
                                             
                                             } else {
 
-                                                // Highlight the selected project type and enable the continue button.
+                                                // Highlight this Picture and enable the 4 "continue" buttons.
                                                 
                                             }
                                         }
@@ -175,7 +177,7 @@ define(["NextWave/source/utility/prototypes",
                                             
                                             } else {
 
-                                                // Highlight the selected project type and enable the continue button.
+                                                // Highlight this Picture and enable the 4 "continue" buttons.
                                                 
                                             }
                                         }
@@ -198,7 +200,7 @@ define(["NextWave/source/utility/prototypes",
                                             
                                             } else {
 
-                                                // Highlight the selected project type and enable the continue button.
+                                                // Highlight this Picture and enable the 4 "continue" buttons.
                                                 
                                             }
                                         }
@@ -221,7 +223,7 @@ define(["NextWave/source/utility/prototypes",
                                             
                                             } else {
 
-                                                // Highlight the selected project type and enable the continue button.
+                                                // Highlight this Picture and enable the 4 "continue" buttons.
                                                 
                                             }
                                         }
@@ -244,7 +246,7 @@ define(["NextWave/source/utility/prototypes",
                                             
                                             } else {
 
-                                                // Highlight the selected project type and enable the continue button.
+                                                // Highlight this Picture and enable the 4 "continue" buttons.
                                                 
                                             }
                                         }
@@ -259,7 +261,7 @@ define(["NextWave/source/utility/prototypes",
                                         width: 2 * settings.general.margin,
                                         height: settings.dialog.lineHeight                                  
                                     },
-                                    // TODO: I want the next 4 buttons to be protected to start. Protection is removed when an image in projectTypes is clicked and highlighted.
+                                    // TODO: I want the next 4 buttons to be disabled to start. They are enabled when an image in projectTypes is clicked and highlighted.
                                     normal: {
                                         type: "Button",
                                         modes: ['Sel Proj Type-priv user'],
@@ -473,7 +475,7 @@ define(["NextWave/source/utility/prototypes",
                                             }
                                         }
                                     },
-                                    // TODO: I want the next button to be protected to start. Protection is removed all fields are validate.
+                                    // TODO: I want the next button to be disabled to start. It is enabled when the project has a name.
                                     createProjectButton: {
                                         type: "Button",
                                         modes: ['Normal proj','Class proj','Online class proj','Product proj'],

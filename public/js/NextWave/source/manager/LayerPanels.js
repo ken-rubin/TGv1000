@@ -185,6 +185,7 @@ define(["NextWave/source/utility/prototypes",
                                 throw exceptionRet;
                             }
                             // Not allocating these three center panels yet.
+                            // They'll be allocated when first needed and data to pass in is available.
 /*                            exceptionRet = m_functionAllocateNewProject();
                             if (exceptionRet) {
 

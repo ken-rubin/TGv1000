@@ -49,6 +49,12 @@ define(["Core/errorHelper"],
 
 												if (data.success) {
 
+													// In case something went wrong--very unlikely, but I always
+													// want something passed in to NewProjectDialog.create().
+													if (data.arrayAvailProjTypes.length === 0) {
+														data.arrayAvailProjTypes = [1];
+													}
+
 													exceptionRet = client.showNewProjectDialog(data.arrayAvailProjTypes);
 													if (exceptionRet) { throw exceptionRet; }
 
