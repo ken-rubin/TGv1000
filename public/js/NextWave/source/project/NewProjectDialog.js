@@ -17,11 +17,11 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/Area",
     "NextWave/source/utility/DialogHost",
     "NextWave/source/utility/List",
-    "NextWave/source/utility/ListItem",
+    "NextWave/source/utility/PictureListItem",
     "Core/errorHelper", 
     "Core/resourceHelper"
     ],
-    function (prototypes, settings, Point, Size, Area, DialogHost, List, ListItem, errorHelper, resourceHelper) {
+    function (prototypes, settings, Point, Size, Area, DialogHost, List, PictureListItem, errorHelper, resourceHelper) {
 
         try {
 
@@ -51,6 +51,10 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            if (!arrayAvailProjTypes) {
+                                return null;
+                            }
+
                             // Can only create an uncreated instance.
                             if (m_bCreated) {
 
@@ -64,8 +68,8 @@ define(["NextWave/source/utility/prototypes",
                             //      A normal user starts in mode 'Sel Proj Type-normal user' and goes to mode 'Normal proj' on image click.
                             //      A privileged user starts in mode 'Sel Proj Type-priv user' and goes to mode 'Normal proj', 'Class proj', 'Online class proj' or 'Product proj', depending on the button clicked.
 
-                            let exceptionRet = self.dialog.create(
-                                {
+                            let objectConfiguration = 
+                            {
                                     toggle1to3: {
                                         type: "Button",
                                         modes: ['Sel Proj Type-normal user'],
@@ -100,7 +104,7 @@ define(["NextWave/source/utility/prototypes",
                                         width: 2 * settings.general.margin,
                                         height: settings.dialog.lineHeight                                  
                                     },
-/*                                    projectTypes: {
+                                    projectTypes: {
                                         type: "ListHost",
                                         modes: ['Sel Proj Type-normal user','Sel Proj Type-priv user'],
                                         constructorParameterString: "false",
@@ -108,148 +112,7 @@ define(["NextWave/source/utility/prototypes",
                                         y: 100,
                                         widthType: "reserve",
                                         width: 2 * settings.general.margin,
-                                        height: 100,
-                                        click: function() {
-
-                                        }
-                                    },
-*/                                    pt1: {
-                                        type: "Button",
-                                        modes: ['Sel Proj Type-normal user','Sel Proj Type-priv user'],
-                                        text: "1",
-                                        x: settings.general.margin + 20,
-                                        y: 120,
-                                        width: 40,
-                                        height: 40,
-                                        click: function() {
-                                            let iPI = self.dialog.controlObject["projectImage"];
-                                            iPI.url = resourceHelper.toURL("images", null, null, "gameProject.png");
-                                            iPI.recreate();
-                                            if (self.dialog.getMode() === "Sel Proj Type-normal user") {
-                                                
-                                                self.dialog.setMode('Normal proj');
-                                            
-                                            } else {
-
-                                                // Highlight this Picture and enable the 4 "continue" buttons.
-
-                                            }
-                                        }
-                                    },
-                                    pt2: {
-                                        type: "Button",
-                                        modes: ['Sel Proj Type-normal user','Sel Proj Type-priv user'],
-                                        text: "2",
-                                        x: settings.general.margin + 80,
-                                        y: 120,
-                                        width: 40,
-                                        height: 40,
-                                        click: function() {
-                                            let iPI = self.dialog.controlObject["projectImage"];
-                                            iPI.url = resourceHelper.toURL("images", null, null, "consoleProject.png");
-                                            iPI.recreate();
-                                            if (self.dialog.getMode() === "Sel Proj Type-normal user") {
-                                                
-                                                self.dialog.setMode('Normal proj');
-                                            
-                                            } else {
-
-                                                // Highlight this Picture and enable the 4 "continue" buttons.
-                                                
-                                            }
-                                        }
-                                    },
-                                    pt3: {
-                                        type: "Button",
-                                        modes: ['Sel Proj Type-normal user','Sel Proj Type-priv user'],
-                                        text: "3",
-                                        x: settings.general.margin + 140,
-                                        y: 120,
-                                        width: 40,
-                                        height: 40,
-                                        click: function() {
-                                            let iPI = self.dialog.controlObject["projectImage"];
-                                            iPI.url = resourceHelper.toURL("images", null, null, "websiteProject.png");
-                                            iPI.recreate();
-                                            if (self.dialog.getMode() === "Sel Proj Type-normal user") {
-                                                
-                                                self.dialog.setMode('Normal proj');
-                                            
-                                            } else {
-
-                                                // Highlight this Picture and enable the 4 "continue" buttons.
-                                                
-                                            }
-                                        }
-                                    },
-                                    pt4: {
-                                        type: "Button",
-                                        modes: ['Sel Proj Type-normal user','Sel Proj Type-priv user'],
-                                        text: "4",
-                                        x: settings.general.margin + 200,
-                                        y: 120,
-                                        width: 40,
-                                        height: 40,
-                                        click: function() {
-                                            let iPI = self.dialog.controlObject["projectImage"];
-                                            iPI.url = resourceHelper.toURL("images", null, null, "hololensProject.png");
-                                            iPI.recreate();
-                                            if (self.dialog.getMode() === "Sel Proj Type-normal user") {
-                                                
-                                                self.dialog.setMode('Normal proj');
-                                            
-                                            } else {
-
-                                                // Highlight this Picture and enable the 4 "continue" buttons.
-                                                
-                                            }
-                                        }
-                                    },
-                                    pt5: {
-                                        type: "Button",
-                                        modes: ['Sel Proj Type-normal user','Sel Proj Type-priv user'],
-                                        text: "5",
-                                        x: settings.general.margin + 260,
-                                        y: 120,
-                                        width: 40,
-                                        height: 40,
-                                        click: function() {
-                                            let iPI = self.dialog.controlObject["projectImage"];
-                                            iPI.url = resourceHelper.toURL("images", null, null, "mappingProject.png");
-                                            iPI.recreate();
-                                            if (self.dialog.getMode() === "Sel Proj Type-normal user") {
-                                                
-                                                self.dialog.setMode('Normal proj');
-                                            
-                                            } else {
-
-                                                // Highlight this Picture and enable the 4 "continue" buttons.
-                                                
-                                            }
-                                        }
-                                    },
-                                    pt6: {
-                                        type: "Button",
-                                        modes: ['Sel Proj Type-normal user','Sel Proj Type-priv user'],
-                                        text: "6",
-                                        x: settings.general.margin + 320,
-                                        y: 120,
-                                        width: 40,
-                                        height: 40,
-                                        click: function() {
-                                            let iPI = self.dialog.controlObject["projectImage"];
-                                            iPI.url = resourceHelper.toURL("images", null, null, "emptyProject.png");
-                                            iPI.recreate();
-                                            if (self.dialog.getMode() === "Sel Proj Type-normal user") {
-                                                
-                                                self.dialog.setMode('Normal proj');
-                                            
-                                            } else {
-
-                                                // Highlight this Picture and enable the 4 "continue" buttons.
-                                                
-                                            }
-                                        }
+                                        height: 100
                                     },
                                     instructions2: {
                                         type: "Label",
@@ -697,13 +560,52 @@ define(["NextWave/source/utility/prototypes",
                                             }
                                         }
                                     }
-                                },
+                            };
+
+                            let exceptionRet = self.dialog.create(
+                                objectConfiguration,
                                 !manager.userAllowedToCreateEditPurchProjs ? 'Sel Proj Type-normal user' : 'Sel Proj Type-priv user'
                             );
 
                             if (exceptionRet) {
                                 return exceptionRet;
                             }
+
+                            // Fill self.dialog.controlObject["projectTypes"] with array of images based upon arrayAvailProjTypes.
+                            m_lhProjectTypes = self.dialog.controlObject["projectTypes"];
+                            let listProjectTypes = m_lhProjectTypes.list;
+                            let index = 0;
+                            
+                            // Don't check result because if destroy fails, that's because it hadn't been created, so it's ok.
+                            listProjectTypes.destroy();
+                            let arrayOutput = arrayAvailProjTypes.map((projTypeId) => {
+
+                                let pliNew = new PictureListItem(m_arrayProjectTypeNames[projTypeId - 1], projTypeId, index++);
+                                pliNew.clickHandler = (id) => {
+                                    
+                                    // self is NewProjectDialog instance.
+                                    m_projectTypeId = id;
+                                    
+                                    let iPI = self.dialog.controlObject["projectImage"];
+                                    iPI.url = resourceHelper.toURL("images", null, null, m_arrayProjectTypeNames[m_projectTypeId - 1] + "Project.png");
+                                    iPI.recreate();
+
+                                    if (self.dialog.getMode() === "Sel Proj Type-normal user") {
+                                        
+                                        // Normal user just switches mode to create new project.
+                                        self.dialog.setMode('Normal proj');
+    
+                                    } else {
+
+                                        // Privileged user has selected project type highlighted and the 4 buttons are enabled.
+
+                                    }
+
+                                };
+                                return pliNew;
+                            })
+
+                            listProjectTypes.create(arrayOutput);
 
                             // Because it is!
                             m_bCreated = true;
@@ -756,6 +658,9 @@ define(["NextWave/source/utility/prototypes",
                     var m_projectName = null;
                     var m_projectDescription = null;
                     var m_imageId = null;
+                    var m_projectTypeId = 0;
+                    var m_lhProjectTypes = null;
+                    var m_arrayProjectTypeNames = ["game","console","website","hololens","mapping","empty"];
 
                 } catch (e) {
 

@@ -375,7 +375,7 @@ define(["NextWave/source/utility/prototypes"],
                             lineHeight: 26,
                             fillBackground: "#aaf"
                         },
-                        image: {
+                        picture: {
                             
                         }
                     };
