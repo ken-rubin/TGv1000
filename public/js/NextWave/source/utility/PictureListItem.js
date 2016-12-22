@@ -59,7 +59,10 @@ define(["NextWave/source/utility/prototypes",
                     // Initialization.
                     self.url = resourceHelper.toURL("images", null, null, self.name + "Project.png");
                     m_image = new Image();
-                    m_image.onload = function() {}
+                    m_bLoaded = false;
+                    m_image.onload = function() {
+                        m_bLoaded = true;
+                    }
                     m_image.src = self.url;
 
                     ////////////////////////
@@ -205,6 +208,10 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+/*                            if (!m_bLoaded || !m_image) {
+                                return null;
+                            }
+*/
                             // Default vertical to true.
                             if (bVertical === undefined) {
 
@@ -258,7 +265,7 @@ define(["NextWave/source/utility/prototypes",
                             }
                             contextRender.fill();
                             contextRender.stroke();
-
+if (true) {
                             // Render the delete handler, if specified.
                             var dSpaceForDeleteIcon = 0;
                             if ($.isFunction(self.deleteHandler)) {
@@ -290,7 +297,23 @@ define(["NextWave/source/utility/prototypes",
                                 m_area.location.x + settings.general.margin,
                                 m_area.location.y + settings.general.margin,
                                 m_area.extent.width - 2 * settings.general.margin - dSpaceForDeleteIcon);
+} else {
 
+                            // Render the image.
+                            try {
+
+                                contextRender.save();                                
+                                contextRender.clip();
+                                contextRender.drawImage(m_image,
+                                    m_area.location.x, 
+                                    m_area.location.y,
+                                    m_area.extent.width,
+                                    m_area.extent.height);
+                            } finally {
+
+                                contextRender.restore();
+                            }
+}
                             return null;
                         } catch (e) {
 
@@ -306,6 +329,7 @@ define(["NextWave/source/utility/prototypes",
                     // Remember where the delete icon is--if delete handler is handled.
                     var m_areaDeleteIcon = null;
                     var m_image = null;
+                    var m_bLoaded = false;
 
                 } catch (e) {
 
