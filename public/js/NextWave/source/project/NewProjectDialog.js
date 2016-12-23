@@ -124,7 +124,6 @@ define(["NextWave/source/utility/prototypes",
                                         width: 2 * settings.general.margin,
                                         height: settings.dialog.lineHeight                                  
                                     },
-                                    // TODO: I want the next 4 buttons to be disabled to start. They are enabled when an image in projectTypes is clicked and highlighted.
                                     normal: {
                                         type: "Button",
                                         modes: ['Sel Proj Type-priv user'],
@@ -137,7 +136,7 @@ define(["NextWave/source/utility/prototypes",
                                             self.dialog.setMode('Normal proj');
                                         }
                                     },
-                                    class: {
+                                    classs: {
                                         type: "Button",
                                         modes: ['Sel Proj Type-priv user'],
                                         text: "Class",
@@ -562,6 +561,7 @@ define(["NextWave/source/utility/prototypes",
                                     }
                             };
 
+                            // Finally...create the Dialog with its controls, based on Normal or Privileged user status.
                             let exceptionRet = self.dialog.create(
                                 objectConfiguration,
                                 !manager.userAllowedToCreateEditPurchProjs ? 'Sel Proj Type-normal user' : 'Sel Proj Type-priv user'
@@ -571,13 +571,13 @@ define(["NextWave/source/utility/prototypes",
                                 return exceptionRet;
                             }
 
+                            ////////////////////////
                             // Fill self.dialog.controlObject["projectTypes"] with array of images based upon arrayAvailProjTypes.
                             m_lhProjectTypes = self.dialog.controlObject["projectTypes"];
                             let listProjectTypes = m_lhProjectTypes.list;
                             let index = 0;
                             
-                            // Don't check result because if destroy fails, that's because it hadn't been created, so it's ok.
-                            listProjectTypes.destroy();
+                            listProjectTypes.destroy(); // Don't check result because if destroy fails, that's because it hadn't been created, so it's ok.
                             let arrayOutput = arrayAvailProjTypes.map((projTypeId) => {
 
                                 let pliNew = new PictureListItem(m_arrayProjectTypeNames[projTypeId - 1], projTypeId, index++);
@@ -585,9 +585,13 @@ define(["NextWave/source/utility/prototypes",
                                     
                                     // self is NewProjectDialog instance.
                                     m_projectTypeId = id;
+
+                                    let i3 = self.dialog.controlObject["instructions3"];
+                                    let ptName = m_arrayProjectTypeNames[projTypeId - 1];
+                                    i3.text = "Enter details for your new " + ptName.charAt(0).toUpperCase() + ptName.slice(1) + "-based Project.";
                                     
                                     let iPI = self.dialog.controlObject["projectImage"];
-                                    iPI.url = resourceHelper.toURL("images", null, null, m_arrayProjectTypeNames[m_projectTypeId - 1] + "Project.png");
+                                    iPI.setUrl(resourceHelper.toURL("images", null, null, m_arrayProjectTypeNames[m_projectTypeId - 1] + "Project.png"));
                                     iPI.recreate();
 
                                     if (self.dialog.getMode() === "Sel Proj Type-normal user") {
@@ -597,15 +601,16 @@ define(["NextWave/source/utility/prototypes",
     
                                     } else {
 
-                                        // Privileged user has selected project type highlighted and the 4 buttons are enabled.
+                                        // Privileged user has selected project type. Highlight its PictureListItem in listHost and enable the 4 project type buttons.
 
                                     }
 
                                 };
                                 return pliNew;
-                            })
-
+                            });
                             listProjectTypes.create(arrayOutput);
+
+                            m_functionSetBtnProtection();
 
                             // Because it is!
                             m_bCreated = true;
@@ -644,11 +649,49 @@ define(["NextWave/source/utility/prototypes",
 					var m_functionSetImageSrc = function (imageId) {
 
 						m_imageId = imageId;
-                        let imageURL = resourceHelper.toURL("resources", m_imageId, "image");
-
-                        // Make it happen....
-                        
+                        let iPI = self.dialog.controlObject["projectImage"];
+                        iPI.setUrl(resourceHelper.toURL("resources", m_imageId, "image"));
+                        iPI.recreate();
 					}
+
+                    var m_functionSetBtnProtection = function() {
+
+                        let currDialogMode = self.dialog.getMode();
+                        if (currDialogMode === "Sel Proj Type-priv user") {
+
+                            ////////////////////////
+                            // Protect (disable buttons until user takes appropriate actions).
+                            // Affected buttons:
+                            //    If priv. user, based on selection of project type: "normal", "class", "onlineClass", "product":
+                            let btn = self.dialog.controlObject["normal"];
+                            btn.setProtected(true);
+                            btn = self.dialog.controlObject["classs"];
+                            btn.setProtected(true);
+                            btn = self.dialog.controlObject["onlineClass"];
+                            btn.setProtected(true);
+                            btn = self.dialog.controlObject["product"];
+                            btn.setProtected(true);
+                        
+                        } else if (currDialogMode === "Normal proj" || currDialogMode === "Class proj" || currDialogMode === "Online class proj" || currDialogMode === "Product proj") {
+
+                            // Enable the Save Project button if validation passes, including project name is set.
+                            let btn = self.dialog.controlObject["normal"];
+                            btn.setProtected(!m_functionIsEverythingValid());
+                        }
+                    }
+
+                    var m_functionIsEverythingValid = function() {
+
+                        let bValid = false;
+                        if (m_projectName.length) {
+
+                            bValid = true;
+                        }
+
+                        // Once created, all of the fields for purchasable projects will be validated, too--both for correctness and completion.
+
+                        return bValid;
+                    }
 
                     ///////////////////////
                     // Private fields.

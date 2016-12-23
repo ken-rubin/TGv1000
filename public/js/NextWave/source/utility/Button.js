@@ -164,6 +164,11 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+                            if (self.protected) {
+
+                                return null;
+                            }
+
                             // Raise event handler, if specified.
                             if (self.configuration.click) {
 

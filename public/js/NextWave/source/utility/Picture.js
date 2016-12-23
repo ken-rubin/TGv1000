@@ -46,6 +46,12 @@ define(["NextWave/source/utility/prototypes",
                         return null;
                     };
 
+                    self.setUrl = function (url) {
+
+                        self.url = url;
+                        return self.recreate();
+                    }
+
                     // Inner load.
                     self.innerCreate = function () {
 

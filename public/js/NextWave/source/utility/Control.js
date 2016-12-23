@@ -34,7 +34,7 @@ define(["NextWave/source/utility/prototypes",
                     self.configuration = null;
                     // The owner dialog.
                     self.dialog = null;
-                    // If protected, no editing, combo or checkbox changes, etc. allowed.
+                    // If protected, no editing, combo or checkbox changes, button clicking, etc. allowed.
                     self.protected = false;
                     // Condition specific owner object--really the 
                     // container of this control outside of a dialog.
