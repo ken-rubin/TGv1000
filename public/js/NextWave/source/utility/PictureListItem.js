@@ -58,8 +58,8 @@ define(["NextWave/source/utility/prototypes",
                     ////////////////////////
                     // Initialization.
                     self.url = resourceHelper.toURL("images", null, null, self.name + "Project.png");
-                    m_image = new Image();
-                    m_bLoaded = false;
+                    var m_image = new Image();
+                    var m_bLoaded = false;
                     m_image.onload = function() {
                         m_bLoaded = true;
                     }
@@ -208,10 +208,10 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-/*                            if (!m_bLoaded || !m_image) {
+                            if (!m_bLoaded || !m_image) {
                                 return null;
                             }
-*/
+
                             // Default vertical to true.
                             if (bVertical === undefined) {
 
@@ -265,7 +265,7 @@ define(["NextWave/source/utility/prototypes",
                             }
                             contextRender.fill();
                             contextRender.stroke();
-if (true) {
+if (false) {
                             // Render the delete handler, if specified.
                             var dSpaceForDeleteIcon = 0;
                             if ($.isFunction(self.deleteHandler)) {
@@ -328,8 +328,6 @@ if (true) {
                     var m_area = null;
                     // Remember where the delete icon is--if delete handler is handled.
                     var m_areaDeleteIcon = null;
-                    var m_image = null;
-                    var m_bLoaded = false;
 
                 } catch (e) {
 
