@@ -80,8 +80,19 @@ define(["NextWave/source/utility/prototypes",
                                 contextRender.save();
                                 contextRender.clip();
 
-                                // Fill and stroke the path.
-                                contextRender.fillStyle = (m_bMouseIn ? (m_bMouseDown ? settings.button.backgroundMouseDown : settings.button.backgroundMouseIn) : settings.button.background);
+                                // Fill and stroke the path. If self.protected, no special background.
+                                if (self.protected) {
+
+                                    contextRender.fillStyle = settings.button.background;
+
+                                } else {
+
+                                    contextRender.fillStyle = (m_bMouseIn ? 
+                                                                (m_bMouseDown ? 
+                                                                    settings.button.backgroundMouseDown : 
+                                                                    settings.button.backgroundMouseIn) : 
+                                                                settings.button.background);
+                                }
                                 contextRender.strokeStyle = settings.general.strokeBackground;
                                 contextRender.fill();
                                 contextRender.stroke();
@@ -90,10 +101,21 @@ define(["NextWave/source/utility/prototypes",
                                 contextRender.fillStyle = "rgba(0,0,0,0.7)";
                                 contextRender.textBaseline = "middle"; 
                                 contextRender.textAlign = "center";
-                                contextRender.fillText(self.configuration.text,
-                                    m_area.location.x + m_area.extent.width / 2 + (m_bMouseDown ? 3 : 0),
-                                    m_area.location.y + m_area.extent.height / 2+ (m_bMouseDown ? 3 : 0)) 
-                            } finally {
+
+                                // Again, if self.protected, nothing special for the text.
+                                if (self.protected) {
+
+                                    contextRender.fillText(self.configuration.text,
+                                        m_area.location.x + m_area.extent.width / 2,
+                                        m_area.location.y + m_area.extent.height / 2); 
+
+                                } else {
+
+                                    contextRender.fillText(self.configuration.text,
+                                        m_area.location.x + m_area.extent.width / 2 + (m_bMouseDown ? 3 : 0),
+                                        m_area.location.y + m_area.extent.height / 2+ (m_bMouseDown ? 3 : 0)); 
+                                }
+                        } finally {
 
                                 contextRender.restore();
                             }

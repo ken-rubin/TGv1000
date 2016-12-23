@@ -654,15 +654,14 @@ define(["NextWave/source/utility/prototypes",
                         iPI.recreate();
 					}
 
+                    // Call this method when first creating dialog and after certain user actions.
                     var m_functionSetBtnProtection = function() {
 
                         let currDialogMode = self.dialog.getMode();
                         if (currDialogMode === "Sel Proj Type-priv user") {
 
                             ////////////////////////
-                            // Protect (disable buttons until user takes appropriate actions).
-                            // Affected buttons:
-                            //    If priv. user, based on selection of project type: "normal", "class", "onlineClass", "product":
+                            // Disable 4 project style buttons until user selects a project type.
                             let btn = self.dialog.controlObject["normal"];
                             btn.setProtected(true);
                             btn = self.dialog.controlObject["classs"];
@@ -672,7 +671,10 @@ define(["NextWave/source/utility/prototypes",
                             btn = self.dialog.controlObject["product"];
                             btn.setProtected(true);
                         
-                        } else if (currDialogMode === "Normal proj" || currDialogMode === "Class proj" || currDialogMode === "Online class proj" || currDialogMode === "Product proj") {
+                        } else if (currDialogMode === "Normal proj"
+                                   || currDialogMode === "Class proj"
+                                   || currDialogMode === "Online class proj"
+                                   || currDialogMode === "Product proj") {
 
                             // Enable the Save Project button if validation passes, including project name is set.
                             let btn = self.dialog.controlObject["normal"];
@@ -688,7 +690,7 @@ define(["NextWave/source/utility/prototypes",
                             bValid = true;
                         }
 
-                        // Once created, all of the fields for purchasable projects will be validated, too--both for correctness and completion.
+                        // Once added, all of the fields for purchasable projects will need to be validated, too--both for correctness and completion.
 
                         return bValid;
                     }
