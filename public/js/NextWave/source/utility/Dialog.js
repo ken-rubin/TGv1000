@@ -280,11 +280,17 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            // Only care about mouse down if over some regon.
+                            // Only care about mouse down if over some region.
                             if (self.highlightControl &&
                                 $.isFunction(self.highlightControl.click)) {
 
-                                return self.highlightControl.click(objectReference);
+                                    // But ignore if self.highlightControl has the property "modes" and m_mode doesn't match one of self.highlightControl.modes's array elements.
+                                    if (m_mode && self.highlightControl.hasOwnProperty("modes") && !self.highlightControl.modes.includes(m_mode)) {
+
+                                        return null;
+                                    }
+
+                                    return self.highlightControl.click(objectReference);
                             }
                             return null;
                         } catch (e) {
