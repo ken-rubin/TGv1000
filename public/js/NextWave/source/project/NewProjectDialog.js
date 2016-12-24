@@ -67,10 +67,109 @@ define(["NextWave/source/utility/prototypes",
 
                             //      A normal user starts in mode 'Sel Proj Type-normal user' and goes to mode 'Normal proj' on image click.
                             //      A privileged user starts in mode 'Sel Proj Type-priv user' and goes to mode 'Normal proj', 'Class proj', 'Online class proj' or 'Product proj', depending on the button clicked.
+                            /* Summary of modes and controls:
+                                
+                                #   Mode
+                                1   'Sel Proj Type-normal user'
+                                2   'Sel Proj Type-priv user'
+                                3   'Normal proj'
+                                4   'Class proj'
+                                5   'Online class proj'
+                                6   'Product proj'
+
+                                                                    Note            In mode(s)      
+                                toggle1to3          Button          Temporary       1
+                                toggle3to1          Button          Temporary       2
+                                instructions1       Label                           1,2
+                                projectTypes        ListHost                        1,2
+                                instructions2       Label                           2
+                                normal              Button                          2
+                                classs              Button                          2
+                                onlineClass         Button                          2
+                                product             Button                          2
+                                instructions3       Label                           3,4,5,6                         
+                                instructions4       Label                           3,4,5,6
+                                nameLabel           Label                           3,4,5,6
+                                nameEdit            Edit                            3,4,5,6
+                                descriptionLabel    Label                           3,4,5,6
+                                descriptionEdit     Edit                            3,4,5,6
+                                projectImageLabel   Label                           3,4,5,6
+                                projectImage        Picture                         3,4,5,6
+                                imageSearchButton   Button                          3,4,5,6
+                                urlSearchButton     Button                          3,4,5,6
+                                fileSearchButton    Button                          3,4,5,6
+                                createProjectButton Button                          3,4,5,6
+                                cancelButton        Button                          3,4,5,6
+
+                                Controls arranged by Mode
+                                1   toggle1to3
+                                1   instructions1
+                                1   projectTypes
+                                2   toggle3to1
+                                2   instructions1
+                                2   projectTypes
+                                2   instructions2
+                                2   normal
+                                2   classs
+                                2   onlineClass
+                                2   product
+                                3   instructions3
+                                3   instructions4
+                                3   nameLabel
+                                3   nameEdit
+                                3   descriptionLabel
+                                3   descriptionEdit
+                                3   projectImageLabel
+                                3   projectImage
+                                3   imageSearchButton
+                                3   urlSearchButton
+                                3   fileSearchButton
+                                3   createProjectButton
+                                3   cancelButton
+                                4   instructions3
+                                4   instructions4
+                                4   nameLabel
+                                4   nameEdit
+                                4   descriptionLabel
+                                4   descriptionEdit
+                                4   projectImageLabel
+                                4   projectImage
+                                4   imageSearchButton
+                                4   urlSearchButton
+                                4   fileSearchButton
+                                4   createProjectButton
+                                4   cancelButton
+                                5   instructions3
+                                5   instructions4
+                                5   nameLabel
+                                5   nameEdit
+                                5   descriptionLabel
+                                5   descriptionEdit
+                                5   projectImageLabel
+                                5   projectImage
+                                5   imageSearchButton
+                                5   urlSearchButton
+                                5   fileSearchButton
+                                5   createProjectButton
+                                5   cancelButton
+                                6   instructions3
+                                6   instructions4
+                                6   nameLabel
+                                6   nameEdit
+                                6   descriptionLabel
+                                6   descriptionEdit
+                                6   projectImageLabel
+                                6   projectImage
+                                6   imageSearchButton
+                                6   urlSearchButton
+                                6   fileSearchButton
+                                6   createProjectButton
+                                6   cancelButton
+                            */
 
                             let objectConfiguration = 
                             {
-                                    toggle1to3: {
+/*                                    toggle1to3: {
                                         type: "Button",
                                         modes: ['Sel Proj Type-normal user'],
                                         text: "Toggle to 'Sel Proj Type-priv user'",
@@ -94,12 +193,12 @@ define(["NextWave/source/utility/prototypes",
                                             self.dialog.setMode('Sel Proj Type-normal user');
                                         }
                                     },
-                                    instructions1: {
+*/                                    instructions1: {
                                         type: "Label",
                                         modes: ['Sel Proj Type-normal user','Sel Proj Type-priv user'],
                                         text: "Choose the type of Project you wish to create by clicking on its picture.",
-                                        x: settings.general.margin + 8,
-                                        y: 70,
+                                        x: settings.general.margin,
+                                        y: 5 * settings.general.margin,
                                         widthType: "reserve",
                                         width: 2 * settings.general.margin,
                                         height: settings.dialog.lineHeight                                  
@@ -109,7 +208,8 @@ define(["NextWave/source/utility/prototypes",
                                         modes: ['Sel Proj Type-normal user','Sel Proj Type-priv user'],
                                         constructorParameterString: "false",
                                         x: settings.general.margin,
-                                        y: 100,
+                                        y: settings.general.margin + 
+                                            2 * settings.dialog.lineHeight,
                                         widthType: "reserve",
                                         width: 2 * settings.general.margin,
                                         height: 100
@@ -118,8 +218,9 @@ define(["NextWave/source/utility/prototypes",
                                         type: "Label",
                                         modes: ['Sel Proj Type-priv user'],
                                         text: "As a privileged user, besides being able to create Normal projects, you are allowed to create a Class, an Online Class or a Product. Choose here:",
-                                        x: settings.general.margin + 8,
-                                        y: 250,
+                                        x: settings.general.margin,
+                                        y: settings.general.margin + 
+                                            2 * settings.dialog.lineHeight + 120,
                                         widthType: "reserve",
                                         width: 2 * settings.general.margin,
                                         height: settings.dialog.lineHeight                                  
@@ -128,8 +229,10 @@ define(["NextWave/source/utility/prototypes",
                                         type: "Button",
                                         modes: ['Sel Proj Type-priv user'],
                                         text: "Normal",
-                                        x: settings.general.margin + 8,
-                                        y: 300,
+                                        x: settings.general.margin,
+                                        y: settings.general.margin + 
+                                            4 * settings.general.margin +
+                                            2 * settings.dialog.lineHeight + 140,
                                         width: 190,
                                         height: 40,
                                         click: function() {
@@ -140,8 +243,10 @@ define(["NextWave/source/utility/prototypes",
                                         type: "Button",
                                         modes: ['Sel Proj Type-priv user'],
                                         text: "Class",
-                                        x: settings.general.margin + 8,
-                                        y: 350,
+                                        x: settings.general.margin + 200,
+                                        y: settings.general.margin + 
+                                            4 * settings.general.margin +
+                                            2 * settings.dialog.lineHeight + 140,
                                         width: 190,
                                         height: 40,
                                         click: function() {
@@ -152,8 +257,10 @@ define(["NextWave/source/utility/prototypes",
                                         type: "Button",
                                         modes: ['Sel Proj Type-priv user'],
                                         text: "Online Class",
-                                        x: settings.general.margin + 8,
-                                        y: 400,
+                                        x: settings.general.margin + 400,
+                                        y: settings.general.margin + 
+                                            4 * settings.general.margin +
+                                            2 * settings.dialog.lineHeight + 140,
                                         width: 190,
                                         height: 40,
                                         click: function() {
@@ -164,8 +271,10 @@ define(["NextWave/source/utility/prototypes",
                                         type: "Button",
                                         modes: ['Sel Proj Type-priv user'],
                                         text: "Product",
-                                        x: settings.general.margin + 8,
-                                        y: 450,
+                                        x: settings.general.margin + 600,
+                                        y: settings.general.margin + 
+                                            4 * settings.general.margin +
+                                            2 * settings.dialog.lineHeight + 140,
                                         width: 190,
                                         height: 40,
                                         click: function() {
@@ -176,8 +285,8 @@ define(["NextWave/source/utility/prototypes",
                                         type: "Label",
                                         modes: ['Normal proj','Class proj','Online class proj','Product proj'],
                                         text: "Enter details for your new Project.",
-                                        x: settings.general.margin + 8,
-                                        y: 50,
+                                        x: settings.general.margin,
+                                        y: 5 * settings.general.margin,
                                         widthType: "reserve",
                                         width: 2 * settings.general.margin,
                                         height: settings.dialog.lineHeight                                  
@@ -186,8 +295,9 @@ define(["NextWave/source/utility/prototypes",
                                         type: "Label",
                                         modes: ['Normal proj','Class proj','Online class proj','Product proj'],
                                         text: "Only Name is required. However, consider changing the default image for id purposes.",
-                                        x: settings.general.margin + 8,
-                                        y: 50 + settings.dialog.lineHeight + 10,
+                                        x: settings.general.margin,
+                                        y: 5 * settings.general.margin +
+                                            settings.dialog.lineHeight,
                                         widthType: "reserve",
                                         width: 2 * settings.general.margin,
                                         height: settings.dialog.lineHeight                                  
@@ -196,8 +306,9 @@ define(["NextWave/source/utility/prototypes",
                                         type: "Label",
                                         modes: ['Normal proj','Class proj','Online class proj','Product proj'],
                                         text: "Name",
-                                        x: settings.general.margin + 8,
-                                        y: 50 + 2 * settings.dialog.lineHeight + 30,
+                                        x: settings.general.margin,
+                                        y: 5 * settings.general.margin +
+                                            2 * settings.dialog.lineHeight,
                                         widthType: "reserve",
                                         width: 2 * settings.general.margin,
                                         height: settings.dialog.lineHeight                                  
@@ -207,7 +318,8 @@ define(["NextWave/source/utility/prototypes",
                                         modes: ['Normal proj','Class proj','Online class proj','Product proj'],
                                         x: 2 * settings.general.margin + 
                                             settings.dialog.firstColumnWidth,
-                                        y: 50 + 2 * settings.dialog.lineHeight + 30,
+                                        y: 5 * settings.general.margin +
+                                            2 * settings.dialog.lineHeight,
                                         width: settings.dialog.firstColumnWidth,
                                         height: settings.dialog.lineHeight,
                                         exitFocus: function (localSelf) {
@@ -223,8 +335,9 @@ define(["NextWave/source/utility/prototypes",
                                         type: "Label",
                                         modes: ['Normal proj','Class proj','Online class proj','Product proj'],
                                         text: "Description",
-                                        x: settings.general.margin + 8,
-                                        y: 50 + 3 * settings.dialog.lineHeight + 40,
+                                        x: settings.general.margin,
+                                        y: 5 * settings.general.margin +
+                                            4 * settings.dialog.lineHeight,
                                         widthType: "reserve",
                                         width: 2 * settings.general.margin,
                                         height: settings.dialog.lineHeight                                  
@@ -234,7 +347,8 @@ define(["NextWave/source/utility/prototypes",
                                         modes: ['Normal proj','Class proj','Online class proj','Product proj'],
                                         x: 2 * settings.general.margin + 
                                             settings.dialog.firstColumnWidth,
-                                        y: 50 + 3 * settings.dialog.lineHeight + 40,
+                                        y: 5 * settings.general.margin +
+                                            4 * settings.dialog.lineHeight,
                                         widthType: "reserve",           // Reserve means: subtract the width from
                                                                         //  the total width on calculateLayout.
                                         width: 3 * settings.general.margin +
@@ -253,8 +367,9 @@ define(["NextWave/source/utility/prototypes",
                                         type: "Label",
                                         modes: ['Normal proj','Class proj','Online class proj','Product proj'],
                                         text: "Project image",
-                                        x: settings.general.margin + 8,
-                                        y: 50 + 8 * settings.dialog.lineHeight + 50,
+                                        x: settings.general.margin,
+                                        y: 5 * settings.general.margin +
+                                            10 * settings.dialog.lineHeight,
                                         widthType: "reserve",
                                         width: 2 * settings.general.margin,
                                         height: settings.dialog.lineHeight                                  
@@ -263,8 +378,10 @@ define(["NextWave/source/utility/prototypes",
                                         type: "Picture",
                                         modes: ['Normal proj','Class proj','Online class proj','Product proj'],
                                         constructorParameterString: null,
-                                        x: 2 * settings.general.margin + settings.dialog.firstColumnWidth,
-                                        y: 50 + 8 * settings.dialog.lineHeight + 50,
+                                        x: 2 * settings.general.margin + 
+                                            settings.dialog.firstColumnWidth,
+                                        y: 5 * settings.general.margin +
+                                            10 * settings.dialog.lineHeight,
                                         width: settings.dialog.firstColumnWidth,
                                         height: settings.dialog.lineHeight * 5
                                     },
@@ -273,7 +390,9 @@ define(["NextWave/source/utility/prototypes",
                                         modes: ['Normal proj','Class proj','Online class proj','Product proj'],
                                         text: "S",
                                         x: 2 * settings.general.margin + settings.dialog.firstColumnWidth + settings.dialog.firstColumnWidth + 20,
-                                        y: 50 + 8 * settings.dialog.lineHeight + 50 + (settings.dialog.lineHeight * 5 - 40) / 2,
+                                        y: 5 * settings.general.margin +
+                                            10 * settings.dialog.lineHeight +
+                                            (settings.dialog.lineHeight * 5 - 40) / 2,
                                         width: 40,
                                         height: 40,
                                         click: function() {
@@ -296,7 +415,9 @@ define(["NextWave/source/utility/prototypes",
                                         modes: ['Normal proj','Class proj','Online class proj','Product proj'],
                                         text: "U",
                                         x: 2 * settings.general.margin + settings.dialog.firstColumnWidth + settings.dialog.firstColumnWidth + 70,
-                                        y: 50 + 8 * settings.dialog.lineHeight + 50 + (settings.dialog.lineHeight * 5 - 40) / 2,
+                                        y: 5 * settings.general.margin +
+                                            10 * settings.dialog.lineHeight +
+                                            (settings.dialog.lineHeight * 5 - 40) / 2,
                                         width: 40,
                                         height: 40,
                                         click: function() {
@@ -319,7 +440,9 @@ define(["NextWave/source/utility/prototypes",
                                         modes: ['Normal proj','Class proj','Online class proj','Product proj'],
                                         text: "F",
                                         x: 2 * settings.general.margin + settings.dialog.firstColumnWidth + settings.dialog.firstColumnWidth + 120,
-                                        y: 50 + 8 * settings.dialog.lineHeight + 50 + (settings.dialog.lineHeight * 5 - 40) / 2,
+                                        y: 5 * settings.general.margin +
+                                            10 * settings.dialog.lineHeight +
+                                            (settings.dialog.lineHeight * 5 - 40) / 2,
                                         width: 40,
                                         height: 40,
                                         click: function() {

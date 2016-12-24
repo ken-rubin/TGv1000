@@ -783,10 +783,10 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
 
             console.log("Entered UtilityBO/routeSearchResources with req.body = " + JSON.stringify(req.body));
             // req.body.description
-            // req.user.userId
-            // req.user.userName
             // req.body.resourceTypeId  1,2,
             // req.body.onlyOwnedByUser   '0' or '1'
+            // req.user.userId
+            // req.user.userName
 
             var iResourceTypeId = parseInt(req.body.resourceTypeId,10);
             var resourceTypeDescr = m_resourceTypes[iResourceTypeId];
