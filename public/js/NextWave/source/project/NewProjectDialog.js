@@ -67,133 +67,107 @@ define(["NextWave/source/utility/prototypes",
 
                             //      A normal user starts in mode 'Sel Proj Type-normal user' and goes to mode 'Normal proj' on image click.
                             //      A privileged user starts in mode 'Sel Proj Type-priv user' and goes to mode 'Normal proj', 'Class proj', 'Online class proj' or 'Product proj', depending on the button clicked.
-                            /* Summary of modes and controls:
-                                
-                                #   Mode
-                                1   'Sel Proj Type-normal user'
-                                2   'Sel Proj Type-priv user'
-                                3   'Normal proj'
-                                4   'Class proj'
-                                5   'Online class proj'
-                                6   'Product proj'
-
+                            /*                                
                                                                     Note            In mode(s)      
-                                toggle1to3          Button          Temporary       1
-                                toggle3to1          Button          Temporary       2
-                                instructions1       Label                           1,2
-                                projectTypes        ListHost                        1,2
-                                instructions2       Label                           2
-                                normal              Button                          2
-                                classs              Button                          2
-                                onlineClass         Button                          2
-                                product             Button                          2
-                                instructions3       Label                           3,4,5,6                         
-                                instructions4       Label                           3,4,5,6
-                                nameLabel           Label                           3,4,5,6
-                                nameEdit            Edit                            3,4,5,6
-                                descriptionLabel    Label                           3,4,5,6
-                                descriptionEdit     Edit                            3,4,5,6
-                                projectImageLabel   Label                           3,4,5,6
-                                projectImage        Picture                         3,4,5,6
-                                imageSearchButton   Button                          3,4,5,6
-                                urlSearchButton     Button                          3,4,5,6
-                                fileSearchButton    Button                          3,4,5,6
-                                createProjectButton Button                          3,4,5,6
-                                cancelButton        Button                          3,4,5,6
+                                instructions1       Label                           'Sel Proj Type-normal user','Sel Proj Type-priv user'
+                                projectTypes        ListHost                        'Sel Proj Type-normal user','Sel Proj Type-priv user'
+                                instructions2       Label                           'Sel Proj Type-priv user'
+                                normal              Button                          'Sel Proj Type-priv user'
+                                classroomClass              Button                          'Sel Proj Type-priv user'
+                                onlineClass         Button                          'Sel Proj Type-priv user'
+                                product             Button                          'Sel Proj Type-priv user'
+                                instructions3       Label                           'Normal proj','Class proj','Online class proj','Product proj'                         
+                                instructions4       Label                           'Normal proj','Class proj','Online class proj','Product proj'
+                                nameLabel           Label                           'Normal proj','Class proj','Online class proj','Product proj'
+                                nameEdit            Edit                            'Normal proj','Class proj','Online class proj','Product proj'
+                                descriptionLabel    Label                           'Normal proj','Class proj','Online class proj','Product proj'
+                                descriptionEdit     Edit                            'Normal proj','Class proj','Online class proj','Product proj'
+                                projectImageLabel   Label                           'Normal proj','Class proj','Online class proj','Product proj'
+                                projectImage        Picture                         'Normal proj','Class proj','Online class proj','Product proj'
+                                imageSearchButton   Button                          'Normal proj','Class proj','Online class proj','Product proj'
+                                urlSearchButton     Button                          'Normal proj','Class proj','Online class proj','Product proj'
+                                fileSearchButton    Button                          'Normal proj','Class proj','Online class proj','Product proj'
+                                createProjectButton Button                          'Normal proj','Class proj','Online class proj','Product proj'
+                                cancelButton        Button                          'Normal proj','Class proj','Online class proj','Product proj'
 
                                 Controls arranged by Mode
-                                1   toggle1to3
-                                1   instructions1
-                                1   projectTypes
-                                2   toggle3to1
-                                2   instructions1
-                                2   projectTypes
-                                2   instructions2
-                                2   normal
-                                2   classs
-                                2   onlineClass
-                                2   product
-                                3   instructions3
-                                3   instructions4
-                                3   nameLabel
-                                3   nameEdit
-                                3   descriptionLabel
-                                3   descriptionEdit
-                                3   projectImageLabel
-                                3   projectImage
-                                3   imageSearchButton
-                                3   urlSearchButton
-                                3   fileSearchButton
-                                3   createProjectButton
-                                3   cancelButton
-                                4   instructions3
-                                4   instructions4
-                                4   nameLabel
-                                4   nameEdit
-                                4   descriptionLabel
-                                4   descriptionEdit
-                                4   projectImageLabel
-                                4   projectImage
-                                4   imageSearchButton
-                                4   urlSearchButton
-                                4   fileSearchButton
-                                4   createProjectButton
-                                4   cancelButton
-                                5   instructions3
-                                5   instructions4
-                                5   nameLabel
-                                5   nameEdit
-                                5   descriptionLabel
-                                5   descriptionEdit
-                                5   projectImageLabel
-                                5   projectImage
-                                5   imageSearchButton
-                                5   urlSearchButton
-                                5   fileSearchButton
-                                5   createProjectButton
-                                5   cancelButton
-                                6   instructions3
-                                6   instructions4
-                                6   nameLabel
-                                6   nameEdit
-                                6   descriptionLabel
-                                6   descriptionEdit
-                                6   projectImageLabel
-                                6   projectImage
-                                6   imageSearchButton
-                                6   urlSearchButton
-                                6   fileSearchButton
-                                6   createProjectButton
-                                6   cancelButton
+                                'Sel Proj Type-normal user'
+                                    instructions1
+                                    projectTypes
+
+                                'Sel Proj Type-priv user'
+                                    instructions1
+                                    projectTypes
+                                    instructions2
+                                    normal
+                                    classroomClass
+                                    onlineClass
+                                    product
+
+                                'Normal proj'
+                                    instructions3
+                                    instructions4
+                                    nameLabel
+                                    nameEdit
+                                    descriptionLabel
+                                    descriptionEdit
+                                    projectImageLabel
+                                    projectImage
+                                    imageSearchButton
+                                    urlSearchButton
+                                    fileSearchButton
+                                    createProjectButton
+                                    cancelButton
+
+                                'Class proj'
+                                    instructions3
+                                    instructions4
+                                    nameLabel
+                                    nameEdit
+                                    descriptionLabel
+                                    descriptionEdit
+                                    projectImageLabel
+                                    projectImage
+                                    imageSearchButton
+                                    urlSearchButton
+                                    fileSearchButton
+                                    createProjectButton
+                                    cancelButton
+
+                                'Online class proj'
+                                    instructions3
+                                    instructions4
+                                    nameLabel
+                                    nameEdit
+                                    descriptionLabel
+                                    descriptionEdit
+                                    projectImageLabel
+                                    projectImage
+                                    imageSearchButton
+                                    urlSearchButton
+                                    fileSearchButton
+                                    createProjectButton
+                                    cancelButton
+
+                                'Product proj'
+                                    instructions3
+                                    instructions4
+                                    nameLabel
+                                    nameEdit
+                                    descriptionLabel
+                                    descriptionEdit
+                                    projectImageLabel
+                                    projectImage
+                                    imageSearchButton
+                                    urlSearchButton
+                                    fileSearchButton
+                                    createProjectButton
+                                    cancelButton
                             */
 
                             let objectConfiguration = 
                             {
-/*                                    toggle1to3: {
-                                        type: "Button",
-                                        modes: ['Sel Proj Type-normal user'],
-                                        text: "Toggle to 'Sel Proj Type-priv user'",
-                                        x: settings.general.margin + 8,
-                                        y: 20,
-                                        width: 490,
-                                        height: 40,
-                                        click: function() {
-                                            self.dialog.setMode('Sel Proj Type-priv user');
-                                        }
-                                    },
-                                    toggle3to1: {
-                                        type: "Button",
-                                        modes: ['Sel Proj Type-priv user'],
-                                        text: "Toggle to 'Sel Proj Type-normal user'",
-                                        x: settings.dialog.firstColumnWidth * 3 + 8,
-                                        y: 20,
-                                        width: 490,
-                                        height: 40,
-                                        click: function() {
-                                            self.dialog.setMode('Sel Proj Type-normal user');
-                                        }
-                                    },
-*/                                    instructions1: {
+                                    instructions1: {
                                         type: "Label",
                                         modes: ['Sel Proj Type-normal user','Sel Proj Type-priv user'],
                                         text: "Choose the type of Project you wish to create by clicking on its picture.",
@@ -239,7 +213,7 @@ define(["NextWave/source/utility/prototypes",
                                             self.dialog.setMode('Normal proj');
                                         }
                                     },
-                                    classs: {
+                                    classroomClass: {
                                         type: "Button",
                                         modes: ['Sel Proj Type-priv user'],
                                         text: "Class",
@@ -281,7 +255,7 @@ define(["NextWave/source/utility/prototypes",
                                             self.dialog.setMode('Product proj');
                                         }
                                     },
-                                    instructions3: {
+/*                                    instructions3: {
                                         type: "Label",
                                         modes: ['Normal proj','Class proj','Online class proj','Product proj'],
                                         text: "Enter details for your new Project.",
@@ -302,15 +276,13 @@ define(["NextWave/source/utility/prototypes",
                                         width: 2 * settings.general.margin,
                                         height: settings.dialog.lineHeight                                  
                                     },
-                                    nameLabel: {
+*/                                    nameLabel: {
                                         type: "Label",
                                         modes: ['Normal proj','Class proj','Online class proj','Product proj'],
                                         text: "Name",
                                         x: settings.general.margin,
-                                        y: 5 * settings.general.margin +
-                                            2 * settings.dialog.lineHeight,
-                                        widthType: "reserve",
-                                        width: 2 * settings.general.margin,
+                                        y: settings.general.margin,
+                                        width: settings.dialog.firstColumnWidth,
                                         height: settings.dialog.lineHeight                                  
                                     },
                                     nameEdit: {
@@ -318,9 +290,11 @@ define(["NextWave/source/utility/prototypes",
                                         modes: ['Normal proj','Class proj','Online class proj','Product proj'],
                                         x: 2 * settings.general.margin + 
                                             settings.dialog.firstColumnWidth,
-                                        y: 5 * settings.general.margin +
-                                            2 * settings.dialog.lineHeight,
-                                        width: settings.dialog.firstColumnWidth,
+                                        y: settings.general.margin,
+                                        widthType: "reserve",           // Reserve means: subtract the width from
+                                                                        //  the total width on calculateLayout.
+                                        width: 3 * settings.general.margin +
+                                            settings.dialog.firstColumnWidth,
                                         height: settings.dialog.lineHeight,
                                         exitFocus: function (localSelf) {
                                             try {
@@ -336,19 +310,18 @@ define(["NextWave/source/utility/prototypes",
                                         modes: ['Normal proj','Class proj','Online class proj','Product proj'],
                                         text: "Description",
                                         x: settings.general.margin,
-                                        y: 5 * settings.general.margin +
-                                            4 * settings.dialog.lineHeight,
-                                        widthType: "reserve",
-                                        width: 2 * settings.general.margin,
-                                        height: settings.dialog.lineHeight                                  
+                                        y: settings.dialog.lineHeight + 
+                                            2 * settings.general.margin,
+                                        width: settings.dialog.firstColumnWidth,
+                                        height: settings.dialog.lineHeight
                                     },
                                     descriptionEdit: {
                                         type: "Edit",
                                         modes: ['Normal proj','Class proj','Online class proj','Product proj'],
                                         x: 2 * settings.general.margin + 
                                             settings.dialog.firstColumnWidth,
-                                        y: 5 * settings.general.margin +
-                                            4 * settings.dialog.lineHeight,
+                                        y: settings.dialog.lineHeight + 
+                                            2 * settings.general.margin,
                                         widthType: "reserve",           // Reserve means: subtract the width from
                                                                         //  the total width on calculateLayout.
                                         width: 3 * settings.general.margin +
@@ -551,7 +524,7 @@ define(["NextWave/source/utility/prototypes",
                                                                 dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
                                                             }
                                                             var strNotes = $("#Notes").val().trim();
-                                                            var iMaxClassSize = parseInt($("#MaxClassSize").val().trim(), 10);
+                                                            var iMaxclassroomClassize = parseInt($("#MaxclassroomClassize").val().trim(), 10);
                                                             var iLoanComputersAvailable = $("#cb1").prop("checked") ? 1 : 0;
 
                                                             client.project.specialProjectData.classData = {
@@ -572,7 +545,7 @@ define(["NextWave/source/utility/prototypes",
                                                                 difficulty: strDifficulty,
                                                                 price: dPrice,
                                                                 classNotes: strNotes,
-                                                                maxClassSize: iMaxClassSize,
+                                                                maxclassroomClassize: iMaxclassroomClassize,
                                                                 loanComputersAvailable: iLoanComputersAvailable,
                                                                 imageId: m_imageId
                                                             };
@@ -709,10 +682,10 @@ define(["NextWave/source/utility/prototypes",
                                     // self is NewProjectDialog instance.
                                     m_projectTypeId = id;
 
-                                    let i3 = self.dialog.controlObject["instructions3"];
+/*                                    let i3 = self.dialog.controlObject["instructions3"];
                                     let ptName = m_arrayProjectTypeNames[projTypeId - 1];
                                     i3.text = "Enter details for your new " + ptName.charAt(0).toUpperCase() + ptName.slice(1) + "-based Project.";
-                                    
+*/                                    
                                     let iPI = self.dialog.controlObject["projectImage"];
                                     iPI.setUrl(resourceHelper.toURL("images", null, null, m_arrayProjectTypeNames[m_projectTypeId - 1] + "Project.png"));
                                     iPI.recreate();
@@ -725,7 +698,7 @@ define(["NextWave/source/utility/prototypes",
                                     } else {
 
                                         // Privileged user has selected project type. Highlight its PictureListItem in listHost and enable the 4 project type buttons.
-
+                                        let b = self.dialog.controlObject[""];
                                     }
 
                                 };
@@ -778,6 +751,25 @@ define(["NextWave/source/utility/prototypes",
 					}
 
                     // Call this method when first creating dialog and after certain user actions.
+                    /* Here are all the buttons and whether or not they should be protected by dialog mode:
+
+                        'Sel Proj Type-priv user'
+                            normal
+                            classroomClass
+                            onlineClass
+                            product
+
+                        'Normal proj'
+                            createProjectButton
+                            cancelButton
+
+                        'Class proj'
+
+                        'Online class proj'
+
+                        'Product proj'
+
+                    */
                     var m_functionSetBtnProtection = function() {
 
                         let currDialogMode = self.dialog.getMode();
@@ -787,7 +779,7 @@ define(["NextWave/source/utility/prototypes",
                             // Disable 4 project style buttons until user selects a project type.
                             let btn = self.dialog.controlObject["normal"];
                             btn.setProtected(true);
-                            btn = self.dialog.controlObject["classs"];
+                            btn = self.dialog.controlObject["classroomClass"];
                             btn.setProtected(true);
                             btn = self.dialog.controlObject["onlineClass"];
                             btn.setProtected(true);

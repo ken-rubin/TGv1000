@@ -53,6 +53,20 @@ define(["NextWave/source/utility/prototypes",
                         return null;
                     };
 
+                    // Give this object a crack at the layout pipeline.
+                    self.innerCalculateLayout = function (areaMaximal, contextRender) {
+
+                        try {
+
+                            m_area = areaMaximal;
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Render object.
                     self.render = function (contextRender) {
 
@@ -71,7 +85,7 @@ define(["NextWave/source/utility/prototypes",
                             if (self.configuration.border) {
 
                                 // Generate the path.
-                                var exceptionRet = self.position.generateRoundedRectPath(contextRender);
+                                var exceptionRet = m_area.generateRoundedRectPath(contextRender);
                                 if (exceptionRet) {
 
                                     throw exceptionRet;
@@ -84,15 +98,22 @@ define(["NextWave/source/utility/prototypes",
                             // Render.
                             contextRender.fillStyle = settings.general.fillText;
                             contextRender.fillText(self.text,
-                                self.position.location.x,
-                                self.position.location.y,
-                                self.position.extent.width);
+                                m_area.location.x,
+                                m_area.location.y,
+                                m_area.extent.width);
                             return null;
                         } catch (e) {
 
                             return e;
                         }
                     };
+
+                    //////////////////////////
+                    // Private fields.
+
+                    // Placement of this instance.
+                    var m_area = null;
+
                 } catch (e) {
 
                     alert(e.message);
@@ -101,7 +122,7 @@ define(["NextWave/source/utility/prototypes",
 
             // Inherit from Control.  Wire 
             // up prototype chain to Control.
-            functionRet.inheritsFrom(Control);
+//            functionRet.inheritsFrom(Control);
 
         	return functionRet;
         } catch (e) {
