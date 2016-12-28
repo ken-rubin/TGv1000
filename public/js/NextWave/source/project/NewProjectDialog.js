@@ -73,7 +73,7 @@ define(["NextWave/source/utility/prototypes",
                                 projectTypes        ListHost                        'Sel Proj Type-normal user','Sel Proj Type-priv user'
                                 instructions2       Label                           'Sel Proj Type-priv user'
                                 normal              Button                          'Sel Proj Type-priv user'
-                                classroomClass              Button                          'Sel Proj Type-priv user'
+                                classroomClass      Button                          'Sel Proj Type-priv user'
                                 onlineClass         Button                          'Sel Proj Type-priv user'
                                 product             Button                          'Sel Proj Type-priv user'
                                 instructions3       Label                           'Normal proj','Class proj','Online class proj','Product proj'                         
@@ -92,64 +92,105 @@ define(["NextWave/source/utility/prototypes",
 
                                 Controls arranged by Mode
                                 'Sel Proj Type-normal user'
-                                    instructions1
-                                    projectTypes
+                                    instructions1       Label
+                                    projectTypes        ListHost
+                                    cancelButton        Button
 
                                 'Sel Proj Type-priv user'
-                                    instructions1
-                                    projectTypes
-                                    instructions2
-                                    normal
-                                    classroomClass
-                                    onlineClass
-                                    product
+                                    instructions1       Label
+                                    projectTypes        ListHost
+                                    instructions2       Label
+                                    normal              Button
+                                    classroomClass      Button
+                                    onlineClass         Button
+                                    product             Button
+                                    cancelButton        Button
 
                                 'Normal proj'
-                                    instructions3
-                                    instructions4
-                                    nameLabel
-                                    nameEdit
-                                    descriptionLabel
-                                    descriptionEdit
-                                    projectImageLabel
-                                    projectImage
-                                    imageSearchButton
-                                    urlSearchButton
-                                    fileSearchButton
-                                    createProjectButton
-                                    cancelButton
+                                    instructions3       Label
+                                    instructions4       Label
+                                    nameLabel           Label
+                                    nameEdit            Edit
+                                    descriptionLabel    Label
+                                    descriptionEdit     Edit-multiline
+                                    projectImageLabel   Label
+                                    projectImage        Picture
+                                    imageSearchButton   Button
+                                    urlSearchButton     Button
+                                    fileSearchButton    Button
+                                    backButton          Button
+                                    createProjectButton Button
+                                    cancelButton        Button
 
-                                'Class proj'
-                                    instructions3
-                                    instructions4
-                                    nameLabel
-                                    nameEdit
-                                    descriptionLabel
-                                    descriptionEdit
-                                    projectImageLabel
-                                    projectImage
-                                    imageSearchButton
-                                    urlSearchButton
-                                    fileSearchButton
-                                    createProjectButton
-                                    cancelButton
+                                'Class proj1'
+                                    instructions3       Label
+                                    instructions4       Label
+                                    nameLabel           Label
+                                    nameEdit            Edit
+                                    descriptionLabel    Label
+                                    descriptionEdit     Edit-multiline
+                                    projectImageLabel   Label
+                                    projectImage        Picture
+                                    imageSearchButton   Button
+                                    urlSearchButton     Button
+                                    fileSearchButton    Button
+                                    backButton          Button
+                                    continueButton      Button
+                                    should I have a createProjectButton here, too?
+                                    cancelButton        Button
 
-                                'Online class proj'
-                                    instructions3
-                                    instructions4
-                                    nameLabel
-                                    nameEdit
-                                    descriptionLabel
-                                    descriptionEdit
-                                    projectImageLabel
-                                    projectImage
-                                    imageSearchButton
-                                    urlSearchButton
-                                    fileSearchButton
-                                    createProjectButton
-                                    cancelButton
+                                'Class proj2'
+                                    instructions5       Label
+                                    nameLabel2          Label
+                                    first set of fields for classroomClass (instructor, phone, level, difficulty, price, max class size, loaner computers available, notes)
+                                    backButton          Button
+                                    continueButton      Button
+                                    should I have a createProjectButton, too?
+                                    cancelButton        Button
 
-                                'Product proj'
+                                'Class proj3'
+                                    instructions6       Label
+                                    nameLabel2          Label
+                                    second set of fields for classroomClass (location 6 fields, class schedule)
+                                    backButton          Button
+                                    createProjectButton Button
+                                    cancelButton        Button
+
+                                'Online class proj1'
+                                    instructions3       Label
+                                    instructions4       Label
+                                    nameLabel           Label
+                                    nameEdit            Edit
+                                    descriptionLabel    Label
+                                    descriptionEdit     Edit-multiline
+                                    projectImageLabel   Label
+                                    projectImage        Picture
+                                    imageSearchButton   Button
+                                    urlSearchButton     Button
+                                    fileSearchButton    Button
+                                    backButton          Button
+                                    continueButton      Button
+                                    should I have a createProjectButton here, too?
+                                    cancelButton        Button
+
+                                'Online class proj2'
+                                    instructions5       Label
+                                    nameLabel2          Label
+                                    first set of fields for classroomClass (instructor, email, level, difficulty, price, notes)
+                                    backButton          Button
+                                    continueButton      Button
+                                    should I have a createProjectButton, too?
+                                    cancelButton        Button
+
+                                'Online class proj3'
+                                    instructions6       Label
+                                    nameLabel2          Label
+                                    second set of fields for classroomClass (location 6 fields, class schedule)
+                                    backButton          Button
+                                    createProjectButton Button
+                                    cancelButton        Button
+
+                                'Product proj1'
                                     instructions3
                                     instructions4
                                     nameLabel
@@ -161,8 +202,18 @@ define(["NextWave/source/utility/prototypes",
                                     imageSearchButton
                                     urlSearchButton
                                     fileSearchButton
-                                    createProjectButton
-                                    cancelButton
+                                    backButton          Button
+                                    continueButton      Button
+                                    should I have a createProjectButton here, too?
+                                    cancelButton        Button
+
+                                'Product proj2'
+                                    instructions6       Label
+                                    nameLabel2          Label
+                                    fields for product proj (level, difficulty, price)
+                                    backButton          Button
+                                    createProjectButton Button
+                                    cancelButton        Button
                             */
 
                             let objectConfiguration = 
@@ -300,6 +351,10 @@ define(["NextWave/source/utility/prototypes",
                                             try {
                                                 // Save off criteria.
                                                 m_projectName = localSelf.text;
+                                                
+                                                // Enable disable buttons.
+                                                m_functionSetBtnProtection();
+
                                             } catch (e) {
                                                 alert(e.message);
                                             }
