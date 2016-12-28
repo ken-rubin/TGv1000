@@ -127,25 +127,20 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper", "Core/S
 						    		self.callFunctionOK(resourceId);
 						    	});
 							if (exceptionRet) { throw exceptionRet; }
-
-							// Click the Search button for them.
-							m_functionSearchBtnClicked();
-
 						} catch (e) {
 
 							errorHelper.show(e.message);
 						}
 					};
 
-					// Invoked (presumably) after user has entered tags and clicks Search.
+					// Invoked after user has entered a search string and clicked Search.
 					var m_functionSearchBtnClicked = function () {
 
 					    try {
 
-						    var tags = $("#ISSearchInput").val().toLowerCase().trim();
 					        var posting = $.post("/BOL/UtilityBO/SearchResources", 
 					        	{
-					        		description: tags, 
+					        		description: $("#ISSearchInput").val().toLowerCase().trim(), 
 					        		// userId: g_profile["userId"], not needed; sent in JWT
 					        		// userName: g_profile["userName"], not needed; sent in JWT
 					        		resourceTypeId: 1,
