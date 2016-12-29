@@ -76,8 +76,9 @@ define(["NextWave/source/utility/prototypes",
                     // Indicates there is a project which has been loaded up into this manager.
                     self.projectLoaded = false;
                     // Holds currently displayed version of panelLayer.
-                    // 0 means panelLayer has no panels at all.
+                    // 0 means panelLayer has no panels at all. [OBSOLETE]
                     // 1 means panels are set for normal projects with all panels present.
+                    // 2 means System project. [OBSOLETE]
                     self.iPanelArrangement = 0;
                     
                     // Indicates that the current user is allowed to create or edit classes, products or online classes.
@@ -231,7 +232,7 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Clear panels.
-                    // iPanelArrangement = 0 for an empty panelLayer.
+                    // iPanelArrangement = 0 for an empty panelLayer. [OBSOLETE]
                     // iPanelArrangement = 1 for a normal project.
                     self.clearPanels = function (iPanelArrangement) {
 
@@ -239,7 +240,7 @@ define(["NextWave/source/utility/prototypes",
 
                             var exceptionRet;
 
-                            self.iPanelArrangement = iPanelArrangement || 0;
+                            self.iPanelArrangement = iPanelArrangement || 1;
                             self.panelLayer = m_arrayPanelLayers[self.iPanelArrangement];
                             m_arrayLayers = 
                                 [

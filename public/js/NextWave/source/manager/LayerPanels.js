@@ -35,9 +35,10 @@ define(["NextWave/source/utility/prototypes",
         "NextWave/source/project/LibrarySearchDialog",
         "NextWave/source/project/NewProjectDialog",
         "NextWave/source/project/SaveProjectDialog",
-        "NextWave/source/project/OpenProjectDialog"
+        "NextWave/source/project/OpenProjectDialog",
+        "NextWave/source/project/LandingPage"
         ],
-    function(prototypes, settings, orientation, Area, Point, Size, Layer, Panel, ProjectDialog, Type, ProjectBuilder, ComicBuilder, LibraryBuilder, TypeBuilder, PropertyBuilder, EventBuilder, NameList, Name, StatementListPayload, ExpressionList, LiteralList, MethodBuilder, LibrarySearchDialog, NewProjectDialog, SaveProjectDialog, OpenProjectDialog) {
+    function(prototypes, settings, orientation, Area, Point, Size, Layer, Panel, ProjectDialog, Type, ProjectBuilder, ComicBuilder, LibraryBuilder, TypeBuilder, PropertyBuilder, EventBuilder, NameList, Name, StatementListPayload, ExpressionList, LiteralList, MethodBuilder, LibrarySearchDialog, NewProjectDialog, SaveProjectDialog, OpenProjectDialog, LandingPage) {
 
         try {
 
@@ -184,6 +185,11 @@ define(["NextWave/source/utility/prototypes",
 
                                 throw exceptionRet;
                             }
+                            exceptionRet = m_functionAllocateLandingPage();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
                             // Not allocating these three center panels yet.
                             // They'll be allocated when first needed and data to pass in is available.
 /*                            exceptionRet = m_functionAllocateNewProject();
@@ -234,6 +240,7 @@ define(["NextWave/source/utility/prototypes",
                         window.newProjectDialog.destroy();
                         window.saveProjectDialog.destroy();
                         window.openProjectDialog.destroy();
+                        window.landingPage.destroy();
                     }
 
                     // Clear the center panel.
@@ -263,8 +270,9 @@ define(["NextWave/source/utility/prototypes",
                             window.newProjectDialog = null;
                             window.saveProjectDialog = null;
                             window.openProjectDialog = null;
+                            window.landingPage = null;
 
-                            // Clear out the three possible 
+                            // Clear out the possible 
                             // payloads for the center panel.
                             var exceptionRet = m_functionAllocateProjectBuilder();
                             if (exceptionRet) {
@@ -317,6 +325,11 @@ define(["NextWave/source/utility/prototypes",
                                 return exceptionRet;
                             }
                             exceptionRet = m_functionAllocateOpenProject();
+                            if (exceptionRet) {
+
+                                return exceptionRet;
+                            }
+                            exceptionRet = m_functionAllocateLandingPage();
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -375,6 +388,9 @@ define(["NextWave/source/utility/prototypes",
                             } else if (strMode === "OpenProject") {
 
                                 return m_functionSetOpenProjectInCenterPanel();
+                            } else if (strMode === "LandingPage") {
+
+                                return m_functionSetLandingPageInCenterPanel();
                             }
                             return null;
                         } catch (e) {
@@ -956,6 +972,32 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Allocate LandingPage instance.
+                    var m_functionAllocateLandingPage = function() {
+
+                        try {
+
+                            // For now, only allocate once.
+                            if (window.landingPage) {
+
+                                return null;
+                            }
+
+                            // Allocate and create the LandingPage.
+                            window.landingPage = new LandingPage();
+                            var exceptionRet = window.landingPage.create();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Helper method adds ProjectDialog to types panel.
                     var m_functionAddProjectDialogToTypesPanel = function(panelTypes) {
 
@@ -993,6 +1035,7 @@ define(["NextWave/source/utility/prototypes",
                             window.comicBuilder.visible = false;
                             window.projectBuilder.visible = true;
                             window.librarySearchDialog.visible = false;
+                            window.landingPage.visible = false;
                             if (window.newProjectDialog) {
                                 window.newProjectDialog.visible = false;
                             }
@@ -1026,6 +1069,7 @@ define(["NextWave/source/utility/prototypes",
                             window.comicBuilder.visible = true;
                             window.projectBuilder.visible = false;
                             window.librarySearchDialog.visible = false;
+                            window.landingPage.visible = false;
                             if (window.newProjectDialog) {
                                 window.newProjectDialog.visible = false;
                             }
@@ -1059,6 +1103,7 @@ define(["NextWave/source/utility/prototypes",
                             window.comicBuilder.visible = false;
                             window.projectBuilder.visible = false;
                             window.librarySearchDialog.visible = false;
+                            window.landingPage.visible = false;
                             if (window.newProjectDialog) {
                                 window.newProjectDialog.visible = false;
                             }
@@ -1092,6 +1137,7 @@ define(["NextWave/source/utility/prototypes",
                             window.comicBuilder.visible = false;
                             window.projectBuilder.visible = false;
                             window.librarySearchDialog.visible = false;
+                            window.landingPage.visible = false;
                             if (window.newProjectDialog) {
                                 window.newProjectDialog.visible = false;
                             }
@@ -1125,6 +1171,7 @@ define(["NextWave/source/utility/prototypes",
                             window.comicBuilder.visible = false;
                             window.projectBuilder.visible = false;
                             window.librarySearchDialog.visible = false;
+                            window.landingPage.visible = false;
                             if (window.newProjectDialog) {
                                 window.newProjectDialog.visible = false;
                             }
@@ -1158,6 +1205,7 @@ define(["NextWave/source/utility/prototypes",
                             window.comicBuilder.visible = false;
                             window.projectBuilder.visible = false;
                             window.librarySearchDialog.visible = false;
+                            window.landingPage.visible = false;
                             if (window.newProjectDialog) {
                                 window.newProjectDialog.visible = false;
                             }
@@ -1191,6 +1239,7 @@ define(["NextWave/source/utility/prototypes",
                             window.comicBuilder.visible = false;
                             window.projectBuilder.visible = false;
                             window.librarySearchDialog.visible = true;
+                            window.landingPage.visible = false;
                             if (window.newProjectDialog) {
                                 window.newProjectDialog.visible = false;
                             }
@@ -1224,6 +1273,7 @@ define(["NextWave/source/utility/prototypes",
                             window.comicBuilder.visible = false;
                             window.projectBuilder.visible = false;
                             window.librarySearchDialog.visible = false;
+                            window.landingPage.visible = false;
                             if (window.newProjectDialog) {
                                 window.newProjectDialog.visible = true;
                             }
@@ -1257,6 +1307,7 @@ define(["NextWave/source/utility/prototypes",
                             window.comicBuilder.visible = false;
                             window.projectBuilder.visible = false;
                             window.librarySearchDialog.visible = false;
+                            window.landingPage.visible = false;
                             if (window.newProjectDialog) {
                                 window.newProjectDialog.visible = false;
                             }
@@ -1290,6 +1341,7 @@ define(["NextWave/source/utility/prototypes",
                             window.comicBuilder.visible = false;
                             window.projectBuilder.visible = false;
                             window.librarySearchDialog.visible = false;
+                            window.landingPage.visible = false;
                             if (window.newProjectDialog) {
                                 window.newProjectDialog.visible = false;
                             }
@@ -1302,6 +1354,40 @@ define(["NextWave/source/utility/prototypes",
 
                             // Set it in the center panel.
                             return self.centerPanel.setPayload("Open Project",
+                                window.openProjectDialog);
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Helper method sets LandingPage in the method panel.
+                    var m_functionSetLandingPageInCenterPanel = function() {
+
+                        try {
+
+                            // Set visible to property builder.
+                            window.eventBuilder.visible = false;
+                            window.propertyBuilder.visible = false;
+                            window.methodBuilder.visible = false;
+                            window.typeBuilder.visible = false;
+                            window.libraryBuilder.visible = false;
+                            window.comicBuilder.visible = false;
+                            window.projectBuilder.visible = false;
+                            window.librarySearchDialog.visible = false;
+                            if (window.newProjectDialog) {
+                                window.newProjectDialog.visible = false;
+                            }
+                            if (window.newProjectDialog) {
+                                window.saveProjectDialog.visible = false;
+                            }
+                            if (window.newProjectDialog) {
+                                window.openProjectDialog.visible = false;
+                            }
+                            window.landingPage.visible = true;
+
+                            // Set it in the center panel.
+                            return self.centerPanel.setPayload("LandingPage",
                                 window.openProjectDialog);
                         } catch (e) {
 
@@ -1323,6 +1409,7 @@ define(["NextWave/source/utility/prototypes",
                             window.comicBuilder.visible = false;
                             window.projectBuilder.visible = false;
                             window.librarySearchDialog.visible = false;
+                            window.landingPage.visible = false;
                             if (window.newProjectDialog) {
                                 window.newProjectDialog.visible = false;
                             }
