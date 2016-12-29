@@ -80,7 +80,7 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             self.iPanelConfiguration = iPanelConfiguration;
-                            switch (iPanelConfiguration) {
+                            switch (self.iPanelConfiguration) {
 
                                 case 0:
 

@@ -133,9 +133,8 @@ define(["NextWave/source/utility/prototypes",
                                 throw exceptionRet;
                             }
 
-                            // Allocate and create the 2 panel layers.
-                            // [0]: No panels.
-                            // [1]: Panels in the normal project configuration.
+                            // Allocate and create the 3 panel layers. 0 = no panels; 1 = normal project; 2 = system types project.
+                            // Of course, only 1 is now used.
                             for (var i = 0; i < 2; i++) {
 
                                 var pl = new LayerPanels();

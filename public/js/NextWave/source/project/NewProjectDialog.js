@@ -61,12 +61,9 @@ define(["NextWave/source/utility/prototypes",
                                 throw { message: "NewProjectDialog: Instance already created!" };
                             }
 
-
-
-                            // Create the dialog.
-
                             //      A normal user starts in mode 'Sel Proj Type-normal user' and goes to mode 'Normal proj' on image click.
-                            //      A privileged user starts in mode 'Sel Proj Type-priv user' and goes to mode 'Normal proj', 'Class proj', 'Online class proj' or 'Product proj', depending on the button clicked.
+                            //      A privileged user starts in mode 'Sel Proj Type-priv user' and goes to mode 'Normal proj', 'Class proj1', 'Online class proj1' or 'Product proj1',
+                            //      depending on the button clicked (eventually may be radio buttons and a continue button).
                             /*                                
                                                                     Note            In mode(s)      
                                 instructions1       Label                           'Sel Proj Type-normal user','Sel Proj Type-priv user'
@@ -306,7 +303,7 @@ define(["NextWave/source/utility/prototypes",
                                             self.dialog.setMode('Product proj');
                                         }
                                     },
-/*                                    instructions3: {
+                                    instructions3: {
                                         type: "Label",
                                         modes: ['Normal proj','Class proj','Online class proj','Product proj'],
                                         text: "Enter details for your new Project.",
@@ -316,9 +313,9 @@ define(["NextWave/source/utility/prototypes",
                                         width: 2 * settings.general.margin,
                                         height: settings.dialog.lineHeight                                  
                                     },
-                                    instructions4: {
+                                    instructions4a: {
                                         type: "Label",
-                                        modes: ['Normal proj','Class proj','Online class proj','Product proj'],
+                                        modes: ['Normal proj'],
                                         text: "Only Name is required. However, consider changing the default image for id purposes.",
                                         x: settings.general.margin,
                                         y: 5 * settings.general.margin +
@@ -327,12 +324,24 @@ define(["NextWave/source/utility/prototypes",
                                         width: 2 * settings.general.margin,
                                         height: settings.dialog.lineHeight                                  
                                     },
-*/                                    nameLabel: {
+                                    instructions4b: {
+                                        type: "Label",
+                                        modes: ['Class proj','Online class proj','Product proj'],
+                                        text: "Only Name is required in order to Create the Project or to Continue. However, consider changing the default image for id purposes.",
+                                        x: settings.general.margin,
+                                        y: 5 * settings.general.margin +
+                                            settings.dialog.lineHeight,
+                                        widthType: "reserve",
+                                        width: 2 * settings.general.margin,
+                                        height: settings.dialog.lineHeight                                  
+                                    },
+                                    nameLabel: {
                                         type: "Label",
                                         modes: ['Normal proj','Class proj','Online class proj','Product proj'],
                                         text: "Name",
                                         x: settings.general.margin,
-                                        y: settings.general.margin,
+                                        y: 5 * settings.general.margin +
+                                            3 * settings.dialog.lineHeight,
                                         width: settings.dialog.firstColumnWidth,
                                         height: settings.dialog.lineHeight                                  
                                     },
@@ -341,7 +350,8 @@ define(["NextWave/source/utility/prototypes",
                                         modes: ['Normal proj','Class proj','Online class proj','Product proj'],
                                         x: 2 * settings.general.margin + 
                                             settings.dialog.firstColumnWidth,
-                                        y: settings.general.margin,
+                                        y: 5 * settings.general.margin +
+                                            3 * settings.dialog.lineHeight,
                                         widthType: "reserve",           // Reserve means: subtract the width from
                                                                         //  the total width on calculateLayout.
                                         width: 3 * settings.general.margin +
@@ -365,8 +375,8 @@ define(["NextWave/source/utility/prototypes",
                                         modes: ['Normal proj','Class proj','Online class proj','Product proj'],
                                         text: "Description",
                                         x: settings.general.margin,
-                                        y: settings.dialog.lineHeight + 
-                                            2 * settings.general.margin,
+                                        y: 6 * settings.general.margin +
+                                            4 * settings.dialog.lineHeight,
                                         width: settings.dialog.firstColumnWidth,
                                         height: settings.dialog.lineHeight
                                     },
@@ -375,8 +385,8 @@ define(["NextWave/source/utility/prototypes",
                                         modes: ['Normal proj','Class proj','Online class proj','Product proj'],
                                         x: 2 * settings.general.margin + 
                                             settings.dialog.firstColumnWidth,
-                                        y: settings.dialog.lineHeight + 
-                                            2 * settings.general.margin,
+                                        y: 6 * settings.general.margin +
+                                            4 * settings.dialog.lineHeight,
                                         widthType: "reserve",           // Reserve means: subtract the width from
                                                                         //  the total width on calculateLayout.
                                         width: 3 * settings.general.margin +
@@ -488,7 +498,20 @@ define(["NextWave/source/utility/prototypes",
                                             }
                                         }
                                     },
-                                    // TODO: I want the next button to be disabled to start. It is enabled when the project has a name.
+                                    continueButton: {
+                                        type: "Button",
+                                        modes: ['Class proj','Online class proj','Product proj'],
+                                        text: "Continue",
+                                        xType: "reserve",
+                                        x: 2 * settings.dialog.firstColumnWidth + 170,
+                                        yType: "reserve",
+                                        y: 100,
+                                        width: 140,
+                                        height: 40,
+                                        click: function() {
+
+                                        }
+                                    },
                                     createProjectButton: {
                                         type: "Button",
                                         modes: ['Normal proj','Class proj','Online class proj','Product proj'],
@@ -737,10 +760,10 @@ define(["NextWave/source/utility/prototypes",
                                     // self is NewProjectDialog instance.
                                     m_projectTypeId = id;
 
-/*                                    let i3 = self.dialog.controlObject["instructions3"];
+                                    let i3 = self.dialog.controlObject["instructions3"];
                                     let ptName = m_arrayProjectTypeNames[projTypeId - 1];
-                                    i3.text = "Enter details for your new " + ptName.charAt(0).toUpperCase() + ptName.slice(1) + "-based Project.";
-*/                                    
+                                    i3.text = "Enter details for your new " + ptName.charAt(0).toUpperCase() + ptName.slice(1) + (ptName === 'empty' ? " Project." : "-based Project.");
+                                    
                                     let iPI = self.dialog.controlObject["projectImage"];
                                     iPI.setUrl(resourceHelper.toURL("images", null, null, m_arrayProjectTypeNames[m_projectTypeId - 1] + "Project.png"));
                                     iPI.recreate();
@@ -753,7 +776,14 @@ define(["NextWave/source/utility/prototypes",
                                     } else {
 
                                         // Privileged user has selected project type. Highlight its PictureListItem in listHost and enable the 4 project type buttons.
-                                        let b = self.dialog.controlObject[""];
+                                        let b = self.dialog.controlObject["normal"];
+                                        b.setProtected(false);
+                                        b = self.dialog.controlObject["classroomClass"];
+                                        b.setProtected(false);
+                                        b = self.dialog.controlObject["onlineClass"];
+                                        b.setProtected(false);
+                                        b = self.dialog.controlObject["product"];
+                                        b.setProtected(false);
                                     }
 
                                 };
