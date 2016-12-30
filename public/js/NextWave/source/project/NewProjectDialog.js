@@ -775,7 +775,10 @@ define(["NextWave/source/utility/prototypes",
     
                                     } else {
 
-                                        // Privileged user has selected project type. Highlight its PictureListItem in listHost and enable the 4 project type buttons.
+                                        // Privileged user has selected project type. Highlight its PictureListItem in listHost (and unhighlight all others first) and enable the 4 project type buttons.
+                                        m_lhProjectTypes.unsetAllHighlights();
+                                        pliNew.setHighlight(true);
+
                                         let b = self.dialog.controlObject["normal"];
                                         b.setProtected(false);
                                         b = self.dialog.controlObject["classroomClass"];

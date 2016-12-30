@@ -42,6 +42,11 @@ define(["NextWave/source/utility/prototypes",
                     ///////////////////////
                     // Public methods.
 
+                    // We are about to highlight a PictureListItem. Turn all highlights off first.
+                    self.unsetAllHighlights = function() {
+                        self.list.unsetAllHighlights();
+                    }
+
                     // Render object.
                     self.render = function (contextRender) {
 

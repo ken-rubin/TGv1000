@@ -30,6 +30,8 @@ define(["NextWave/source/utility/prototypes",
                     ///////////////////////
                     // Public fields.
 
+                    // For hit testing.
+                    self.isPictureListItem = true;
                     // Name of this type object.
                     self.name = strName || "default";
                     // Fullname of this object.
@@ -156,6 +158,12 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Highlight self.
+                    self.setHighlight = function(b) {
+
+                        self.highlight = b;
+                    }
+
                     // Change cursor if over delete handler.
                     self.mouseMove = function (objectReference) {
 
@@ -229,12 +237,47 @@ define(["NextWave/source/utility/prototypes",
                                 );
                             } else {
 
-                                m_area = new Area(
+/*                                m_area = new Area(
                                     new Point(areaRender.location.x + settings.general.margin + dOffset, 
                                         areaRender.location.y + settings.general.margin),
                                     new Size(self.getWidth(contextRender) - 2 * settings.general.margin, 
                                         areaRender.extent.height - 2 * settings.general.margin)
                                 );
+*/                                
+                                // A special test just for the horizontal listHost's PictureListItem (which this is).
+                                if (self.highlight) {
+
+                                    // First we'll draw the background highlight rectangle at normal size.
+                                    m_area = new Area(
+                                        new Point(areaRender.location.x + settings.general.margin + dOffset, 
+                                            areaRender.location.y + settings.general.margin),
+                                        new Size(self.getWidth(contextRender) - 2 * settings.general.margin, 
+                                            areaRender.extent.height - 2 * settings.general.margin)
+                                    );
+                                    contextRender.fillStyle = "rgba(255,0,0,1)";
+                                    contextRender.fillRect(
+                                        m_area.location.x, 
+                                        m_area.location.y,
+                                        m_area.extent.width,
+                                        m_area.extent.height);
+
+                                    // Then we'll shrink down a bit so the image drawing below will appear indented.
+                                    m_area = new Area(
+                                        new Point(areaRender.location.x + settings.general.margin + dOffset + 5, 
+                                            areaRender.location.y + settings.general.margin + 5),
+                                        new Size(self.getWidth(contextRender) - 2 * settings.general.margin - 10, 
+                                            areaRender.extent.height - 2 * settings.general.margin - 10)
+                                    );
+
+                                } else {
+
+                                    m_area = new Area(
+                                        new Point(areaRender.location.x + settings.general.margin + dOffset, 
+                                            areaRender.location.y + settings.general.margin),
+                                        new Size(self.getWidth(contextRender) - 2 * settings.general.margin, 
+                                            areaRender.extent.height - 2 * settings.general.margin)
+                                    );
+                                }
                             }
 
                             // Generate the path.
@@ -245,7 +288,7 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Fill and stroke the path.
-                            if ((window.draggingObject) &&
+/*                            if ((window.draggingObject) &&
                                 self.collection) {
 
                                 contextRender.fillStyle = settings.general.fillDrag;
@@ -259,45 +302,12 @@ define(["NextWave/source/utility/prototypes",
                                 contextRender.fillStyle = settings.general.fillBackgroundHighlight;
                                 contextRender.strokeStyle = settings.general.strokeBackgroundHighlight;
                             } else {
-
+*/
                                 contextRender.fillStyle = self.settingsNode.fillBackground;
                                 contextRender.strokeStyle = settings.general.strokeBackground;
-                            }
-                            contextRender.fill();
+/*                            }
+*/                            contextRender.fill();
                             contextRender.stroke();
-if (false) {
-                            // Render the delete handler, if specified.
-                            var dSpaceForDeleteIcon = 0;
-                            if ($.isFunction(self.deleteHandler)) {
-
-                                // Calculate where the icon is, also used for hittesting.
-                                m_areaDeleteIcon = new Area(
-                                    new Point(m_area.location.x + m_area.extent.width - settings.glyphs.width,
-                                        m_area.location.y),
-                                    new Size(settings.glyphs.smallWidth,
-                                        settings.glyphs.smallHeight));
-
-                                dSpaceForDeleteIcon = settings.glyphs.width;
-
-                                // Render pushpin.
-                                exceptionRet = glyphs.render(contextRender,
-                                    m_areaDeleteIcon,
-                                    glyphs.remove,
-                                    settings.manager.showIconBackgrounds);
-                                if (exceptionRet) {
-
-                                    throw exceptionRet;
-                                }
-                            }
-
-                            // Render the name.
-                            contextRender.font = self.settingsNode.font;
-                            contextRender.fillStyle = settings.general.fillText;
-                            contextRender.fillText(self.getName(),
-                                m_area.location.x + settings.general.margin,
-                                m_area.location.y + settings.general.margin,
-                                m_area.extent.width - 2 * settings.general.margin - dSpaceForDeleteIcon);
-} else {
 
                             // Render the image.
                             try {
@@ -313,8 +323,8 @@ if (false) {
 
                                 contextRender.restore();
                             }
-}
                             return null;
+
                         } catch (e) {
 
                             return e;

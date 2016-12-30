@@ -6,6 +6,7 @@
     },
 
     "editor.wrappingColumn": -1,
+    "editor.detectIndentation": false,
     "files.autoSave": "afterDelay",
-    "files.autoSaveDelay": 15000
+    "files.autoSaveDelay": 10000
 }
