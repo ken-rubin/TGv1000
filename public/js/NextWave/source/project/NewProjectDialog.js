@@ -501,7 +501,7 @@ define(["NextWave/source/utility/prototypes",
                                     continueButton: {
                                         type: "Button",
                                         modes: ['Class proj','Online class proj','Product proj'],
-                                        text: "Continue",
+                                        text: "Next >",
                                         xType: "reserve",
                                         x: 2 * settings.dialog.firstColumnWidth + 170,
                                         yType: "reserve",
