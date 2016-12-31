@@ -18,10 +18,11 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/DialogHost",
     "NextWave/source/utility/List",
     "NextWave/source/utility/PictureListItem",
+    "NextWave/source/utility/RadioListItem",
     "Core/errorHelper", 
     "Core/resourceHelper"
     ],
-    function (prototypes, settings, Point, Size, Area, DialogHost, List, PictureListItem, errorHelper, resourceHelper) {
+    function (prototypes, settings, Point, Size, Area, DialogHost, List, PictureListItem, RadioListItem, errorHelper, resourceHelper) {
 
         try {
 
@@ -64,154 +65,150 @@ define(["NextWave/source/utility/prototypes",
                             //      A normal user starts in mode 'Sel Proj Type-normal user' and goes to mode 'Normal proj' on image click.
                             //      A privileged user starts in mode 'Sel Proj Type-priv user' and goes to mode 'Normal proj', 'Class proj1', 'Online class proj1' or 'Product proj1',
                             //      depending on the button clicked (eventually may be radio buttons and a continue button).
-                            /*                                
-                                                                    Note            In mode(s)      
-                                instructions1       Label                           'Sel Proj Type-normal user','Sel Proj Type-priv user'
-                                projectTypes        ListHost                        'Sel Proj Type-normal user','Sel Proj Type-priv user'
-                                instructions2       Label                           'Sel Proj Type-priv user'
-                                normal              Button                          'Sel Proj Type-priv user'
-                                classroomClass      Button                          'Sel Proj Type-priv user'
-                                onlineClass         Button                          'Sel Proj Type-priv user'
-                                product             Button                          'Sel Proj Type-priv user'
-                                instructions3       Label                           'Normal proj','Class proj','Online class proj','Product proj'                         
-                                instructions4       Label                           'Normal proj','Class proj','Online class proj','Product proj'
-                                nameLabel           Label                           'Normal proj','Class proj','Online class proj','Product proj'
-                                nameEdit            Edit                            'Normal proj','Class proj','Online class proj','Product proj'
-                                descriptionLabel    Label                           'Normal proj','Class proj','Online class proj','Product proj'
-                                descriptionEdit     Edit                            'Normal proj','Class proj','Online class proj','Product proj'
-                                projectImageLabel   Label                           'Normal proj','Class proj','Online class proj','Product proj'
-                                projectImage        Picture                         'Normal proj','Class proj','Online class proj','Product proj'
-                                imageSearchButton   Button                          'Normal proj','Class proj','Online class proj','Product proj'
-                                urlSearchButton     Button                          'Normal proj','Class proj','Online class proj','Product proj'
-                                fileSearchButton    Button                          'Normal proj','Class proj','Online class proj','Product proj'
-                                createProjectButton Button                          'Normal proj','Class proj','Online class proj','Product proj'
-                                cancelButton        Button                          'Normal proj','Class proj','Online class proj','Product proj'
+/*                                
+                                    Note            In mode(s)      
+instructions1       Label                           'Sel Proj Type-normal user','Sel Proj Type-priv user'
+projectTypes        ListHost                        'Sel Proj Type-normal user','Sel Proj Type-priv user'
+instructions2       Label                           'Sel Proj Type-priv user'
+normal              Button                          'Sel Proj Type-priv user'
+classroomClass      Button                          'Sel Proj Type-priv user'
+onlineClass         Button                          'Sel Proj Type-priv user'
+product             Button                          'Sel Proj Type-priv user'
+instructions3       Label                           'Normal proj','Class proj','Online class proj','Product proj'                         
+instructions4       Label                           'Normal proj','Class proj','Online class proj','Product proj'
+nameLabel           Label                           'Normal proj','Class proj','Online class proj','Product proj'
+nameEdit            Edit                            'Normal proj','Class proj','Online class proj','Product proj'
+descriptionLabel    Label                           'Normal proj','Class proj','Online class proj','Product proj'
+descriptionEdit     Edit                            'Normal proj','Class proj','Online class proj','Product proj'
+projectImageLabel   Label                           'Normal proj','Class proj','Online class proj','Product proj'
+projectImage        Picture                         'Normal proj','Class proj','Online class proj','Product proj'
+imageSearchButton   Button                          'Normal proj','Class proj','Online class proj','Product proj'
+urlSearchButton     Button                          'Normal proj','Class proj','Online class proj','Product proj'
+fileSearchButton    Button                          'Normal proj','Class proj','Online class proj','Product proj'
+createProjectButton Button                          'Normal proj','Class proj','Online class proj','Product proj'
+cancelButton        Button                          'Normal proj','Class proj','Online class proj','Product proj'
 
-                                Controls arranged by Mode
-                                'Sel Proj Type-normal user'
-                                    instructions1       Label
-                                    projectTypes        ListHost
-                                    cancelButton        Button
+Controls arranged by Mode
+'Sel Proj Type-normal user'
+    instructions1       Label
+    projectTypes        ListHost
+    cancelButton        Button
 
-                                'Sel Proj Type-priv user'
-                                    instructions1       Label
-                                    projectTypes        ListHost
-                                    instructions2       Label
-                                    normal              Button
-                                    classroomClass      Button
-                                    onlineClass         Button
-                                    product             Button
-                                    cancelButton        Button
+'Sel Proj Type-priv user'
+    instructions1       Label
+    projectTypes        ListHost
+    instructions2       Label
+    If I had radio buttons for the next 4 buttons, I'd add the Next button and enable it when an image is selected and a radio choice is made.
+    normal              Button
+    classroomClass      Button
+    onlineClass         Button
+    product             Button
+    cancelButton        Button
 
-                                'Normal proj'
-                                    instructions3       Label
-                                    instructions4       Label
-                                    nameLabel           Label
-                                    nameEdit            Edit
-                                    descriptionLabel    Label
-                                    descriptionEdit     Edit-multiline
-                                    projectImageLabel   Label
-                                    projectImage        Picture
-                                    imageSearchButton   Button
-                                    urlSearchButton     Button
-                                    fileSearchButton    Button
-                                    backButton          Button
-                                    createProjectButton Button
-                                    cancelButton        Button
+'Normal proj'
+    instructions3       Label
+    instructions4       Label
+    nameLabel           Label
+    nameEdit            Edit
+    descriptionLabel    Label
+    descriptionEdit     Edit-multiline
+    projectImageLabel   Label
+    projectImage        Picture
+    imageSearchButton   Button
+    urlSearchButton     Button
+    fileSearchButton    Button
+    backButton          Button
+    createProjectButton Button
+    cancelButton        Button
 
-                                'Class proj1'
-                                    instructions3       Label
-                                    instructions4       Label
-                                    nameLabel           Label
-                                    nameEdit            Edit
-                                    descriptionLabel    Label
-                                    descriptionEdit     Edit-multiline
-                                    projectImageLabel   Label
-                                    projectImage        Picture
-                                    imageSearchButton   Button
-                                    urlSearchButton     Button
-                                    fileSearchButton    Button
-                                    backButton          Button
-                                    continueButton      Button
-                                    should I have a createProjectButton here, too?
-                                    cancelButton        Button
+'Class proj1'
+    instructions3       Label
+    instructions4       Label
+    nameLabel           Label
+    nameEdit            Edit
+    descriptionLabel    Label
+    descriptionEdit     Edit-multiline
+    projectImageLabel   Label
+    projectImage        Picture
+    imageSearchButton   Button
+    urlSearchButton     Button
+    fileSearchButton    Button
+    backButton          Button
+    nextButton          Button
+    cancelButton        Button
 
-                                'Class proj2'
-                                    instructions5       Label
-                                    nameLabel2          Label
-                                    first set of fields for classroomClass (instructor, phone, level, difficulty, price, max class size, loaner computers available, notes)
-                                    backButton          Button
-                                    continueButton      Button
-                                    should I have a createProjectButton, too?
-                                    cancelButton        Button
+'Class proj2'
+    instructions5       Label
+    nameLabel2          Label
+    first set of fields for classroomClass (instructor, phone, level, difficulty, price, max class size, loaner computers available, notes)
+    backButton          Button
+    nextButton          Button
+    cancelButton        Button
 
-                                'Class proj3'
-                                    instructions6       Label
-                                    nameLabel2          Label
-                                    second set of fields for classroomClass (location 6 fields, class schedule)
-                                    backButton          Button
-                                    createProjectButton Button
-                                    cancelButton        Button
+'Class proj3'
+    instructions6       Label
+    nameLabel2          Label
+    second set of fields for classroomClass (location 6 fields, class schedule)
+    backButton          Button
+    createProjectButton Button
+    cancelButton        Button
 
-                                'Online class proj1'
-                                    instructions3       Label
-                                    instructions4       Label
-                                    nameLabel           Label
-                                    nameEdit            Edit
-                                    descriptionLabel    Label
-                                    descriptionEdit     Edit-multiline
-                                    projectImageLabel   Label
-                                    projectImage        Picture
-                                    imageSearchButton   Button
-                                    urlSearchButton     Button
-                                    fileSearchButton    Button
-                                    backButton          Button
-                                    continueButton      Button
-                                    should I have a createProjectButton here, too?
-                                    cancelButton        Button
+'Online class proj1'
+    instructions3       Label
+    instructions4       Label
+    nameLabel           Label
+    nameEdit            Edit
+    descriptionLabel    Label
+    descriptionEdit     Edit-multiline
+    projectImageLabel   Label
+    projectImage        Picture
+    imageSearchButton   Button
+    urlSearchButton     Button
+    fileSearchButton    Button
+    backButton          Button
+    nextButton          Button
+    cancelButton        Button
 
-                                'Online class proj2'
-                                    instructions5       Label
-                                    nameLabel2          Label
-                                    first set of fields for classroomClass (instructor, email, level, difficulty, price, notes)
-                                    backButton          Button
-                                    continueButton      Button
-                                    should I have a createProjectButton, too?
-                                    cancelButton        Button
+'Online class proj2'
+    instructions5       Label
+    nameLabel2          Label
+    first set of fields for classroomClass (instructor, email, level, difficulty, price, notes)
+    backButton          Button
+    nextButton          Button
+    cancelButton        Button
 
-                                'Online class proj3'
-                                    instructions6       Label
-                                    nameLabel2          Label
-                                    second set of fields for classroomClass (location 6 fields, class schedule)
-                                    backButton          Button
-                                    createProjectButton Button
-                                    cancelButton        Button
+'Online class proj3'
+    instructions6       Label
+    nameLabel2          Label
+    second set of fields for classroomClass (location 6 fields, class schedule)
+    backButton          Button
+    createProjectButton Button
+    cancelButton        Button
 
-                                'Product proj1'
-                                    instructions3
-                                    instructions4
-                                    nameLabel
-                                    nameEdit
-                                    descriptionLabel
-                                    descriptionEdit
-                                    projectImageLabel
-                                    projectImage
-                                    imageSearchButton
-                                    urlSearchButton
-                                    fileSearchButton
-                                    backButton          Button
-                                    continueButton      Button
-                                    should I have a createProjectButton here, too?
-                                    cancelButton        Button
+'Product proj1'
+    instructions3
+    instructions4
+    nameLabel
+    nameEdit
+    descriptionLabel
+    descriptionEdit
+    projectImageLabel
+    projectImage
+    imageSearchButton
+    urlSearchButton
+    fileSearchButton
+    backButton          Button
+    nextButton          Button
+    cancelButton        Button
 
-                                'Product proj2'
-                                    instructions6       Label
-                                    nameLabel2          Label
-                                    fields for product proj (level, difficulty, price)
-                                    backButton          Button
-                                    createProjectButton Button
-                                    cancelButton        Button
-                            */
+'Product proj2'
+    instructions6       Label
+    nameLabel2          Label
+    fields for product proj (level, difficulty, price)
+    backButton          Button
+    createProjectButton Button
+    cancelButton        Button
+*/
 
                             let objectConfiguration = 
                             {
@@ -247,7 +244,18 @@ define(["NextWave/source/utility/prototypes",
                                         width: 2 * settings.general.margin,
                                         height: settings.dialog.lineHeight                                  
                                     },
-                                    normal: {
+                                    ncopChoice: {
+                                        type: "ListHost",
+                                        modes: ['Sel Proj Type-priv user'],
+                                        constructorParameterString: "true",
+                                        x: settings.general.margin + 
+                                            3 * settings.dialog.firstColumnWidth,
+                                        y: settings.general.margin + 
+                                            3 * settings.dialog.lineHeight + 130,
+                                        width: settings.dialog.firstColumnWidth,
+                                        height: 5 * settings.dialog.lineHeight                                  
+                                    },
+/*                                    normal: {
                                         type: "Button",
                                         modes: ['Sel Proj Type-priv user'],
                                         text: "Normal",
@@ -303,7 +311,7 @@ define(["NextWave/source/utility/prototypes",
                                             self.dialog.setMode('Product proj');
                                         }
                                     },
-                                    instructions3: {
+*/                                    instructions3: {
                                         type: "Label",
                                         modes: ['Normal proj','Class proj','Online class proj','Product proj'],
                                         text: "Enter details for your new Project.",
@@ -313,21 +321,10 @@ define(["NextWave/source/utility/prototypes",
                                         width: 2 * settings.general.margin,
                                         height: settings.dialog.lineHeight                                  
                                     },
-                                    instructions4a: {
+                                    instructions4: {
                                         type: "Label",
-                                        modes: ['Normal proj'],
-                                        text: "Only Name is required. However, consider changing the default image for id purposes.",
-                                        x: settings.general.margin,
-                                        y: 5 * settings.general.margin +
-                                            settings.dialog.lineHeight,
-                                        widthType: "reserve",
-                                        width: 2 * settings.general.margin,
-                                        height: settings.dialog.lineHeight                                  
-                                    },
-                                    instructions4b: {
-                                        type: "Label",
-                                        modes: ['Class proj','Online class proj','Product proj'],
-                                        text: "Only Name is required in order to Create the Project or to Continue. However, consider changing the default image for id purposes.",
+                                        modes: ['Normal proj','Class proj','Online class proj','Product proj'],
+                                        text: "Only Name is required. However, consider entering a description for searching and changing the default image for identification.",
                                         x: settings.general.margin,
                                         y: 5 * settings.general.margin +
                                             settings.dialog.lineHeight,
@@ -498,18 +495,56 @@ define(["NextWave/source/utility/prototypes",
                                             }
                                         }
                                     },
-                                    continueButton: {
+                                    backButton: {
                                         type: "Button",
-                                        modes: ['Class proj','Online class proj','Product proj'],
-                                        text: "Next >",
-                                        xType: "reserve",
-                                        x: 2 * settings.dialog.firstColumnWidth + 170,
+                                        modes: ['Normal proj','Class proj','Online class proj','Product proj'],
+                                        text: "< Back",
+                                        x: settings.general.margin,
                                         yType: "reserve",
                                         y: 100,
                                         width: 140,
                                         height: 40,
                                         click: function() {
 
+                                        }
+                                    },
+                                    nextButton: {
+                                        type: "Button",
+                                        modes: ['Class proj','Online class proj','Product proj'],
+                                        text: "Next >",
+                                        x: settings.general.margin +
+                                            settings.dialog.firstColumnWidth,
+                                        yType: "reserve",
+                                        y: 100,
+                                        width: 140,
+                                        height: 40,
+                                        click: function() {
+
+                                        }
+                                    },
+                                    cancelButton: {
+                                        type: "Button",
+                                        modes: ['Sel Proj Type-normal user','Sel Proj Type-priv user','Normal proj','Class proj','Online class proj','Product proj'],
+                                        text: "Cancel",
+                                        x: settings.general.margin +
+                                            2 * settings.dialog.firstColumnWidth,
+                                        yType: "reserve",
+                                        y: 100,
+                                        width: 110,
+                                        height: 40,
+                                        click: function() {
+                                            try {
+                                                if (window.methodBuilder) {
+
+                                                    // TODO: getting currentMethod = null even when I think there should be one. Ask Ken.
+                                                    let exceptionRet = manager.selectMethod(window.methodBuilder.currentMethod);
+                                                    if (exceptionRet) {
+                                                        throw exceptionRet;
+                                                    }
+                                                }
+                                            } catch (e) {
+                                                errorHelper.show(e);
+                                            }
                                         }
                                     },
                                     createProjectButton: {
@@ -707,31 +742,6 @@ define(["NextWave/source/utility/prototypes",
                                                 errorHelper.show(e);
                                             }
 */                                        }
-                                    },
-                                    cancelButton: {
-                                        type: "Button",
-                                        modes: ['Normal proj','Class proj','Online class proj','Product proj'],
-                                        text: "Cancel",
-                                        xType: "reserve",
-                                        x: settings.dialog.firstColumnWidth,
-                                        yType: "reserve",
-                                        y: 100,
-                                        width: 110,
-                                        height: 40,
-                                        click: function() {
-                                            try {
-                                                if (window.methodBuilder) {
-
-                                                    // TODO: getting currentMethod = null even when I think there should be one. Ask Ken.
-                                                    let exceptionRet = manager.selectMethod(window.methodBuilder.currentMethod);
-                                                    if (exceptionRet) {
-                                                        throw exceptionRet;
-                                                    }
-                                                }
-                                            } catch (e) {
-                                                errorHelper.show(e);
-                                            }
-                                        }
                                     }
                             };
 
@@ -773,13 +783,13 @@ define(["NextWave/source/utility/prototypes",
                                         // Normal user just switches mode to create new project.
                                         self.dialog.setMode('Normal proj');
     
-                                    } else {
+                                    } else if (self.dialog.getMode() === "Sel Proj Type-priv user") {
 
-                                        // Privileged user has selected project type. Highlight its PictureListItem in listHost (and unhighlight all others first) and enable the 4 project type buttons.
-                                        m_lhProjectTypes.unsetAllHighlights();
-                                        pliNew.setHighlight(true);
+                                        // Privileged user has selected a project type. Outline its PictureListItem in listHost (un-outline all others first).
+                                        m_lhProjectTypes.removeAllOutlines();
+                                        pliNew.setOutline(true);
 
-                                        let b = self.dialog.controlObject["normal"];
+/*                                        let b = self.dialog.controlObject["normal"];
                                         b.setProtected(false);
                                         b = self.dialog.controlObject["classroomClass"];
                                         b.setProtected(false);
@@ -787,12 +797,32 @@ define(["NextWave/source/utility/prototypes",
                                         b.setProtected(false);
                                         b = self.dialog.controlObject["product"];
                                         b.setProtected(false);
+*/                                    
+                                        m_functionSetBtnProtection();
                                     }
-
                                 };
                                 return pliNew;
                             });
                             listProjectTypes.create(arrayOutput);
+
+                            if (self.dialog.getMode() === "Sel Proj Type-priv user") {
+
+                                // Fill self.dialog.controlObject["ncopChoice"] with array of RadioListItems.
+                                m_lh_ncopChoice = self.dialog.controlObject["ncopChoice"];
+                                let listProjectModes = m_lh_ncopChoice.list;
+                                let index = 0;
+
+                                listProjectModes.destroy();
+                                let arrayOutput = ["Normal project","Classroom project","Online class project","Product project"].map((projMode) => {
+
+                                    let rliNew = new RadioListItem(projMode, index++);
+                                    rliNew.clickHandler = (ind) => {
+
+                                    };
+                                    return rliNew;
+                                });
+                                listProjectModes.create(arrayOutput);
+                            }
 
                             m_functionSetBtnProtection();
 
@@ -828,7 +858,8 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     ///////////////////////
-                    // Private methods - will they be accessible with current structure??
+                    // Private methods.
+
 					// Display the chosen image.
 					var m_functionSetImageSrc = function (imageId) {
 
@@ -861,20 +892,18 @@ define(["NextWave/source/utility/prototypes",
                     var m_functionSetBtnProtection = function() {
 
                         let currDialogMode = self.dialog.getMode();
-                        if (currDialogMode === "Sel Proj Type-priv user") {
+                        if ((currDialogMode === "Sel Proj Type-priv user") && m_projectTypeId && m_projectModeId) {
 
-                            ////////////////////////
-                            // Disable 4 project style buttons until user selects a project type.
-                            let btn = self.dialog.controlObject["normal"];
-                            btn.setProtected(true);
-                            btn = self.dialog.controlObject["classroomClass"];
-                            btn.setProtected(true);
-                            btn = self.dialog.controlObject["onlineClass"];
-                            btn.setProtected(true);
-                            btn = self.dialog.controlObject["product"];
-                            btn.setProtected(true);
+                            let btn = self.dialog.controlObject["nextButton"];
+                            btn.setProtected(false);
+
+                        } else if ((currDialogMode === "Sel Proj Type-priv user") && (!m_projectTypeId || !m_projectModeId)) {
                         
-                        } else if (currDialogMode === "Normal proj"
+                            let btn = self.dialog.controlObject["nextButton"];
+                            btn.setProtected(true);
+
+                        }
+/*                         else if (currDialogMode === "Normal proj"
                                    || currDialogMode === "Class proj"
                                    || currDialogMode === "Online class proj"
                                    || currDialogMode === "Product proj") {
@@ -883,7 +912,7 @@ define(["NextWave/source/utility/prototypes",
                             let btn = self.dialog.controlObject["normal"];
                             btn.setProtected(!m_functionIsEverythingValid());
                         }
-                    }
+*/                    }
 
                     var m_functionIsEverythingValid = function() {
 
@@ -907,7 +936,9 @@ define(["NextWave/source/utility/prototypes",
                     var m_projectDescription = null;
                     var m_imageId = null;
                     var m_projectTypeId = 0;
+                    var m_projectModeId = 0;
                     var m_lhProjectTypes = null;
+                    var m_lh_ncopChoice = null;
                     var m_arrayProjectTypeNames = ["game","console","website","hololens","mapping","empty"];
 
                 } catch (e) {

@@ -106,14 +106,14 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // We are about to highlight a PictureListItem. Turn all highlights in the List off first.
-                    self.unsetAllHighlights = function() {
+                    // We are about to outline a PictureListItem. Turn all outlines in the List off first.
+                    self.removeAllOutlines = function() {
 
                         for (var i = 0; i < self.items.length; i++) {
 
                             let cIth = self.items[i];
-                            if ($.isFunction(cIth.setHighlight)) {
-                                cIth.setHighlight(false);
+                            if ($.isFunction(cIth.setOutline)) {
+                                cIth.setOutline(false);
                             }
                         }
                     }
@@ -560,10 +560,7 @@ define(["NextWave/source/utility/prototypes",
                                     m_itemCursor.mouseOut(objectReference);
                                 }
 
-                                if (!m_itemCursor.hasOwnProperty("isPictureListItem")) {
-                                 
-                                    m_itemCursor.highlight = false;
-                                }
+                                m_itemCursor.highlight = false;
                                 m_itemCursor = null;
                             }
 
@@ -864,10 +861,7 @@ define(["NextWave/source/utility/prototypes",
                             // See if the cursor point is in any item.
                             if (m_itemCursor) {
 
-                                if (!m_itemCursor.hasOwnProperty("isPictureListItem")) {
-
-                                    m_itemCursor.highlight = false;
-                                }
+                                m_itemCursor.highlight = false;
                                 m_itemCursor = null;
                             }
 
@@ -883,10 +877,7 @@ define(["NextWave/source/utility/prototypes",
                                 if (bContainsPoint) {
 
                                     m_itemCursor = itemIth;
-                                    if (!m_itemCursor.hasOwnProperty("isPictureListItem")) {
-
-                                        m_itemCursor.highlight = true;
-                                    }
+                                    m_itemCursor.highlight = true;
 
                                     // Call mouse move on the new type.
                                     if ($.isFunction(m_itemCursor.mouseMove)) {

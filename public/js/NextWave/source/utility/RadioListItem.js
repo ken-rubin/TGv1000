@@ -1,5 +1,5 @@
 ///////////////////////////////////////
-// PictureListItem module.
+// RadioListItem module.
 //
 // Class for all picture list items.
 //
@@ -21,7 +21,7 @@ define(["NextWave/source/utility/prototypes",
         try {
 
             // Constructor function.
-        	var functionRet = function PictureListItem(strName, id, index) {
+        	var functionRet = function RadioListItem(projMode, index) {
 
                 try {
 
@@ -30,12 +30,8 @@ define(["NextWave/source/utility/prototypes",
                     ///////////////////////
                     // Public fields.
 
-                    // Name of this type object.
-                    self.name = strName || "default";
-                    // Fullname of this object.
-                    self.fullname = self.name.charAt(0).toUpperCase() + self.name.slice(1) + "Project";
-                    // Save the id (1-6) of this item.
-                    self.id = id;
+                    // Words for this object.
+                    self.name = projMode;
                     // Save the index (0-?) of this item.
                     self.index = index;
                     // Indicates the item is highlighted.
@@ -45,7 +41,7 @@ define(["NextWave/source/utility/prototypes",
                     // Also provide a selected coloring.
                     self.selected = false;
                     // Get a reference to the settings for this object.
-                    self.settingsNode = settings.list["picture"];
+                    self.settingsNode = settings.list["radio"];
                     // Callback to handle click event.
                     // Callback must accept click-event-object 
                     // reference and return an Exception.
@@ -53,13 +49,6 @@ define(["NextWave/source/utility/prototypes",
 
                     ////////////////////////
                     // Initialization.
-                    self.url = resourceHelper.toURL("images", null, null, self.name + "Project.png");
-                    var m_image = new Image();
-                    var m_bLoaded = false;
-                    m_image.onload = function() {
-                        m_bLoaded = true;
-                    }
-                    m_image.src = self.url;
 
                     ////////////////////////
                     // Public methods.
@@ -136,8 +125,8 @@ define(["NextWave/source/utility/prototypes",
                             // If click is defined, call it.
                             if ($.isFunction(self.clickHandler)) {
 
-                                // Pass the click event the id of the PLI clicked.
-                                return self.clickHandler(self.id);
+                                // Pass the click event the id of the RLI clicked.
+                                return self.clickHandler(self.index);
                             }
 
                             return null;
@@ -182,10 +171,6 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            if (!m_bLoaded || !m_image) {
-                                return null;
-                            }
-
                             // Default vertical to true.
                             if (bVertical === undefined) {
 
@@ -193,7 +178,7 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Define the containing area.
-                            if (bVertical) {
+                            if (!bVertical) {
 
                                 m_area = new Area(
                                     new Point(areaRender.location.x + settings.general.margin, 
@@ -203,7 +188,7 @@ define(["NextWave/source/utility/prototypes",
                                 );
                             } else {
 
-                                // A special test just for the horizontal listHost's PictureListItem (which this is).
+                                // A special test just for the horizontal listHost's RadioListItem (which this is).
                                 if (self.outline) {
 
                                     // First we'll draw the background (outline) rectangle at normal size.
@@ -267,16 +252,15 @@ define(["NextWave/source/utility/prototypes",
                             contextRender.fill();
                             contextRender.stroke();
 
-                            // Render the image.
+                            // Render the radio button.
                             try {
 
-                                contextRender.save();                                
-                                contextRender.clip();
-                                contextRender.drawImage(m_image,
-                                    m_area.location.x, 
-                                    m_area.location.y,
-                                    m_area.extent.width,
-                                    m_area.extent.height);
+                                contextRender.font = self.settingsNode.font;
+                                contextRender.fillStyle = settings.general.fillText;
+                                contextRender.fillText(self.getName(),
+                                    m_area.location.x + settings.general.margin,
+                                    m_area.location.y + settings.general.margin,
+                                    m_area.extent.width - 2 * settings.general.margin);
                             } finally {
 
                                 contextRender.restore();

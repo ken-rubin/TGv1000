@@ -186,7 +186,7 @@ define(["NextWave/source/utility/prototypes",
                                 // If control contains point, then highlight.
                                 var bRet = controlIth.pointIn(objectReference.renderContent, 
                                     objectReference.pointCursor);
-                                if (bRet && !controlIth.hasOwnProperty("isPictureListItem")) {
+                                if (bRet) {
 
                                     self.highlightControl = controlIth;
                                     self.highlightControl.highlight = true;
@@ -312,7 +312,7 @@ define(["NextWave/source/utility/prototypes",
 
                                     self.highlightControl.mouseOut(objectReference);
                                 }
-                                if (self.highlightControl.hasOwnProperty("highlight") && typeof self.highlightControl !== "PictureListItem") {
+                                if (self.highlightControl.hasOwnProperty("highlight")) {
 
                                     self.highlightControl.highlight = false;
                                 }

@@ -377,6 +377,12 @@ define(["NextWave/source/utility/prototypes"],
                         },
                         picture: {
                             
+                        },
+                        radio: {
+                            
+                            font: "18px Arial",
+                            lineHeight: 26,
+                            fillBackground: "#aaf"
                         }
                     };
                     self.tree = {
