@@ -249,7 +249,7 @@ Controls arranged by Mode
                                         modes: ['Sel Proj Type-priv user'],
                                         constructorParameterString: "true",
                                         x: settings.general.margin + 
-                                            3 * settings.dialog.firstColumnWidth,
+                                            2 * settings.dialog.firstColumnWidth,
                                         y: settings.general.margin + 
                                             3 * settings.dialog.lineHeight + 130,
                                         width: settings.dialog.firstColumnWidth,
@@ -510,7 +510,7 @@ Controls arranged by Mode
                                     },
                                     nextButton: {
                                         type: "Button",
-                                        modes: ['Class proj','Online class proj','Product proj'],
+                                        modes: ['Sel Proj Type-priv user','Class proj','Online class proj','Product proj'],
                                         text: "Next >",
                                         x: settings.general.margin +
                                             settings.dialog.firstColumnWidth,
