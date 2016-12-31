@@ -63,35 +63,14 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             //      A normal user starts in mode 'Sel Proj Type-normal user' and goes to mode 'Normal proj' on image click.
-                            //      A privileged user starts in mode 'Sel Proj Type-priv user' and goes to mode 'Normal proj', 'Class proj1', 'Online class proj1' or 'Product proj1',
+                            //      A privileged user starts in mode 'Sel Proj Type-priv user' and goes to mode 'Normal proj', 'Classroom class proj1', 'Online class proj1' or 'Product proj1',
                             //      depending on the button clicked (eventually may be radio buttons and a continue button).
 /*                                
-                                    Note            In mode(s)      
-instructions1       Label                           'Sel Proj Type-normal user','Sel Proj Type-priv user'
-projectTypes        ListHost                        'Sel Proj Type-normal user','Sel Proj Type-priv user'
-instructions2       Label                           'Sel Proj Type-priv user'
-normal              Button                          'Sel Proj Type-priv user'
-classroomClass      Button                          'Sel Proj Type-priv user'
-onlineClass         Button                          'Sel Proj Type-priv user'
-product             Button                          'Sel Proj Type-priv user'
-instructions3       Label                           'Normal proj','Class proj','Online class proj','Product proj'                         
-instructions4       Label                           'Normal proj','Class proj','Online class proj','Product proj'
-nameLabel           Label                           'Normal proj','Class proj','Online class proj','Product proj'
-nameEdit            Edit                            'Normal proj','Class proj','Online class proj','Product proj'
-descriptionLabel    Label                           'Normal proj','Class proj','Online class proj','Product proj'
-descriptionEdit     Edit                            'Normal proj','Class proj','Online class proj','Product proj'
-projectImageLabel   Label                           'Normal proj','Class proj','Online class proj','Product proj'
-projectImage        Picture                         'Normal proj','Class proj','Online class proj','Product proj'
-imageSearchButton   Button                          'Normal proj','Class proj','Online class proj','Product proj'
-urlSearchButton     Button                          'Normal proj','Class proj','Online class proj','Product proj'
-fileSearchButton    Button                          'Normal proj','Class proj','Online class proj','Product proj'
-createProjectButton Button                          'Normal proj','Class proj','Online class proj','Product proj'
-cancelButton        Button                          'Normal proj','Class proj','Online class proj','Product proj'
-
 Controls arranged by Mode
+
 'Sel Proj Type-normal user'
     instructions1       Label
-    projectTypes        ListHost
+    projectTypes        ListHost	self.dialog.setMode('Normal proj')
     cancelButton        Button
 
 'Sel Proj Type-priv user'
@@ -99,10 +78,8 @@ Controls arranged by Mode
     projectTypes        ListHost
     instructions2       Label
     If I had radio buttons for the next 4 buttons, I'd add the Next button and enable it when an image is selected and a radio choice is made.
-    normal              Button
-    classroomClass      Button
-    onlineClass         Button
-    product             Button
+	ncopChoice			ListHost
+    nextButton          Button		self.dialog.setMode('Normal proj' or 'Classroom class proj1' or 'Online class proj1' or 'Product proj1', depending on m_projectModeId)
     cancelButton        Button
 
 'Normal proj'
@@ -117,11 +94,11 @@ Controls arranged by Mode
     imageSearchButton   Button
     urlSearchButton     Button
     fileSearchButton    Button
-    backButton          Button
+    backButton          Button		if (normal user) setMode('Sel Proj Type-normal user') else setMode('Sel Proj Type-priv user')
     createProjectButton Button
     cancelButton        Button
 
-'Class proj1'
+'Classroom class proj1'
     instructions3       Label
     instructions4       Label
     nameLabel           Label
@@ -133,11 +110,11 @@ Controls arranged by Mode
     imageSearchButton   Button
     urlSearchButton     Button
     fileSearchButton    Button
-    backButton          Button
+    backButton          Button		setMode('Sel Proj Type-priv user')
     nextButton          Button
     cancelButton        Button
 
-'Class proj2'
+'Classroom class proj2'
     instructions5       Label
     nameLabel2          Label
     first set of fields for classroomClass (instructor, phone, level, difficulty, price, max class size, loaner computers available, notes)
@@ -145,7 +122,7 @@ Controls arranged by Mode
     nextButton          Button
     cancelButton        Button
 
-'Class proj3'
+'Classroom class proj3'
     instructions6       Label
     nameLabel2          Label
     second set of fields for classroomClass (location 6 fields, class schedule)
@@ -165,23 +142,23 @@ Controls arranged by Mode
     imageSearchButton   Button
     urlSearchButton     Button
     fileSearchButton    Button
-    backButton          Button
-    nextButton          Button
+    backButton          Button		setMode('Sel Proj Type-priv user')
+    nextButton          Button		setMode('Online class proj2')
     cancelButton        Button
 
 'Online class proj2'
     instructions5       Label
     nameLabel2          Label
     first set of fields for classroomClass (instructor, email, level, difficulty, price, notes)
-    backButton          Button
-    nextButton          Button
+    backButton          Button		setMode('Online class proj1')
+    nextButton          Button		setMode('Online class proj3')
     cancelButton        Button
 
 'Online class proj3'
     instructions6       Label
     nameLabel2          Label
     second set of fields for classroomClass (location 6 fields, class schedule)
-    backButton          Button
+    backButton          Button		setMode('Online class proj2')
     createProjectButton Button
     cancelButton        Button
 
@@ -197,15 +174,15 @@ Controls arranged by Mode
     imageSearchButton
     urlSearchButton
     fileSearchButton
-    backButton          Button
-    nextButton          Button
+    backButton          Button		setMode('Sel Proj Type-priv user')
+    nextButton          Button		setMode('Product proj2')
     cancelButton        Button
 
 'Product proj2'
     instructions6       Label
     nameLabel2          Label
     fields for product proj (level, difficulty, price)
-    backButton          Button
+    backButton          Button		setMode('Product proj1')
     createProjectButton Button
     cancelButton        Button
 */
@@ -255,65 +232,9 @@ Controls arranged by Mode
                                         width: settings.dialog.firstColumnWidth,
                                         height: 5 * settings.dialog.lineHeight                                  
                                     },
-/*                                    normal: {
-                                        type: "Button",
-                                        modes: ['Sel Proj Type-priv user'],
-                                        text: "Normal",
-                                        x: settings.general.margin,
-                                        y: settings.general.margin + 
-                                            4 * settings.general.margin +
-                                            2 * settings.dialog.lineHeight + 140,
-                                        width: 190,
-                                        height: 40,
-                                        click: function() {
-                                            self.dialog.setMode('Normal proj');
-                                        }
-                                    },
-                                    classroomClass: {
-                                        type: "Button",
-                                        modes: ['Sel Proj Type-priv user'],
-                                        text: "Class",
-                                        x: settings.general.margin + 200,
-                                        y: settings.general.margin + 
-                                            4 * settings.general.margin +
-                                            2 * settings.dialog.lineHeight + 140,
-                                        width: 190,
-                                        height: 40,
-                                        click: function() {
-                                            self.dialog.setMode('Class proj');
-                                        }
-                                    },
-                                    onlineClass: {
-                                        type: "Button",
-                                        modes: ['Sel Proj Type-priv user'],
-                                        text: "Online Class",
-                                        x: settings.general.margin + 400,
-                                        y: settings.general.margin + 
-                                            4 * settings.general.margin +
-                                            2 * settings.dialog.lineHeight + 140,
-                                        width: 190,
-                                        height: 40,
-                                        click: function() {
-                                            self.dialog.setMode('Online class proj');
-                                        }
-                                    },
-                                    product: {
-                                        type: "Button",
-                                        modes: ['Sel Proj Type-priv user'],
-                                        text: "Product",
-                                        x: settings.general.margin + 600,
-                                        y: settings.general.margin + 
-                                            4 * settings.general.margin +
-                                            2 * settings.dialog.lineHeight + 140,
-                                        width: 190,
-                                        height: 40,
-                                        click: function() {
-                                            self.dialog.setMode('Product proj');
-                                        }
-                                    },
-*/                                    instructions3: {
+                                    instructions3: {
                                         type: "Label",
-                                        modes: ['Normal proj','Class proj','Online class proj','Product proj'],
+                                        modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
                                         text: "Enter details for your new Project.",
                                         x: settings.general.margin,
                                         y: 5 * settings.general.margin,
@@ -323,7 +244,7 @@ Controls arranged by Mode
                                     },
                                     instructions4: {
                                         type: "Label",
-                                        modes: ['Normal proj','Class proj','Online class proj','Product proj'],
+                                        modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
                                         text: "Only Name is required. However, consider entering a description for searching and changing the default image for identification.",
                                         x: settings.general.margin,
                                         y: 5 * settings.general.margin +
@@ -334,7 +255,7 @@ Controls arranged by Mode
                                     },
                                     nameLabel: {
                                         type: "Label",
-                                        modes: ['Normal proj','Class proj','Online class proj','Product proj'],
+                                        modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
                                         text: "Name",
                                         x: settings.general.margin,
                                         y: 5 * settings.general.margin +
@@ -344,7 +265,7 @@ Controls arranged by Mode
                                     },
                                     nameEdit: {
                                         type: "Edit",
-                                        modes: ['Normal proj','Class proj','Online class proj','Product proj'],
+                                        modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
                                         x: 2 * settings.general.margin + 
                                             settings.dialog.firstColumnWidth,
                                         y: 5 * settings.general.margin +
@@ -360,7 +281,7 @@ Controls arranged by Mode
                                                 m_projectName = localSelf.text;
                                                 
                                                 // Enable disable buttons.
-                                                m_functionSetBtnProtection();
+                                                // m_functionSetBtnProtection();
 
                                             } catch (e) {
                                                 alert(e.message);
@@ -369,7 +290,7 @@ Controls arranged by Mode
                                     },
                                     descriptionLabel: {
                                         type: "Label",
-                                        modes: ['Normal proj','Class proj','Online class proj','Product proj'],
+                                        modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
                                         text: "Description",
                                         x: settings.general.margin,
                                         y: 6 * settings.general.margin +
@@ -379,7 +300,7 @@ Controls arranged by Mode
                                     },
                                     descriptionEdit: {
                                         type: "Edit",
-                                        modes: ['Normal proj','Class proj','Online class proj','Product proj'],
+                                        modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
                                         x: 2 * settings.general.margin + 
                                             settings.dialog.firstColumnWidth,
                                         y: 6 * settings.general.margin +
@@ -400,7 +321,7 @@ Controls arranged by Mode
                                     },
                                     projectImageLabel: {
                                         type: "Label",
-                                        modes: ['Normal proj','Class proj','Online class proj','Product proj'],
+                                        modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
                                         text: "Project image",
                                         x: settings.general.margin,
                                         y: 5 * settings.general.margin +
@@ -411,7 +332,7 @@ Controls arranged by Mode
                                     },
                                     projectImage: {
                                         type: "Picture",
-                                        modes: ['Normal proj','Class proj','Online class proj','Product proj'],
+                                        modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
                                         constructorParameterString: null,
                                         x: 2 * settings.general.margin + 
                                             settings.dialog.firstColumnWidth,
@@ -422,7 +343,7 @@ Controls arranged by Mode
                                     },
                                     imageSearchButton: {
                                         type: "Button",
-                                        modes: ['Normal proj','Class proj','Online class proj','Product proj'],
+                                        modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
                                         text: "S",
                                         x: 2 * settings.general.margin + settings.dialog.firstColumnWidth + settings.dialog.firstColumnWidth + 20,
                                         y: 5 * settings.general.margin +
@@ -447,7 +368,7 @@ Controls arranged by Mode
                                     },
                                     urlSearchButton: {
                                         type: "Button",
-                                        modes: ['Normal proj','Class proj','Online class proj','Product proj'],
+                                        modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
                                         text: "U",
                                         x: 2 * settings.general.margin + settings.dialog.firstColumnWidth + settings.dialog.firstColumnWidth + 70,
                                         y: 5 * settings.general.margin +
@@ -472,7 +393,7 @@ Controls arranged by Mode
                                     },
                                     fileSearchButton: {
                                         type: "Button",
-                                        modes: ['Normal proj','Class proj','Online class proj','Product proj'],
+                                        modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
                                         text: "F",
                                         x: 2 * settings.general.margin + settings.dialog.firstColumnWidth + settings.dialog.firstColumnWidth + 120,
                                         y: 5 * settings.general.margin +
@@ -497,7 +418,7 @@ Controls arranged by Mode
                                     },
                                     backButton: {
                                         type: "Button",
-                                        modes: ['Normal proj','Class proj','Online class proj','Product proj'],
+                                        modes: ['Normal proj','Classroom class proj1','Classroom class proj2','Classroom class proj3','Online class proj1','Online class proj2','Online class proj3','Product proj1','Product proj2'],
                                         text: "< Back",
                                         x: settings.general.margin,
                                         yType: "reserve",
@@ -506,11 +427,32 @@ Controls arranged by Mode
                                         height: 40,
                                         click: function() {
 
+											if (!manager.userAllowedToCreateEditPurchProjs) {
+
+												self.dialog.setMode('Sel Proj Type-normal user');
+
+											} else {
+
+												let currmode = self.dialog.getMode();
+												if (currmode === 'Normal proj' || currmode === 'Classroom class proj1' || currmode === 'Online class proj1' || currmode === 'Product proj1') {
+													self.dialog.setMode('Sel Proj Type-priv user');
+												} else if (currmode === 'Classroom class proj2') {
+													self.dialog.setMode('Classroom class proj1');
+												} else if (currmode === 'Classroom class proj3') {
+													self.dialog.setMode('Classroom class proj2');
+												} else if (currmode === 'Online class proj2') {
+													self.dialog.setMode('Online class proj1');
+												} else if (currmode === 'Online class proj3') {
+													self.dialog.setMode('Online class proj2');
+												} else if (currmode === 'Product proj2') {
+													self.dialog.setMode('Product proj1');
+												}
+											}
                                         }
                                     },
                                     nextButton: {
                                         type: "Button",
-                                        modes: ['Sel Proj Type-priv user','Class proj','Online class proj','Product proj'],
+                                        modes: ['Sel Proj Type-priv user','Classroom class proj1','Classroom class proj2','Online class proj1','Online class proj2','Product proj1'],
                                         text: "Next >",
                                         x: settings.general.margin +
                                             settings.dialog.firstColumnWidth,
@@ -520,11 +462,34 @@ Controls arranged by Mode
                                         height: 40,
                                         click: function() {
 
+											let currmode = self.dialog.getMode();
+											if (currmode === 'Sel Proj Type-priv user') {
+
+												if (m_projectModeId === 1) {
+													self.dialog.setMode('Normal proj');
+												} else if (m_projectModeId === 2) {
+													self.dialog.setMode('Classroom class proj1');
+												} else if (m_projectModeId === 3) {
+													self.dialog.setMode('Online class proj1');
+												} else if (m_projectModeId === 4) {
+													self.dialog.setMode('Product proj1');
+												}
+											} else if (currmode === 'Classroom class proj1') {
+												self.dialog.setMode('Classroom class proj2');
+											} else if (currmode === 'Classroom class proj2') {
+												self.dialog.setMode('Classroom class proj3');
+											} else if (currmode === 'Online class proj1') {
+												self.dialog.setMode('Online class proj2');
+											} else if (currmode === 'Online class proj2') {
+												self.dialog.setMode('Online class proj3');
+											} else if (currmode === 'Product proj1') {
+												self.dialog.setMode('Product proj2');
+											}
                                         }
                                     },
                                     cancelButton: {
                                         type: "Button",
-                                        modes: ['Sel Proj Type-normal user','Sel Proj Type-priv user','Normal proj','Class proj','Online class proj','Product proj'],
+                                        modes: ['Sel Proj Type-normal user','Sel Proj Type-priv user','Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
                                         text: "Cancel",
                                         x: settings.general.margin +
                                             2 * settings.dialog.firstColumnWidth,
@@ -549,7 +514,7 @@ Controls arranged by Mode
                                     },
                                     createProjectButton: {
                                         type: "Button",
-                                        modes: ['Normal proj','Class proj','Online class proj','Product proj'],
+                                        modes: ['Normal proj','Classroom class proj3','Online class proj3','Product proj2'],
                                         text: "Create Project",
                                         xType: "reserve",
                                         x: 2 * settings.dialog.firstColumnWidth + 20,
@@ -788,7 +753,7 @@ Controls arranged by Mode
                                         // Privileged user has selected a project type. Outline its PictureListItem in listHost (un-outline all others first).
                                         m_lhProjectTypes.removeAllOutlines();
                                         pliNew.setOutline(true);
-                                        m_functionSetBtnProtection();
+                                        // m_functionSetBtnProtection();
                                     }
                                 };
                                 return pliNew;
@@ -800,7 +765,7 @@ Controls arranged by Mode
                                 // Fill self.dialog.controlObject["ncopChoice"] with array of RadioListItems.
                                 m_lh_ncopChoice = self.dialog.controlObject["ncopChoice"];
                                 let listProjectModes = m_lh_ncopChoice.list;
-                                let id = 0;
+                                let id = 1;
 
                                 listProjectModes.destroy();
                                 let arrayOutput = ["Normal project","Classroom project","Online class project","Product project"].map((projMode) => {
@@ -808,17 +773,19 @@ Controls arranged by Mode
                                     let rliNew = new RadioListItem(projMode, id++);
                                     rliNew.clickHandler = (id) => {
 
+										m_projectModeId = id;
+
                                         // Privileged user has selected a project type. Outline its RadioListItem in listHost (un-outline all others first).
                                         m_lh_ncopChoice.removeAllOutlines();
                                         rliNew.setOutline(true);
-                                        m_functionSetBtnProtection();
+                                        // m_functionSetBtnProtection();
                                     };
                                     return rliNew;
                                 });
                                 listProjectModes.create(arrayOutput);
                             }
 
-                            m_functionSetBtnProtection();
+                            // m_functionSetBtnProtection();
 
                             // Because it is!
                             m_bCreated = true;
@@ -876,11 +843,11 @@ Controls arranged by Mode
                             createProjectButton
                             cancelButton
 
-                        'Class proj'
+                        'Classroom class proj1'
 
-                        'Online class proj'
+                        'Online class proj1'
 
-                        'Product proj'
+                        'Product proj1'
 
                     */
                     var m_functionSetBtnProtection = function() {
