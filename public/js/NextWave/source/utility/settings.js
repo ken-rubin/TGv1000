@@ -381,6 +381,7 @@ define(["NextWave/source/utility/prototypes"],
                         radio: {
                             
                             font: "18px Arial",
+							outlineFont: "14px Arial",
                             lineHeight: 26,
                             fillBackground: "#aaf"
                         }

@@ -21,7 +21,7 @@ define(["NextWave/source/utility/prototypes",
         try {
 
             // Constructor function.
-        	var functionRet = function RadioListItem(projMode, index) {
+        	var functionRet = function RadioListItem(projMode, id) {
 
                 try {
 
@@ -32,8 +32,8 @@ define(["NextWave/source/utility/prototypes",
 
                     // Words for this object.
                     self.name = projMode;
-                    // Save the index (0-?) of this item.
-                    self.index = index;
+                    // Save the id (0-?) of this item.
+                    self.id = id;
                     // Indicates the item is highlighted.
                     self.highlight = false;
                     // Indicates it is outlined.
@@ -126,7 +126,7 @@ define(["NextWave/source/utility/prototypes",
                             if ($.isFunction(self.clickHandler)) {
 
                                 // Pass the click event the id of the RLI clicked.
-                                return self.clickHandler(self.index);
+                                return self.clickHandler(self.id);
                             }
 
                             return null;
@@ -180,12 +180,39 @@ define(["NextWave/source/utility/prototypes",
                             // Define the containing area.
                             if (bVertical) {
 
-                                m_area = new Area(
-                                    new Point(areaRender.location.x + settings.general.margin, 
-                                        areaRender.location.y + settings.general.margin + dOffset),
-                                    new Size(areaRender.extent.width - 2 * settings.general.margin, 
-                                        self.getHeight() - 2 * settings.general.margin)
-                                );
+								// A special test just for the vertical listHost's RadioListItem (which this is).
+								if (self.outline) {
+
+                                    // First we'll draw the background (outline) rectangle at normal size--in red.
+									m_area = new Area(
+										new Point(areaRender.location.x + settings.general.margin, 
+											areaRender.location.y + settings.general.margin + dOffset),
+										new Size(areaRender.extent.width - 2 * settings.general.margin, 
+											self.getHeight() - 2 * settings.general.margin)
+									);
+                                    contextRender.fillStyle = "rgba(255,0,0,1)";
+                                    contextRender.fillRect(
+                                        m_area.location.x, 
+                                        m_area.location.y,
+                                        m_area.extent.width,
+                                        m_area.extent.height);
+
+                                    // Then we'll shrink down a bit so the image drawing below will appear indented.
+                                    m_area = new Area(
+                                        new Point(areaRender.location.x + settings.general.margin + 3, 
+                                            areaRender.location.y + settings.general.margin + dOffset + 3),
+                                        new Size(areaRender.extent.width - 2 * settings.general.margin - 6, 
+                                            self.getHeight() - 2 * settings.general.margin - 6)
+                                    );
+								} else {
+
+									m_area = new Area(
+										new Point(areaRender.location.x + settings.general.margin, 
+											areaRender.location.y + settings.general.margin + dOffset),
+										new Size(areaRender.extent.width - 2 * settings.general.margin, 
+											self.getHeight() - 2 * settings.general.margin)
+									);
+								}
                             } else {
 
                                 m_area = new Area(
@@ -228,7 +255,7 @@ define(["NextWave/source/utility/prototypes",
                             // Render the radio button.
                             try {
 
-                                contextRender.font = self.settingsNode.font;
+                                contextRender.font = self.outline ? self.settingsNode.outlineFont : self.settingsNode.font;
                                 contextRender.fillStyle = settings.general.fillText;
                                 contextRender.fillText(self.getName(),
                                     m_area.location.x + settings.general.margin,

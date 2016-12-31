@@ -788,16 +788,6 @@ Controls arranged by Mode
                                         // Privileged user has selected a project type. Outline its PictureListItem in listHost (un-outline all others first).
                                         m_lhProjectTypes.removeAllOutlines();
                                         pliNew.setOutline(true);
-
-/*                                        let b = self.dialog.controlObject["normal"];
-                                        b.setProtected(false);
-                                        b = self.dialog.controlObject["classroomClass"];
-                                        b.setProtected(false);
-                                        b = self.dialog.controlObject["onlineClass"];
-                                        b.setProtected(false);
-                                        b = self.dialog.controlObject["product"];
-                                        b.setProtected(false);
-*/                                    
                                         m_functionSetBtnProtection();
                                     }
                                 };
@@ -810,14 +800,18 @@ Controls arranged by Mode
                                 // Fill self.dialog.controlObject["ncopChoice"] with array of RadioListItems.
                                 m_lh_ncopChoice = self.dialog.controlObject["ncopChoice"];
                                 let listProjectModes = m_lh_ncopChoice.list;
-                                let index = 0;
+                                let id = 0;
 
                                 listProjectModes.destroy();
                                 let arrayOutput = ["Normal project","Classroom project","Online class project","Product project"].map((projMode) => {
 
-                                    let rliNew = new RadioListItem(projMode, index++);
-                                    rliNew.clickHandler = (ind) => {
+                                    let rliNew = new RadioListItem(projMode, id++);
+                                    rliNew.clickHandler = (id) => {
 
+                                        // Privileged user has selected a project type. Outline its RadioListItem in listHost (un-outline all others first).
+                                        m_lh_ncopChoice.removeAllOutlines();
+                                        rliNew.setOutline(true);
+                                        m_functionSetBtnProtection();
                                     };
                                     return rliNew;
                                 });
