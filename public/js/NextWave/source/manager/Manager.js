@@ -262,6 +262,12 @@ define(["NextWave/source/utility/prototypes",
                         }
                     }
 
+					// Outer public function to reset title of panel in center.
+					self.resetCenterPanelTitle = function(strTitle) {
+
+						self.panelLayer.resetCenterPanelTitle(strTitle);
+					}
+
                     // Load the new library into the current comic.
                     self.loadLibrary = function (library) {
 

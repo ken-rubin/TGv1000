@@ -371,6 +371,12 @@ define(["NextWave/source/utility/prototypes",
                         }
                     }
 
+					// Change the title.
+					self.resetTitle = function(strTitle) {
+
+						self.title = strTitle;
+					}
+
                     // Set and position the panel.
                     self.setPayload = function(strTitle, objectPayload) {
 

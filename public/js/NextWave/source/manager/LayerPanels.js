@@ -349,6 +349,12 @@ define(["NextWave/source/utility/prototypes",
                         return self.statementsPanel.payload.save();
                     };
 
+					// Pass through resetting title of center panel panel.
+					self.resetCenterPanelTitle = function(strTitle) {
+
+						self.centerPanel.resetTitle(strTitle);
+					}					
+
                     // Put the center panel into different modes.
                     self.switchCenterPanelMode = function(strMode) {
 

@@ -467,6 +467,7 @@ Controls arranged by Mode
 
 												if (m_projectModeId === 1) {
 													self.dialog.setMode('Normal proj');
+													manager.resetCenterPanelTitle('Normal project');
 												} else if (m_projectModeId === 2) {
 													self.dialog.setMode('Classroom class proj1');
 												} else if (m_projectModeId === 3) {
