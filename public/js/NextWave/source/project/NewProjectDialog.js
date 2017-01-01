@@ -189,542 +189,537 @@ Controls arranged by Mode
 
                             let objectConfiguration = 
                             {
-                                    instructions1: {
-                                        type: "Label",
-                                        modes: ['Sel Proj Type-normal user','Sel Proj Type-priv user'],
-                                        text: "Choose the type of Project you wish to create by clicking on its picture.",
-                                        x: settings.general.margin,
-                                        y: 5 * settings.general.margin,
-                                        widthType: "reserve",
-                                        width: 2 * settings.general.margin,
-                                        height: settings.dialog.lineHeight                                  
-                                    },
-                                    projectTypes: {
-                                        type: "ListHost",
-                                        modes: ['Sel Proj Type-normal user','Sel Proj Type-priv user'],
-                                        constructorParameterString: "false",
-                                        x: settings.general.margin,
-                                        y: settings.general.margin + 
-                                            2 * settings.dialog.lineHeight,
-                                        widthType: "reserve",
-                                        width: 2 * settings.general.margin,
-                                        height: 100
-                                    },
-                                    instructions2: {
-                                        type: "Label",
-                                        modes: ['Sel Proj Type-priv user'],
-                                        text: "As a privileged user, besides being able to create Normal projects, you are allowed to create a Class, an Online Class or a Product. Choose here:",
-                                        x: settings.general.margin,
-                                        y: settings.general.margin + 
-                                            2 * settings.dialog.lineHeight + 120,
-                                        widthType: "reserve",
-                                        width: 2 * settings.general.margin,
-                                        height: settings.dialog.lineHeight                                  
-                                    },
-                                    ncopChoice: {
-                                        type: "ListHost",
-                                        modes: ['Sel Proj Type-priv user'],
-                                        constructorParameterString: "true",
-                                        x: settings.general.margin + 
-                                            2 * settings.dialog.firstColumnWidth,
-                                        y: settings.general.margin + 
-                                            3 * settings.dialog.lineHeight + 130,
-                                        width: settings.dialog.firstColumnWidth,
-                                        height: 5 * settings.dialog.lineHeight                                  
-                                    },
-                                    instructions3: {
-                                        type: "Label",
-                                        modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
-                                        text: "Enter details for your new Project.",
-                                        x: settings.general.margin,
-                                        y: 5 * settings.general.margin,
-                                        widthType: "reserve",
-                                        width: 2 * settings.general.margin,
-                                        height: settings.dialog.lineHeight                                  
-                                    },
-                                    instructions4: {
-                                        type: "Label",
-                                        modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
-                                        text: "Only Name is required. However, consider entering a description for searching and changing the default image for identification.",
-                                        x: settings.general.margin,
-                                        y: 5 * settings.general.margin +
-                                            settings.dialog.lineHeight,
-                                        widthType: "reserve",
-                                        width: 2 * settings.general.margin,
-                                        height: settings.dialog.lineHeight                                  
-                                    },
-                                    nameLabel: {
-                                        type: "Label",
-                                        modes: ['Normal proj','Classroom class proj1','Classroom class proj2','Classroom class proj3','Online class proj1','Online class proj2','Online class proj3','Product proj1','Product proj2'],
-                                        text: "Name",
-                                        x: settings.general.margin,
-                                        y: 5 * settings.general.margin +
-                                            3 * settings.dialog.lineHeight,
-                                        width: settings.dialog.firstColumnWidth,
-                                        height: settings.dialog.lineHeight                                  
-                                    },
-                                    nameEdit: {
-                                        type: "Edit",
-                                        modes: ['Normal proj','Classroom class proj1','Classroom class proj2','Classroom class proj3','Online class proj1','Online class proj2','Online class proj3','Product proj1','Product proj2'],
-                                        x: 2 * settings.general.margin + 
-                                            settings.dialog.firstColumnWidth,
-                                        y: 5 * settings.general.margin +
-                                            3 * settings.dialog.lineHeight,
-                                        widthType: "reserve",           // Reserve means: subtract the width from
-                                                                        //  the total width on calculateLayout.
-                                        width: 3 * settings.general.margin +
-                                            settings.dialog.firstColumnWidth,
-                                        height: settings.dialog.lineHeight,
-                                        exitFocus: function (localSelf) {
-                                            try {
-                                                // Save off criteria.
-                                                m_projectName = localSelf.text;
+								instructions1: {
+									type: "Label",
+									modes: ['Sel Proj Type-normal user','Sel Proj Type-priv user'],
+									text: "Choose the type of Project you wish to create by clicking on its picture.",
+									x: settings.general.margin,
+									y: 5 * settings.general.margin,
+									widthType: "reserve",
+									width: 2 * settings.general.margin,
+									height: settings.dialog.lineHeight                                  
+								},
+								projectTypes: {
+									type: "ListHost",
+									modes: ['Sel Proj Type-normal user','Sel Proj Type-priv user'],
+									constructorParameterString: "false",
+									x: settings.general.margin,
+									y: settings.general.margin + 
+										2 * settings.dialog.lineHeight,
+									widthType: "reserve",
+									width: 2 * settings.general.margin,
+									height: 100
+								},
+								instructions2: {
+									type: "Label",
+									modes: ['Sel Proj Type-priv user'],
+									text: "As a privileged user, besides being able to create Normal projects, you are allowed to create a Class, an Online Class or a Product. Choose here:",
+									x: settings.general.margin,
+									y: settings.general.margin + 
+										2 * settings.dialog.lineHeight + 120,
+									widthType: "reserve",
+									width: 2 * settings.general.margin,
+									height: settings.dialog.lineHeight                                  
+								},
+								ncopChoice: {
+									type: "ListHost",
+									modes: ['Sel Proj Type-priv user'],
+									constructorParameterString: "true",
+									x: settings.general.margin + 
+										2 * settings.dialog.firstColumnWidth,
+									y: settings.general.margin + 
+										3 * settings.dialog.lineHeight + 130,
+									width: settings.dialog.firstColumnWidth,
+									height: 5 * settings.dialog.lineHeight                                  
+								},
+								instructions3: {
+									type: "Label",
+									modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
+									text: "Enter details for your new Project.",
+									x: settings.general.margin,
+									y: 5 * settings.general.margin,
+									widthType: "reserve",
+									width: 2 * settings.general.margin,
+									height: settings.dialog.lineHeight                                  
+								},
+								instructions4: {
+									type: "Label",
+									modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
+									text: "Only Name is required. However, consider entering a description for searching and changing the default image for identification.",
+									x: settings.general.margin,
+									y: 5 * settings.general.margin +
+										settings.dialog.lineHeight,
+									widthType: "reserve",
+									width: 2 * settings.general.margin,
+									height: settings.dialog.lineHeight                                  
+								},
+								nameLabel: {
+									type: "Label",
+									modes: ['Normal proj','Classroom class proj1','Classroom class proj2','Classroom class proj3','Online class proj1','Online class proj2','Online class proj3','Product proj1','Product proj2'],
+									text: "Name",
+									x: settings.general.margin,
+									y: 5 * settings.general.margin +
+										3 * settings.dialog.lineHeight,
+									width: settings.dialog.firstColumnWidth,
+									height: settings.dialog.lineHeight                                  
+								},
+								nameEdit: {
+									type: "Edit",
+									modes: ['Normal proj','Classroom class proj1','Classroom class proj2','Classroom class proj3','Online class proj1','Online class proj2','Online class proj3','Product proj1','Product proj2'],
+									x: 2 * settings.general.margin + 
+										settings.dialog.firstColumnWidth,
+									y: 5 * settings.general.margin +
+										3 * settings.dialog.lineHeight,
+									widthType: "reserve",           // Reserve means: subtract the width from
+																	//  the total width on calculateLayout.
+									width: 3 * settings.general.margin +
+										settings.dialog.firstColumnWidth,
+									height: settings.dialog.lineHeight,
+									exitFocus: function (localSelf) {
+										try {
+											// Save off criteria.
+											m_projectName = localSelf.text;
 
-												let cb = self.dialog.controlObject["createProjectButton"];
-												cb.setProtected(!m_functionIsEverythingValid());
+											let cb = self.dialog.controlObject["createProjectButton"];
+											cb.setProtected(!m_functionIsEverythingValid());
 
-                                            } catch (e) {
-                                                alert(e.message);
-                                            }
-                                        }
-                                    },
-                                    descriptionLabel: {
-                                        type: "Label",
-                                        modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
-                                        text: "Description",
-                                        x: settings.general.margin,
-                                        y: 6 * settings.general.margin +
-                                            4 * settings.dialog.lineHeight,
-                                        width: settings.dialog.firstColumnWidth,
-                                        height: settings.dialog.lineHeight
-                                    },
-                                    descriptionEdit: {
-                                        type: "Edit",
-                                        modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
-                                        x: 2 * settings.general.margin + 
-                                            settings.dialog.firstColumnWidth,
-                                        y: 6 * settings.general.margin +
-                                            4 * settings.dialog.lineHeight,
-                                        widthType: "reserve",           // Reserve means: subtract the width from
-                                                                        //  the total width on calculateLayout.
-                                        width: 3 * settings.general.margin +
-                                            settings.dialog.firstColumnWidth,
-                                        height: settings.dialog.lineHeight * 5,
-                                        exitFocus: function (localSelf) {
-                                            try {
-                                                // Save off criteria.
-                                                m_projectDescription = localSelf.text;
+										} catch (e) {
+											alert(e.message);
+										}
+									}
+								},
+								descriptionLabel: {
+									type: "Label",
+									modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
+									text: "Description",
+									x: settings.general.margin,
+									y: 6 * settings.general.margin +
+										4 * settings.dialog.lineHeight,
+									width: settings.dialog.firstColumnWidth,
+									height: settings.dialog.lineHeight
+								},
+								descriptionEdit: {
+									type: "Edit",
+									modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
+									x: 2 * settings.general.margin + 
+										settings.dialog.firstColumnWidth,
+									y: 6 * settings.general.margin +
+										4 * settings.dialog.lineHeight,
+									widthType: "reserve",           // Reserve means: subtract the width from
+																	//  the total width on calculateLayout.
+									width: 3 * settings.general.margin +
+										settings.dialog.firstColumnWidth,
+									height: settings.dialog.lineHeight * 5,
+									exitFocus: function (localSelf) {
+										try {
+											// Save off criteria.
+											m_projectDescription = localSelf.text;
 
-                                            } catch (e) {
-                                                alert(e.message);
-                                            }
-                                        }
-                                    },
-                                    projectImageLabel: {
-                                        type: "Label",
-                                        modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
-                                        text: "Project image",
-                                        x: settings.general.margin,
-                                        y: 5 * settings.general.margin +
-                                            10 * settings.dialog.lineHeight,
-                                        widthType: "reserve",
-                                        width: 2 * settings.general.margin,
-                                        height: settings.dialog.lineHeight                                  
-                                    },
-                                    projectImage: {
-                                        type: "Picture",
-                                        modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
-                                        constructorParameterString: null,
-                                        x: 2 * settings.general.margin + 
-                                            settings.dialog.firstColumnWidth,
-                                        y: 5 * settings.general.margin +
-                                            10 * settings.dialog.lineHeight,
-                                        width: settings.dialog.firstColumnWidth,
-                                        height: settings.dialog.lineHeight * 5
-                                    },
-                                    imageSearchButton: {
-                                        type: "Button",
-                                        modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
-                                        text: "S",
-                                        x: 2 * settings.general.margin + settings.dialog.firstColumnWidth + settings.dialog.firstColumnWidth + 20,
-                                        y: 5 * settings.general.margin +
-                                            10 * settings.dialog.lineHeight +
-                                            (settings.dialog.lineHeight * 5 - 40) / 2,
-                                        width: 40,
-                                        height: 40,
-                                        click: function() {
+										} catch (e) {
+											alert(e.message);
+										}
+									}
+								},
+								projectImageLabel: {
+									type: "Label",
+									modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
+									text: "Project image",
+									x: settings.general.margin,
+									y: 5 * settings.general.margin +
+										10 * settings.dialog.lineHeight,
+									widthType: "reserve",
+									width: 2 * settings.general.margin,
+									height: settings.dialog.lineHeight                                  
+								},
+								projectImage: {
+									type: "Picture",
+									modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
+									constructorParameterString: null,
+									x: 2 * settings.general.margin + 
+										settings.dialog.firstColumnWidth,
+									y: 5 * settings.general.margin +
+										10 * settings.dialog.lineHeight,
+									width: settings.dialog.firstColumnWidth,
+									height: settings.dialog.lineHeight * 5
+								},
+								imageSearchButton: {
+									type: "Button",
+									modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
+									text: "S",
+									x: 2 * settings.general.margin + settings.dialog.firstColumnWidth + settings.dialog.firstColumnWidth + 20,
+									y: 5 * settings.general.margin +
+										10 * settings.dialog.lineHeight +
+										(settings.dialog.lineHeight * 5 - 40) / 2,
+									width: 40,
+									height: 40,
+									click: function() {
 
-                                            try {
+										try {
 
-                                                var exceptionRet = client.showImageSearchDialog(true, m_functionSetImageSrc);
-                                                if (exceptionRet) {
+											var exceptionRet = client.showImageSearchDialog(true, m_functionSetImageSrc);
+											if (exceptionRet) {
 
-                                                    throw exceptionRet;
-                                                }
-                                            } catch(e) {
-
-                                                errorHelper.show(e);
-                                            }
-                                        }
-                                    },
-                                    urlSearchButton: {
-                                        type: "Button",
-                                        modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
-                                        text: "U",
-                                        x: 2 * settings.general.margin + settings.dialog.firstColumnWidth + settings.dialog.firstColumnWidth + 70,
-                                        y: 5 * settings.general.margin +
-                                            10 * settings.dialog.lineHeight +
-                                            (settings.dialog.lineHeight * 5 - 40) / 2,
-                                        width: 40,
-                                        height: 40,
-                                        click: function() {
-
-                                            try {
-
-                                                var exceptionRet = client.showImageURLDialog(true, m_functionSetImageSrc);
-                                                if (exceptionRet) {
-
-                                                    throw exceptionRet;
-                                                }
-                                            } catch(e) {
-
-                                                errorHelper.show(e);
-                                            }
-                                        }
-                                    },
-                                    fileSearchButton: {
-                                        type: "Button",
-                                        modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
-                                        text: "F",
-                                        x: 2 * settings.general.margin + settings.dialog.firstColumnWidth + settings.dialog.firstColumnWidth + 120,
-                                        y: 5 * settings.general.margin +
-                                            10 * settings.dialog.lineHeight +
-                                            (settings.dialog.lineHeight * 5 - 40) / 2,
-                                        width: 40,
-                                        height: 40,
-                                        click: function() {
-
-                                            try {
-
-                                                var exceptionRet = client.showImageDiskDialog(true, m_functionSetImageSrc);
-                                                if (exceptionRet) {
-
-                                                    throw exceptionRet;
-                                                }
-                                            } catch(e) {
-
-                                                errorHelper.show(e);
-                                            }
-                                        }
-                                    },
-                                    backButton: {
-                                        type: "Button",
-                                        modes: ['Normal proj','Classroom class proj1','Classroom class proj2','Classroom class proj3','Online class proj1','Online class proj2','Online class proj3','Product proj1','Product proj2'],
-                                        text: "< Back",
-                                        x: settings.general.margin,
-                                        yType: "reserve",
-                                        y: 100,
-                                        width: 140,
-                                        height: 40,
-                                        click: function() {
-
-											if (!manager.userAllowedToCreateEditPurchProjs) {
-
-												manager.resetCenterPanelTitle('New Project');
-												self.dialog.setMode('Sel Proj Type-normal user');
-
-											} else {
-
-												let currmode = self.dialog.getMode();
-												if (currmode === 'Normal proj' || currmode === 'Classroom class proj1' || currmode === 'Online class proj1' || currmode === 'Product proj1') {
-													manager.resetCenterPanelTitle('New Project');
-													self.dialog.setMode('Sel Proj Type-priv user');
-												} else if (currmode === 'Classroom class proj2') {
-													manager.resetCenterPanelTitle('Classroom project 1');
-													self.dialog.setMode('Classroom class proj1');
-												} else if (currmode === 'Classroom class proj3') {
-													manager.resetCenterPanelTitle('Classroom project 2');
-													self.dialog.setMode('Classroom class proj2');
-												} else if (currmode === 'Online class proj2') {
-													manager.resetCenterPanelTitle('Online project 1');
-													self.dialog.setMode('Online class proj1');
-												} else if (currmode === 'Online class proj3') {
-													manager.resetCenterPanelTitle('Online project 2');
-													self.dialog.setMode('Online class proj2');
-												} else if (currmode === 'Product proj2') {
-													manager.resetCenterPanelTitle('Product project 1');
-													self.dialog.setMode('Product proj1');
-												}
+												throw exceptionRet;
 											}
-                                        }
-                                    },
-                                    nextButton: {
-                                        type: "Button",
-                                        modes: ['Sel Proj Type-priv user','Classroom class proj1','Classroom class proj2','Online class proj1','Online class proj2','Product proj1'],
-                                        text: "Next >",
-                                        x: settings.general.margin +
-                                            settings.dialog.firstColumnWidth,
-                                        yType: "reserve",
-                                        y: 100,
-                                        width: 140,
-                                        height: 40,
-                                        click: function() {
+										} catch(e) {
+
+											errorHelper.show(e);
+										}
+									}
+								},
+								urlSearchButton: {
+									type: "Button",
+									modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
+									text: "U",
+									x: 2 * settings.general.margin + settings.dialog.firstColumnWidth + settings.dialog.firstColumnWidth + 70,
+									y: 5 * settings.general.margin +
+										10 * settings.dialog.lineHeight +
+										(settings.dialog.lineHeight * 5 - 40) / 2,
+									width: 40,
+									height: 40,
+									click: function() {
+
+										try {
+
+											var exceptionRet = client.showImageURLDialog(true, m_functionSetImageSrc);
+											if (exceptionRet) {
+
+												throw exceptionRet;
+											}
+										} catch(e) {
+
+											errorHelper.show(e);
+										}
+									}
+								},
+								fileSearchButton: {
+									type: "Button",
+									modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
+									text: "F",
+									x: 2 * settings.general.margin + settings.dialog.firstColumnWidth + settings.dialog.firstColumnWidth + 120,
+									y: 5 * settings.general.margin +
+										10 * settings.dialog.lineHeight +
+										(settings.dialog.lineHeight * 5 - 40) / 2,
+									width: 40,
+									height: 40,
+									click: function() {
+
+										try {
+
+											var exceptionRet = client.showImageDiskDialog(true, m_functionSetImageSrc);
+											if (exceptionRet) {
+
+												throw exceptionRet;
+											}
+										} catch(e) {
+
+											errorHelper.show(e);
+										}
+									}
+								},
+								backButton: {
+									type: "Button",
+									modes: ['Normal proj','Classroom class proj1','Classroom class proj2','Classroom class proj3','Online class proj1','Online class proj2','Online class proj3','Product proj1','Product proj2'],
+									text: "< Back",
+									x: settings.general.margin,
+									yType: "reserve",
+									y: 100,
+									width: 140,
+									height: 40,
+									click: function() {
+
+										if (!manager.userAllowedToCreateEditPurchProjs) {
+
+											manager.resetCenterPanelTitle('New Project');
+											self.dialog.setMode('Sel Proj Type-normal user');
+
+										} else {
 
 											let currmode = self.dialog.getMode();
-											if (currmode === 'Sel Proj Type-priv user') {
-
-												if (m_projectModeId === 1) {
-													manager.resetCenterPanelTitle('Normal project');
-													self.dialog.setMode('Normal proj');
-												} else if (m_projectModeId === 2) {
-													manager.resetCenterPanelTitle('Classroom project 1');
-													self.dialog.setMode('Classroom class proj1');
-												} else if (m_projectModeId === 3) {
-													manager.resetCenterPanelTitle('Online project 1');
-													self.dialog.setMode('Online class proj1');
-												} else if (m_projectModeId === 4) {
-													manager.resetCenterPanelTitle('Product project 1');
-													self.dialog.setMode('Product proj1');
-												}
-											} else if (currmode === 'Classroom class proj1') {
+											if (currmode === 'Normal proj' || currmode === 'Classroom class proj1' || currmode === 'Online class proj1' || currmode === 'Product proj1') {
+												manager.resetCenterPanelTitle('New Project');
+												self.dialog.setMode('Sel Proj Type-priv user');
+											} else if (currmode === 'Classroom class proj2') {
+												manager.resetCenterPanelTitle('Classroom project 1');
+												self.dialog.setMode('Classroom class proj1');
+											} else if (currmode === 'Classroom class proj3') {
 												manager.resetCenterPanelTitle('Classroom project 2');
 												self.dialog.setMode('Classroom class proj2');
-											} else if (currmode === 'Classroom class proj2') {
-												manager.resetCenterPanelTitle('Classroom project 3');
-												self.dialog.setMode('Classroom class proj3');
-											} else if (currmode === 'Online class proj1') {
+											} else if (currmode === 'Online class proj2') {
+												manager.resetCenterPanelTitle('Online project 1');
+												self.dialog.setMode('Online class proj1');
+											} else if (currmode === 'Online class proj3') {
 												manager.resetCenterPanelTitle('Online project 2');
 												self.dialog.setMode('Online class proj2');
-											} else if (currmode === 'Online class proj2') {
-												manager.resetCenterPanelTitle('Online project 3');
-												self.dialog.setMode('Online class proj3');
-											} else if (currmode === 'Product proj1') {
-												manager.resetCenterPanelTitle('Product project 2');
-												self.dialog.setMode('Product proj2');
+											} else if (currmode === 'Product proj2') {
+												manager.resetCenterPanelTitle('Product project 1');
+												self.dialog.setMode('Product proj1');
 											}
-                                        }
-                                    },
-                                    cancelButton: {
-                                        type: "Button",
-                                        modes: ['Sel Proj Type-normal user','Sel Proj Type-priv user','Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
-                                        text: "Cancel",
-                                        x: settings.general.margin +
-                                            2 * settings.dialog.firstColumnWidth,
-                                        yType: "reserve",
-                                        y: 100,
-                                        width: 110,
-                                        height: 40,
-                                        click: function() {
-                                            try {
-                                                if (window.methodBuilder) {
+										}
+									}
+								},
+								nextButton: {
+									type: "Button",
+									modes: ['Sel Proj Type-priv user','Classroom class proj1','Classroom class proj2','Online class proj1','Online class proj2','Product proj1'],
+									text: "Next >",
+									x: settings.general.margin +
+										settings.dialog.firstColumnWidth,
+									yType: "reserve",
+									y: 100,
+									width: 140,
+									height: 40,
+									click: function() {
 
-                                                    // TODO: getting currentMethod = null even when I think there should be one. Ask Ken.
-                                                    let exceptionRet = manager.selectMethod(window.methodBuilder.currentMethod);
-                                                    if (exceptionRet) {
-                                                        throw exceptionRet;
-                                                    }
-                                                }
-                                            } catch (e) {
-                                                errorHelper.show(e);
-                                            }
-                                        }
-                                    },
-                                    createProjectButton: {
-                                        type: "Button",
-                                        modes: ['Normal proj','Classroom class proj3','Online class proj3','Product proj2'],
-                                        text: "Create Project",
-                                        xType: "reserve",
-                                        x: 2 * settings.dialog.firstColumnWidth + 20,
-                                        yType: "reserve",
-                                        y: 100,
-                                        width: 210,
-                                        height: 40,
-                                        click: function() {
+										let currmode = self.dialog.getMode();
+										if (currmode === 'Sel Proj Type-priv user') {
 
-                                            // TODO: Adapt the following from original NewProjectDialog.js.
-/*                                            try {
+											if (m_projectModeId === 1) {
+												manager.resetCenterPanelTitle('Normal project');
+												self.dialog.setMode('Normal proj');
+											} else if (m_projectModeId === 2) {
+												manager.resetCenterPanelTitle('Classroom project 1');
+												self.dialog.setMode('Classroom class proj1');
+											} else if (m_projectModeId === 3) {
+												manager.resetCenterPanelTitle('Online project 1');
+												self.dialog.setMode('Online class proj1');
+											} else if (m_projectModeId === 4) {
+												manager.resetCenterPanelTitle('Product project 1');
+												self.dialog.setMode('Product proj1');
+											}
+										} else if (currmode === 'Classroom class proj1') {
+											manager.resetCenterPanelTitle('Classroom project 2');
+											self.dialog.setMode('Classroom class proj2');
+										} else if (currmode === 'Classroom class proj2') {
+											manager.resetCenterPanelTitle('Classroom project 3');
+											self.dialog.setMode('Classroom class proj3');
+										} else if (currmode === 'Online class proj1') {
+											manager.resetCenterPanelTitle('Online project 2');
+											self.dialog.setMode('Online class proj2');
+										} else if (currmode === 'Online class proj2') {
+											manager.resetCenterPanelTitle('Online project 3');
+											self.dialog.setMode('Online class proj3');
+										} else if (currmode === 'Product proj1') {
+											manager.resetCenterPanelTitle('Product project 2');
+											self.dialog.setMode('Product proj2');
+										}
+									}
+								},
+								cancelButton: {
+									type: "Button",
+									modes: ['Sel Proj Type-normal user','Sel Proj Type-priv user','Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
+									text: "Cancel",
+									x: settings.general.margin +
+										2 * settings.dialog.firstColumnWidth,
+									yType: "reserve",
+									y: 100,
+									width: 110,
+									height: 40,
+									click: function() {
+										try {
+											if (window.methodBuilder) {
 
-                                                client.unloadProject(null, true);		// In case one exists. This will ask about saving. And no callback.
+												// TODO: getting currentMethod = null even when I think there should be one. Ask Ken.
+												let exceptionRet = manager.selectMethod(window.methodBuilder.currentMethod);
+												if (exceptionRet) {
+													throw exceptionRet;
+												}
+											}
+										} catch (e) {
+											errorHelper.show(e);
+										}
+									}
+								},
+								createProjectButton: {
+									type: "Button",
+									modes: ['Normal proj','Classroom class proj3','Online class proj3','Product proj2'],
+									text: "Create Project",
+									xType: "reserve",
+									x: 2 * settings.dialog.firstColumnWidth + 20,
+									yType: "reserve",
+									y: 100,
+									width: 210,
+									height: 40,
+									click: function() {
 
-                                                // Create project based on the new project dialog's fields--or lack thereof.
-                                                // Call client to inject it throughout.
+										try {
 
-                                                var strProjectName = $("#ProjectName").val().trim();
-                                                var strProjectDescription = $("#ProjectDescription").val().trim();
-                                                var strProjectTags = $("#ProjectTags").val().trim();
+											// client.unloadProject(null, true);		// I believe we're already unloaded.
 
-                                                var exceptionRet = client.openProjectFromDB(
-                                                    // 1st parameter is 1-5 based on m_projectType: "Game"-1 "Console"-2 "Web Site"-3 "HoloLens"-4 "Mapping"-5
-                                                    ["Game", "Console", "Web Site", "HoloLens", "Mapping", "Empty"].indexOf(m_projectType) + 1, 
-                                                    'new',
-                                                    function(){	// callback is used to set fields after async fetch of empty-ish core project from db.
+											// Create project based on the new project dialog's fields--or lack thereof.
+											// Call client to inject it throughout.
 
-                                                        client.project.isCoreProject = false;
+											var strProjectName = m_projectName;
+											var strProjectDescription = m_projectDescription;
 
-                                                        client.project.name = strProjectName;
-                                                        client.project.tags = strProjectTags;
-                                                        client.project.description = strProjectDescription;
-                                                        client.project.imageId = m_imageId;
-                                                        if (m_imageId) {
-                                                            client.project.altImagePath = '';
-                                                        }
+											var exceptionRet = client.openProjectFromDB(
+												m_projectTypeId,
+												'new',
+												function(){	// callback is used to set fields after async fetch of empty-ish core project from db.
 
-                                                        // Now we'll add the fields to the project that will both tell the rest of the UI how to handle it and will affect how it gets saved to the database.
-                                                        // Since there's already a client.project.specialProjectData (although it may be empty), we'll merge new stuff into the existing.
-                                                        var spd = {
-                                                            userAllowedToCreateEditPurchProjs: manager.userAllowedToCreateEditPurchProjs,
-                                                            userCanWorkWithSystemLibsAndTypes: manager.userCanWorkWithSystemLibsAndTypes,
-                                                            ownedByUser: false,
-                                                            othersProjects: false,
-                                                            normalProject: m_bNormalProject,
-                                                            coreProject: false,
-                                                            classProject: m_bClassProject,
-                                                            productProject: m_bProductProject,
-                                                            onlineClassProject: m_bOnlineClassProject,
-                                                            comicsEdited: false,
-                                                            systemTypesEdited: false,
-                                                            openMode: 'new'
-                                                        };
+													client.project.isCoreProject = false;
 
-                                                        client.project.specialProjectData = Object.assign(client.project.specialProjectData, spd);
+													client.project.name = strProjectName;
+													client.project.description = strProjectDescription;
+													client.project.imageId = m_imageId;
+													if (m_imageId) {
+														client.project.altImagePath = '';
+													}
 
-                                                        if (m_bClassProject) {
+													// Now we'll add the fields to the project that will both tell the rest of the UI how to handle it and will affect how it gets saved to the database.
+													// Since there's already a client.project.specialProjectData (although it may be empty), we'll merge new stuff into the existing.
+													var spd = {
+														userAllowedToCreateEditPurchProjs: manager.userAllowedToCreateEditPurchProjs,
+														userCanWorkWithSystemLibsAndTypes: manager.userCanWorkWithSystemLibsAndTypes,
+														ownedByUser: false,
+														othersProjects: false,
+														normalProject: m_bNormalProject,
+														coreProject: false,
+														classProject: m_bClassProject,
+														productProject: m_bProductProject,
+														onlineClassProject: m_bOnlineClassProject,
+														comicsEdited: false,
+														systemTypesEdited: false,
+														openMode: 'new'
+													};
 
-                                                            client.project.isClass = true;
+													client.project.specialProjectData = Object.assign(client.project.specialProjectData, spd);
 
-                                                            // Retrieve class data from template fields. It's all optional until we're about to make the class active, actually.
-                                                            var strInstructorFirst = $("#InstructorFirst").val().trim();
-                                                            var strInstructorLast = $("#InstructorLast").val().trim();
-                                                            var strPhone = $("#Phone").val().trim();
-                                                            var strFacility = $("#Facility").val().trim();
-                                                            var strAddress = $("#Address").val().trim();
-                                                            var strRoom = $("#Room").val().trim();
-                                                            var strCity = $("#City").val().trim();
-                                                            var strState = $("#USState option:selected").text();
-                                                            var strZip = $("#Zip").val().trim();
-                                                            var arrWhen = [];
-                                                            for (var i = 1; i <=8; i++) {
-                                                                var str = $("#When" + i).val().trim();
-                                                                if (str.length) { 
-                                                                    arrWhen.push(m_funcWhenProcess(str)); 
-                                                                } else {
-                                                                    arrWhen.push({ date: '', duration: 0});
-                                                                }
-                                                            }
-                                                            var strLevel = $("#Level option:selected").text();
-                                                            var strDifficulty = $("#Difficulty option:selected").text();
-                                                            var dPrice = 0.00;
-                                                            var strPrice = $("#Price").val().trim();
-                                                            if (strPrice.length) {
-                                                                dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
-                                                            }
-                                                            var strNotes = $("#Notes").val().trim();
-                                                            var iMaxclassroomClassize = parseInt($("#MaxclassroomClassize").val().trim(), 10);
-                                                            var iLoanComputersAvailable = $("#cb1").prop("checked") ? 1 : 0;
+													if (m_bClassProject) {
 
-                                                            client.project.specialProjectData.classData = {
-                                                                id: 0,
-                                                                active: false,
-                                                                classDescription: strProjectDescription,
-                                                                instructorFirstName: strInstructorFirst,
-                                                                instructorLastName: strInstructorLast,
-                                                                instructorPhone: strPhone,
-                                                                facility: strFacility,
-                                                                address: strAddress,
-                                                                room: strRoom,
-                                                                city: strCity,
-                                                                state: strState,
-                                                                zip: strZip,
-                                                                schedule: arrWhen,
-                                                                level: strLevel,
-                                                                difficulty: strDifficulty,
-                                                                price: dPrice,
-                                                                classNotes: strNotes,
-                                                                maxclassroomClassize: iMaxclassroomClassize,
-                                                                loanComputersAvailable: iLoanComputersAvailable,
-                                                                imageId: m_imageId
-                                                            };
+														client.project.isClass = true;
 
-                                                        } else if (m_bProductProject) {
+														// Retrieve class data from template fields. It's all optional until we're about to make the class active, actually.
+														var strInstructorFirst = $("#InstructorFirst").val().trim();
+														var strInstructorLast = $("#InstructorLast").val().trim();
+														var strPhone = $("#Phone").val().trim();
+														var strFacility = $("#Facility").val().trim();
+														var strAddress = $("#Address").val().trim();
+														var strRoom = $("#Room").val().trim();
+														var strCity = $("#City").val().trim();
+														var strState = $("#USState option:selected").text();
+														var strZip = $("#Zip").val().trim();
+														var arrWhen = [];
+														for (var i = 1; i <=8; i++) {
+															var str = $("#When" + i).val().trim();
+															if (str.length) { 
+																arrWhen.push(m_funcWhenProcess(str)); 
+															} else {
+																arrWhen.push({ date: '', duration: 0});
+															}
+														}
+														var strLevel = $("#Level option:selected").text();
+														var strDifficulty = $("#Difficulty option:selected").text();
+														var dPrice = 0.00;
+														var strPrice = $("#Price").val().trim();
+														if (strPrice.length) {
+															dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
+														}
+														var strNotes = $("#Notes").val().trim();
+														var iMaxclassroomClassize = parseInt($("#MaxclassroomClassize").val().trim(), 10);
+														var iLoanComputersAvailable = $("#cb1").prop("checked") ? 1 : 0;
 
-                                                            client.project.isProduct = true;
+														client.project.specialProjectData.classData = {
+															id: 0,
+															active: false,
+															classDescription: strProjectDescription,
+															instructorFirstName: strInstructorFirst,
+															instructorLastName: strInstructorLast,
+															instructorPhone: strPhone,
+															facility: strFacility,
+															address: strAddress,
+															room: strRoom,
+															city: strCity,
+															state: strState,
+															zip: strZip,
+															schedule: arrWhen,
+															level: strLevel,
+															difficulty: strDifficulty,
+															price: dPrice,
+															classNotes: strNotes,
+															maxclassroomClassize: iMaxclassroomClassize,
+															loanComputersAvailable: iLoanComputersAvailable,
+															imageId: m_imageId
+														};
 
-                                                            // Retrieve product data from template fields. It's all optional until we're about to make the product active, actually.
-                                                            var strLevel = $("#Level option:selected").text();
-                                                            var strDifficulty = $("#Difficulty option:selected").text();
-                                                            var dPrice = 0.00;
-                                                            var strPrice = $("#Price").val().trim();
-                                                            if (strPrice.length) {
-                                                                dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
-                                                            }
+													} else if (m_bProductProject) {
 
-                                                            client.project.specialProjectData.productData = {
-                                                                id: 0,
-                                                                active: false,
-                                                                productDescription: strProjectDescription,
-                                                                level: strLevel,
-                                                                difficulty: strDifficulty,
-                                                                price: dPrice,
-                                                                imageId: m_imageId
-                                                            };
-                                                        } else if (m_bOnlineClassProject) {
+														client.project.isProduct = true;
 
-                                                            client.project.isOnlineClass = true;
+														// Retrieve product data from template fields. It's all optional until we're about to make the product active, actually.
+														var strLevel = $("#Level option:selected").text();
+														var strDifficulty = $("#Difficulty option:selected").text();
+														var dPrice = 0.00;
+														var strPrice = $("#Price").val().trim();
+														if (strPrice.length) {
+															dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
+														}
 
-                                                            // Retrieve online class data from template fields. It's all optional until we're about to make the class active, actually.
-                                                            var strInstructorFirst = $("#InstructorFirst").val().trim();
-                                                            var strInstructorLast = $("#InstructorLast").val().trim();
-                                                            var strEmail = $("#Email").val().trim();
-                                                            var arrWhen = [];
-                                                            for (var i = 1; i <=8; i++) {
-                                                                var str = $("#When" + i).val().trim();
-                                                                if (str.length) { 
-                                                                    arrWhen.push(m_funcWhenProcess(str)); 
-                                                                } else {
-                                                                    arrWhen.push({ date: '', duration: 0});
-                                                                }
-                                                            }
-                                                            var strLevel = $("#Level option:selected").text();
-                                                            var strDifficulty = $("#Difficulty option:selected").text();
-                                                            var dPrice = 0.00;
-                                                            var strPrice = $("#Price").val().trim();
-                                                            if (strPrice.length) {
-                                                                dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
-                                                            }
-                                                            var strNotes = $("#Notes").val().trim();
+														client.project.specialProjectData.productData = {
+															id: 0,
+															active: false,
+															productDescription: strProjectDescription,
+															level: strLevel,
+															difficulty: strDifficulty,
+															price: dPrice,
+															imageId: m_imageId
+														};
+													} else if (m_bOnlineClassProject) {
 
-                                                            client.project.specialProjectData.onlineClassData = {
-                                                                id: 0,
-                                                                active: false,
-                                                                classDescription: strProjectDescription,
-                                                                instructorFirstName: strInstructorFirst,
-                                                                instructorLastName: strInstructorLast,
-                                                                instructorEmail: strEmail,
-                                                                schedule: arrWhen,
-                                                                level: strLevel,
-                                                                difficulty: strDifficulty,
-                                                                price: dPrice,
-                                                                classNotes: strNotes,
-                                                                imageId: m_imageId
-                                                            };
-                                                        }
+														client.project.isOnlineClass = true;
 
-                                                        var exceptionRet = manager.loadProject(client.project);
-                                                        if (exceptionRet) { throw exceptionRet; }
+														// Retrieve online class data from template fields. It's all optional until we're about to make the class active, actually.
+														var strInstructorFirst = $("#InstructorFirst").val().trim();
+														var strInstructorLast = $("#InstructorLast").val().trim();
+														var strEmail = $("#Email").val().trim();
+														var arrWhen = [];
+														for (var i = 1; i <=8; i++) {
+															var str = $("#When" + i).val().trim();
+															if (str.length) { 
+																arrWhen.push(m_funcWhenProcess(str)); 
+															} else {
+																arrWhen.push({ date: '', duration: 0});
+															}
+														}
+														var strLevel = $("#Level option:selected").text();
+														var strDifficulty = $("#Difficulty option:selected").text();
+														var dPrice = 0.00;
+														var strPrice = $("#Price").val().trim();
+														if (strPrice.length) {
+															dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
+														}
+														var strNotes = $("#Notes").val().trim();
 
-                                                        client.setBrowserTabAndBtns();
-                                                    }
-                                                );
-                                                if (exceptionRet) { throw exceptionRet; }
+														client.project.specialProjectData.onlineClassData = {
+															id: 0,
+															active: false,
+															classDescription: strProjectDescription,
+															instructorFirstName: strInstructorFirst,
+															instructorLastName: strInstructorLast,
+															instructorEmail: strEmail,
+															schedule: arrWhen,
+															level: strLevel,
+															difficulty: strDifficulty,
+															price: dPrice,
+															classNotes: strNotes,
+															imageId: m_imageId
+														};
+													}
 
-                                                m_dialog.close();
+													var exceptionRet = manager.loadProject(client.project);
+													if (exceptionRet) { throw exceptionRet; }
 
-                                            } catch (e) {
+													client.setBrowserTabAndBtns();
+												}
+											);
+											if (exceptionRet) { throw exceptionRet; }
 
-                                                errorHelper.show(e);
-                                            }
-*/                                        }
-                                    }
+											// m_dialog.close();	I believe that loading the project into manager will populate all panels.
+
+										} catch (e) {
+											errorHelper.show(e);
+										}
+									}
+								}
                             };
 
                             // Finally...create the Dialog with its controls, based on Normal or Privileged user status.
@@ -812,6 +807,13 @@ Controls arranged by Mode
 
 										m_projectModeId = id;
 
+										/* Set one of these to true, others to false.
+											var m_bNormalProject = true;
+											var m_bClassProject = false;
+											var m_bOnlineClassProject = false;
+											var m_bProductProject = false;
+										*/
+
                                         // Privileged user has selected a project type. Outline its RadioListItem in listHost (un-outline all others first).
                                         m_lh_ncopChoice.removeAllOutlines();
                                         rliNew.setOutline(true);
@@ -898,6 +900,11 @@ Controls arranged by Mode
                     var m_projectTypeId = 0;
 					// Normal, Classroom, Online, Product
                     var m_projectModeId = 0;
+					// Booleans corrolaries to m_projectModeId.
+					var m_bNormalProject = true;
+					var m_bClassProject = false;
+					var m_bOnlineClassProject = false;
+					var m_bProductProject = false;
 					// Holds horizontal ListHost used to select project type.
                     var m_lhProjectTypes = null;
 					// Holds vertical ListHost used to select project mode.
