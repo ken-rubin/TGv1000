@@ -77,7 +77,6 @@ Controls arranged by Mode
     instructions1       Label
     projectTypes        ListHost
     instructions2       Label
-    If I had radio buttons for the next 4 buttons, I'd add the Next button and enable it when an image is selected and a radio choice is made.
 	ncopChoice			ListHost
     nextButton          Button		self.dialog.setMode('Normal proj' or 'Classroom class proj1' or 'Online class proj1' or 'Product proj1', depending on m_projectModeId)
     cancelButton        Button
@@ -99,8 +98,8 @@ Controls arranged by Mode
     cancelButton        Button
 
 'Classroom class proj1'
-    instructions3       Label
-    instructions4       Label
+    instructions5       Label
+    instructions6       Label
     nameLabel           Label
     nameEdit            Edit
     descriptionLabel    Label
@@ -115,24 +114,24 @@ Controls arranged by Mode
     cancelButton        Button
 
 'Classroom class proj2'
-    instructions5       Label
-    nameLabel2          Label
-    first set of fields for classroomClass (instructor, phone, level, difficulty, price, max class size, loaner computers available, notes)
+    instructions7       Label	first set of fields for classroomClass (instructor, phone, level, difficulty, price, max class size, loaner computers available, notes)
+    nameLabel			Label
+    nameEdit            Edit
     backButton          Button
     nextButton          Button
     cancelButton        Button
 
 'Classroom class proj3'
-    instructions6       Label
-    nameLabel2          Label
-    second set of fields for classroomClass (location 6 fields, class schedule)
+    instructions8       Label	second set of fields for classroomClass (six location fields, class schedule)
+    nameLabel			Label
+    nameEdit            Edit
     backButton          Button
     createProjectButton Button
     cancelButton        Button
 
 'Online class proj1'
-    instructions3       Label
-    instructions4       Label
+    instructions9       Label
+    instructions10      Label
     nameLabel           Label
     nameEdit            Edit
     descriptionLabel    Label
@@ -147,24 +146,24 @@ Controls arranged by Mode
     cancelButton        Button
 
 'Online class proj2'
-    instructions5       Label
-    nameLabel2          Label
-    first set of fields for classroomClass (instructor, email, level, difficulty, price, notes)
+    instructions11      Label	first set of fields for Online class (instructor, email, level, difficulty, price, notes)
+    nameLabel           Label
+    nameEdit            Edit
     backButton          Button		setMode('Online class proj1')
     nextButton          Button		setMode('Online class proj3')
     cancelButton        Button
 
 'Online class proj3'
-    instructions6       Label
-    nameLabel2          Label
-    second set of fields for classroomClass (location 6 fields, class schedule)
+    instructions12     Label	second set of fields for Online class (class schedule)
+    nameLabel          Label
+    nameEdit            Edit
     backButton          Button		setMode('Online class proj2')
     createProjectButton Button
     cancelButton        Button
 
 'Product proj1'
-    instructions3
-    instructions4
+    instructions13
+    instructions14
     nameLabel
     nameEdit
     descriptionLabel
@@ -179,9 +178,9 @@ Controls arranged by Mode
     cancelButton        Button
 
 'Product proj2'
-    instructions6       Label
-    nameLabel2          Label
-    fields for product proj (level, difficulty, price)
+    instructions15      Label	fields for product proj (level, difficulty, price)
+    nameLabel           Label
+    nameEdit            Edit
     backButton          Button		setMode('Product proj1')
     createProjectButton Button
     cancelButton        Button
@@ -234,7 +233,7 @@ Controls arranged by Mode
 								},
 								instructions3: {
 									type: "Label",
-									modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
+									modes: ['Normal proj'],
 									text: "Enter details for your new Project.",
 									x: settings.general.margin,
 									y: 5 * settings.general.margin,
@@ -244,8 +243,126 @@ Controls arranged by Mode
 								},
 								instructions4: {
 									type: "Label",
-									modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
+									modes: ['Normal proj'],
 									text: "Only Name is required. However, consider entering a description for searching and changing the default image for identification.",
+									x: settings.general.margin,
+									y: 5 * settings.general.margin +
+										settings.dialog.lineHeight,
+									widthType: "reserve",
+									width: 2 * settings.general.margin,
+									height: settings.dialog.lineHeight                                  
+								},
+								instructions5: {
+									type: "Label",
+									modes: ['Classroom class proj1'],
+									text: "Enter details for your new Classroom Project.",
+									x: settings.general.margin,
+									y: 5 * settings.general.margin,
+									widthType: "reserve",
+									width: 2 * settings.general.margin,
+									height: settings.dialog.lineHeight                                  
+								},
+								instructions6: {
+									type: "Label",
+									modes: ['Classroom class proj1'],
+									text: "Only Name is required. However, consider entering a description for searching and changing the default image for identification.",
+									x: settings.general.margin,
+									y: 5 * settings.general.margin +
+										settings.dialog.lineHeight,
+									widthType: "reserve",
+									width: 2 * settings.general.margin,
+									height: settings.dialog.lineHeight                                  
+								},
+								instructions7: {
+									type: "Label",
+									modes: ['Classroom class proj2'],
+									text: "[first set of fields: instructor, phone, level, difficulty, price, max class size, loaner computers available, notes]",
+									x: settings.general.margin,
+									y: 5 * settings.general.margin +
+										settings.dialog.lineHeight,
+									widthType: "reserve",
+									width: 2 * settings.general.margin,
+									height: settings.dialog.lineHeight                                  
+								},
+								instructions8: {
+									type: "Label",
+									modes: ['Classroom class proj3'],
+									text: "[second set of fields: six location fields, class schedule]",
+									x: settings.general.margin,
+									y: 5 * settings.general.margin +
+										settings.dialog.lineHeight,
+									widthType: "reserve",
+									width: 2 * settings.general.margin,
+									height: settings.dialog.lineHeight                                  
+								},
+								instructions9: {
+									type: "Label",
+									modes: ['Online class proj1'],
+									text: "Enter details for your new Online Class Project.",
+									x: settings.general.margin,
+									y: 5 * settings.general.margin,
+									widthType: "reserve",
+									width: 2 * settings.general.margin,
+									height: settings.dialog.lineHeight                                  
+								},
+								instructions10: {
+									type: "Label",
+									modes: ['Online class proj1'],
+									text: "Only Name is required. However, consider entering a description for searching and changing the default image for identification.",
+									x: settings.general.margin,
+									y: 5 * settings.general.margin +
+										settings.dialog.lineHeight,
+									widthType: "reserve",
+									width: 2 * settings.general.margin,
+									height: settings.dialog.lineHeight                                  
+								},
+								instructions11: {
+									type: "Label",
+									modes: ['Online class proj2'],
+									text: "[first set of fields: instructor, email, level, difficulty, price, notes]",
+									x: settings.general.margin,
+									y: 5 * settings.general.margin +
+										settings.dialog.lineHeight,
+									widthType: "reserve",
+									width: 2 * settings.general.margin,
+									height: settings.dialog.lineHeight                                  
+								},
+								instructions12: {
+									type: "Label",
+									modes: ['Online class proj3'],
+									text: "[second set of fields: class schedule]",
+									x: settings.general.margin,
+									y: 5 * settings.general.margin +
+										settings.dialog.lineHeight,
+									widthType: "reserve",
+									width: 2 * settings.general.margin,
+									height: settings.dialog.lineHeight                                  
+								},
+								instructions13: {
+									type: "Label",
+									modes: ['Product proj1'],
+									text: "Enter details for your new Product Project.",
+									x: settings.general.margin,
+									y: 5 * settings.general.margin,
+									widthType: "reserve",
+									width: 2 * settings.general.margin,
+									height: settings.dialog.lineHeight                                  
+								},
+								instructions14: {
+									type: "Label",
+									modes: ['Product proj1'],
+									text: "Only Name is required. However, consider entering a description for searching and changing the default image for identification.",
+									x: settings.general.margin,
+									y: 5 * settings.general.margin +
+										settings.dialog.lineHeight,
+									widthType: "reserve",
+									width: 2 * settings.general.margin,
+									height: settings.dialog.lineHeight                                  
+								},
+								instructions15: {
+									type: "Label",
+									modes: ['Product proj2'],
+									text: "[fields: level, difficulty, price]",
 									x: settings.general.margin,
 									y: 5 * settings.general.margin +
 										settings.dialog.lineHeight,
