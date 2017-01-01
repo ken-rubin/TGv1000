@@ -429,22 +429,29 @@ Controls arranged by Mode
 
 											if (!manager.userAllowedToCreateEditPurchProjs) {
 
+												manager.resetCenterPanelTitle('New Project');
 												self.dialog.setMode('Sel Proj Type-normal user');
 
 											} else {
 
 												let currmode = self.dialog.getMode();
 												if (currmode === 'Normal proj' || currmode === 'Classroom class proj1' || currmode === 'Online class proj1' || currmode === 'Product proj1') {
+													manager.resetCenterPanelTitle('New Project');
 													self.dialog.setMode('Sel Proj Type-priv user');
 												} else if (currmode === 'Classroom class proj2') {
+													manager.resetCenterPanelTitle('Classroom project 1');
 													self.dialog.setMode('Classroom class proj1');
 												} else if (currmode === 'Classroom class proj3') {
+													manager.resetCenterPanelTitle('Classroom project 2');
 													self.dialog.setMode('Classroom class proj2');
 												} else if (currmode === 'Online class proj2') {
+													manager.resetCenterPanelTitle('Online project 1');
 													self.dialog.setMode('Online class proj1');
 												} else if (currmode === 'Online class proj3') {
+													manager.resetCenterPanelTitle('Online project 2');
 													self.dialog.setMode('Online class proj2');
 												} else if (currmode === 'Product proj2') {
+													manager.resetCenterPanelTitle('Product project 1');
 													self.dialog.setMode('Product proj1');
 												}
 											}
@@ -466,24 +473,32 @@ Controls arranged by Mode
 											if (currmode === 'Sel Proj Type-priv user') {
 
 												if (m_projectModeId === 1) {
-													self.dialog.setMode('Normal proj');
 													manager.resetCenterPanelTitle('Normal project');
+													self.dialog.setMode('Normal proj');
 												} else if (m_projectModeId === 2) {
+													manager.resetCenterPanelTitle('Classroom project 1');
 													self.dialog.setMode('Classroom class proj1');
 												} else if (m_projectModeId === 3) {
+													manager.resetCenterPanelTitle('Online project 1');
 													self.dialog.setMode('Online class proj1');
 												} else if (m_projectModeId === 4) {
+													manager.resetCenterPanelTitle('Product project 1');
 													self.dialog.setMode('Product proj1');
 												}
 											} else if (currmode === 'Classroom class proj1') {
+												manager.resetCenterPanelTitle('Classroom project 2');
 												self.dialog.setMode('Classroom class proj2');
 											} else if (currmode === 'Classroom class proj2') {
+												manager.resetCenterPanelTitle('Classroom project 3');
 												self.dialog.setMode('Classroom class proj3');
 											} else if (currmode === 'Online class proj1') {
+												manager.resetCenterPanelTitle('Online project 2');
 												self.dialog.setMode('Online class proj2');
 											} else if (currmode === 'Online class proj2') {
+												manager.resetCenterPanelTitle('Online project 3');
 												self.dialog.setMode('Online class proj3');
 											} else if (currmode === 'Product proj1') {
+												manager.resetCenterPanelTitle('Product project 2');
 												self.dialog.setMode('Product proj2');
 											}
                                         }
@@ -747,6 +762,7 @@ Controls arranged by Mode
                                     if (self.dialog.getMode() === "Sel Proj Type-normal user") {
                                         
                                         // Normal user just switches mode to create new project.
+										manager.resetCenterPanelTitle('Normal project');
                                         self.dialog.setMode('Normal proj');
     
                                     } else if (self.dialog.getMode() === "Sel Proj Type-priv user") {
@@ -894,13 +910,21 @@ Controls arranged by Mode
 
                     // Indicates this instance is already created.
                     var m_bCreated = false;
+					// From Edit.
                     var m_projectName = null;
+					// From multi-line Edit.
                     var m_projectDescription = null;
+					// resourceId for project image.
                     var m_imageId = null;
+					// Game, Console, Website, Hololens, Mapping, Empty
                     var m_projectTypeId = 0;
+					// Normal, Classroom, Online, Product
                     var m_projectModeId = 0;
+					// Holds horizontal ListHost used to select project type.
                     var m_lhProjectTypes = null;
+					// Holds vertical ListHost used to select project mode.
                     var m_lh_ncopChoice = null;
+					// Array of project type names.
                     var m_arrayProjectTypeNames = ["game","console","website","hololens","mapping","empty"];
 
                 } catch (e) {
