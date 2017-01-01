@@ -183,21 +183,26 @@ define(["NextWave/source/utility/prototypes",
                                 // Get the ith control.
                                 var controlIth = self.controls[i];
 
-                                // If control contains point, then highlight.
-                                var bRet = controlIth.pointIn(objectReference.renderContent, 
-                                    objectReference.pointCursor);
-                                if (bRet) {
+								// Determine value of pointIn for controlIth only if not using modes for this dialog or
+								// using modes and current mode is active.
+								if (!m_mode || !controlIth.hasOwnProperty("modes") || controlIth.modes.includes(m_mode)) {
 
-                                    self.highlightControl = controlIth;
-                                    self.highlightControl.highlight = true;
+									// If control contains point, then highlight.
+									var bRet = controlIth.pointIn(objectReference.renderContent, 
+										objectReference.pointCursor);
+									if (bRet) {
 
-                                    if ($.isFunction(self.highlightControl.mouseMove)) {
+										self.highlightControl = controlIth;
+										self.highlightControl.highlight = true;
 
-                                        // Call and pass mousemove.
-                                        return self.highlightControl.mouseMove(objectReference);
-                                    }
-                                    break;
-                                }
+										if ($.isFunction(self.highlightControl.mouseMove)) {
+
+											// Call and pass mousemove.
+											return self.highlightControl.mouseMove(objectReference);
+										}
+										break;
+									}
+								}
                             }
 
                             return null;

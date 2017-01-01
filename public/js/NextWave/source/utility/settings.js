@@ -179,8 +179,6 @@ define(["NextWave/source/utility/prototypes"],
                         },
                         save: {
 
-                            // x: 184,  this chose open folder
-                            // y: 252
                             x: 215,
                             y: 316
                         },

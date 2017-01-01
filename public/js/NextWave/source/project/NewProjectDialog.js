@@ -255,7 +255,7 @@ Controls arranged by Mode
                                     },
                                     nameLabel: {
                                         type: "Label",
-                                        modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
+                                        modes: ['Normal proj','Classroom class proj1','Classroom class proj2','Classroom class proj3','Online class proj1','Online class proj2','Online class proj3','Product proj1','Product proj2'],
                                         text: "Name",
                                         x: settings.general.margin,
                                         y: 5 * settings.general.margin +
@@ -265,7 +265,7 @@ Controls arranged by Mode
                                     },
                                     nameEdit: {
                                         type: "Edit",
-                                        modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
+                                        modes: ['Normal proj','Classroom class proj1','Classroom class proj2','Classroom class proj3','Online class proj1','Online class proj2','Online class proj3','Product proj1','Product proj2'],
                                         x: 2 * settings.general.margin + 
                                             settings.dialog.firstColumnWidth,
                                         y: 5 * settings.general.margin +
@@ -279,9 +279,9 @@ Controls arranged by Mode
                                             try {
                                                 // Save off criteria.
                                                 m_projectName = localSelf.text;
-                                                
-                                                // Enable disable buttons.
-                                                // m_functionSetBtnProtection();
+
+												let cb = self.dialog.controlObject["createProjectButton"];
+												cb.setProtected(!m_functionIsEverythingValid());
 
                                             } catch (e) {
                                                 alert(e.message);
@@ -314,6 +314,7 @@ Controls arranged by Mode
                                             try {
                                                 // Save off criteria.
                                                 m_projectDescription = localSelf.text;
+
                                             } catch (e) {
                                                 alert(e.message);
                                             }
@@ -736,6 +737,17 @@ Controls arranged by Mode
                                 return exceptionRet;
                             }
 
+							// At first, for privileged user, nextButton is disabled.
+							if (self.dialog.getMode() === 'Sel Proj Type-priv user') {
+
+								let btn = self.dialog.controlObject["nextButton"];
+								btn.setProtected(true);
+							}
+
+							// And createProjectButton is disabled to start.
+							let cb = self.dialog.controlObject["createProjectButton"];
+							cb.setProtected(true);
+
                             ////////////////////////
                             // Fill self.dialog.controlObject["projectTypes"] with array of images based upon arrayAvailProjTypes.
                             m_lhProjectTypes = self.dialog.controlObject["projectTypes"];
@@ -770,22 +782,30 @@ Controls arranged by Mode
                                         // Privileged user has selected a project type. Outline its PictureListItem in listHost (un-outline all others first).
                                         m_lhProjectTypes.removeAllOutlines();
                                         pliNew.setOutline(true);
-                                        // m_functionSetBtnProtection();
+
+										if (m_projectModeId) {
+
+											let btn = self.dialog.controlObject["nextButton"];
+											btn.setProtected(false);
+										}
                                     }
                                 };
                                 return pliNew;
                             });
                             listProjectTypes.create(arrayOutput);
 
+							///////////////////////////////
+							// Only for the privileged user.
                             if (self.dialog.getMode() === "Sel Proj Type-priv user") {
 
+								/////////////////////////
                                 // Fill self.dialog.controlObject["ncopChoice"] with array of RadioListItems.
                                 m_lh_ncopChoice = self.dialog.controlObject["ncopChoice"];
                                 let listProjectModes = m_lh_ncopChoice.list;
-                                let id = 1;
+                                let id = 1;	// <-- Note that this starts at 1 on purpose.
 
                                 listProjectModes.destroy();
-                                let arrayOutput = ["Normal project","Classroom project","Online class project","Product project"].map((projMode) => {
+                                let arrayOutput = m_arrayProjectModeNames.map((projMode) => {
 
                                     let rliNew = new RadioListItem(projMode, id++);
                                     rliNew.clickHandler = (id) => {
@@ -795,14 +815,17 @@ Controls arranged by Mode
                                         // Privileged user has selected a project type. Outline its RadioListItem in listHost (un-outline all others first).
                                         m_lh_ncopChoice.removeAllOutlines();
                                         rliNew.setOutline(true);
-                                        // m_functionSetBtnProtection();
+
+										if (m_projectTypeId) {
+
+											let btn = self.dialog.controlObject["nextButton"];
+											btn.setProtected(false);
+										}
                                     };
                                     return rliNew;
                                 });
                                 listProjectModes.create(arrayOutput);
                             }
-
-                            // m_functionSetBtnProtection();
 
                             // Because it is!
                             m_bCreated = true;
@@ -847,51 +870,6 @@ Controls arranged by Mode
                         iPI.recreate();
 					}
 
-                    // Call this method when first creating dialog and after certain user actions.
-                    /* Here are all the buttons and whether or not they should be protected by dialog mode:
-
-                        'Sel Proj Type-priv user'
-                            normal
-                            classroomClass
-                            onlineClass
-                            product
-
-                        'Normal proj'
-                            createProjectButton
-                            cancelButton
-
-                        'Classroom class proj1'
-
-                        'Online class proj1'
-
-                        'Product proj1'
-
-                    */
-                    var m_functionSetBtnProtection = function() {
-
-                        let currDialogMode = self.dialog.getMode();
-                        if ((currDialogMode === "Sel Proj Type-priv user") && m_projectTypeId && m_projectModeId) {
-
-                            let btn = self.dialog.controlObject["nextButton"];
-                            btn.setProtected(false);
-
-                        } else if ((currDialogMode === "Sel Proj Type-priv user") && (!m_projectTypeId || !m_projectModeId)) {
-                        
-                            let btn = self.dialog.controlObject["nextButton"];
-                            btn.setProtected(true);
-
-                        }
-/*                         else if (currDialogMode === "Normal proj"
-                                   || currDialogMode === "Class proj"
-                                   || currDialogMode === "Online class proj"
-                                   || currDialogMode === "Product proj") {
-
-                            // Enable the Save Project button if validation passes, including project name is set.
-                            let btn = self.dialog.controlObject["normal"];
-                            btn.setProtected(!m_functionIsEverythingValid());
-                        }
-*/                    }
-
                     var m_functionIsEverythingValid = function() {
 
                         let bValid = false;
@@ -926,6 +904,8 @@ Controls arranged by Mode
                     var m_lh_ncopChoice = null;
 					// Array of project type names.
                     var m_arrayProjectTypeNames = ["game","console","website","hololens","mapping","empty"];
+					// Array of project mode names.
+					var m_arrayProjectModeNames = ["Normal project","Classroom project","Online class project","Product project"];
 
                 } catch (e) {
 
