@@ -924,14 +924,28 @@ Controls arranged by Mode
 
 										m_projectModeId = id;
 
-										/* Set one of these to true, others to false.
-											var m_bNormalProject = true;
-											var m_bClassProject = false;
-											var m_bOnlineClassProject = false;
-											var m_bProductProject = false;
-										*/
-
-                                        // Privileged user has selected a project type. Outline its RadioListItem in listHost (un-outline all others first).
+										// Temporarily, force only Normal projects.
+										// Uncomment as additional modes are implemented.
+										m_bNormalProject = true;	//false;
+/*										m_bClassProject = false;
+										m_bOnlineClassProject = false;
+										m_bProductProject = false;
+										switch (m_projectModeId) {
+											case 1:
+												m_bNormalProject = true;
+												break;
+											case 2:
+												m_bClassProject = true;
+												break;
+											case 3:
+												m_bOnlineClassProject = true;
+												break;
+											case 4:
+												m_bProductProject = true;
+												break;
+										}
+*/
+                                        // Privileged user has selected a project mode. Outline its RadioListItem in listHost (un-outline all others first).
                                         m_lh_ncopChoice.removeAllOutlines();
                                         rliNew.setOutline(true);
 
@@ -997,7 +1011,8 @@ Controls arranged by Mode
                             bValid = true;
                         }
 
-                        // Once added, all of the fields for purchasable projects will need to be validated, too--both for correctness and completion.
+                        // Once they are added, all of the fields for purchasable projects will need to be validated, too--I think only for correctness here. 
+						// Presence of all required fields will be checked in ActivatePPDialog.js.
 
                         return bValid;
                     }
@@ -1018,7 +1033,7 @@ Controls arranged by Mode
 					// Normal, Classroom, Online, Product
                     var m_projectModeId = 0;
 					// Booleans corrolaries to m_projectModeId.
-					var m_bNormalProject = true;
+					var m_bNormalProject = false;
 					var m_bClassProject = false;
 					var m_bOnlineClassProject = false;
 					var m_bProductProject = false;
