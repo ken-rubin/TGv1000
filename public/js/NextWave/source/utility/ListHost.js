@@ -21,7 +21,7 @@ define(["NextWave/source/utility/prototypes",
         try {
 
             // Constructor function.
-        	var functionRet = function ListHost(objectParameters) {
+        	var functionRet = function ListHost(...objectParameters) {
 
                 try {
 
@@ -37,7 +37,16 @@ define(["NextWave/source/utility/prototypes",
                     // Indicate if this object is highlighted.
                     self.highlight = false;
                     // The hosted object.
-                    self.list = new List(objectParameters);
+                    self.list = null;
+					
+					if (objectParameters.length === 1) {
+
+						self.list = new List(objectParameters[0]);
+
+					} else {
+
+						self.list = new List(objectParameters[0], objectParameters[1]);
+					}
 
                     ///////////////////////
                     // Public methods.

@@ -20,7 +20,7 @@ define(["NextWave/source/utility/prototypes",
         try {
 
             // Constructor function.
-        	var functionRet = function List(bVertical) {
+        	var functionRet = function List(bVertical, bTinyScrollStub) {
 
                 try {
 
@@ -33,6 +33,7 @@ define(["NextWave/source/utility/prototypes",
                     self.items = [];
                     // Indicates how things are measured and how they scroll.
                     self.vertical = bVertical;
+					self.scrollStub = bTinyScrollStub ? settings.general.tinyScrollStub : settings.general.scrollStub;
                     // Access this property based on orientation.
                     self.propertyAccessor = (self.vertical ? "height" : "width");
                     // Access this method based on orientation.
@@ -106,7 +107,7 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // We are about to outline a PictureListItem. Turn all outlines in the List off first.
+                    // We are about to outline a PictureListItem or a RadioListItem. Turn all outlines in the List off first.
                     self.removeAllOutlines = function() {
 
                         for (var i = 0; i < self.items.length; i++) {
@@ -421,7 +422,7 @@ define(["NextWave/source/utility/prototypes",
                                         // Special case, scroll down.
                                         if (m_dScrollOffset > 0) {
 
-                                            m_dScrollOffset -= settings.general.scrollStub.amount;
+                                            m_dScrollOffset -= self.scrollStub.amount;
                                         }
                                         // Pin to bounds.
                                         if (m_dScrollOffset < 0) {
@@ -455,7 +456,7 @@ define(["NextWave/source/utility/prototypes",
                                         // Special case, scroll up.
                                         if (m_dScrollOffset < (dTotalExtent - m_areaMaximal.extent[self.propertyAccessor])) {
 
-                                            m_dScrollOffset += settings.general.scrollStub.amount;
+                                            m_dScrollOffset += self.scrollStub.amount;
                                         }
                                         // Pin to bounds.
                                         if (m_dScrollOffset > (dTotalExtent - m_areaMaximal.extent[self.propertyAccessor])) {
@@ -628,24 +629,24 @@ define(["NextWave/source/utility/prototypes",
 
                             if (self.vertical) {
 
-                                self.scrollStubArea[0] = new Area(new Point(areaMaximal.location.x + (areaMaximal.extent.width - settings.general.scrollStub.width) / 2, 
-                                        areaMaximal.location.y + settings.general.scrollStub.yOffset), 
-                                    new Size(settings.general.scrollStub.width, settings.general.scrollStub.height));
+                                self.scrollStubArea[0] = new Area(new Point(areaMaximal.location.x + (areaMaximal.extent.width - self.scrollStub.width) / 2, 
+                                        areaMaximal.location.y + self.scrollStub.yOffset), 
+                                    new Size(self.scrollStub.width, self.scrollStub.height));
 
-                                self.scrollStubArea[1] = new Area(new Point(areaMaximal.location.x + (areaMaximal.extent.width - settings.general.scrollStub.width) / 2, 
-                                        areaMaximal.location.y + areaMaximal.extent.height + settings.general.scrollStub.yOffset), 
-                                    new Size(settings.general.scrollStub.width, settings.general.scrollStub.height));
+                                self.scrollStubArea[1] = new Area(new Point(areaMaximal.location.x + (areaMaximal.extent.width - self.scrollStub.width) / 2, 
+                                        areaMaximal.location.y + areaMaximal.extent.height + self.scrollStub.yOffset), 
+                                    new Size(self.scrollStub.width, self.scrollStub.height));
                             } else {
 
-                                self.scrollStubArea[0] = new Area(new Point(m_areaMaximal.location.x - settings.general.scrollStub.height / 2, 
-                                        m_areaMaximal.location.y - settings.general.scrollStub.yOffset / 5), 
-                                    new Size(settings.general.scrollStub.height /* this one is on its side */, 
-                                        m_areaMaximal.extent.height + 2 * settings.general.scrollStub.yOffset / 5));
+                                self.scrollStubArea[0] = new Area(new Point(m_areaMaximal.location.x - self.scrollStub.height / 2, 
+                                        m_areaMaximal.location.y - self.scrollStub.yOffset / 5), 
+                                    new Size(self.scrollStub.height /* this one is on its side */, 
+                                        m_areaMaximal.extent.height + 2 * self.scrollStub.yOffset / 5));
 
-                                self.scrollStubArea[1] = new Area(new Point(m_areaMaximal.location.x + m_areaMaximal.extent.width - settings.general.scrollStub.height / 2, 
-                                        m_areaMaximal.location.y - settings.general.scrollStub.yOffset / 5), 
-                                    new Size(settings.general.scrollStub.height /* this one is on its side */, 
-                                        m_areaMaximal.extent.height + 2 * settings.general.scrollStub.yOffset / 5));
+                                self.scrollStubArea[1] = new Area(new Point(m_areaMaximal.location.x + m_areaMaximal.extent.width - self.scrollStub.height / 2, 
+                                        m_areaMaximal.location.y - self.scrollStub.yOffset / 5), 
+                                    new Size(self.scrollStub.height /* this one is on its side */, 
+                                        m_areaMaximal.extent.height + 2 * self.scrollStub.yOffset / 5));
                             }
 
                             // Call virtual.
@@ -805,7 +806,7 @@ define(["NextWave/source/utility/prototypes",
 
                                         throw exceptionRet;
                                     }
-                                    contextRender.fillStyle = settings.general.scrollStub.fillBackground;
+                                    contextRender.fillStyle = self.scrollStub.fillBackground;
                                     contextRender.fill();
                                     contextRender.strokeStyle = settings.general.strokeBackground;
                                     contextRender.stroke();
@@ -821,7 +822,7 @@ define(["NextWave/source/utility/prototypes",
 
                                         throw exceptionRet;
                                     }
-                                    contextRender.fillStyle = settings.general.scrollStub.fillBackground;
+                                    contextRender.fillStyle = self.scrollStub.fillBackground;
                                     contextRender.fill();
                                     contextRender.strokeStyle = settings.general.strokeBackground;
                                     contextRender.stroke();

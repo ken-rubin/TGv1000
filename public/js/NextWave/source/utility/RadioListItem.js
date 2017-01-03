@@ -1,7 +1,7 @@
 ///////////////////////////////////////
 // RadioListItem module.
 //
-// Class for all picture list items.
+// Class for all selectable text list items--acts like RadioButton or ComboBox.
 //
 // Return constructor function.
 //

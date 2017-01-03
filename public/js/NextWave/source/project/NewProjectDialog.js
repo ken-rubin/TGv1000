@@ -534,13 +534,13 @@ Controls arranged by Mode
 								level: {
 									type: "ListHost",	//	['Elementary school','Middle School','High school and beyond']
 									modes: ['Classroom class proj1','Online class proj1','Product proj1'],
-									constructorParameterString: "true",
+									constructorParameterString: "true, true",	// bVertical, vUseTinyScrollStub
 									x: 2 * settings.general.margin + 
 										settings.dialog.firstColumnWidth,
 									y: 5 * settings.general.margin +
 										16 * settings.dialog.lineHeight,
 									width: settings.dialog.firstColumnWidth,
-									height: 1.5 * settings.dialog.lineHeight
+									height: 2 * settings.dialog.lineHeight
 								},
 								difficultyLabel: {
 									type: "Label",
@@ -548,20 +548,20 @@ Controls arranged by Mode
 									text: "Difficulty",
 									x: settings.general.margin,
 									y: 5 * settings.general.margin +
-										18 * settings.dialog.lineHeight,
+										19 * settings.dialog.lineHeight,
 									width: settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight                                  
 								},
 								difficulty: {
 									type: "ListHost",	//	['Beginner','Has used the TechGroms system','Has completed a TechGroms class','Almost self-sufficient','An expert!']
 									modes: ['Classroom class proj1','Online class proj1','Product proj1'],
-									constructorParameterString: "true",
+									constructorParameterString: "true, true",	// bVertical, vUseTinyScrollStub
 									x: 2 * settings.general.margin + 
 										settings.dialog.firstColumnWidth,
 									y: 5 * settings.general.margin +
-										18 * settings.dialog.lineHeight,
+										19 * settings.dialog.lineHeight,
 									width: settings.dialog.firstColumnWidth,
-									height: 2 * settings.dialog.lineHeight
+									height: 3 * settings.dialog.lineHeight
 								},
 								priceLabel: {
 									type: "Label",
@@ -569,7 +569,7 @@ Controls arranged by Mode
 									text: "Price",
 									x: settings.general.margin,
 									y: 4 * settings.general.margin +
-										21 * settings.dialog.lineHeight,
+										23 * settings.dialog.lineHeight,
 									width: settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight                                  
 								},
@@ -579,7 +579,7 @@ Controls arranged by Mode
 									x: 2 * settings.general.margin + 
 										settings.dialog.firstColumnWidth,
 									y: 4 * settings.general.margin +
-										21 * settings.dialog.lineHeight,
+										23 * settings.dialog.lineHeight,
 									width: settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
 								},

@@ -34,6 +34,14 @@ define(["NextWave/source/utility/prototypes"],
                             fillBackground: "rgba(0,0,100,0.25)",
                             amount: 4
                         },
+                        tinyScrollStub: {
+
+                            width: 40,
+                            height: 10,
+                            yOffset: -5,
+                            fillBackground: "rgba(0,0,100,0.25)",
+                            amount: 4
+                        },
                         margin: 4,
                         textOffset: 4,
                         strokeDrag: "rgba(0,0,0,0.1)",
