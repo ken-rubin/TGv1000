@@ -173,15 +173,13 @@ Controls arranged by Mode
     imageSearchButton
     urlSearchButton
     fileSearchButton
+	prodLevelLabel		Label
+	prodLevel   		ListHost	['Elementary school','Middle School','High school and beyond']
+	prodDifficultyLabel	Label
+	prodDifficulty		ListHost	['Beginner','Has used the TechGroms system','Has completed a TechGroms class','Almost self-sufficient','An expert!']
+	prodPriceLabel		Label
+	prodPrice			Text
     backButton          Button		setMode('Sel Proj Type-priv user')
-    nextButton          Button		setMode('Product proj2')
-    cancelButton        Button
-
-'Product proj2'
-    instructions15      Label	fields for product proj (level, difficulty, price)
-    nameLabel           Label
-    nameEdit            Edit
-    backButton          Button		setMode('Product proj1')
     createProjectButton Button
     cancelButton        Button
 */
@@ -351,18 +349,7 @@ Controls arranged by Mode
 								instructions14: {
 									type: "Label",
 									modes: ['Product proj1'],
-									text: "Only Name is required. However, consider entering a description for searching and changing the default image for identification.",
-									x: settings.general.margin,
-									y: 5 * settings.general.margin +
-										settings.dialog.lineHeight,
-									widthType: "reserve",
-									width: 2 * settings.general.margin,
-									height: settings.dialog.lineHeight                                  
-								},
-								instructions15: {
-									type: "Label",
-									modes: ['Product proj2'],
-									text: "[fields: level, difficulty, price]",
+									text: "All but Name are optional until the Product is made active, and it's ready for sale.",
 									x: settings.general.margin,
 									y: 5 * settings.general.margin +
 										settings.dialog.lineHeight,
@@ -372,7 +359,7 @@ Controls arranged by Mode
 								},
 								nameLabel: {
 									type: "Label",
-									modes: ['Normal proj','Classroom class proj1','Classroom class proj2','Classroom class proj3','Online class proj1','Online class proj2','Online class proj3','Product proj1','Product proj2'],
+									modes: ['Normal proj','Classroom class proj1','Classroom class proj2','Classroom class proj3','Online class proj1','Online class proj2','Online class proj3','Product proj1'],
 									text: "Name",
 									x: settings.general.margin,
 									y: 5 * settings.general.margin +
@@ -382,7 +369,7 @@ Controls arranged by Mode
 								},
 								nameEdit: {
 									type: "Edit",
-									modes: ['Normal proj','Classroom class proj1','Classroom class proj2','Classroom class proj3','Online class proj1','Online class proj2','Online class proj3','Product proj1','Product proj2'],
+									modes: ['Normal proj','Classroom class proj1','Classroom class proj2','Classroom class proj3','Online class proj1','Online class proj2','Online class proj3','Product proj1'],
 									x: 2 * settings.general.margin + 
 										settings.dialog.firstColumnWidth,
 									y: 5 * settings.general.margin +
@@ -534,9 +521,84 @@ Controls arranged by Mode
 										}
 									}
 								},
+								prodLevelLabel: {
+									type: "Label",
+									modes: ['Product proj1'],
+									text: "Level",
+									xType: "",
+									x: 0,
+									yType: "",
+									y: 0,
+									widthType: "",
+									width: 0,
+									heightType: "",
+									height: 0
+								},
+								prodLevel: {
+									type: "ListHost",	//	['Elementary school','Middle School','High school and beyond']
+									modes: ['Product proj1'],
+									xType: "",
+									x: 0,
+									yType: "",
+									y: 0,
+									widthType: "",
+									width: 0,
+									heightType: "",
+									height: 0
+								},
+								prodDifficultyLabel: {
+									type: "Label",
+									modes: ['Product proj1'],
+									text: "Difficulty",
+									xType: "",
+									x: 0,
+									yType: "",
+									y: 0,
+									widthType: "",
+									width: 0,
+									heightType: "",
+									height: 0
+								},
+								prodDifficulty: {
+									type: "ListHost",	//	['Beginner','Has used the TechGroms system','Has completed a TechGroms class','Almost self-sufficient','An expert!']
+									modes: ['Product proj1'],
+									xType: "",
+									x: 0,
+									yType: "",
+									y: 0,
+									widthType: "",
+									width: 0,
+									heightType: "",
+									height: 0
+								},
+								prodPriceLabel: {
+									type: "Label",
+									modes: ['Product proj1'],
+									text: "Price",
+									xType: "",
+									x: 0,
+									yType: "",
+									y: 0,
+									widthType: "",
+									width: 0,
+									heightType: "",
+									height: 0
+								},
+								prodPrice: {
+									type: "Edit",
+									modes: ['Product proj1'],
+									xType: "",
+									x: 0,
+									yType: "",
+									y: 0,
+									widthType: "",
+									width: 0,
+									heightType: "",
+									height: 0
+								},
 								backButton: {
 									type: "Button",
-									modes: ['Normal proj','Classroom class proj1','Classroom class proj2','Classroom class proj3','Online class proj1','Online class proj2','Online class proj3','Product proj1','Product proj2'],
+									modes: ['Normal proj','Classroom class proj1','Classroom class proj2','Classroom class proj3','Online class proj1','Online class proj2','Online class proj3','Product proj1'],
 									text: "< Back",
 									x: settings.general.margin,
 									yType: "reserve",
@@ -568,16 +630,13 @@ Controls arranged by Mode
 											} else if (currmode === 'Online class proj3') {
 												manager.resetCenterPanelTitle('Online project 2');
 												self.dialog.setMode('Online class proj2');
-											} else if (currmode === 'Product proj2') {
-												manager.resetCenterPanelTitle('Product project 1');
-												self.dialog.setMode('Product proj1');
 											}
 										}
 									}
 								},
 								nextButton: {
 									type: "Button",
-									modes: ['Sel Proj Type-priv user','Classroom class proj1','Classroom class proj2','Online class proj1','Online class proj2','Product proj1'],
+									modes: ['Sel Proj Type-priv user','Classroom class proj1','Classroom class proj2','Online class proj1','Online class proj2'],
 									text: "Next >",
 									x: settings.general.margin +
 										settings.dialog.firstColumnWidth,
@@ -615,9 +674,6 @@ Controls arranged by Mode
 										} else if (currmode === 'Online class proj2') {
 											manager.resetCenterPanelTitle('Online project 3');
 											self.dialog.setMode('Online class proj3');
-										} else if (currmode === 'Product proj1') {
-											manager.resetCenterPanelTitle('Product project 2');
-											self.dialog.setMode('Product proj2');
 										}
 									}
 								},
@@ -648,7 +704,7 @@ Controls arranged by Mode
 								},
 								createProjectButton: {
 									type: "Button",
-									modes: ['Normal proj','Classroom class proj3','Online class proj3','Product proj2'],
+									modes: ['Normal proj','Classroom class proj3','Online class proj3','Product proj1'],
 									text: "Create Project",
 									xType: "reserve",
 									x: 2 * settings.dialog.firstColumnWidth + 20,
@@ -1017,6 +1073,34 @@ Controls arranged by Mode
                         return bValid;
                     }
 
+					// Privileged user enters string of form 2016/02/01.........20:00.-.20:55 
+					// Below assumes user is in EST: UTC-5:00.
+					// Returns { date: '2016-02-02T01:00:00+00:00', duration: 3360000}.
+					// 		date is start time in UTC.
+					// 		duration is in ms, inclusive (i.e., this example is 56 minutes long).
+					// If any parts (date, duration) are missing or invalid, returns { date: '', duration: 0}.
+					// Due to masking, we can have only numbers, but we can have numbers out of range, etc. (Like 34:00 - 51:00.)
+					var m_funcWhenProcess = function(strWhen) {
+
+						var strDate = strWhen.substring(0, 10);		// Let substring return junky results if strWhen is of insufficient length.
+						var strFrom = strWhen.substring(19, 24);
+						var strThru = strWhen.substring(27, 32);
+
+						var mntHypo1 = moment('2016-01-01T' + strFrom);	// to check validity of strFrom
+						var mntHypo2 = moment('2016-01-01T' + strThru);	// to check validity of strThru
+						var mntDate = moment(strDate, "YYYY-MM-DD");	// to check validty of strDate
+						var bValidMntDate = mntDate.isValid();
+						var bValidMntHypo1 = mntHypo1.isValid();
+						var bValidMntHypo2 = mntHypo2.isValid();
+
+						if (bValidMntDate && bValidMntHypo1 && bValidMntHypo2 /*&& mntHypo2.isAfter(mntHypo1)*/) {
+							var mntDateFromUTC = moment(strDate + 'T' + strFrom).utc();	// Actual class start datetime with utc flag set.
+							return { date: mntDateFromUTC.format(), duration: (mntHypo2.diff(mntHypo1) + 60000)};	// Add 60000 to account for inclusive thru time.
+						}
+
+						return { date: '', duration: 0};
+					}
+
                     ///////////////////////
                     // Private fields.
 
@@ -1027,7 +1111,7 @@ Controls arranged by Mode
 					// From multi-line Edit.
                     var m_projectDescription = null;
 					// resourceId for project image.
-                    var m_imageId = null;
+                    var m_imageId = 0;
 					// Game, Console, Website, Hololens, Mapping, Empty
                     var m_projectTypeId = 0;
 					// Normal, Classroom, Online, Product
