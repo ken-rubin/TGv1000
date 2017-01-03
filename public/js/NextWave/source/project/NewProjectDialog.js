@@ -349,7 +349,7 @@ Controls arranged by Mode
 								instructions14: {
 									type: "Label",
 									modes: ['Product proj1'],
-									text: "All but Name are optional until the Product is made active, and it's ready for sale.",
+									text: "All fields but Name are optional until the Product is made active and put on sale.",
 									x: settings.general.margin,
 									y: 5 * settings.general.margin +
 										settings.dialog.lineHeight,
@@ -521,80 +521,67 @@ Controls arranged by Mode
 										}
 									}
 								},
-								prodLevelLabel: {
+								levelLabel: {
 									type: "Label",
-									modes: ['Product proj1'],
+									modes: ['Classroom class proj1','Online class proj1','Product proj1'],
 									text: "Level",
-									xType: "",
-									x: 0,
-									yType: "",
-									y: 0,
-									widthType: "",
-									width: 0,
-									heightType: "",
-									height: 0
+									x: settings.general.margin,
+									y: 5 * settings.general.margin +
+										16 * settings.dialog.lineHeight,
+									width: settings.dialog.firstColumnWidth,
+									height: settings.dialog.lineHeight                                  
 								},
-								prodLevel: {
+								level: {
 									type: "ListHost",	//	['Elementary school','Middle School','High school and beyond']
-									modes: ['Product proj1'],
-									xType: "",
-									x: 0,
-									yType: "",
-									y: 0,
-									widthType: "",
-									width: 0,
-									heightType: "",
-									height: 0
+									modes: ['Classroom class proj1','Online class proj1','Product proj1'],
+									constructorParameterString: "true",
+									x: 2 * settings.general.margin + 
+										settings.dialog.firstColumnWidth,
+									y: 5 * settings.general.margin +
+										16 * settings.dialog.lineHeight,
+									width: settings.dialog.firstColumnWidth,
+									height: 1.5 * settings.dialog.lineHeight
 								},
-								prodDifficultyLabel: {
+								difficultyLabel: {
 									type: "Label",
-									modes: ['Product proj1'],
+									modes: ['Classroom class proj1','Online class proj1','Product proj1'],
 									text: "Difficulty",
-									xType: "",
-									x: 0,
-									yType: "",
-									y: 0,
-									widthType: "",
-									width: 0,
-									heightType: "",
-									height: 0
+									x: settings.general.margin,
+									y: 5 * settings.general.margin +
+										18 * settings.dialog.lineHeight,
+									width: settings.dialog.firstColumnWidth,
+									height: settings.dialog.lineHeight                                  
 								},
-								prodDifficulty: {
+								difficulty: {
 									type: "ListHost",	//	['Beginner','Has used the TechGroms system','Has completed a TechGroms class','Almost self-sufficient','An expert!']
-									modes: ['Product proj1'],
-									xType: "",
-									x: 0,
-									yType: "",
-									y: 0,
-									widthType: "",
-									width: 0,
-									heightType: "",
-									height: 0
+									modes: ['Classroom class proj1','Online class proj1','Product proj1'],
+									constructorParameterString: "true",
+									x: 2 * settings.general.margin + 
+										settings.dialog.firstColumnWidth,
+									y: 5 * settings.general.margin +
+										18 * settings.dialog.lineHeight,
+									width: settings.dialog.firstColumnWidth,
+									height: 2 * settings.dialog.lineHeight
 								},
-								prodPriceLabel: {
+								priceLabel: {
 									type: "Label",
-									modes: ['Product proj1'],
+									modes: ['Classroom class proj1','Online class proj1','Product proj1'],
 									text: "Price",
-									xType: "",
-									x: 0,
-									yType: "",
-									y: 0,
-									widthType: "",
-									width: 0,
-									heightType: "",
-									height: 0
+									x: settings.general.margin,
+									y: 4 * settings.general.margin +
+										21 * settings.dialog.lineHeight,
+									width: settings.dialog.firstColumnWidth,
+									height: settings.dialog.lineHeight                                  
 								},
-								prodPrice: {
+								price: {
 									type: "Edit",
-									modes: ['Product proj1'],
-									xType: "",
-									x: 0,
-									yType: "",
-									y: 0,
-									widthType: "",
-									width: 0,
-									heightType: "",
-									height: 0
+									modes: ['Classroom class proj1','Online class proj1','Product proj1'],
+									x: 2 * settings.general.margin + 
+										settings.dialog.firstColumnWidth,
+									y: 4 * settings.general.margin +
+										21 * settings.dialog.lineHeight,
+									width: settings.dialog.firstColumnWidth,
+									height: settings.dialog.lineHeight
 								},
 								backButton: {
 									type: "Button",
@@ -912,7 +899,7 @@ Controls arranged by Mode
 								btn.setProtected(true);
 							}
 
-							// And createProjectButton is disabled to start.
+							// And createProjectButton is disabled to start in all cases until Name is entered.
 							let cb = self.dialog.controlObject["createProjectButton"];
 							cb.setProtected(true);
 
@@ -1014,6 +1001,50 @@ Controls arranged by Mode
                                     return rliNew;
                                 });
                                 listProjectModes.create(arrayOutput);
+
+								/////////////////////////
+                                // Fill self.dialog.controlObject["level"] with array of RadioListItems.
+                                m_lh_level = self.dialog.controlObject["level"];
+                                let listLevels = m_lh_level.list;
+                                id = 0;
+
+                                listLevels.destroy();
+                                arrayOutput = m_arrayLevels.map((level) => {
+
+                                    let rliNew = new RadioListItem(level, id++);
+                                    rliNew.clickHandler = (id) => {
+
+										m_strLevel = m_arrayLevels[id];
+
+                                        // User has selected a level. Outline its RadioListItem in listHost (un-outline all others first).
+                                        m_lh_level.removeAllOutlines();
+                                        rliNew.setOutline(true);
+                                    };
+                                    return rliNew;
+                                });
+                                listLevels.create(arrayOutput);
+
+								/////////////////////////
+                                // Fill self.dialog.controlObject["difficulty"] with array of RadioListItems.
+                                m_lh_difficulty = self.dialog.controlObject["difficulty"];
+                                let listDifficulties = m_lh_difficulty.list;
+                                id = 0;
+
+                                listDifficulties.destroy();
+                                arrayOutput = m_arrayDifficulties.map((difficulty) => {
+
+                                    let rliNew = new RadioListItem(difficulty, id++);
+                                    rliNew.clickHandler = (id) => {
+
+										m_strDifficulty = m_arrayDifficulties[id];
+
+                                        // User has selected a difficulty. Outline its RadioListItem in listHost (un-outline all others first).
+                                        m_lh_difficulty.removeAllOutlines();
+                                        rliNew.setOutline(true);
+                                    };
+                                    return rliNew;
+                                });
+                                listDifficulties.create(arrayOutput);
                             }
 
                             // Because it is!
@@ -1129,6 +1160,14 @@ Controls arranged by Mode
                     var m_arrayProjectTypeNames = ["game","console","website","hololens","mapping","empty"];
 					// Array of project mode names.
 					var m_arrayProjectModeNames = ["Normal project","Classroom project","Online class project","Product project"];
+					//
+					var m_arrayLevels = ['Elementary school','Middle School','High school and beyond'];
+					//
+					var m_arrayDifficulties = ['Beginner','Has used the TechGroms system','Has completed a TechGroms class','Almost self-sufficient','An expert!'];
+					var m_lh_level = null;
+					var m_lh_difficulty = null;
+					var m_strLevel = "";
+					var m_strDifficulty = "";
 
                 } catch (e) {
 
