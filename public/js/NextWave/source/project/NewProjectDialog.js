@@ -20,10 +20,9 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/PictureListItem",
     "NextWave/source/utility/RadioListItem",
     "Core/errorHelper", 
-    "Core/resourceHelper",
-	"NextWave/source/utility/glyphs"
+    "Core/resourceHelper"
     ],
-    function (prototypes, settings, Point, Size, Area, DialogHost, List, PictureListItem, RadioListItem, errorHelper, resourceHelper, glyphs) {
+    function (prototypes, settings, Point, Size, Area, DialogHost, List, PictureListItem, RadioListItem, errorHelper, resourceHelper) {
 
         try {
 
@@ -448,16 +447,16 @@ Controls arranged by Mode
 									height: settings.dialog.lineHeight * 5
 								},
 								imageSearchButton: {
-									type: "GlyphButton",
+									type: "GlyphHost",
 									modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
-									constructorParameterString: "glyphs.search",
+									constructorParameterString: "'search'",
 									x: 2 * settings.general.margin + settings.dialog.firstColumnWidth + settings.dialog.firstColumnWidth + 20,
 									y: 5 * settings.general.margin +
 										10 * settings.dialog.lineHeight +
 										(settings.dialog.lineHeight * 5 - 40) / 2,
 									width: 40,
 									height: 40,
-									click: function() {
+									clickHandler: function() {
 
 										try {
 
@@ -473,16 +472,16 @@ Controls arranged by Mode
 									}
 								},
 								urlSearchButton: {
-									type: "Button",
+									type: "GlyphHost",
 									modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
-									text: "U",
+									constructorParameterString: "'cloudDownload'",
 									x: 2 * settings.general.margin + settings.dialog.firstColumnWidth + settings.dialog.firstColumnWidth + 70,
 									y: 5 * settings.general.margin +
 										10 * settings.dialog.lineHeight +
 										(settings.dialog.lineHeight * 5 - 40) / 2,
 									width: 40,
 									height: 40,
-									click: function() {
+									clickHandler: function() {
 
 										try {
 
@@ -498,16 +497,16 @@ Controls arranged by Mode
 									}
 								},
 								fileSearchButton: {
-									type: "Button",
+									type: "GlyphHost",
 									modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
-									text: "F",
+									constructorParameterString: "'openFile'",
 									x: 2 * settings.general.margin + settings.dialog.firstColumnWidth + settings.dialog.firstColumnWidth + 120,
 									y: 5 * settings.general.margin +
 										10 * settings.dialog.lineHeight +
 										(settings.dialog.lineHeight * 5 - 40) / 2,
 									width: 40,
 									height: 40,
-									click: function() {
+									clickHandler: function() {
 
 										try {
 

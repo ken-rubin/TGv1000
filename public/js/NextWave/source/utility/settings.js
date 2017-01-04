@@ -195,16 +195,16 @@ define(["NextWave/source/utility/prototypes"],
                             x: 1526,
                             y: 6
                         },
-                        openFile: {
-							// row: 4; column: 3 - 0-based
-                            x: 243,
-                            y: 172
-                        },
 						cloudDownload: {
 							// row: 6; column: 19 - 0-based
-							x: 365,
-							y: 1089
-						}
+							x: 1038,
+							y: 373
+						},
+                        openFile: {
+							// row: 4; column: 3 - 0-based
+                            x: 183,
+                            y: 254
+                        }
                     };
                     self.layerPanels = {
 
