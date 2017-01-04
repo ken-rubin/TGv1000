@@ -20,9 +20,10 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/PictureListItem",
     "NextWave/source/utility/RadioListItem",
     "Core/errorHelper", 
-    "Core/resourceHelper"
+    "Core/resourceHelper",
+	"NextWave/source/utility/glyphs"
     ],
-    function (prototypes, settings, Point, Size, Area, DialogHost, List, PictureListItem, RadioListItem, errorHelper, resourceHelper) {
+    function (prototypes, settings, Point, Size, Area, DialogHost, List, PictureListItem, RadioListItem, errorHelper, resourceHelper, glyphs) {
 
         try {
 
@@ -447,9 +448,9 @@ Controls arranged by Mode
 									height: settings.dialog.lineHeight * 5
 								},
 								imageSearchButton: {
-									type: "Button",
+									type: "GlyphButton",
 									modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
-									text: "S",
+									constructorParameterString: "glyphs.search",
 									x: 2 * settings.general.margin + settings.dialog.firstColumnWidth + settings.dialog.firstColumnWidth + 20,
 									y: 5 * settings.general.margin +
 										10 * settings.dialog.lineHeight +

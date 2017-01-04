@@ -60,6 +60,12 @@ define(["NextWave/source/utility/prototypes",
                     // search.
                     self.search = new Area(new Point(settings.glyphs.search.x,settings.glyphs.search.y),
                         new Size(settings.glyphs.width, settings.glyphs.width));
+                    // openFile.
+                    self.openFile = new Area(new Point(settings.glyphs.openFile.x,settings.glyphs.openFile.y),
+                        new Size(settings.glyphs.width, settings.glyphs.width));
+                    // cloudDownload.
+                    self.cloudDownload = new Area(new Point(settings.glyphs.cloudDownload.x,settings.glyphs.cloudDownload.y),
+                        new Size(settings.glyphs.width, settings.glyphs.width));
 
                     ///////////////////////
                     // Public methods.

@@ -48,10 +48,10 @@ define(["NextWave/source/utility/prototypes"],
                         fillDrag: "rgba(100,100,100,0.1)",
                         strokeBackgroundSelected: "#404",
                         fillBackgroundSelected: "#f0f",
-                        strokeBackgroundHighlight: "#000",
-                        fillBackgroundHighlight: "#fff",
                         // strokeBackgroundHighlight: "#000",
-                        // fillBackgroundHighlight: "#0ff",
+                        // fillBackgroundHighlight: "#fff",
+                        strokeBackgroundHighlight: "#000",
+                        fillBackgroundHighlight: "#0ff",
                         fillBackground: "rgba(0,0,0,0.5)",
                         strokeBackground: "#000",
                         fillText: "#000",
@@ -194,7 +194,17 @@ define(["NextWave/source/utility/prototypes"],
 
                             x: 1526,
                             y: 6
-                        }
+                        },
+                        openFile: {
+							// row: 4; column: 3 - 0-based
+                            x: 243,
+                            y: 172
+                        },
+						cloudDownload: {
+							// row: 6; column: 19 - 0-based
+							x: 365,
+							y: 1089
+						}
                     };
                     self.layerPanels = {
 
