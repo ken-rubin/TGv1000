@@ -621,7 +621,7 @@ Controls arranged by Mode
 									modes: ['Classroom class proj2','Online class proj2'],
 									exitFocus: function (localSelf) {
 										try {
-											m_instrFirst = localSelf.getText().trim();
+											m_instructor.first = localSelf.getText().trim();
 
 										} catch (e) {
 											alert(e.message);
@@ -634,7 +634,7 @@ Controls arranged by Mode
 									modes: ['Classroom class proj2','Online class proj2'],
 									exitFocus: function (localSelf) {
 										try {
-											m_instrLast = localSelf.getText().trim();
+											m_instructor.last = localSelf.getText().trim();
 
 										} catch (e) {
 											alert(e.message);
@@ -670,7 +670,8 @@ Controls arranged by Mode
 									modes: ['Classroom class proj2'],
 									exitFocus: function (localSelf) {
 										try {
-											m_strPhone = localSelf.getText().trim();
+											// Validate.
+											m_instructor.phone = localSelf.getText().trim();
 
 										} catch (e) {
 											alert(e.message);
@@ -688,7 +689,8 @@ Controls arranged by Mode
 									modes: ['Online class proj2'],
 									exitFocus: function (localSelf) {
 										try {
-											m_strEmail = localSelf.getText().trim();
+											// Validate.
+											m_instructor.email = localSelf.getText().trim();
 
 										} catch (e) {
 											alert(e.message);
@@ -706,8 +708,23 @@ Controls arranged by Mode
 									modes: ['Classroom class proj2'],
 									exitFocus: function (localSelf) {
 										try {
-											m_iMaxClassSize = Number(localSelf.getText().trim());
+											// Validate and then save maxClassSize if valid.
+											let strMax = localSelf.getText().trim();
+											if (strMax.length === 0) {
+												m_iMaxClassSize = 0;
+												return;
+											}
 
+											if (isNaN(strMax)) {
+												alert("Your Max. Class Size entry " + strMax + " is not a valid number.");
+												return;
+											}
+
+											m_iMaxClassSize = Number.parseFloat(strMax);
+											if (isNaN(m_iMaxClassSize)) {
+												m_iMaxClassSize = 0;
+												alert("Your Max. Class Size entry " + strMax + " is not a valid number.");
+											}
 										} catch (e) {
 											alert(e.message);
 										}
@@ -722,6 +739,26 @@ Controls arranged by Mode
 									type: "ListHost",	//	['Yes','No']
 									modes: ['Classroom class proj2'],
 									constructorParameterString: "true, true"	// bVertical, vUseTinyScrollStub
+								},
+								whenLabel: {
+									type: "Label",
+									text: "Schedule (MM/DD/YYYY hh:mm-hh:mm)",
+									modes: ['Classroom class proj2','Online class proj2']
+								},
+								when: {
+									type: "Edit",
+									multiline: true,
+									modes: ['Classroom class proj2','Online class proj2'],
+									exitFocus: function (localSelf) {
+										try {
+											let exceptionRet = m_functionProcessWhen(localself.getText());
+											if (exceptionRet) {
+												throw exceptionRet;
+											}
+										} catch (e) {
+											alert(e.message);
+										}
+									}
 								},
 								backButton: {
 									type: "Button",
@@ -1018,8 +1055,8 @@ Controls arranged by Mode
 
                             ////////////////////////
                             // Fill self.dialog.controlObject["projectTypes"] with array of images based upon arrayAvailProjTypes.
-                            m_lhProjectTypes = self.dialog.controlObject["projectTypes"];
-                            let listProjectTypes = m_lhProjectTypes.list;
+                            let lhProjectTypes = self.dialog.controlObject["projectTypes"];
+                            let listProjectTypes = lhProjectTypes.list;
                             let index = 0;
 
                             listProjectTypes.destroy(); // Don't check result because if destroy fails, that's because it hadn't been created, so it's ok.
@@ -1048,7 +1085,7 @@ Controls arranged by Mode
                                     } else if (self.dialog.getMode() === "Sel Proj Type-priv user") {
 
                                         // Privileged user has selected a project type. Outline its PictureListItem in listHost (un-outline all others first).
-                                        m_lhProjectTypes.removeAllOutlines();
+                                        lhProjectTypes.removeAllOutlines();
                                         pliNew.setOutline(true);
 
 										if (m_projectModeId) {
@@ -1068,8 +1105,8 @@ Controls arranged by Mode
 
 								/////////////////////////
                                 // Fill self.dialog.controlObject["ncopChoice"] with array of RadioListItems.
-                                m_lh_ncopChoice = self.dialog.controlObject["ncopChoice"];
-                                let listProjectModes = m_lh_ncopChoice.list;
+                                let lh_ncopChoice = self.dialog.controlObject["ncopChoice"];
+                                let listProjectModes = lh_ncopChoice.list;
                                 let id = 1;	// <-- Note that this starts at 1 on purpose.
 
                                 listProjectModes.destroy();
@@ -1100,7 +1137,7 @@ Controls arranged by Mode
 										}
 
                                         // Privileged user has selected a project mode. Outline its RadioListItem in listHost (un-outline all others first).
-                                        m_lh_ncopChoice.removeAllOutlines();
+                                        lh_ncopChoice.removeAllOutlines();
                                         rliNew.setOutline(true);
 
 										if (m_projectTypeId) {
@@ -1115,8 +1152,8 @@ Controls arranged by Mode
 
 								/////////////////////////
                                 // Fill self.dialog.controlObject["level"] with array of RadioListItems.
-                                m_lh_level = self.dialog.controlObject["level"];
-                                let listLevels = m_lh_level.list;
+                                let lh_level = self.dialog.controlObject["level"];
+                                let listLevels = lh_level.list;
                                 id = 0;
 
                                 listLevels.destroy();
@@ -1128,7 +1165,7 @@ Controls arranged by Mode
 										m_strLevel = m_arrayLevels[id];
 
                                         // User has selected a level. Outline its RadioListItem in listHost (un-outline all others first).
-                                        m_lh_level.removeAllOutlines();
+                                        lh_level.removeAllOutlines();
                                         rliNew.setOutline(true);
                                     };
                                     return rliNew;
@@ -1137,8 +1174,8 @@ Controls arranged by Mode
 
 								/////////////////////////
                                 // Fill self.dialog.controlObject["difficulty"] with array of RadioListItems.
-                                m_lh_difficulty = self.dialog.controlObject["difficulty"];
-                                let listDifficulties = m_lh_difficulty.list;
+                                let lh_difficulty = self.dialog.controlObject["difficulty"];
+                                let listDifficulties = lh_difficulty.list;
                                 id = 0;
 
                                 listDifficulties.destroy();
@@ -1150,12 +1187,34 @@ Controls arranged by Mode
 										m_strDifficulty = m_arrayDifficulties[id];
 
                                         // User has selected a difficulty. Outline its RadioListItem in listHost (un-outline all others first).
-                                        m_lh_difficulty.removeAllOutlines();
+                                        lh_difficulty.removeAllOutlines();
                                         rliNew.setOutline(true);
                                     };
                                     return rliNew;
                                 });
                                 listDifficulties.create(arrayOutput);
+
+								/////////////////////////
+                                // Fill self.dialog.controlObject["loaners"] with array of RadioListItems.
+                                let lh_loaners = self.dialog.controlObject["loaners"];
+                                let listLoaners = lh_loaners.list;
+                                id = 0;
+
+                                listLoaners.destroy();
+                                arrayOutput = m_arrayDifficulties.map((loaner) => {
+
+                                    let rliNew = new RadioListItem(loaner, id++);
+                                    rliNew.clickHandler = (id) => {
+
+										m_bLoaners = !id;
+
+                                        // User has selected loaners. Outline its RadioListItem in listHost (un-outline all others first).
+                                        lh_loaners.removeAllOutlines();
+                                        rliNew.setOutline(true);
+                                    };
+                                    return rliNew;
+                                });
+                                listLoaners.create(arrayOutput);
                             }
 
                             // Because it is!
@@ -1222,25 +1281,31 @@ Controls arranged by Mode
 					// 		duration is in ms, inclusive (i.e., this example is 56 minutes long).
 					// If any parts (date, duration) are missing or invalid, returns { date: '', duration: 0}.
 					// Due to masking, we can have only numbers, but we can have numbers out of range, etc. (Like 34:00 - 51:00.)
-					var m_funcWhenProcess = function(strWhen) {
+					var m_functionProcessWhen = function(strWhen) {
 
-						var strDate = strWhen.substring(0, 10);		// Let substring return junky results if strWhen is of insufficient length.
-						var strFrom = strWhen.substring(19, 24);
-						var strThru = strWhen.substring(27, 32);
+						try {
 
-						var mntHypo1 = moment('2016-01-01T' + strFrom);	// to check validity of strFrom
-						var mntHypo2 = moment('2016-01-01T' + strThru);	// to check validity of strThru
-						var mntDate = moment(strDate, "YYYY-MM-DD");	// to check validty of strDate
-						var bValidMntDate = mntDate.isValid();
-						var bValidMntHypo1 = mntHypo1.isValid();
-						var bValidMntHypo2 = mntHypo2.isValid();
+/*							var strDate = strWhen.substring(0, 10);		// Let substring return junky results if strWhen is of insufficient length.
+							var strFrom = strWhen.substring(19, 24);
+							var strThru = strWhen.substring(27, 32);
 
-						if (bValidMntDate && bValidMntHypo1 && bValidMntHypo2 /*&& mntHypo2.isAfter(mntHypo1)*/) {
-							var mntDateFromUTC = moment(strDate + 'T' + strFrom).utc();	// Actual class start datetime with utc flag set.
-							return { date: mntDateFromUTC.format(), duration: (mntHypo2.diff(mntHypo1) + 60000)};	// Add 60000 to account for inclusive thru time.
+							var mntHypo1 = moment('2016-01-01T' + strFrom);	// to check validity of strFrom
+							var mntHypo2 = moment('2016-01-01T' + strThru);	// to check validity of strThru
+							var mntDate = moment(strDate, "YYYY-MM-DD");	// to check validty of strDate
+							var bValidMntDate = mntDate.isValid();
+							var bValidMntHypo1 = mntHypo1.isValid();
+							var bValidMntHypo2 = mntHypo2.isValid();
+
+							if (bValidMntDate && bValidMntHypo1 && bValidMntHypo2) {
+								var mntDateFromUTC = moment(strDate + 'T' + strFrom).utc();	// Actual class start datetime with utc flag set.
+								return { date: mntDateFromUTC.format(), duration: (mntHypo2.diff(mntHypo1) + 60000)};	// Add 60000 to account for inclusive thru time.
+							}
+*/
+							return null;
+
+						} catch(e) {
+							return e;
 						}
-
-						return { date: '', duration: 0};
 					}
 
                     ///////////////////////
@@ -1248,41 +1313,54 @@ Controls arranged by Mode
 
                     // Indicates this instance is already created.
                     var m_bCreated = false;
-                    var m_projectTypeId = 0;
-					// Normal, Classroom, Online, Product
-                    var m_projectModeId = 0;
-					// Holds horizontal ListHost used to select project type.
-                    var m_lhProjectTypes = null;
-					// Holds vertical ListHost used to select project mode.
-                    var m_lh_ncopChoice = null;
+
 					// Array of project type names.
                     var m_arrayProjectTypeNames = ["game","console","website","hololens","mapping","empty"];
+                    var m_projectTypeId = 0;
+
 					// Array of project mode names.
 					var m_arrayProjectModeNames = ["Normal project","Classroom project","Online class project","Product project"];
-					//
-					var m_arrayLevels = ['Elementary school','Middle School','High school and beyond'];
-					//
-					var m_arrayDifficulties = ['Beginner','Has used the TechGroms system','Has completed a TechGroms class','Almost self-sufficient','An expert!'];
-					var m_lh_level = null;
-					var m_lh_difficulty = null;
-
-					/////////////////////////////////
-					// Fields for project creation
-					// From Edit.
-                    var m_strProjectName = null;
-					// From multi-line Edit.
-                    var m_strProjectDescription = null;
-					// resourceId for project image.
-                    var m_imageId = 0;
-					// Game, Console, Website, Hololens, Mapping, Empty
-					var m_strLevel = "";
-					var m_strDifficulty = "";
-					// Booleans corrolaries to m_projectModeId.
+                    var m_projectModeId = 0;
 					var m_bNormalProject = false;
 					var m_bClassProject = false;
 					var m_bOnlineClassProject = false;
 					var m_bProductProject = false;
+
+					// Array of Levels.
+					var m_arrayLevels = ['Elementary school','Middle School','High school and beyond'];
+					var m_strLevel = "";
+
+					// Difficulties.
+					var m_arrayDifficulties = ['Beginner','Has used the TechGroms system','Has completed a TechGroms class','Almost self-sufficient','An expert!'];
+					var m_strDifficulty = "";
+
+					// Loaners available.
+					var m_arrayLoanersAvailable = ['Yes','No'];
+					var m_bLoaners = false;
+
+					// From name Edit.
+                    var m_strProjectName = null;
+					// From multi-line description Edit.
+                    var m_strProjectDescription = null;
+					// resourceId for project image.
+                    var m_imageId = 0;
 					var m_dPrice = 0.00;
+					var m_iMaxClassSize = 0;
+					var m_instructor = {
+						first: "",
+						last: "",
+						phone: "",
+						email: ""
+					};
+					var m_facilty = {
+						name: "",
+						address: "",
+						room: "",
+						city: "",
+						state: "",
+						zip: ""
+					}
+					var m_strNotes = "";
 
                 } catch (e) {
 
