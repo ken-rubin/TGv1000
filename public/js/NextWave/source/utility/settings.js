@@ -196,12 +196,12 @@ define(["NextWave/source/utility/prototypes"],
                             y: 6
                         },
 						cloudDownload: {
-							// row: 6; column: 19 - 0-based
+
 							x: 1038,
 							y: 373
 						},
                         openFile: {
-							// row: 4; column: 3 - 0-based
+
                             x: 183,
                             y: 254
                         }

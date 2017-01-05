@@ -8,6 +8,11 @@
     "editor.wrappingColumn": -1,
     "editor.detectIndentation": false,
     "editor.insertSpaces": false,
+	"extensions.autoUpdate": true,
     "files.autoSave": "afterDelay",
-    "files.autoSaveDelay": 10000
+    "files.autoSaveDelay": 10000,
+	"files.trimTrailingWhitespace": true,
+	"files.insertFinalNewline": true,
+    "window.openFilesInNewWindow": true,
+	"window.zoomLevel": 1
 }

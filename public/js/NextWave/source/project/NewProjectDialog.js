@@ -1,7 +1,7 @@
 ///////////////////////////////////////
 // NewProjectDialog module.
 //
-// Gui component responsible for 
+// Gui component responsible for
 // creating a normal project or a purchasable project.
 //
 // Return constructor function.
@@ -19,7 +19,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/List",
     "NextWave/source/utility/PictureListItem",
     "NextWave/source/utility/RadioListItem",
-    "Core/errorHelper", 
+    "Core/errorHelper",
     "Core/resourceHelper"
     ],
     function (prototypes, settings, Point, Size, Area, DialogHost, List, PictureListItem, RadioListItem, errorHelper, resourceHelper) {
@@ -41,7 +41,7 @@ define(["NextWave/source/utility/prototypes",
 
                     // Attach instance to DOM and initialize state.
                     // arrayAvailProjTypes is used to get the images from which the user chooses the project type to create.
-                    // It is an int array containing 1-6 (perhaps a subset for normal users; all 6 for priv. users), corresponding to 
+                    // It is an int array containing 1-6 (perhaps a subset for normal users; all 6 for priv. users), corresponding to
                     // 1 game project
                     // 2 console project
                     // 3 website project
@@ -65,7 +65,7 @@ define(["NextWave/source/utility/prototypes",
                             //      A normal user starts in mode 'Sel Proj Type-normal user' and goes to mode 'Normal proj' on image click.
                             //      A privileged user starts in mode 'Sel Proj Type-priv user' and goes to mode 'Normal proj', 'Classroom class proj1', 'Online class proj1' or 'Product proj1',
                             //      depending on the button clicked (eventually may be radio buttons and a continue button).
-/*                                
+/*
 Controls arranged by Mode
 
 'Sel Proj Type-normal user'
@@ -184,7 +184,7 @@ Controls arranged by Mode
     cancelButton        Button
 */
 
-                            let objectConfiguration = 
+                            let objectConfiguration =
                             {
 								instructions1: {
 									type: "Label",
@@ -194,14 +194,14 @@ Controls arranged by Mode
 									y: 5 * settings.general.margin,
 									widthType: "reserve",
 									width: 2 * settings.general.margin,
-									height: settings.dialog.lineHeight                                  
+									height: settings.dialog.lineHeight
 								},
 								projectTypes: {
 									type: "ListHost",
 									modes: ['Sel Proj Type-normal user','Sel Proj Type-priv user'],
 									constructorParameterString: "false",
 									x: settings.general.margin,
-									y: settings.general.margin + 
+									y: settings.general.margin +
 										2 * settings.dialog.lineHeight,
 									widthType: "reserve",
 									width: 2 * settings.general.margin,
@@ -212,22 +212,22 @@ Controls arranged by Mode
 									modes: ['Sel Proj Type-priv user'],
 									text: "As a privileged user, besides being able to create Normal projects, you are allowed to create a Class, an Online Class or a Product. Choose here:",
 									x: settings.general.margin,
-									y: settings.general.margin + 
+									y: settings.general.margin +
 										2 * settings.dialog.lineHeight + 120,
 									widthType: "reserve",
 									width: 2 * settings.general.margin,
-									height: settings.dialog.lineHeight                                  
+									height: settings.dialog.lineHeight
 								},
 								ncopChoice: {
 									type: "ListHost",
 									modes: ['Sel Proj Type-priv user'],
 									constructorParameterString: "true",
-									x: settings.general.margin + 
+									x: settings.general.margin +
 										2 * settings.dialog.firstColumnWidth,
-									y: settings.general.margin + 
+									y: settings.general.margin +
 										3 * settings.dialog.lineHeight + 130,
 									width: settings.dialog.firstColumnWidth,
-									height: 5 * settings.dialog.lineHeight                                  
+									height: 5 * settings.dialog.lineHeight
 								},
 								instructions3: {
 									type: "Label",
@@ -237,7 +237,7 @@ Controls arranged by Mode
 									y: 5 * settings.general.margin,
 									widthType: "reserve",
 									width: 2 * settings.general.margin,
-									height: settings.dialog.lineHeight                                  
+									height: settings.dialog.lineHeight
 								},
 								instructions4: {
 									type: "Label",
@@ -248,7 +248,7 @@ Controls arranged by Mode
 										settings.dialog.lineHeight,
 									widthType: "reserve",
 									width: 2 * settings.general.margin,
-									height: settings.dialog.lineHeight                                  
+									height: settings.dialog.lineHeight
 								},
 								instructions5: {
 									type: "Label",
@@ -258,7 +258,7 @@ Controls arranged by Mode
 									y: 5 * settings.general.margin,
 									widthType: "reserve",
 									width: 2 * settings.general.margin,
-									height: settings.dialog.lineHeight                                  
+									height: settings.dialog.lineHeight
 								},
 								instructions6: {
 									type: "Label",
@@ -269,7 +269,7 @@ Controls arranged by Mode
 										settings.dialog.lineHeight,
 									widthType: "reserve",
 									width: 2 * settings.general.margin,
-									height: settings.dialog.lineHeight                                  
+									height: settings.dialog.lineHeight
 								},
 								instructions7: {
 									type: "Label",
@@ -280,7 +280,7 @@ Controls arranged by Mode
 										settings.dialog.lineHeight,
 									widthType: "reserve",
 									width: 2 * settings.general.margin,
-									height: settings.dialog.lineHeight                                  
+									height: settings.dialog.lineHeight
 								},
 								instructions8: {
 									type: "Label",
@@ -291,7 +291,7 @@ Controls arranged by Mode
 										settings.dialog.lineHeight,
 									widthType: "reserve",
 									width: 2 * settings.general.margin,
-									height: settings.dialog.lineHeight                                  
+									height: settings.dialog.lineHeight
 								},
 								instructions9: {
 									type: "Label",
@@ -301,7 +301,7 @@ Controls arranged by Mode
 									y: 5 * settings.general.margin,
 									widthType: "reserve",
 									width: 2 * settings.general.margin,
-									height: settings.dialog.lineHeight                                  
+									height: settings.dialog.lineHeight
 								},
 								instructions10: {
 									type: "Label",
@@ -312,7 +312,7 @@ Controls arranged by Mode
 										settings.dialog.lineHeight,
 									widthType: "reserve",
 									width: 2 * settings.general.margin,
-									height: settings.dialog.lineHeight                                  
+									height: settings.dialog.lineHeight
 								},
 								instructions11: {
 									type: "Label",
@@ -323,7 +323,7 @@ Controls arranged by Mode
 										settings.dialog.lineHeight,
 									widthType: "reserve",
 									width: 2 * settings.general.margin,
-									height: settings.dialog.lineHeight                                  
+									height: settings.dialog.lineHeight
 								},
 								instructions12: {
 									type: "Label",
@@ -334,7 +334,7 @@ Controls arranged by Mode
 										settings.dialog.lineHeight,
 									widthType: "reserve",
 									width: 2 * settings.general.margin,
-									height: settings.dialog.lineHeight                                  
+									height: settings.dialog.lineHeight
 								},
 								instructions13: {
 									type: "Label",
@@ -344,7 +344,7 @@ Controls arranged by Mode
 									y: 5 * settings.general.margin,
 									widthType: "reserve",
 									width: 2 * settings.general.margin,
-									height: settings.dialog.lineHeight                                  
+									height: settings.dialog.lineHeight
 								},
 								instructions14: {
 									type: "Label",
@@ -355,7 +355,7 @@ Controls arranged by Mode
 										settings.dialog.lineHeight,
 									widthType: "reserve",
 									width: 2 * settings.general.margin,
-									height: settings.dialog.lineHeight                                  
+									height: settings.dialog.lineHeight
 								},
 								nameLabel: {
 									type: "Label",
@@ -365,12 +365,13 @@ Controls arranged by Mode
 									y: 5 * settings.general.margin +
 										3 * settings.dialog.lineHeight,
 									width: settings.dialog.firstColumnWidth,
-									height: settings.dialog.lineHeight                                  
+									height: settings.dialog.lineHeight
 								},
 								nameEdit: {
 									type: "Edit",
 									modes: ['Normal proj','Classroom class proj1','Classroom class proj2','Classroom class proj3','Online class proj1','Online class proj2','Online class proj3','Product proj1'],
-									x: 2 * settings.general.margin + 
+                                    multiline: false,
+									x: 2 * settings.general.margin +
 										settings.dialog.firstColumnWidth,
 									y: 5 * settings.general.margin +
 										3 * settings.dialog.lineHeight,
@@ -405,7 +406,8 @@ Controls arranged by Mode
 								descriptionEdit: {
 									type: "Edit",
 									modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
-									x: 2 * settings.general.margin + 
+                                    multiline: true,
+									x: 2 * settings.general.margin +
 										settings.dialog.firstColumnWidth,
 									y: 6 * settings.general.margin +
 										4 * settings.dialog.lineHeight,
@@ -433,13 +435,13 @@ Controls arranged by Mode
 										10 * settings.dialog.lineHeight,
 									widthType: "reserve",
 									width: 2 * settings.general.margin,
-									height: settings.dialog.lineHeight                                  
+									height: settings.dialog.lineHeight
 								},
 								projectImage: {
 									type: "Picture",
 									modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
 									constructorParameterString: null,
-									x: 2 * settings.general.margin + 
+									x: 2 * settings.general.margin +
 										settings.dialog.firstColumnWidth,
 									y: 5 * settings.general.margin +
 										10 * settings.dialog.lineHeight,
@@ -529,13 +531,13 @@ Controls arranged by Mode
 									y: 5 * settings.general.margin +
 										16 * settings.dialog.lineHeight,
 									width: settings.dialog.firstColumnWidth,
-									height: settings.dialog.lineHeight                                  
+									height: settings.dialog.lineHeight
 								},
 								level: {
 									type: "ListHost",	//	['Elementary school','Middle School','High school and beyond']
 									modes: ['Classroom class proj1','Online class proj1','Product proj1'],
 									constructorParameterString: "true, true",	// bVertical, vUseTinyScrollStub
-									x: 2 * settings.general.margin + 
+									x: 2 * settings.general.margin +
 										settings.dialog.firstColumnWidth,
 									y: 5 * settings.general.margin +
 										16 * settings.dialog.lineHeight,
@@ -550,13 +552,13 @@ Controls arranged by Mode
 									y: 5 * settings.general.margin +
 										19 * settings.dialog.lineHeight,
 									width: settings.dialog.firstColumnWidth,
-									height: settings.dialog.lineHeight                                  
+									height: settings.dialog.lineHeight
 								},
 								difficulty: {
 									type: "ListHost",	//	['Beginner','Has used the TechGroms system','Has completed a TechGroms class','Almost self-sufficient','An expert!']
 									modes: ['Classroom class proj1','Online class proj1','Product proj1'],
 									constructorParameterString: "true, true",	// bVertical, vUseTinyScrollStub
-									x: 2 * settings.general.margin + 
+									x: 2 * settings.general.margin +
 										settings.dialog.firstColumnWidth,
 									y: 5 * settings.general.margin +
 										19 * settings.dialog.lineHeight,
@@ -571,12 +573,13 @@ Controls arranged by Mode
 									y: 4 * settings.general.margin +
 										23 * settings.dialog.lineHeight,
 									width: settings.dialog.firstColumnWidth,
-									height: settings.dialog.lineHeight                                  
+									height: settings.dialog.lineHeight
 								},
 								price: {
 									type: "Edit",
 									modes: ['Classroom class proj1','Online class proj1','Product proj1'],
-									x: 2 * settings.general.margin + 
+                                    multiline: false,
+									x: 2 * settings.general.margin +
 										settings.dialog.firstColumnWidth,
 									y: 4 * settings.general.margin +
 										23 * settings.dialog.lineHeight,
@@ -761,8 +764,8 @@ Controls arranged by Mode
 														var arrWhen = [];
 														for (var i = 1; i <=8; i++) {
 															var str = $("#When" + i).val().trim();
-															if (str.length) { 
-																arrWhen.push(m_funcWhenProcess(str)); 
+															if (str.length) {
+																arrWhen.push(m_funcWhenProcess(str));
 															} else {
 																arrWhen.push({ date: '', duration: 0});
 															}
@@ -834,8 +837,8 @@ Controls arranged by Mode
 														var arrWhen = [];
 														for (var i = 1; i <=8; i++) {
 															var str = $("#When" + i).val().trim();
-															if (str.length) { 
-																arrWhen.push(m_funcWhenProcess(str)); 
+															if (str.length) {
+																arrWhen.push(m_funcWhenProcess(str));
 															} else {
 																arrWhen.push({ date: '', duration: 0});
 															}
@@ -908,30 +911,30 @@ Controls arranged by Mode
                             m_lhProjectTypes = self.dialog.controlObject["projectTypes"];
                             let listProjectTypes = m_lhProjectTypes.list;
                             let index = 0;
-                            
+
                             listProjectTypes.destroy(); // Don't check result because if destroy fails, that's because it hadn't been created, so it's ok.
                             let arrayOutput = arrayAvailProjTypes.map((projTypeId) => {
 
                                 let pliNew = new PictureListItem(m_arrayProjectTypeNames[projTypeId - 1], projTypeId, index++);
                                 pliNew.clickHandler = (id) => {
-                                    
+
                                     // self is NewProjectDialog instance.
                                     m_projectTypeId = id;
 
                                     let i3 = self.dialog.controlObject["instructions3"];
                                     let ptName = m_arrayProjectTypeNames[projTypeId - 1];
                                     i3.text = "Enter details for your new " + ptName.charAt(0).toUpperCase() + ptName.slice(1) + (ptName === 'empty' ? " Project." : "-based Project.");
-                                    
+
                                     let iPI = self.dialog.controlObject["projectImage"];
                                     iPI.setUrl(resourceHelper.toURL("images", null, null, m_arrayProjectTypeNames[m_projectTypeId - 1] + "Project.png"));
                                     iPI.recreate();
 
                                     if (self.dialog.getMode() === "Sel Proj Type-normal user") {
-                                        
+
                                         // Normal user just switches mode to create new project.
 										manager.resetCenterPanelTitle('Normal project');
                                         self.dialog.setMode('Normal proj');
-    
+
                                     } else if (self.dialog.getMode() === "Sel Proj Type-priv user") {
 
                                         // Privileged user has selected a project type. Outline its PictureListItem in listHost (un-outline all others first).
@@ -1098,13 +1101,13 @@ Controls arranged by Mode
                             bValid = true;
                         }
 
-                        // Once they are added, all of the fields for purchasable projects will need to be validated, too--I think only for correctness here. 
+                        // Once they are added, all of the fields for purchasable projects will need to be validated, too--I think only for correctness here.
 						// Presence of all required fields will be checked in ActivatePPDialog.js.
 
                         return bValid;
                     }
 
-					// Privileged user enters string of form 2016/02/01.........20:00.-.20:55 
+					// Privileged user enters string of form 2016/02/01.........20:00.-.20:55
 					// Below assumes user is in EST: UTC-5:00.
 					// Returns { date: '2016-02-02T01:00:00+00:00', duration: 3360000}.
 					// 		date is start time in UTC.
