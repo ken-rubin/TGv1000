@@ -63,7 +63,7 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             //      A normal user starts in mode 'Sel Proj Type-normal user' and goes to mode 'Normal proj' on image click.
-                            //      A privileged user starts in mode 'Sel Proj Type-priv user' and goes to mode 'Normal proj', 'Classroom class proj1', 'Online class proj1' or 'Product proj1',
+                            //      A privileged user starts in mode 'Sel Proj Type-priv user' and goes to mode 'Normal proj', 'Classroom class proj1', 'Online class proj1' or 'Product proj',
                             //      depending on the button clicked (eventually may be radio buttons and a continue button).
 /*
 Controls arranged by Mode
@@ -78,7 +78,7 @@ Controls arranged by Mode
     projectTypes        ListHost
     instructions2       Label
 	ncopChoice			ListHost
-    nextButton          Button		self.dialog.setMode('Normal proj' or 'Classroom class proj1' or 'Online class proj1' or 'Product proj1', depending on m_projectModeId)
+    nextButton          Button		self.dialog.setMode('Normal proj' or 'Classroom class proj1' or 'Online class proj1' or 'Product proj', depending on m_projectModeId)
     cancelButton        Button
 
 'Normal proj'
@@ -90,9 +90,9 @@ Controls arranged by Mode
     descriptionEdit     Edit-multiline
     projectImageLabel   Label
     projectImage        Picture
-    imageSearchButton   Button
-    urlSearchButton     Button
-    fileSearchButton    Button
+    imageSearchButton   GlyphHost
+    urlSearchButton     GlyphHost
+    fileSearchButton    GlyphHost
     backButton          Button		if (normal user) setMode('Sel Proj Type-normal user') else setMode('Sel Proj Type-priv user')
     createProjectButton Button
     cancelButton        Button
@@ -154,14 +154,14 @@ Controls arranged by Mode
     cancelButton        Button
 
 'Online class proj3'
-    instructions12     Label	second set of fields for Online class (class schedule)
-    nameLabel          Label
+    instructions12		Label	second set of fields for Online class (class schedule)
+    nameLabel			Label
     nameEdit            Edit
     backButton          Button		setMode('Online class proj2')
     createProjectButton Button
     cancelButton        Button
 
-'Product proj1'
+'Product proj'
     instructions13
     instructions14
     nameLabel
@@ -173,12 +173,12 @@ Controls arranged by Mode
     imageSearchButton
     urlSearchButton
     fileSearchButton
-	prodLevelLabel		Label
-	prodLevel   		ListHost	['Elementary school','Middle School','High school and beyond']
-	prodDifficultyLabel	Label
-	prodDifficulty		ListHost	['Beginner','Has used the TechGroms system','Has completed a TechGroms class','Almost self-sufficient','An expert!']
-	prodPriceLabel		Label
-	prodPrice			Text
+	levelLabel			Label
+	level   			ListHost	['Elementary school','Middle School','High school and beyond']
+	difficultyLabel		Label
+	difficulty			ListHost	['Beginner','Has used the TechGroms system','Has completed a TechGroms class','Almost self-sufficient','An expert!']
+	priceLabel			Label
+	price				Text
     backButton          Button		setMode('Sel Proj Type-priv user')
     createProjectButton Button
     cancelButton        Button
@@ -274,7 +274,7 @@ Controls arranged by Mode
 								instructions7: {
 									type: "Label",
 									modes: ['Classroom class proj2'],
-									text: "[first set of fields: instructor, phone, level, difficulty, price, max class size, loaner computers available, notes]",
+									text: "[first set of fields: instructor (first, last, phone), max class size, loaner computers available, notes]",
 									x: settings.general.margin,
 									y: 5 * settings.general.margin +
 										settings.dialog.lineHeight,
@@ -285,7 +285,7 @@ Controls arranged by Mode
 								instructions8: {
 									type: "Label",
 									modes: ['Classroom class proj3'],
-									text: "[second set of fields: six location fields, class schedule]",
+									text: "[second set of fields: facility, address, room, city, state, zip, class schedule*8]",
 									x: settings.general.margin,
 									y: 5 * settings.general.margin +
 										settings.dialog.lineHeight,
@@ -317,7 +317,7 @@ Controls arranged by Mode
 								instructions11: {
 									type: "Label",
 									modes: ['Online class proj2'],
-									text: "[first set of fields: instructor, email, level, difficulty, price, notes]",
+									text: "[first set of fields: instructor (first, last, email), notes]",
 									x: settings.general.margin,
 									y: 5 * settings.general.margin +
 										settings.dialog.lineHeight,
@@ -328,7 +328,7 @@ Controls arranged by Mode
 								instructions12: {
 									type: "Label",
 									modes: ['Online class proj3'],
-									text: "[second set of fields: class schedule]",
+									text: "[second set of fields: class schedule * 8]",
 									x: settings.general.margin,
 									y: 5 * settings.general.margin +
 										settings.dialog.lineHeight,
@@ -338,7 +338,7 @@ Controls arranged by Mode
 								},
 								instructions13: {
 									type: "Label",
-									modes: ['Product proj1'],
+									modes: ['Product proj'],
 									text: "Enter details for your new Product Project.",
 									x: settings.general.margin,
 									y: 5 * settings.general.margin,
@@ -348,7 +348,7 @@ Controls arranged by Mode
 								},
 								instructions14: {
 									type: "Label",
-									modes: ['Product proj1'],
+									modes: ['Product proj'],
 									text: "All fields but Name are optional until the Product is made active and put on sale.",
 									x: settings.general.margin,
 									y: 5 * settings.general.margin +
@@ -359,7 +359,7 @@ Controls arranged by Mode
 								},
 								nameLabel: {
 									type: "Label",
-									modes: ['Normal proj','Classroom class proj1','Classroom class proj2','Classroom class proj3','Online class proj1','Online class proj2','Online class proj3','Product proj1'],
+									modes: ['Normal proj','Classroom class proj1','Classroom class proj2','Classroom class proj3','Online class proj1','Online class proj2','Online class proj3','Product proj'],
 									text: "Name",
 									x: settings.general.margin,
 									y: 5 * settings.general.margin +
@@ -369,7 +369,7 @@ Controls arranged by Mode
 								},
 								nameEdit: {
 									type: "Edit",
-									modes: ['Normal proj','Classroom class proj1','Classroom class proj2','Classroom class proj3','Online class proj1','Online class proj2','Online class proj3','Product proj1'],
+									modes: ['Normal proj','Classroom class proj1','Classroom class proj2','Classroom class proj3','Online class proj1','Online class proj2','Online class proj3','Product proj'],
                                     multiline: false,
 									x: 2 * settings.general.margin +
 										settings.dialog.firstColumnWidth,
@@ -383,7 +383,7 @@ Controls arranged by Mode
 									exitFocus: function (localSelf) {
 										try {
 											// Save off criteria.
-											m_strProjectName = localSelf.getText();
+											m_strProjectName = localSelf.getText().trim();
 
 											let cb = self.dialog.controlObject["createProjectButton"];
 											cb.setProtected(!m_functionIsEverythingValid());
@@ -395,7 +395,7 @@ Controls arranged by Mode
 								},
 								descriptionLabel: {
 									type: "Label",
-									modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
+									modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj'],
 									text: "Description",
 									x: settings.general.margin,
 									y: 6 * settings.general.margin +
@@ -405,7 +405,7 @@ Controls arranged by Mode
 								},
 								descriptionEdit: {
 									type: "Edit",
-									modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
+									modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj'],
                                     multiline: true,
 									x: 2 * settings.general.margin +
 										settings.dialog.firstColumnWidth,
@@ -428,7 +428,7 @@ Controls arranged by Mode
 								},
 								projectImageLabel: {
 									type: "Label",
-									modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
+									modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj'],
 									text: "Project image",
 									x: settings.general.margin,
 									y: 5 * settings.general.margin +
@@ -439,7 +439,7 @@ Controls arranged by Mode
 								},
 								projectImage: {
 									type: "Picture",
-									modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
+									modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj'],
 									constructorParameterString: null,
 									x: 2 * settings.general.margin +
 										settings.dialog.firstColumnWidth,
@@ -450,7 +450,7 @@ Controls arranged by Mode
 								},
 								imageSearchButton: {
 									type: "GlyphHost",
-									modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
+									modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj'],
 									constructorParameterString: "'search'",
 									x: 2 * settings.general.margin + settings.dialog.firstColumnWidth + settings.dialog.firstColumnWidth + 20,
 									y: 5 * settings.general.margin +
@@ -475,7 +475,7 @@ Controls arranged by Mode
 								},
 								urlSearchButton: {
 									type: "GlyphHost",
-									modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
+									modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj'],
 									constructorParameterString: "'cloudDownload'",
 									x: 2 * settings.general.margin + settings.dialog.firstColumnWidth + settings.dialog.firstColumnWidth + 70,
 									y: 5 * settings.general.margin +
@@ -500,7 +500,7 @@ Controls arranged by Mode
 								},
 								fileSearchButton: {
 									type: "GlyphHost",
-									modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
+									modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj'],
 									constructorParameterString: "'openFile'",
 									x: 2 * settings.general.margin + settings.dialog.firstColumnWidth + settings.dialog.firstColumnWidth + 120,
 									y: 5 * settings.general.margin +
@@ -525,7 +525,7 @@ Controls arranged by Mode
 								},
 								levelLabel: {
 									type: "Label",
-									modes: ['Classroom class proj1','Online class proj1','Product proj1'],
+									modes: ['Classroom class proj1','Online class proj1','Product proj'],
 									text: "Level",
 									x: settings.general.margin,
 									y: 5 * settings.general.margin +
@@ -535,7 +535,7 @@ Controls arranged by Mode
 								},
 								level: {
 									type: "ListHost",	//	['Elementary school','Middle School','High school and beyond']
-									modes: ['Classroom class proj1','Online class proj1','Product proj1'],
+									modes: ['Classroom class proj1','Online class proj1','Product proj'],
 									constructorParameterString: "true, true",	// bVertical, vUseTinyScrollStub
 									x: 2 * settings.general.margin +
 										settings.dialog.firstColumnWidth,
@@ -546,7 +546,7 @@ Controls arranged by Mode
 								},
 								difficultyLabel: {
 									type: "Label",
-									modes: ['Classroom class proj1','Online class proj1','Product proj1'],
+									modes: ['Classroom class proj1','Online class proj1','Product proj'],
 									text: "Difficulty",
 									x: settings.general.margin,
 									y: 5 * settings.general.margin +
@@ -556,7 +556,7 @@ Controls arranged by Mode
 								},
 								difficulty: {
 									type: "ListHost",	//	['Beginner','Has used the TechGroms system','Has completed a TechGroms class','Almost self-sufficient','An expert!']
-									modes: ['Classroom class proj1','Online class proj1','Product proj1'],
+									modes: ['Classroom class proj1','Online class proj1','Product proj'],
 									constructorParameterString: "true, true",	// bVertical, vUseTinyScrollStub
 									x: 2 * settings.general.margin +
 										settings.dialog.firstColumnWidth,
@@ -567,8 +567,8 @@ Controls arranged by Mode
 								},
 								priceLabel: {
 									type: "Label",
-									modes: ['Classroom class proj1','Online class proj1','Product proj1'],
-									text: "Price",
+									modes: ['Classroom class proj1','Online class proj1','Product proj'],
+									text: "Price                        $",
 									x: settings.general.margin,
 									y: 4 * settings.general.margin +
 										23 * settings.dialog.lineHeight,
@@ -577,18 +577,155 @@ Controls arranged by Mode
 								},
 								price: {
 									type: "Edit",
-									modes: ['Classroom class proj1','Online class proj1','Product proj1'],
+									modes: ['Classroom class proj1','Online class proj1','Product proj'],
                                     multiline: false,
 									x: 2 * settings.general.margin +
 										settings.dialog.firstColumnWidth,
 									y: 4 * settings.general.margin +
 										23 * settings.dialog.lineHeight,
 									width: settings.dialog.firstColumnWidth,
-									height: settings.dialog.lineHeight
+									height: settings.dialog.lineHeight,
+									exitFocus: function (localSelf) {
+										try {
+											// Validate and then save price if valid.
+											let strPrice = localSelf.getText().trim();
+											if (strPrice.length === 0) {
+												m_dPrice = 0.0;
+												return;
+											}
+
+											// let rStrPrice = strPrice.replace(/[^0-9\.]+/g,"");
+											if (isNaN(strPrice)) {
+												alert("Your Price entry " + strPrice + " is not a valid number.");
+												return;
+											}
+
+											m_dPrice = Number.parseFloat(strPrice);
+											if (isNaN(m_dPrice)) {
+												m_dPrice = 0.0;
+												alert("Your Price entry " + strPrice + " is not a valid number.");
+											}
+										} catch (e) {
+											alert(e.message);
+										}
+									}
+								},
+								instructorLabel: {
+									type: "Label",
+									text: "Instructor",
+									modes: ['Classroom class proj2','Online class proj2']
+								},
+								instructorFirst: {
+									type: "Edit",
+									multiline: false,
+									modes: ['Classroom class proj2','Online class proj2'],
+									exitFocus: function (localSelf) {
+										try {
+											m_instrFirst = localSelf.getText().trim();
+
+										} catch (e) {
+											alert(e.message);
+										}
+									}
+								},
+								instructorLast: {
+									type: "Edit",
+									multiline: false,
+									modes: ['Classroom class proj2','Online class proj2'],
+									exitFocus: function (localSelf) {
+										try {
+											m_instrLast = localSelf.getText().trim();
+
+										} catch (e) {
+											alert(e.message);
+										}
+									}
+								},
+								classNotesLabel: {
+									type: "Label",
+									text: "Notes",
+									modes: ['Classroom class proj2','Online class proj2']
+								},
+								classNotes: {
+									type: "Edit",
+									multiline: true,
+									modes: ['Classroom class proj2','Online class proj2'],
+									exitFocus: function (localSelf) {
+										try {
+											m_strNotes = localSelf.getText().trim();
+
+										} catch (e) {
+											alert(e.message);
+										}
+									}
+								},
+								instructorPhoneLabel: {
+									type: "Label",
+									text: "Instructor phone",
+									modes: ['Classroom class proj2']
+								},
+								phone: {
+									type: "Edit",
+									multiline: false,
+									modes: ['Classroom class proj2'],
+									exitFocus: function (localSelf) {
+										try {
+											m_strPhone = localSelf.getText().trim();
+
+										} catch (e) {
+											alert(e.message);
+										}
+									}
+								},
+								instructorEmailLabel: {
+									type: "Label",
+									text: "Instructor email",
+									modes: ['Online class proj2']
+								},
+								email: {
+									type: "Edit",
+									multiline: false,
+									modes: ['Online class proj2'],
+									exitFocus: function (localSelf) {
+										try {
+											m_strEmail = localSelf.getText().trim();
+
+										} catch (e) {
+											alert(e.message);
+										}
+									}
+								},
+								maxClassSizeLabel: {
+									type: "Label",
+									text: "Max class size",
+									modes: ['Classroom class proj2']
+								},
+								maxClassSize: {
+									type: "Edit",
+									multiline: false,
+									modes: ['Classroom class proj2'],
+									exitFocus: function (localSelf) {
+										try {
+											m_iMaxClassSize = Number(localSelf.getText().trim());
+
+										} catch (e) {
+											alert(e.message);
+										}
+									}
+								},
+								loanersLabel: {
+									type: "Label",
+									modes: ['Classroom class proj2'],
+									text: "Some loan computers avail"
+								},
+								loaners: {
+									type: "ListHost",	//	['Yes','No']
+									modes: ['Classroom class proj2'],
+									constructorParameterString: "true, true"	// bVertical, vUseTinyScrollStub
 								},
 								backButton: {
 									type: "Button",
-									modes: ['Normal proj','Classroom class proj1','Classroom class proj2','Classroom class proj3','Online class proj1','Online class proj2','Online class proj3','Product proj1'],
+									modes: ['Normal proj','Classroom class proj1','Classroom class proj2','Classroom class proj3','Online class proj1','Online class proj2','Online class proj3','Product proj'],
 									text: "< Back",
 									x: settings.general.margin,
 									yType: "reserve",
@@ -605,7 +742,7 @@ Controls arranged by Mode
 										} else {
 
 											let currmode = self.dialog.getMode();
-											if (currmode === 'Normal proj' || currmode === 'Classroom class proj1' || currmode === 'Online class proj1' || currmode === 'Product proj1') {
+											if (currmode === 'Normal proj' || currmode === 'Classroom class proj1' || currmode === 'Online class proj1' || currmode === 'Product proj') {
 												manager.resetCenterPanelTitle('New Project');
 												self.dialog.setMode('Sel Proj Type-priv user');
 											} else if (currmode === 'Classroom class proj2') {
@@ -650,7 +787,7 @@ Controls arranged by Mode
 												self.dialog.setMode('Online class proj1');
 											} else if (m_projectModeId === 4) {
 												manager.resetCenterPanelTitle('Product project 1');
-												self.dialog.setMode('Product proj1');
+												self.dialog.setMode('Product proj');
 											}
 										} else if (currmode === 'Classroom class proj1') {
 											manager.resetCenterPanelTitle('Classroom project 2');
@@ -669,7 +806,7 @@ Controls arranged by Mode
 								},
 								cancelButton: {
 									type: "Button",
-									modes: ['Sel Proj Type-normal user','Sel Proj Type-priv user','Normal proj','Classroom class proj1','Online class proj1','Product proj1'],
+									modes: ['Sel Proj Type-normal user','Sel Proj Type-priv user','Normal proj','Classroom class proj1','Online class proj1','Product proj'],
 									text: "Cancel",
 									x: settings.general.margin +
 										2 * settings.dialog.firstColumnWidth,
@@ -694,7 +831,7 @@ Controls arranged by Mode
 								},
 								createProjectButton: {
 									type: "Button",
-									modes: ['Normal proj','Classroom class proj3','Online class proj3','Product proj1'],
+									modes: ['Normal proj','Classroom class proj3','Online class proj3','Product proj'],
 									text: "Create Project",
 									xType: "reserve",
 									x: 2 * settings.dialog.firstColumnWidth + 20,
@@ -767,13 +904,6 @@ Controls arranged by Mode
 																arrWhen.push({ date: '', duration: 0});
 															}
 														}
-														var strLevel = $("#Level option:selected").text();
-														var strDifficulty = $("#Difficulty option:selected").text();
-														var dPrice = 0.00;
-														var strPrice = $("#Price").val().trim();
-														if (strPrice.length) {
-															dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
-														}
 														var strNotes = $("#Notes").val().trim();
 														var iMaxclassroomClassize = parseInt($("#MaxclassroomClassize").val().trim(), 10);
 														var iLoanComputersAvailable = $("#cb1").prop("checked") ? 1 : 0;
@@ -792,9 +922,9 @@ Controls arranged by Mode
 															state: strState,
 															zip: strZip,
 															schedule: arrWhen,
-															level: strLevel,
-															difficulty: strDifficulty,
-															price: dPrice,
+															level: m_strLevel,
+															difficulty: m_strDifficulty,
+															price: m_dPrice,
 															classNotes: strNotes,
 															maxclassroomClassize: iMaxclassroomClassize,
 															loanComputersAvailable: iLoanComputersAvailable,
@@ -805,20 +935,14 @@ Controls arranged by Mode
 
 														client.project.isProduct = true;
 
-														// Retrieve product data from template fields. It's all optional until we're about to make the product active, actually.
-														var dPrice = 0.00;
-														var strPrice = $("#Price").val().trim();
-														if (strPrice.length) {
-															dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
-														}
-
+														// Remember all data but name is optional until we're about to make the product active.
 														client.project.specialProjectData.productData = {
 															id: 0,
 															active: false,
 															productDescription: m_strProjectDescription,
 															level: m_strLevel,
 															difficulty: m_strDifficulty,
-															price: dPrice,
+															price: m_dPrice,
 															imageId: m_imageId
 														};
 													} else if (m_bOnlineClassProject) {
@@ -838,13 +962,6 @@ Controls arranged by Mode
 																arrWhen.push({ date: '', duration: 0});
 															}
 														}
-														var strLevel = $("#Level option:selected").text();
-														var strDifficulty = $("#Difficulty option:selected").text();
-														var dPrice = 0.00;
-														var strPrice = $("#Price").val().trim();
-														if (strPrice.length) {
-															dPrice = Number(strPrice.replace(/[^0-9\.]+/g,""));
-														}
 														var strNotes = $("#Notes").val().trim();
 
 														client.project.specialProjectData.onlineClassData = {
@@ -855,9 +972,9 @@ Controls arranged by Mode
 															instructorLastName: strInstructorLast,
 															instructorEmail: strEmail,
 															schedule: arrWhen,
-															level: strLevel,
-															difficulty: strDifficulty,
-															price: dPrice,
+															level: m_strLevel,
+															difficulty: m_strDifficulty,
+															price: m_dPrice,
 															classNotes: strNotes,
 															imageId: m_imageId
 														};
@@ -1131,21 +1248,9 @@ Controls arranged by Mode
 
                     // Indicates this instance is already created.
                     var m_bCreated = false;
-					// From Edit.
-                    var m_strProjectName = null;
-					// From multi-line Edit.
-                    var m_strProjectDescription = null;
-					// resourceId for project image.
-                    var m_imageId = 0;
-					// Game, Console, Website, Hololens, Mapping, Empty
                     var m_projectTypeId = 0;
 					// Normal, Classroom, Online, Product
                     var m_projectModeId = 0;
-					// Booleans corrolaries to m_projectModeId.
-					var m_bNormalProject = false;
-					var m_bClassProject = false;
-					var m_bOnlineClassProject = false;
-					var m_bProductProject = false;
 					// Holds horizontal ListHost used to select project type.
                     var m_lhProjectTypes = null;
 					// Holds vertical ListHost used to select project mode.
@@ -1160,8 +1265,24 @@ Controls arranged by Mode
 					var m_arrayDifficulties = ['Beginner','Has used the TechGroms system','Has completed a TechGroms class','Almost self-sufficient','An expert!'];
 					var m_lh_level = null;
 					var m_lh_difficulty = null;
+
+					/////////////////////////////////
+					// Fields for project creation
+					// From Edit.
+                    var m_strProjectName = null;
+					// From multi-line Edit.
+                    var m_strProjectDescription = null;
+					// resourceId for project image.
+                    var m_imageId = 0;
+					// Game, Console, Website, Hololens, Mapping, Empty
 					var m_strLevel = "";
 					var m_strDifficulty = "";
+					// Booleans corrolaries to m_projectModeId.
+					var m_bNormalProject = false;
+					var m_bClassProject = false;
+					var m_bOnlineClassProject = false;
+					var m_bProductProject = false;
+					var m_dPrice = 0.00;
 
                 } catch (e) {
 
