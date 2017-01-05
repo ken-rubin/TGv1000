@@ -383,7 +383,7 @@ Controls arranged by Mode
 									exitFocus: function (localSelf) {
 										try {
 											// Save off criteria.
-											m_projectName = localSelf.text;
+											m_strProjectName = localSelf.getText();
 
 											let cb = self.dialog.controlObject["createProjectButton"];
 											cb.setProtected(!m_functionIsEverythingValid());
@@ -418,8 +418,8 @@ Controls arranged by Mode
 									height: settings.dialog.lineHeight * 5,
 									exitFocus: function (localSelf) {
 										try {
-											// Save off criteria.
-											m_projectDescription = localSelf.text;
+											// Save off description.
+											m_strProjectDescription = localSelf.getText();
 
 										} catch (e) {
 											alert(e.message);
@@ -711,9 +711,6 @@ Controls arranged by Mode
 											// Create project based on the new project dialog's fields--or lack thereof.
 											// Call client to inject it throughout.
 
-											var strProjectName = m_projectName;
-											var strProjectDescription = m_projectDescription;
-
 											var exceptionRet = client.openProjectFromDB(
 												m_projectTypeId,
 												'new',
@@ -721,8 +718,8 @@ Controls arranged by Mode
 
 													client.project.isCoreProject = false;
 
-													client.project.name = strProjectName;
-													client.project.description = strProjectDescription;
+													client.project.name = m_strProjectName;
+													client.project.description = m_strProjectDescription;
 													client.project.imageId = m_imageId;
 													if (m_imageId) {
 														client.project.altImagePath = '';
@@ -784,7 +781,7 @@ Controls arranged by Mode
 														client.project.specialProjectData.classData = {
 															id: 0,
 															active: false,
-															classDescription: strProjectDescription,
+															classDescription: m_strProjectDescription,
 															instructorFirstName: strInstructorFirst,
 															instructorLastName: strInstructorLast,
 															instructorPhone: strPhone,
@@ -809,8 +806,6 @@ Controls arranged by Mode
 														client.project.isProduct = true;
 
 														// Retrieve product data from template fields. It's all optional until we're about to make the product active, actually.
-														var strLevel = $("#Level option:selected").text();
-														var strDifficulty = $("#Difficulty option:selected").text();
 														var dPrice = 0.00;
 														var strPrice = $("#Price").val().trim();
 														if (strPrice.length) {
@@ -820,9 +815,9 @@ Controls arranged by Mode
 														client.project.specialProjectData.productData = {
 															id: 0,
 															active: false,
-															productDescription: strProjectDescription,
-															level: strLevel,
-															difficulty: strDifficulty,
+															productDescription: m_strProjectDescription,
+															level: m_strLevel,
+															difficulty: m_strDifficulty,
 															price: dPrice,
 															imageId: m_imageId
 														};
@@ -855,7 +850,7 @@ Controls arranged by Mode
 														client.project.specialProjectData.onlineClassData = {
 															id: 0,
 															active: false,
-															classDescription: strProjectDescription,
+															classDescription: m_strProjectDescription,
 															instructorFirstName: strInstructorFirst,
 															instructorLastName: strInstructorLast,
 															instructorEmail: strEmail,
@@ -875,8 +870,6 @@ Controls arranged by Mode
 												}
 											);
 											if (exceptionRet) { throw exceptionRet; }
-
-											// m_dialog.close();	I believe that loading the project into manager will populate all panels.
 
 										} catch (e) {
 											errorHelper.show(e);
@@ -970,10 +963,8 @@ Controls arranged by Mode
 
 										m_projectModeId = id;
 
-										// Temporarily, force only Normal projects.
-										// Uncomment as additional modes are implemented.
-										m_bNormalProject = true;	//false;
-/*										m_bClassProject = false;
+										m_bNormalProject = false;
+										m_bClassProject = false;
 										m_bOnlineClassProject = false;
 										m_bProductProject = false;
 										switch (m_projectModeId) {
@@ -990,7 +981,7 @@ Controls arranged by Mode
 												m_bProductProject = true;
 												break;
 										}
-*/
+
                                         // Privileged user has selected a project mode. Outline its RadioListItem in listHost (un-outline all others first).
                                         m_lh_ncopChoice.removeAllOutlines();
                                         rliNew.setOutline(true);
@@ -1096,7 +1087,7 @@ Controls arranged by Mode
                     var m_functionIsEverythingValid = function() {
 
                         let bValid = false;
-                        if (m_projectName.length) {
+                        if (m_strProjectName.length) {
 
                             bValid = true;
                         }
@@ -1141,9 +1132,9 @@ Controls arranged by Mode
                     // Indicates this instance is already created.
                     var m_bCreated = false;
 					// From Edit.
-                    var m_projectName = null;
+                    var m_strProjectName = null;
 					// From multi-line Edit.
-                    var m_projectDescription = null;
+                    var m_strProjectDescription = null;
 					// resourceId for project image.
                     var m_imageId = 0;
 					// Game, Console, Website, Hololens, Mapping, Empty
