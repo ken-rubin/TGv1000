@@ -6,11 +6,10 @@
 
 // Define module and require dependencies.
 define(["Core/errorHelper",
-		"Dialogs/NewProjectDialog/NewProjectDialog", 
-		"Dialogs/OpenProjectDialog/OpenProjectDialog", 
-		"Dialogs/SaveProjectAsDialog/SaveProjectAsDialog", 
-		"Dialogs/ImageDiskDialog/ImageDiskDialog", 
-		"Dialogs/ImageURLDialog/ImageURLDialog", 
+		"Dialogs/OpenProjectDialog/OpenProjectDialog",
+		"Dialogs/SaveProjectAsDialog/SaveProjectAsDialog",
+		"Dialogs/ImageDiskDialog/ImageDiskDialog",
+		"Dialogs/ImageURLDialog/ImageURLDialog",
 		"Dialogs/ImageSearchDialog/ImageSearchDialog",
 		"Dialogs/BuyDialog/BuyDialog",
 		"Dialogs/AZActivatePPDialog/AZActivatePPDialog",
@@ -19,13 +18,12 @@ define(["Core/errorHelper",
 		"Dialogs/AZSavePPDataDialog/AZSavePPDataDialog",
 		"Dialogs/AZPPBuyersDialog/AZPPBuyersDialog"
 		],
-	function (errorHelper, 
-				NewProjectDialog, 
+	function (errorHelper,
 				OpenProjectDialog,
 				SaveProjectAsDialog,
-				ImageDiskDialog, 
-				ImageURLDialog, 
-				ImageSearchDialog, 
+				ImageDiskDialog,
+				ImageURLDialog,
+				ImageSearchDialog,
 				BuyDialog,
 				AZActivatePPDialog,
 				AZUsersDialog,
@@ -101,7 +99,7 @@ define(["Core/errorHelper",
 										self.project.isCoreProject = false;
 
 										// We could also do these things that used to be done in the BO, but we aren't--at least for now.
-						                        //     comicIth.id = 0; 
+						                        //     comicIth.id = 0;
 
 										self.project.name = 'noname';
 										self.project.tags = '';
@@ -144,7 +142,7 @@ define(["Core/errorHelper",
 					// self.loadSystemTypesAndPinPanels = function (callback) {
 
 					// 	// While others get all system types, statements, literals and expressions loaded.
-					// 	var posting = $.post("/BOL/ProjectBO/FetchForPanels_S_L_E_ST", 
+					// 	var posting = $.post("/BOL/ProjectBO/FetchForPanels_S_L_E_ST",
 					// 		{},
 					// 		'json');
 					// 	posting.done(function(data){
@@ -155,7 +153,7 @@ define(["Core/errorHelper",
 					// 			if (exceptionRet) {
 
 					// 				errorHelper.show(exceptionRet);
-					// 			} 
+					// 			}
 
 					// 			if ($.isFunction(callback)) {
 					// 				callback();
@@ -174,7 +172,7 @@ define(["Core/errorHelper",
 
 					//////////////////////////////
 					// Dialog creators/openers
-					
+
 					self.showAZPPBuyersDialog = function (iProjectId) {
 
 						try {
@@ -192,11 +190,11 @@ define(["Core/errorHelper",
 
 						try {
 
-							m_openDialog = new NewProjectDialog();
+/*							m_openDialog = new NewProjectDialog();
 							var exceptionRet = m_openDialog.create(arrayAvailProjTypes);
 							if (exceptionRet) { throw exceptionRet; }
-
-							// Also switch center panel to what will replace NewProjectDialog.
+*/
+							// Switch center panel to new version of NewProjectDialog.
 							exceptionRet = manager.createNewProject(arrayAvailProjTypes);
 							if (exceptionRet) { throw exceptionRet; }
 
@@ -241,7 +239,7 @@ define(["Core/errorHelper",
 
 						try {
 
-							var posting = $.post("/BOL/UtilityBO/PutUserOnWaitlist", 
+							var posting = $.post("/BOL/UtilityBO/PutUserOnWaitlist",
 								{
 									projectId: iProjectId
 									// userId: g_profile["userId"] not needed; sent in JWT
@@ -471,10 +469,10 @@ define(["Core/errorHelper",
 
 										// objectData holds a completely filled in (likely modified) project: objectData.project.
 										// We need to replace this with that. Let's try:
-										
+
 										self.unloadProject(null, false);	// We just saved. No callback and block displaying the "Abandon Project" dialog.
 																			// This is the only place that calls client.unloadProject with 2nd param = false.
-										
+
 										// cause whichever dialog was open to close.
 										self.closeCurrentDialog();
 
@@ -576,10 +574,10 @@ define(["Core/errorHelper",
 
 										// objectData holds a completely filled in (likely modified) project: objectData.project.
 										// We need to replace this with that. Let's try:
-										
+
 										// self.unloadProject(null, false);	// We just saved. No callback and block displaying the "Abandon Project" dialog.
 										// 									// This is the only place that calls client.unloadProject with 2nd param = false.
-										
+
 										// Set up the modified project.
 										// specialProjectData.openMode might be "new". Change to "searched". It's no longer new.
 										// This will get saving to work correctly down the road.
@@ -608,7 +606,7 @@ define(["Core/errorHelper",
 
 						try {
 
-							var posting = $.post("/BOL/UtilityBO/SearchLibraries", 
+							var posting = $.post("/BOL/UtilityBO/SearchLibraries",
 								{
 									searchPhrase: searchPhrase
 								},
@@ -631,7 +629,7 @@ define(["Core/errorHelper",
 
 						try {
 
-							var posting = $.post("/BOL/ProjectBO/RetrieveProject", 
+							var posting = $.post("/BOL/ProjectBO/RetrieveProject",
 								{
 									projectId: iProjectId,
 									mode: strMode
@@ -675,7 +673,7 @@ define(["Core/errorHelper",
 
 						try {
 
-							var posting = $.post("/BOL/ProjectBO/RetrieveProject", 
+							var posting = $.post("/BOL/ProjectBO/RetrieveProject",
 								{
 									projectId: iProjectId,
 									mode: strMode
@@ -713,7 +711,7 @@ define(["Core/errorHelper",
 
 								// For some reason the callback is calling client.setBrowserTabAndBtns().
 								callback();
-							
+
 							} else {
 
 								self.setBrowserTabAndBtns();
@@ -751,8 +749,8 @@ define(["Core/errorHelper",
 							var closeProjectMenuItem = bFromCloseProjectMenuItem || false;
 
 							if (manager.projectLoaded || manager.systemTypesLoaded) {
-							
-								m_functionAbandonProjectDialog(function() {	
+
+								m_functionAbandonProjectDialog(function() {
 
 									// This callback will be called if the user wants to abandon the open project.
 									try {
@@ -777,7 +775,7 @@ define(["Core/errorHelper",
 								},
 								bShowAbandonDlg);	// If bShowAbandonDlg is false, will just return. No better way.
 							} else {
-								
+
 								if ($.isFunction(unloadedCallback)) {
 									unloadedCallback();
 								}
@@ -805,7 +803,7 @@ define(["Core/errorHelper",
 
 							if (client.project.name.length > 0) { document.title += " / " + client.project.name; }
 							navbar.setSaveBtnText("Save Project");
-						
+
 						} else if (manager.systemTypesLoaded) {
 
 							document.title += " / System types";
@@ -838,7 +836,7 @@ define(["Core/errorHelper",
 
 							m_openDialog.closeYourself();
 							m_openDialog = null;
-						
+
 						} else if (m_openDialog2) {
 
 							m_openDialog2.closeYourself();

@@ -146,18 +146,10 @@ Controls arranged by Mode
     cancelButton        Button
 
 'Online class proj2'
-    instructions11      Label	first set of fields for Online class (instructor, email, level, difficulty, price, notes)
+    instructions11      Label	set of fields for Online class (instructor, email, level, difficulty, price, notes)
     nameLabel           Label
     nameEdit            Edit
     backButton          Button		setMode('Online class proj1')
-    nextButton          Button		setMode('Online class proj3')
-    cancelButton        Button
-
-'Online class proj3'
-    instructions12		Label	second set of fields for Online class (class schedule)
-    nameLabel			Label
-    nameEdit            Edit
-    backButton          Button		setMode('Online class proj2')
     createProjectButton Button
     cancelButton        Button
 
@@ -253,7 +245,7 @@ Controls arranged by Mode
 								instructions5: {
 									type: "Label",
 									modes: ['Classroom class proj1'],
-									text: "Enter details for your new Classroom Project.",
+									text: "Enter some details for your new Classroom Project. Only Name is absolutely required at this time.",
 									x: settings.general.margin,
 									y: 5 * settings.general.margin,
 									widthType: "reserve",
@@ -263,7 +255,7 @@ Controls arranged by Mode
 								instructions6: {
 									type: "Label",
 									modes: ['Classroom class proj1'],
-									text: "Only Name is required. However, consider entering a description for searching and changing the default image for identification.",
+									text: "You'll be able to come back and complete the class info--and will have to before it can be made active.",
 									x: settings.general.margin,
 									y: 5 * settings.general.margin +
 										settings.dialog.lineHeight,
@@ -274,7 +266,7 @@ Controls arranged by Mode
 								instructions7: {
 									type: "Label",
 									modes: ['Classroom class proj2'],
-									text: "[first set of fields: instructor (first, last, phone), max class size, loaner computers available, notes]",
+									text: "You may enter instructor info here along with some class info. Or wait till later.",
 									x: settings.general.margin,
 									y: 5 * settings.general.margin +
 										settings.dialog.lineHeight,
@@ -285,7 +277,7 @@ Controls arranged by Mode
 								instructions8: {
 									type: "Label",
 									modes: ['Classroom class proj3'],
-									text: "[second set of fields: facility, address, room, city, state, zip, class schedule*8]",
+									text: "Complete setup with classroom details along with a schedule of up to 8 class meeting dates and times. Or not.",
 									x: settings.general.margin,
 									y: 5 * settings.general.margin +
 										settings.dialog.lineHeight,
@@ -306,7 +298,7 @@ Controls arranged by Mode
 								instructions10: {
 									type: "Label",
 									modes: ['Online class proj1'],
-									text: "Only Name is required. However, consider entering a description for searching and changing the default image for identification.",
+									text: "You'll be able to come back and complete the class info--and will have to before it can be made active.",
 									x: settings.general.margin,
 									y: 5 * settings.general.margin +
 										settings.dialog.lineHeight,
@@ -317,18 +309,7 @@ Controls arranged by Mode
 								instructions11: {
 									type: "Label",
 									modes: ['Online class proj2'],
-									text: "[first set of fields: instructor (first, last, email), notes]",
-									x: settings.general.margin,
-									y: 5 * settings.general.margin +
-										settings.dialog.lineHeight,
-									widthType: "reserve",
-									width: 2 * settings.general.margin,
-									height: settings.dialog.lineHeight
-								},
-								instructions12: {
-									type: "Label",
-									modes: ['Online class proj3'],
-									text: "[second set of fields: class schedule * 8]",
+									text: "Complete setup with instructor info along with a schedule of up to 8 class meeting dates and times. Or not.",
 									x: settings.general.margin,
 									y: 5 * settings.general.margin +
 										settings.dialog.lineHeight,
@@ -359,7 +340,7 @@ Controls arranged by Mode
 								},
 								nameLabel: {
 									type: "Label",
-									modes: ['Normal proj','Classroom class proj1','Classroom class proj2','Classroom class proj3','Online class proj1','Online class proj2','Online class proj3','Product proj'],
+									modes: ['Normal proj','Classroom class proj1','Classroom class proj2','Classroom class proj3','Online class proj1','Online class proj2','Product proj'],
 									text: "Name",
 									x: settings.general.margin,
 									y: 5 * settings.general.margin +
@@ -369,7 +350,7 @@ Controls arranged by Mode
 								},
 								nameEdit: {
 									type: "Edit",
-									modes: ['Normal proj','Classroom class proj1','Classroom class proj2','Classroom class proj3','Online class proj1','Online class proj2','Online class proj3','Product proj'],
+									modes: ['Normal proj','Classroom class proj1','Classroom class proj2','Classroom class proj3','Online class proj1','Online class proj2','Product proj'],
                                     multiline: false,
 									x: 2 * settings.general.margin +
 										settings.dialog.firstColumnWidth,
@@ -612,8 +593,13 @@ Controls arranged by Mode
 								},
 								instructorLabel: {
 									type: "Label",
-									text: "Instructor",
-									modes: ['Classroom class proj2','Online class proj2']
+									text: "Instructor (first, last)",
+									modes: ['Classroom class proj2','Online class proj2'],
+									x: 0,
+									y: 0,
+									width: 0,
+									height: 0
+
 								},
 								instructorFirst: {
 									type: "Edit",
@@ -626,7 +612,11 @@ Controls arranged by Mode
 										} catch (e) {
 											alert(e.message);
 										}
-									}
+									},
+									x: 0,
+									y: 0,
+									width: 0,
+									height: 0
 								},
 								instructorLast: {
 									type: "Edit",
@@ -639,12 +629,20 @@ Controls arranged by Mode
 										} catch (e) {
 											alert(e.message);
 										}
-									}
+									},
+									x: 0,
+									y: 0,
+									width: 0,
+									height: 0
 								},
 								classNotesLabel: {
 									type: "Label",
 									text: "Notes",
-									modes: ['Classroom class proj2','Online class proj2']
+									modes: ['Classroom class proj2','Online class proj2'],
+									x: 0,
+									y: 0,
+									width: 0,
+									height: 0
 								},
 								classNotes: {
 									type: "Edit",
@@ -657,12 +655,20 @@ Controls arranged by Mode
 										} catch (e) {
 											alert(e.message);
 										}
-									}
+									},
+									x: 0,
+									y: 0,
+									width: 0,
+									height: 0
 								},
 								instructorPhoneLabel: {
 									type: "Label",
 									text: "Instructor phone",
-									modes: ['Classroom class proj2']
+									modes: ['Classroom class proj2'],
+									x: 0,
+									y: 0,
+									width: 0,
+									height: 0
 								},
 								phone: {
 									type: "Edit",
@@ -676,12 +682,20 @@ Controls arranged by Mode
 										} catch (e) {
 											alert(e.message);
 										}
-									}
+									},
+									x: 0,
+									y: 0,
+									width: 0,
+									height: 0
 								},
 								instructorEmailLabel: {
 									type: "Label",
 									text: "Instructor email",
-									modes: ['Online class proj2']
+									modes: ['Online class proj2'],
+									x: 0,
+									y: 0,
+									width: 0,
+									height: 0
 								},
 								email: {
 									type: "Edit",
@@ -695,12 +709,20 @@ Controls arranged by Mode
 										} catch (e) {
 											alert(e.message);
 										}
-									}
+									},
+									x: 0,
+									y: 0,
+									width: 0,
+									height: 0
 								},
 								maxClassSizeLabel: {
 									type: "Label",
 									text: "Max class size",
-									modes: ['Classroom class proj2']
+									modes: ['Classroom class proj2'],
+									x: 0,
+									y: 0,
+									width: 0,
+									height: 0
 								},
 								maxClassSize: {
 									type: "Edit",
@@ -728,27 +750,43 @@ Controls arranged by Mode
 										} catch (e) {
 											alert(e.message);
 										}
-									}
+									},
+									x: 0,
+									y: 0,
+									width: 0,
+									height: 0
 								},
 								loanersLabel: {
 									type: "Label",
 									modes: ['Classroom class proj2'],
-									text: "Some loan computers avail"
+									text: "Some loan computers avail",
+									x: 0,
+									y: 0,
+									width: 0,
+									height: 0
 								},
 								loaners: {
 									type: "ListHost",	//	['Yes','No']
 									modes: ['Classroom class proj2'],
-									constructorParameterString: "true, true"	// bVertical, vUseTinyScrollStub
+									constructorParameterString: "true, true",	// bVertical, vUseTinyScrollStub
+									x: 0,
+									y: 0,
+									width: 0,
+									height: 0
 								},
 								whenLabel: {
 									type: "Label",
 									text: "Schedule (MM/DD/YYYY hh:mm-hh:mm)",
-									modes: ['Classroom class proj2','Online class proj2']
+									modes: ['Classroom class proj3','Online class proj2'],
+									x: 0,
+									y: 0,
+									width: 0,
+									height: 0
 								},
 								when: {
 									type: "Edit",
 									multiline: true,
-									modes: ['Classroom class proj2','Online class proj2'],
+									modes: ['Classroom class proj3','Online class proj2'],
 									exitFocus: function (localSelf) {
 										try {
 											let exceptionRet = m_functionProcessWhen(localself.getText());
@@ -758,11 +796,167 @@ Controls arranged by Mode
 										} catch (e) {
 											alert(e.message);
 										}
-									}
+									},
+									x: 0,
+									y: 0,
+									width: 0,
+									height: 0
+								},
+								facilityNameLabel: {
+									type: "Label",
+									text: "Facility name",
+									modes: ['Online class proj3'],
+									x: 0,
+									y: 0,
+									width: 0,
+									height: 0
+								},
+								facilityName: {
+									type: "Edit",
+									multiline: false,
+									modes: ['Online class proj3'],
+									exitFocus: function (localSelf) {
+										try {
+											// Validate?
+											m_facilty.name = localSelf.getText().trim();
+
+										} catch (e) {
+											alert(e.message);
+										}
+									},
+									x: 0,
+									y: 0,
+									width: 0,
+									height: 0
+								},
+								facilityAddrLabel: {
+									type: "Label",
+									text: "Facility address",
+									modes: ['Online class proj3'],
+									x: 0,
+									y: 0,
+									width: 0,
+									height: 0
+								},
+								facilityAddr: {
+									type: "Edit",
+									multiline: false,
+									modes: ['Online class proj3'],
+									exitFocus: function (localSelf) {
+										try {
+											// Validate?
+											m_facilty.address = localSelf.getText().trim();
+
+										} catch (e) {
+											alert(e.message);
+										}
+									},
+									x: 0,
+									y: 0,
+									width: 0,
+									height: 0
+								},
+								facilityRoomLabel: {
+									type: "Label",
+									text: "Facility room #",
+									modes: ['Online class proj3'],
+									x: 0,
+									y: 0,
+									width: 0,
+									height: 0
+								},
+								facilityRoom: {
+									type: "Edit",
+									multiline: false,
+									modes: ['Online class proj3'],
+									exitFocus: function (localSelf) {
+										try {
+											// Validate?
+											m_facilty.room = localSelf.getText().trim();
+
+										} catch (e) {
+											alert(e.message);
+										}
+									},
+									x: 0,
+									y: 0,
+									width: 0,
+									height: 0
+								},
+								facilityCityLabel: {
+									type: "Label",
+									text: "Facility city",
+									modes: ['Online class proj3'],
+									x: 0,
+									y: 0,
+									width: 0,
+									height: 0
+								},
+								facilityCity: {
+									type: "Edit",
+									multiline: false,
+									modes: ['Online class proj3'],
+									exitFocus: function (localSelf) {
+										try {
+											// Validate?
+											m_facilty.city = localSelf.getText().trim();
+
+										} catch (e) {
+											alert(e.message);
+										}
+									},
+									x: 0,
+									y: 0,
+									width: 0,
+									height: 0
+								},
+								facilityStateLabel: {
+									type: "Label",
+									text: "State",
+									modes: ['Online class proj3'],
+									x: 0,
+									y: 0,
+									width: 0,
+									height: 0
+								},
+								facilityState: {
+									type: "ListHost",
+									modes: ['Online class proj3'],
+									x: 0,
+									y: 0,
+									width: 0,
+									height: 0
+								},
+								facilityZipLabel: {
+									type: "Label",
+									text: "Facility zipcode",
+									modes: ['Online class proj3'],
+									x: 0,
+									y: 0,
+									width: 0,
+									height: 0
+								},
+								facilityZip: {
+									type: "Edit",
+									multiline: false,
+									modes: ['Online class proj3'],
+									exitFocus: function (localSelf) {
+										try {
+											// Validate?
+											m_facilty.zip = localSelf.getText().trim();
+
+										} catch (e) {
+											alert(e.message);
+										}
+									},
+									x: 0,
+									y: 0,
+									width: 0,
+									height: 0
 								},
 								backButton: {
 									type: "Button",
-									modes: ['Normal proj','Classroom class proj1','Classroom class proj2','Classroom class proj3','Online class proj1','Online class proj2','Online class proj3','Product proj'],
+									modes: ['Normal proj','Classroom class proj1','Classroom class proj2','Online class proj1','Online class proj2','Product proj'],
 									text: "< Back",
 									x: settings.general.margin,
 									yType: "reserve",
@@ -791,16 +985,13 @@ Controls arranged by Mode
 											} else if (currmode === 'Online class proj2') {
 												manager.resetCenterPanelTitle('Online project 1');
 												self.dialog.setMode('Online class proj1');
-											} else if (currmode === 'Online class proj3') {
-												manager.resetCenterPanelTitle('Online project 2');
-												self.dialog.setMode('Online class proj2');
 											}
 										}
 									}
 								},
 								nextButton: {
 									type: "Button",
-									modes: ['Sel Proj Type-priv user','Classroom class proj1','Classroom class proj2','Online class proj1','Online class proj2'],
+									modes: ['Sel Proj Type-priv user','Classroom class proj1','Classroom class proj2','Online class proj1'],
 									text: "Next >",
 									x: settings.general.margin +
 										settings.dialog.firstColumnWidth,
@@ -835,15 +1026,12 @@ Controls arranged by Mode
 										} else if (currmode === 'Online class proj1') {
 											manager.resetCenterPanelTitle('Online project 2');
 											self.dialog.setMode('Online class proj2');
-										} else if (currmode === 'Online class proj2') {
-											manager.resetCenterPanelTitle('Online project 3');
-											self.dialog.setMode('Online class proj3');
 										}
 									}
 								},
 								cancelButton: {
 									type: "Button",
-									modes: ['Sel Proj Type-normal user','Sel Proj Type-priv user','Normal proj','Classroom class proj1','Online class proj1','Product proj'],
+									modes: ['Sel Proj Type-normal user','Sel Proj Type-priv user','Normal proj','Classroom class proj1','Classroom class proj2','Classroom class proj3','Online class proj1','Online class proj2','Product proj'],
 									text: "Cancel",
 									x: settings.general.margin +
 										2 * settings.dialog.firstColumnWidth,
@@ -868,7 +1056,7 @@ Controls arranged by Mode
 								},
 								createProjectButton: {
 									type: "Button",
-									modes: ['Normal proj','Classroom class proj3','Online class proj3','Product proj'],
+									modes: ['Normal proj','Classroom class proj3','Online class proj2','Product proj'],
 									text: "Create Project",
 									xType: "reserve",
 									x: 2 * settings.dialog.firstColumnWidth + 20,
@@ -1101,7 +1289,7 @@ Controls arranged by Mode
 
 							///////////////////////////////
 							// Only for the privileged user.
-                            if (self.dialog.getMode() === "Sel Proj Type-priv user") {
+                            if (manager.userAllowedToCreateEditPurchProjs) {
 
 								/////////////////////////
                                 // Fill self.dialog.controlObject["ncopChoice"] with array of RadioListItems.
@@ -1215,6 +1403,28 @@ Controls arranged by Mode
                                     return rliNew;
                                 });
                                 listLoaners.create(arrayOutput);
+
+								/////////////////////////
+                                // Fill self.dialog.controlObject["facilityState"] with array of RadioListItems.
+                                let lh_facilityStates = self.dialog.controlObject["facilityState"];
+                                let listFacilityStates = lh_facilityStates.list;
+                                id = 0;
+
+                                listFacilityStates.destroy();
+                                arrayOutput = m_arrayStates.map((state) => {
+
+                                    let rliNew = new RadioListItem(state, id++);
+                                    rliNew.clickHandler = (id) => {
+
+										m_facilty.state = m_arrayStates[id];
+
+                                        // User has selected states. Outline its RadioListItem in listHost (un-outline all others first).
+                                        lh_facilityStates.removeAllOutlines();
+                                        rliNew.setOutline(true);
+                                    };
+                                    return rliNew;
+                                });
+                                listFacilityStates.create(arrayOutput);
                             }
 
                             // Because it is!
@@ -1337,6 +1547,9 @@ Controls arranged by Mode
 					// Loaners available.
 					var m_arrayLoanersAvailable = ['Yes','No'];
 					var m_bLoaners = false;
+
+					// States.
+					var m_arrayStates = ['AK','AL','AR','AS','AZ','CA','CO','CT','DC','DE','FL','GA','GU','HI','IA','ID','IL','IN','KS','KY','LA','MA','MD','ME','MH','MI','MN','MO','MS','MT','NC','ND','NE','NH','NJ','NM','NV','NY','OH','OK','OR','PA','PR','PW','RI','SC','SD','TN','TX','UT','VA','VI','VT','WA','WI','WV','WY'];
 
 					// From name Edit.
                     var m_strProjectName = null;
