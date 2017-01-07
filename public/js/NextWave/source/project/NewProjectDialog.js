@@ -413,7 +413,7 @@ Controls arranged by Mode
 									text: "Project image",
 									x: settings.general.margin,
 									y: 5 * settings.general.margin +
-										10 * settings.dialog.lineHeight,
+										11 * settings.dialog.lineHeight,
 									widthType: "reserve",
 									width: 2 * settings.general.margin,
 									height: settings.dialog.lineHeight
@@ -425,7 +425,7 @@ Controls arranged by Mode
 									x: 2 * settings.general.margin +
 										settings.dialog.firstColumnWidth,
 									y: 5 * settings.general.margin +
-										10 * settings.dialog.lineHeight,
+										11 * settings.dialog.lineHeight,
 									width: settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight * 5
 								},
@@ -435,7 +435,7 @@ Controls arranged by Mode
 									constructorParameterString: "'search'",
 									x: 2 * settings.general.margin + settings.dialog.firstColumnWidth + settings.dialog.firstColumnWidth + 20,
 									y: 5 * settings.general.margin +
-										10 * settings.dialog.lineHeight +
+										11 * settings.dialog.lineHeight +
 										(settings.dialog.lineHeight * 5 - 40) / 2,
 									width: 40,
 									height: 40,
@@ -460,7 +460,7 @@ Controls arranged by Mode
 									constructorParameterString: "'cloudDownload'",
 									x: 2 * settings.general.margin + settings.dialog.firstColumnWidth + settings.dialog.firstColumnWidth + 70,
 									y: 5 * settings.general.margin +
-										10 * settings.dialog.lineHeight +
+										11 * settings.dialog.lineHeight +
 										(settings.dialog.lineHeight * 5 - 40) / 2,
 									width: 40,
 									height: 40,
@@ -485,7 +485,7 @@ Controls arranged by Mode
 									constructorParameterString: "'openFile'",
 									x: 2 * settings.general.margin + settings.dialog.firstColumnWidth + settings.dialog.firstColumnWidth + 120,
 									y: 5 * settings.general.margin +
-										10 * settings.dialog.lineHeight +
+										11 * settings.dialog.lineHeight +
 										(settings.dialog.lineHeight * 5 - 40) / 2,
 									width: 40,
 									height: 40,
@@ -508,9 +508,10 @@ Controls arranged by Mode
 									type: "Label",
 									modes: ['Classroom class proj1','Online class proj1','Product proj'],
 									text: "Level",
-									x: settings.general.margin,
+									xType: "reserve",
+									x: 3 * settings.dialog.firstColumnWidth,
 									y: 5 * settings.general.margin +
-										16 * settings.dialog.lineHeight,
+										12 * settings.dialog.lineHeight,
 									width: settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
 								},
@@ -518,10 +519,10 @@ Controls arranged by Mode
 									type: "ListHost",	//	['Elementary school','Middle School','High school and beyond']
 									modes: ['Classroom class proj1','Online class proj1','Product proj'],
 									constructorParameterString: "true, true",	// bVertical, vUseTinyScrollStub
-									x: 2 * settings.general.margin +
-										settings.dialog.firstColumnWidth,
+									xType: "reserve",
+									x: 2 * settings.dialog.firstColumnWidth,
 									y: 5 * settings.general.margin +
-										16 * settings.dialog.lineHeight,
+										12 * settings.dialog.lineHeight,
 									width: settings.dialog.firstColumnWidth,
 									height: 2 * settings.dialog.lineHeight
 								},
@@ -529,9 +530,10 @@ Controls arranged by Mode
 									type: "Label",
 									modes: ['Classroom class proj1','Online class proj1','Product proj'],
 									text: "Difficulty",
-									x: settings.general.margin,
+									xType: "reserve",
+									x: 3 * settings.dialog.firstColumnWidth,
 									y: 5 * settings.general.margin +
-										19 * settings.dialog.lineHeight,
+										15 * settings.dialog.lineHeight,
 									width: settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
 								},
@@ -539,10 +541,10 @@ Controls arranged by Mode
 									type: "ListHost",	//	['Beginner','Has used the TechGroms system','Has completed a TechGroms class','Almost self-sufficient','An expert!']
 									modes: ['Classroom class proj1','Online class proj1','Product proj'],
 									constructorParameterString: "true, true",	// bVertical, vUseTinyScrollStub
-									x: 2 * settings.general.margin +
-										settings.dialog.firstColumnWidth,
+									xType: "reserve",
+									x: 2 * settings.dialog.firstColumnWidth,
 									y: 5 * settings.general.margin +
-										19 * settings.dialog.lineHeight,
+										15 * settings.dialog.lineHeight,
 									width: settings.dialog.firstColumnWidth,
 									height: 3 * settings.dialog.lineHeight
 								},
@@ -552,7 +554,7 @@ Controls arranged by Mode
 									text: "Price                        $",
 									x: settings.general.margin,
 									y: 4 * settings.general.margin +
-										23 * settings.dialog.lineHeight,
+										18 * settings.dialog.lineHeight,
 									width: settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
 								},
@@ -560,10 +562,10 @@ Controls arranged by Mode
 									type: "Edit",
 									modes: ['Classroom class proj1','Online class proj1','Product proj'],
                                     multiline: false,
-									x: 2 * settings.general.margin +
+									x: settings.general.margin +
 										settings.dialog.firstColumnWidth,
 									y: 4 * settings.general.margin +
-										23 * settings.dialog.lineHeight,
+										18 * settings.dialog.lineHeight,
 									width: settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight,
 									exitFocus: function (localSelf) {
@@ -642,7 +644,7 @@ Controls arranged by Mode
 								},
 								classNotesLabel: {
 									type: "Label",
-									text: "Notes",
+									text: "Class notes",
 									modes: ['Classroom class proj2','Online class proj2'],
 									x: settings.general.margin,
 									yType: "reserve",
@@ -1133,18 +1135,8 @@ Controls arranged by Mode
 
 														client.project.isClass = true;
 
-														// Retrieve class data from template fields. It's all optional until we're about to make the class active, actually.
-														var strInstructorFirst = $("#InstructorFirst").val().trim();
-														var strInstructorLast = $("#InstructorLast").val().trim();
-														var strPhone = $("#Phone").val().trim();
-														var strFacility = $("#Facility").val().trim();
-														var strAddress = $("#Address").val().trim();
-														var strRoom = $("#Room").val().trim();
-														var strCity = $("#City").val().trim();
-														var strState = $("#USState option:selected").text();
-														var strZip = $("#Zip").val().trim();
 														var arrWhen = [];
-														for (var i = 1; i <=8; i++) {
+/*														for (var i = 1; i <=8; i++) {
 															var str = $("#When" + i).val().trim();
 															if (str.length) {
 																arrWhen.push(m_funcWhenProcess(str));
@@ -1152,30 +1144,27 @@ Controls arranged by Mode
 																arrWhen.push({ date: '', duration: 0});
 															}
 														}
-														var strNotes = $("#Notes").val().trim();
-														var iMaxclassroomClassize = parseInt($("#MaxclassroomClassize").val().trim(), 10);
-														var iLoanComputersAvailable = $("#cb1").prop("checked") ? 1 : 0;
-
+*/
 														client.project.specialProjectData.classData = {
 															id: 200,
 															active: false,
 															classDescription: m_strProjectDescription,
-															instructorFirstName: strInstructorFirst,
-															instructorLastName: strInstructorLast,
-															instructorPhone: strPhone,
-															facility: strFacility,
-															address: strAddress,
-															room: strRoom,
-															city: strCity,
-															state: strState,
-															zip: strZip,
+															instructorFirstName: m_instructor.first,
+															instructorLastName: m_instructor.last,
+															instructorPhone: m_instructor.phone,
+															facility: m_facilty.name,
+															address: m_facilty.address,
+															room: m_facilty.room,
+															city: m_facilty.city,
+															state: m_facilty.state,
+															zip: m_facilty.zip,
 															schedule: arrWhen,
 															level: m_strLevel,
 															difficulty: m_strDifficulty,
 															price: m_dPrice,
-															classNotes: strNotes,
-															maxclassroomClassize: iMaxclassroomClassize,
-															loanComputersAvailable: iLoanComputersAvailable,
+															classNotes: m_strNotes,
+															maxclassroomClassize: m_iMaxClassSize,
+															loanComputersAvailable: m_bLoaners,
 															imageId: m_imageId
 														};
 
@@ -1198,11 +1187,8 @@ Controls arranged by Mode
 														client.project.isOnlineClass = true;
 
 														// Retrieve online class data from template fields. It's all optional until we're about to make the class active, actually.
-														var strInstructorFirst = $("#InstructorFirst").val().trim();
-														var strInstructorLast = $("#InstructorLast").val().trim();
-														var strEmail = $("#Email").val().trim();
 														var arrWhen = [];
-														for (var i = 1; i <=8; i++) {
+/*														for (var i = 1; i <=8; i++) {
 															var str = $("#When" + i).val().trim();
 															if (str.length) {
 																arrWhen.push(m_funcWhenProcess(str));
@@ -1210,20 +1196,19 @@ Controls arranged by Mode
 																arrWhen.push({ date: '', duration: 0});
 															}
 														}
-														var strNotes = $("#Notes").val().trim();
-
+*/
 														client.project.specialProjectData.onlineClassData = {
 															id: 200,
 															active: false,
 															classDescription: m_strProjectDescription,
-															instructorFirstName: strInstructorFirst,
-															instructorLastName: strInstructorLast,
-															instructorEmail: strEmail,
+															instructorFirstName: m_instructor.first,
+															instructorLastName: m_instructor.last,
+															instructorEmail: m_instructor.email,
 															schedule: arrWhen,
 															level: m_strLevel,
 															difficulty: m_strDifficulty,
 															price: m_dPrice,
-															classNotes: strNotes,
+															classNotes: m_strNotes,
 															imageId: m_imageId
 														};
 													}
