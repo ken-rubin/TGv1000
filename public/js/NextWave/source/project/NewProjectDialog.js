@@ -799,7 +799,7 @@ Controls arranged by Mode
 								},
 								whenLabel: {
 									type: "Label",
-									text: "Schedule (MM/DD/YYYY hh:mm-hh:mm)",
+									text: "Schedule--up to 8 classes on separate lines.",
 									modes: ['Classroom class proj3','Online class proj2'],
 									xType: "reserve",
 									x: 2 * settings.dialog.firstColumnWidth + 100,
@@ -811,6 +811,7 @@ Controls arranged by Mode
 									type: "Edit",
 									multiline: true,
 									modes: ['Classroom class proj3','Online class proj2'],
+									text: "MM/DD/YYYY hh:mm-hh:mm\r\nMM/DD/YYYY hh:mm-hh:mm\r\nMM/DD/YYYY hh:mm-hh:mm\r\nMM/DD/YYYY hh:mm-hh:mm\r\nMM/DD/YYYY hh:mm-hh:mm\r\nMM/DD/YYYY hh:mm-hh:mm\r\nMM/DD/YYYY hh:mm-hh:mm\r\nMM/DD/YYYY hh:mm-hh:mm",
 									exitFocus: function (localSelf) {
 										try {
 											let exceptionRet = m_functionProcessWhen(localSelf.getText());
@@ -825,7 +826,7 @@ Controls arranged by Mode
 									x: 2 * settings.dialog.firstColumnWidth + 100,
 									y: settings.dialog.firstColumnWidth +
 										settings.dialog.lineHeight,
-									width: settings.dialog.firstColumnWidth * 2 + 20,
+									width: settings.dialog.firstColumnWidth * 2 + 30,
 									height: 8 * settings.dialog.lineHeight
 								},
 								facilityNameLabel: {
@@ -953,7 +954,7 @@ Controls arranged by Mode
 									modes: ['Classroom class proj3'],
 									constructorParameterString: "true, true",
 									x: 2 * settings.general.margin +
-										settings.dialog.firstColumnWidth + 240,
+										settings.dialog.firstColumnWidth + 235,
 									y: 9 * settings.general.margin +
 										7 * settings.dialog.lineHeight,
 									width: 50,
@@ -1135,16 +1136,6 @@ Controls arranged by Mode
 
 														client.project.isClass = true;
 
-														var arrWhen = [];
-/*														for (var i = 1; i <=8; i++) {
-															var str = $("#When" + i).val().trim();
-															if (str.length) {
-																arrWhen.push(m_funcWhenProcess(str));
-															} else {
-																arrWhen.push({ date: '', duration: 0});
-															}
-														}
-*/
 														client.project.specialProjectData.classData = {
 															id: 200,
 															active: false,
@@ -1158,7 +1149,7 @@ Controls arranged by Mode
 															city: m_facilty.city,
 															state: m_facilty.state,
 															zip: m_facilty.zip,
-															schedule: arrWhen,
+															schedule: m_arrWhen,
 															level: m_strLevel,
 															difficulty: m_strDifficulty,
 															price: m_dPrice,
@@ -1186,17 +1177,6 @@ Controls arranged by Mode
 
 														client.project.isOnlineClass = true;
 
-														// Retrieve online class data from template fields. It's all optional until we're about to make the class active, actually.
-														var arrWhen = [];
-/*														for (var i = 1; i <=8; i++) {
-															var str = $("#When" + i).val().trim();
-															if (str.length) {
-																arrWhen.push(m_funcWhenProcess(str));
-															} else {
-																arrWhen.push({ date: '', duration: 0});
-															}
-														}
-*/
 														client.project.specialProjectData.onlineClassData = {
 															id: 200,
 															active: false,
@@ -1204,7 +1184,7 @@ Controls arranged by Mode
 															instructorFirstName: m_instructor.first,
 															instructorLastName: m_instructor.last,
 															instructorEmail: m_instructor.email,
-															schedule: arrWhen,
+															schedule: m_arrWhen,
 															level: m_strLevel,
 															difficulty: m_strDifficulty,
 															price: m_dPrice,
@@ -1492,33 +1472,48 @@ Controls arranged by Mode
                         return bValid;
                     }
 
-					// Privileged user enters string of form 2016/02/01.........20:00.-.20:55
-					// Below assumes user is in EST: UTC-5:00.
-					// Returns { date: '2016-02-02T01:00:00+00:00', duration: 3360000}.
-					// 		date is start time in UTC.
-					// 		duration is in ms, inclusive (i.e., this example is 56 minutes long).
-					// If any parts (date, duration) are missing or invalid, returns { date: '', duration: 0}.
-					// Due to masking, we can have only numbers, but we can have numbers out of range, etc. (Like 34:00 - 51:00.)
+					// strWhen started as this string: "MM/DD/YYYY hh:mm-hh:mm\r\nMM\DD\YYYY hh:mm-hh:mm..." with up to 8 class sessions specified.
+					// The user was supposed to overwrite the masks and enter dates and their start and end times in their local timezone.
+					// But we're never really sure if the user complied or not.
+					// We will build up an array: [{date: '2016-02-02T01:00:00+00:00', duration: 3360000},...] where date holds the date and start time (UTC)
+					// and duration in ms. We will save the array to m_arrWhen. We can do this because we have access to moment.js.
+					// Any invalid or unentered dates will be returned as: {date: '', duration: 0}.
 					var m_functionProcessWhen = function(strWhen) {
 
 						try {
 
-/*							var strDate = strWhen.substring(0, 10);		// Let substring return junky results if strWhen is of insufficient length.
-							var strFrom = strWhen.substring(19, 24);
-							var strThru = strWhen.substring(27, 32);
+							let arrWhen = [];
+							let arrParts = strWhen.split('\r\n');
+							for (let i = 0; i < arrParts.length; i++) {
 
-							var mntHypo1 = moment('2016-01-01T' + strFrom);	// to check validity of strFrom
-							var mntHypo2 = moment('2016-01-01T' + strThru);	// to check validity of strThru
-							var mntDate = moment(strDate, "YYYY-MM-DD");	// to check validty of strDate
-							var bValidMntDate = mntDate.isValid();
-							var bValidMntHypo1 = mntHypo1.isValid();
-							var bValidMntHypo2 = mntHypo2.isValid();
+								let partIth = arrParts[i];
 
-							if (bValidMntDate && bValidMntHypo1 && bValidMntHypo2) {
-								var mntDateFromUTC = moment(strDate + 'T' + strFrom).utc();	// Actual class start datetime with utc flag set.
-								return { date: mntDateFromUTC.format(), duration: (mntHypo2.diff(mntHypo1) + 60000)};	// Add 60000 to account for inclusive thru time.
+								// Let substring return junky results if strWhen is of insufficient length.
+								let strDate = partIth.substr(0, 10);
+								let strFrom = partIth.substr(11, 5);
+								let strThru = partIth.substr(17, 5);
+
+								let mntHypo1 = moment('2016-01-01T' + strFrom);	// to check validity of strFrom
+								let mntHypo2 = moment('2016-01-01T' + strThru);	// to check validity of strThru
+								let mntDate = moment(strDate, "MM/DD/YYYY");	// to check validty of strDate
+								let bValidMntDate = mntDate.isValid();
+								let bValidMntHypo1 = mntHypo1.isValid();
+								let bValidMntHypo2 = mntHypo2.isValid();
+
+								if (bValidMntDate && bValidMntHypo1 && bValidMntHypo2) {
+
+									let mntDateFromUTC = moment(mntDate.format('YYYY-MM-DD') + 'T' + strFrom).utc();			// Actual class start datetime with utc flag set.
+									arrWhen.push({ date: mntDateFromUTC.format(), duration: (mntHypo2.diff(mntHypo1) + 60000)});	// Add 60000 to account for inclusive thru time.
+
+								} else {
+
+									arrWhen.push({date: '', duration: 0});
+								}
+
+
 							}
-*/
+
+							m_arrWhen = arrWhen;
 							return null;
 
 						} catch(e) {
@@ -1582,6 +1577,7 @@ Controls arranged by Mode
 						zip: ""
 					}
 					var m_strNotes = "";
+					var m_arrWhen = [];
 
                 } catch (e) {
 
