@@ -181,22 +181,22 @@ Controls arranged by Mode
 								instructions1: {
 									type: "Label",
 									modes: ['Sel Proj Type-normal user','Sel Proj Type-priv user'],
-									text: "Choose the type of Project you wish to create by clicking on its picture.",
+									text: "Project type",
 									x: settings.general.margin,
 									y: 5 * settings.general.margin,
-									widthType: "reserve",
-									width: 2 * settings.general.margin,
+									width: settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
 								},
 								projectTypes: {
 									type: "ListHost",
 									modes: ['Sel Proj Type-normal user','Sel Proj Type-priv user'],
 									constructorParameterString: "false",
-									x: settings.general.margin,
-									y: settings.general.margin +
-										2 * settings.dialog.lineHeight,
+									x: 2 * settings.general.margin +
+										settings.dialog.firstColumnWidth,
+									y: 5 * settings.general.margin,
 									widthType: "reserve",
-									width: 2 * settings.general.margin,
+									width: 2 * settings.general.margin +
+										settings.dialog.firstColumnWidth,
 									height: 100
 								},
 								instructions2: {
@@ -341,7 +341,7 @@ Controls arranged by Mode
 								nameLabel: {
 									type: "Label",
 									modes: ['Normal proj','Classroom class proj1','Classroom class proj2','Classroom class proj3','Online class proj1','Online class proj2','Product proj'],
-									text: "Name",
+									text: "Project name",
 									x: settings.general.margin,
 									y: 5 * settings.general.margin +
 										3 * settings.dialog.lineHeight,
@@ -356,10 +356,7 @@ Controls arranged by Mode
 										settings.dialog.firstColumnWidth,
 									y: 5 * settings.general.margin +
 										3 * settings.dialog.lineHeight,
-									widthType: "reserve",           // Reserve means: subtract the width from
-																	//  the total width on calculateLayout.
-									width: 3 * settings.general.margin +
-										settings.dialog.firstColumnWidth,
+									width: 3 * settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight,
 									exitFocus: function (localSelf) {
 										try {
@@ -394,7 +391,7 @@ Controls arranged by Mode
 										4 * settings.dialog.lineHeight,
 									widthType: "reserve",           // Reserve means: subtract the width from
 																	//  the total width on calculateLayout.
-									width: 3 * settings.general.margin +
+									width: 4 * settings.general.margin +
 										settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight * 5,
 									exitFocus: function (localSelf) {
@@ -435,10 +432,9 @@ Controls arranged by Mode
 									constructorParameterString: "'search'",
 									x: 2 * settings.general.margin + settings.dialog.firstColumnWidth + settings.dialog.firstColumnWidth + 20,
 									y: 5 * settings.general.margin +
-										11 * settings.dialog.lineHeight +
-										(settings.dialog.lineHeight * 5 - 40) / 2,
-									width: 40,
-									height: 40,
+										11 * settings.dialog.lineHeight,
+									width: settings.dialog.lineHeight,
+									height: settings.dialog.lineHeight,
 									clickHandler: function() {
 
 										try {
@@ -458,12 +454,11 @@ Controls arranged by Mode
 									type: "GlyphHost",
 									modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj'],
 									constructorParameterString: "'cloudDownload'",
-									x: 2 * settings.general.margin + settings.dialog.firstColumnWidth + settings.dialog.firstColumnWidth + 70,
+									x: 2 * settings.general.margin + settings.dialog.firstColumnWidth + settings.dialog.firstColumnWidth + 20,
 									y: 5 * settings.general.margin +
-										11 * settings.dialog.lineHeight +
-										(settings.dialog.lineHeight * 5 - 40) / 2,
-									width: 40,
-									height: 40,
+										13 * settings.dialog.lineHeight,
+									width: settings.dialog.lineHeight,
+									height: settings.dialog.lineHeight,
 									clickHandler: function() {
 
 										try {
@@ -483,12 +478,11 @@ Controls arranged by Mode
 									type: "GlyphHost",
 									modes: ['Normal proj','Classroom class proj1','Online class proj1','Product proj'],
 									constructorParameterString: "'openFile'",
-									x: 2 * settings.general.margin + settings.dialog.firstColumnWidth + settings.dialog.firstColumnWidth + 120,
+									x: 2 * settings.general.margin + settings.dialog.firstColumnWidth + settings.dialog.firstColumnWidth + 20,
 									y: 5 * settings.general.margin +
-										11 * settings.dialog.lineHeight +
-										(settings.dialog.lineHeight * 5 - 40) / 2,
-									width: 40,
-									height: 40,
+										15 * settings.dialog.lineHeight,
+									width: settings.dialog.lineHeight,
+									height: settings.dialog.lineHeight,
 									clickHandler: function() {
 
 										try {
@@ -509,9 +503,9 @@ Controls arranged by Mode
 									modes: ['Classroom class proj1','Online class proj1','Product proj'],
 									text: "Level",
 									xType: "reserve",
-									x: 3 * settings.dialog.firstColumnWidth,
+									x: 2 * settings.dialog.firstColumnWidth,
 									y: 5 * settings.general.margin +
-										12 * settings.dialog.lineHeight,
+										11 * settings.dialog.lineHeight,
 									width: settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
 								},
@@ -531,7 +525,7 @@ Controls arranged by Mode
 									modes: ['Classroom class proj1','Online class proj1','Product proj'],
 									text: "Difficulty",
 									xType: "reserve",
-									x: 3 * settings.dialog.firstColumnWidth,
+									x: 2 * settings.dialog.firstColumnWidth,
 									y: 5 * settings.general.margin +
 										15 * settings.dialog.lineHeight,
 									width: settings.dialog.firstColumnWidth,
@@ -544,7 +538,7 @@ Controls arranged by Mode
 									xType: "reserve",
 									x: 2 * settings.dialog.firstColumnWidth,
 									y: 5 * settings.general.margin +
-										15 * settings.dialog.lineHeight,
+										16 * settings.dialog.lineHeight,
 									width: settings.dialog.firstColumnWidth,
 									height: 3 * settings.dialog.lineHeight
 								},
@@ -620,7 +614,11 @@ Controls arranged by Mode
 										settings.dialog.firstColumnWidth,
 									y: 6 * settings.general.margin +
 										4 * settings.dialog.lineHeight,
-									width: 2 * settings.dialog.firstColumnWidth,
+									widthType: "callback",
+									width: function(area) {
+										return (area.extent.width - (settings.general.margin + settings.dialog.firstColumnWidth)) / 2 -
+										4 * settings.general.margin;
+									},
 									height: settings.dialog.lineHeight
 								},
 								instructorLast: {
@@ -635,11 +633,18 @@ Controls arranged by Mode
 											alert(e.message);
 										}
 									},
-									x: 3 * settings.general.margin +
-										3 * settings.dialog.firstColumnWidth,
+									xType: "callback",
+									x: function(area) {
+										return settings.dialog.firstColumnWidth +
+											(area.extent.width - (settings.general.margin + settings.dialog.firstColumnWidth)) / 2 -
+											settings.general.margin;
+									},
 									y: 6 * settings.general.margin +
 										4 * settings.dialog.lineHeight,
-									width: 2 * settings.dialog.firstColumnWidth,
+									widthType: "callback",
+									width: function(area) {
+										return (area.extent.width - (settings.general.margin + settings.dialog.firstColumnWidth)) / 2;
+									},
 									height: settings.dialog.lineHeight
 								},
 								classNotesLabel: {
@@ -669,7 +674,8 @@ Controls arranged by Mode
 									yType: "reserve",
 									y: 90 + 6 * settings.dialog.lineHeight,
 									widthType: "reserve",
-									width: settings.dialog.firstColumnWidth,
+									width: 4 * settings.general.margin +
+										settings.dialog.firstColumnWidth,
 									height: 5 * settings.dialog.lineHeight
 								},
 								instructorPhoneLabel: {
@@ -736,7 +742,11 @@ Controls arranged by Mode
 									type: "Label",
 									text: "Max class size",
 									modes: ['Classroom class proj2'],
-									x: settings.general.margin,
+									xType: "callback",
+									x: function(area) {
+										return area.extent.width / 2 +
+											settings.dialog.firstColumnWidth;
+									},
 									y: 8 * settings.general.margin +
 										6 * settings.dialog.lineHeight,
 									width: settings.dialog.firstColumnWidth,
@@ -769,20 +779,27 @@ Controls arranged by Mode
 											alert(e.message);
 										}
 									},
-									x: 2 * settings.general.margin +
-										settings.dialog.firstColumnWidth,
+									xType: "callback",
+									x: function(area) {
+										return area.extent.width / 2 +
+											settings.dialog.firstColumnWidth;
+									},
 									y: 8 * settings.general.margin +
-										6 * settings.dialog.lineHeight,
-									width: 100,
+										7 * settings.dialog.lineHeight,
+									width: 60,
 									height: settings.dialog.lineHeight
 								},
 								loanersLabel: {
 									type: "Label",
 									modes: ['Classroom class proj2'],
-									text: "Some loan computers avail",
-									x: settings.general.margin,
+									text: "Loaner computers available",
+									xType: "callback",
+									x: function(area) {
+										return area.extent.width / 2 +
+											settings.dialog.firstColumnWidth;
+									},
 									y: 9 * settings.general.margin +
-										7 * settings.dialog.lineHeight,
+										9 * settings.dialog.lineHeight,
 									width: settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
 								},
@@ -790,27 +807,50 @@ Controls arranged by Mode
 									type: "ListHost",	//	['Yes','No']
 									modes: ['Classroom class proj2'],
 									constructorParameterString: "true, true",	// bVertical, vUseTinyScrollStub
-									x: 2 * settings.general.margin +
-										settings.dialog.firstColumnWidth,
+									xType: "callback",
+									x: function(area) {
+										return area.extent.width / 2 +
+											settings.dialog.firstColumnWidth;
+									},
 									y: 9 * settings.general.margin +
-										7 * settings.dialog.lineHeight,
-									width: 100,
-									height: 100
+										10 * settings.dialog.lineHeight,
+									width: 60,
+									height: 77
 								},
-								whenLabel: {
+								whenLabel1: {
 									type: "Label",
-									text: "Schedule--up to 8 classes on separate lines.",
-									modes: ['Classroom class proj3','Online class proj2'],
-									xType: "reserve",
-									x: 2 * settings.dialog.firstColumnWidth + 100,
-									y: settings.dialog.firstColumnWidth,
-									width: settings.dialog.firstColumnWidth * 2,
+									text: "Class schedule",
+									modes: ['Classroom class proj2','Online class proj2'],
+									x: settings.general.margin,
+									y: 8 * settings.general.margin +
+										6 * settings.dialog.lineHeight,
+									width: settings.dialog.firstColumnWidth,
+									height: settings.dialog.lineHeight
+								},
+								whenLabel2: {
+									type: "Label",
+									text: "   (1-8 classes on",
+									modes: ['Classroom class proj2','Online class proj2'],
+									x: settings.general.margin,
+									y: 8 * settings.general.margin +
+										7 * settings.dialog.lineHeight,
+									width: settings.dialog.firstColumnWidth,
+									height: settings.dialog.lineHeight
+								},
+								whenLabel3: {
+									type: "Label",
+									text: "   separate lines)",
+									modes: ['Classroom class proj2','Online class proj2'],
+									x: settings.general.margin,
+									y: 8 * settings.general.margin +
+										8 * settings.dialog.lineHeight,
+									width: settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
 								},
 								when: {
 									type: "Edit",
 									multiline: true,
-									modes: ['Classroom class proj3','Online class proj2'],
+									modes: ['Classroom class proj2','Online class proj2'],
 									text: "MM/DD/YYYY hh:mm-hh:mm\r\nMM/DD/YYYY hh:mm-hh:mm\r\nMM/DD/YYYY hh:mm-hh:mm\r\nMM/DD/YYYY hh:mm-hh:mm\r\nMM/DD/YYYY hh:mm-hh:mm\r\nMM/DD/YYYY hh:mm-hh:mm\r\nMM/DD/YYYY hh:mm-hh:mm\r\nMM/DD/YYYY hh:mm-hh:mm",
 									exitFocus: function (localSelf) {
 										try {
@@ -822,10 +862,10 @@ Controls arranged by Mode
 											alert(e.message);
 										}
 									},
-									xType: "reserve",
-									x: 2 * settings.dialog.firstColumnWidth + 100,
-									y: settings.dialog.firstColumnWidth +
-										settings.dialog.lineHeight,
+									x: 2 * settings.general.margin +
+										settings.dialog.firstColumnWidth,
+									y: 8 * settings.general.margin +
+										6 * settings.dialog.lineHeight,
 									width: settings.dialog.firstColumnWidth * 2 + 30,
 									height: 8 * settings.dialog.lineHeight
 								},
