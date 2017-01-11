@@ -512,7 +512,7 @@ Controls arranged by Mode
 								level: {
 									type: "ListHost",	//	['Elementary school','Middle School','High school and beyond']
 									modes: ['Classroom class proj1','Online class proj1','Product proj'],
-									constructorParameterString: "true, true",	// bVertical, vUseTinyScrollStub
+									constructorParameterString: "true, true",	// bVertical, bUseTinyScrollStub
 									xType: "reserve",
 									x: 2 * settings.dialog.firstColumnWidth,
 									y: 5 * settings.general.margin +
@@ -1024,6 +1024,7 @@ Controls arranged by Mode
 									type: "Button",
 									modes: ['Normal proj','Classroom class proj1','Classroom class proj2','Classroom class proj3','Online class proj1','Online class proj2','Product proj'],
 									text: "< Back",
+									constructorParameterString: "'15px Arial'",
 									x: settings.general.margin,
 									yType: "reserve",
 									y: 100,
@@ -1059,6 +1060,7 @@ Controls arranged by Mode
 									type: "Button",
 									modes: ['Sel Proj Type-priv user','Classroom class proj1','Classroom class proj2','Online class proj1'],
 									text: "Next >",
+									constructorParameterString: "'15px Arial'",
 									x: settings.general.margin +
 										settings.dialog.firstColumnWidth,
 									yType: "reserve",
@@ -1099,6 +1101,7 @@ Controls arranged by Mode
 									type: "Button",
 									modes: ['Sel Proj Type-normal user','Sel Proj Type-priv user','Normal proj','Classroom class proj1','Classroom class proj2','Classroom class proj3','Online class proj1','Online class proj2','Product proj'],
 									text: "Cancel",
+									constructorParameterString: "'15px Arial'",
 									x: settings.general.margin +
 										2 * settings.dialog.firstColumnWidth,
 									yType: "reserve",
@@ -1124,6 +1127,7 @@ Controls arranged by Mode
 									type: "Button",
 									modes: ['Normal proj','Classroom class proj3','Online class proj2','Product proj'],
 									text: "Create Project",
+									constructorParameterString: "'15px Arial'",
 									xType: "reserve",
 									x: 2 * settings.dialog.firstColumnWidth + 20,
 									yType: "reserve",

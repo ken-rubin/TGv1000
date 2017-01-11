@@ -38,15 +38,11 @@ define(["NextWave/source/utility/prototypes",
                     self.highlight = false;
                     // The hosted object.
                     self.list = null;
-					
-					if (objectParameters.length === 1) {
 
-						self.list = new List(objectParameters[0]);
-
-					} else {
-
-						self.list = new List(objectParameters[0], objectParameters[1]);
-					}
+					// Ensure defaults for List construction parameters are there, because we don't know if user passed in 0, 1 or 2.
+					objectParameters.push(false);
+					objectParameters.push(false);
+					self.list = new List(objectParameters[0], objectParameters[1]);
 
                     ///////////////////////
                     // Public methods.
@@ -128,7 +124,7 @@ define(["NextWave/source/utility/prototypes",
                 }
         	};
 
-            // Inherit from Control.  Wire 
+            // Inherit from Control.  Wire
             // up prototype chain to Control.
             functionRet.inheritsFrom(Control);
 

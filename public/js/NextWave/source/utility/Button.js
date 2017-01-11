@@ -31,6 +31,13 @@ define(["NextWave/source/utility/prototypes",
                     // constructor.  Pass parameters, if specified.
                     self.inherits(Control);
 
+					self.font = settings.general.font;
+
+					if (objectParameters) {
+
+						self.font = objectParameters;
+					}
+
                     ////////////////////////
                     // Public methods.
 
@@ -87,19 +94,19 @@ define(["NextWave/source/utility/prototypes",
 
                                 } else {
 
-                                    contextRender.fillStyle = (m_bMouseIn ? 
-                                                                (m_bMouseDown ? 
-                                                                    settings.button.backgroundMouseDown : 
-                                                                    settings.button.backgroundMouseIn) : 
+                                    contextRender.fillStyle = (m_bMouseIn ?
+                                                                (m_bMouseDown ?
+                                                                    settings.button.backgroundMouseDown :
+                                                                    settings.button.backgroundMouseIn) :
                                                                 settings.button.background);
                                 }
                                 contextRender.strokeStyle = settings.general.strokeBackground;
                                 contextRender.fill();
                                 contextRender.stroke();
 
-                                contextRender.font = settings.general.largeFont;
+                                contextRender.font = self.font;
                                 contextRender.fillStyle = "rgba(0,0,0,0.7)";
-                                contextRender.textBaseline = "middle"; 
+                                contextRender.textBaseline = "middle";
                                 contextRender.textAlign = "center";
 
                                 // Again, if self.protected, nothing special for the text.
@@ -107,13 +114,13 @@ define(["NextWave/source/utility/prototypes",
 
                                     contextRender.fillText(self.configuration.text,
                                         m_area.location.x + m_area.extent.width / 2,
-                                        m_area.location.y + m_area.extent.height / 2); 
+                                        m_area.location.y + m_area.extent.height / 2);
 
                                 } else {
 
                                     contextRender.fillText(self.configuration.text,
                                         m_area.location.x + m_area.extent.width / 2 + (m_bMouseDown ? 3 : 0),
-                                        m_area.location.y + m_area.extent.height / 2+ (m_bMouseDown ? 3 : 0)); 
+                                        m_area.location.y + m_area.extent.height / 2+ (m_bMouseDown ? 3 : 0));
                                 }
                         } finally {
 

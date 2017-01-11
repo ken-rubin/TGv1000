@@ -60,7 +60,9 @@ define(["NextWave/source/utility/prototypes"],
                         smallFont: "15px Arial",
                         font: "20px Arial",
                         largeFont: "30px Arial",
-                        monoSpaceFont: "30px Courier New"
+                        smallMonoSpaceFont: "15px Courier New",
+                        monoSpaceFont: "20px Courier New",
+                        largeMonoSpaceFont: "30px Courier New"
                     };
                     self.dialog = {
 
@@ -146,7 +148,7 @@ define(["NextWave/source/utility/prototypes"],
                         // 4) Adjust....
                         //
                         pushpin: {
-                            
+
                             x: 708,
                             y: 562
                         },
@@ -258,7 +260,12 @@ define(["NextWave/source/utility/prototypes"],
                             x: 0.3,
                             width: 0.7,
                             height: 1
-                        }
+                        },
+						landingPagePanel: {
+
+							width: 1,
+							height: 1
+						}
                     };
                     self.centerPanel = {
 
@@ -392,10 +399,10 @@ define(["NextWave/source/utility/prototypes"],
                             fillBackground: "#aaf"
                         },
                         picture: {
-                            
+
                         },
                         radio: {
-                            
+
                             font: "18px Arial",
 							outlineFont: "14px Arial",
                             lineHeight: 26,

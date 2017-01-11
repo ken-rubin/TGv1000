@@ -1,7 +1,7 @@
 ///////////////////////////////////////
 // LandingPage module.
 //
-// Gui component responsible for 
+// Gui component responsible for
 // creating a normal project or a purchasable project.
 //
 // Return constructor function.
@@ -48,9 +48,26 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Create the dialog.
-                            var exceptionRet = self.dialog.create({
-
-                            });
+							let objectConfiguration = {
+								test: {
+									type: "Label",
+									text: "This is a test. Live with it.",
+									modes: ['Normal user','Privileged user'],
+									xType: "callback",
+									x: function(area) {
+										return (area.extent.width - settings.dialog.firstColumnWidth) / 2
+									},
+									yType: "callback",
+									y: function(area) {
+										return area.extent.height / 2
+									},
+									width: settings.dialog.firstColumnWidth,
+									height: settings.dialog.lineHeight
+								}
+							};
+                            var exceptionRet = self.dialog.create(objectConfiguration,
+							                                 !manager.userAllowedToCreateEditPurchProjs ? 'Normal user' : 'Privileged user'
+							);
 
                             // Because it is!
                             m_bCreated = true;

@@ -80,7 +80,7 @@ define(["NextWave/source/utility/prototypes",
                     // 1 means panels are set for normal projects with all panels present.
                     // 2 means System project. [OBSOLETE]
                     self.iPanelArrangement = 0;
-                    
+
                     // Indicates that the current user is allowed to create or edit classes, products or online classes.
                     self.userAllowedToCreateEditPurchProjs = false;
 
@@ -98,7 +98,7 @@ define(["NextWave/source/utility/prototypes",
                                 throw { message: "Manager: Instance already created!" };
                             }
 
-                            // Store the manager in window, 
+                            // Store the manager in window,
                             // so it is universally accessible.
                             window.manager = self;
 
@@ -158,7 +158,7 @@ define(["NextWave/source/utility/prototypes",
                             // Mouse actions are passed to layers in reverse order, i.e., from front to back.
                             // If a layer doesn't see fit to handle a mouse action, the action is passed to the
                             // next lower layer for possible handling.
-                            m_arrayLayers = 
+                            m_arrayLayers =
                                 [
                                     self.backgroundLayer,
                                     self.canvasLayer,
@@ -205,7 +205,7 @@ define(["NextWave/source/utility/prototypes",
                                 m_functionMouseDown);
                             m_jqCanvas.bind("mousemove",
                                 m_functionMouseMove);
-                            m_jqCanvas.bind("mousewheel", 
+                            m_jqCanvas.bind("mousewheel",
                                 m_functionMouseWheel);
                             m_jqCanvas.bind("mouseout",
                                 m_functionMouseOut);
@@ -242,7 +242,7 @@ define(["NextWave/source/utility/prototypes",
 
                             self.iPanelArrangement = iPanelArrangement || 1;
                             self.panelLayer = m_arrayPanelLayers[self.iPanelArrangement];
-                            m_arrayLayers = 
+                            m_arrayLayers =
                                 [
                                     self.backgroundLayer,
                                     self.canvasLayer,
@@ -280,7 +280,7 @@ define(["NextWave/source/utility/prototypes",
                         }
                     }
 
-                    // Load all types and visible/existing panels 
+                    // Load all types and visible/existing panels
                     // into this manager instance from persistence.
                     // objectprojectData is comics[i].data as loaded from database.
                     // It needs to be massaged a bit.
@@ -312,9 +312,9 @@ define(["NextWave/source/utility/prototypes",
 
                                 window.tg.project = new Project();
                                 exceptionRet = window.tg.project.create(objectProject);
-                                if (exceptionRet) { 
+                                if (exceptionRet) {
 
-                                    return exceptionRet; 
+                                    return exceptionRet;
                                 }
 
                                 // Load up the project into the ProjectDialog.
@@ -324,7 +324,11 @@ define(["NextWave/source/utility/prototypes",
                                 // Set loaded.
                                 self.projectLoaded = true;
 
-                                self.panelLayer.openAndPinAllPanels();
+								// Used to start this way:
+                                // self.panelLayer.openAndPinAllPanels();
+
+								// Now we start with the landing page as the only open and pinned panel.
+                                self.panelLayer.unpinAllPanels();
                             }
 
                             return null;
@@ -451,7 +455,7 @@ define(["NextWave/source/utility/prototypes",
                             // No only letters and number and _:
                             strName = strName.replace(/[^A-Za-z0-9\_]/g, "_");
 
-                            // Define a simple method which 
+                            // Define a simple method which
                             // searches for a matching name.
                             var functionNameExists = function (strTest) {
 
@@ -697,7 +701,7 @@ define(["NextWave/source/utility/prototypes",
                             if (!method) {
                                 return null;
                             }
-                            
+
                             // Load up the method into the method builder.
                             return window.methodBuilder.loadMethod(method);
                         } catch (e) {
@@ -755,7 +759,7 @@ define(["NextWave/source/utility/prototypes",
                             return self.panelLayer.switchCenterPanelMode(strMode);
                         } catch (e) {
 
-                            return e;   
+                            return e;
                         }
                     };
 
@@ -866,8 +870,8 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            // If the alternateFocus object is a control, 
-                            // then it will have a configuration.  If that 
+                            // If the alternateFocus object is a control,
+                            // then it will have a configuration.  If that
                             // object has a enterFocus method, call it now.
                             if (self.alternateFocus &&
                                 self.alternateFocus.configuration &&
@@ -894,8 +898,8 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            // If the alternateFocus object is a control, 
-                            // then it will have a configuration.  If that 
+                            // If the alternateFocus object is a control,
+                            // then it will have a configuration.  If that
                             // object has a exitFocus method, call it now.
                             if (self.alternateFocus &&
                                 self.alternateFocus.configuration &&
@@ -917,12 +921,12 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // Calculate e.offsetX and e.offsetY 
+                    // Calculate e.offsetX and e.offsetY
                     // if they are undefined (as in Firefox).
                     var m_functionPossibleFirefoxAdjustment = function (e) {
 
                         try {
-                            
+
                             // Check...
                             if (e.offsetX !== undefined &&
                                 e.offsetY !== undefined)
@@ -934,7 +938,7 @@ define(["NextWave/source/utility/prototypes",
 
                             return null;
                         } catch (e) {
-                            
+
                             return e;
                         }
                     };
@@ -1042,7 +1046,7 @@ define(["NextWave/source/utility/prototypes",
                                 return exceptionRet;
                             }
 
-                            // Clear existing drag object--it will be reset, 
+                            // Clear existing drag object--it will be reset,
                             // if applicable lower down in this method.
                             exceptionRet = self.dragLayer.clearDragObject();
                             if (exceptionRet) {
@@ -1416,16 +1420,16 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            // Get the size from the container, 
+                            // Get the size from the container,
                             // if possible, or default (?).
                             m_dWidth = m_jqParent.width();
-                            if (m_dWidth === undefined || 
+                            if (m_dWidth === undefined ||
                                 m_dWidth === 0) {
 
                                 m_dWidth = settings.manager.defaultWidth;
                             }
                             m_dHeight = m_jqParent.height();
-                            if (m_dHeight === undefined || 
+                            if (m_dHeight === undefined ||
                                 m_dHeight === 0) {
 
                                 m_dHeight = settings.manager.defaultHeight;
@@ -1448,11 +1452,11 @@ define(["NextWave/source/utility/prototypes",
                             m_contextRender.textAlign = "left";
 
                             // Define the extent for the layers.
-                            var sizeExtent = new Size(m_dWidth, 
+                            var sizeExtent = new Size(m_dWidth,
                                 m_dHeight);
 
                             // Calculate the maximal area.
-                            m_areaMaximal = new Area(new Point(0, 0), 
+                            m_areaMaximal = new Area(new Point(0, 0),
                                 sizeExtent);
 
                             // Update all layers.
@@ -1481,12 +1485,12 @@ define(["NextWave/source/utility/prototypes",
 
                     // Render out the application.
                     var m_functionRender = function () {
-                        
+
                         try {
 
                             // Get "now".
                             var iMS = (new Date()).getTime();
- 
+
                             // Calculate the layout whenever dirty.
                             var exceptionRet = null;
                             if (m_bDirty[self.iPanelArrangement]) {
@@ -1513,7 +1517,7 @@ define(["NextWave/source/utility/prototypes",
                                 }
                             }
                         } catch (e) {
-                            
+
                             alert(e.message);
                         } finally {
 
@@ -1557,26 +1561,26 @@ define(["NextWave/source/utility/prototypes",
                     var m_arrayReserved = [
 
                         "abstract", "alert", "all", "anchor", "anchors", "area", "Array", "assign",
-                        "Boolean", "break", "byte", "blur", "button", 
+                        "Boolean", "break", "byte", "blur", "button",
                         "case", "catch", "char", "class", "const", "continue", "checkbox", "clearInterval", "clearTimeout", "clientInformation", "close", "closed", "confirm", "constructor", "crypto",
-                        "debugger", "default", "delete", "do", "double", "Date", "decodeURI", "decodeURIComponent", "defaultStatus", "document", 
+                        "debugger", "default", "delete", "do", "double", "Date", "decodeURI", "decodeURIComponent", "defaultStatus", "document",
                         "else", "enum", "export", "extends", "element", "elements", "embed", "encodeURI", "encodeURIComponent", "escape", "eval", "event",
                         "false", "final", "finally", "float", "for", "function", "fileUpload", "focus", "form", "forms", "frame", "frames", "frameRate",
                         "goto", "getClass",
-                        "hasOwnProperty", "hidden", "history", 
-                        "if", "implements", "import", "in", "instanceof", "int", "interface", "Image", "images", "Infinity", "isFinite", "isNaN", "isPrototypeOf", "innerHeight", "innerWidth", 
+                        "hasOwnProperty", "hidden", "history",
+                        "if", "implements", "import", "in", "instanceof", "int", "interface", "Image", "images", "Infinity", "isFinite", "isNaN", "isPrototypeOf", "innerHeight", "innerWidth",
                         "java", "JavaArray", "JavaClass", "JavaObject", "JavaPackage",
                         "let", "long", "layer", "laysers", "length", "link", "location",
-                        "Math", "mimeTypes", 
-                        "native", "new", "null", "name", "NaN", "navigate", "navigator", "Number", 
+                        "Math", "mimeTypes",
+                        "native", "new", "null", "name", "NaN", "navigate", "navigator", "Number",
                         "Object", "offscreenBuffering", "open", "opener", "option", "outerHeight", "outerWidth", "onbeforeunload", "onblur", "ondragdrop", "onclick", "oncontextmenu", "onerror", "onfocus", "onkeydown", "onkeypress", "onkeyup", "onload", "onmousedown", "onmousemove", "onmouseout", "onmouseover", "onmouseup", "onreset", "onsubmit", "onunload",
                         "package", "private", "protected", "public", "packages", "pageXOffset", "pageYOffset", "parent", "pargeFloat", "parseInt", "password", "pkcs11", "plugin", "prompt", "propertyIsEnum", "prototype",
                         "return", "radio", "reset", "RegEx",
-                        "short", "static", "super", "switch", "synchronized", "screenX", "screenY", "scroll", "secure", "select", "self", "setInterval", "setTimeout", "status", "String", "submit", 
-                        "this", "throw", "throws", "transient", "true", "try", "typeof", "taint", "text", "textarea", "top", "toString", 
-                        "undefined", "unescape", "untaint", 
-                        "var", "void", "volatile", "valueOf", 
-                        "while", "with" 
+                        "short", "static", "super", "switch", "synchronized", "screenX", "screenY", "scroll", "secure", "select", "self", "setInterval", "setTimeout", "status", "String", "submit",
+                        "this", "throw", "throws", "transient", "true", "try", "typeof", "taint", "text", "textarea", "top", "toString",
+                        "undefined", "unescape", "untaint",
+                        "var", "void", "volatile", "valueOf",
+                        "while", "with"
                     ];
                 } catch (e) {
 

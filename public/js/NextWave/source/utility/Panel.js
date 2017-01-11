@@ -111,11 +111,11 @@ define(["NextWave/source/utility/prototypes",
                                     objectReference.pointCursor,
                                     true)) {
 
-                                // Indicate that over payload = true, 
+                                // Indicate that over payload = true,
                                 // subsequent mouse events can short-cut.
                                 m_bInPayload = true;
 
-                                // Have to tell the manager this panel handled the 
+                                // Have to tell the manager this panel handled the
                                 // call, because of the return statement just here.
                                 objectReference.handled = true;
 
@@ -411,7 +411,7 @@ define(["NextWave/source/utility/prototypes",
                             self.openExtent = new Size(self.extentPercent.width * sizeExtent.width - 2 * settings.panel.gap,
                                 self.extentPercent.height * sizeExtent.height - 2 * settings.panel.gap);
 
-                            // Set the closed and current extent 
+                            // Set the closed and current extent
                             // based on the extent and dock.
                             if (self.dock === orientation.north) {
 
@@ -602,7 +602,7 @@ define(["NextWave/source/utility/prototypes",
 
                                 // Render title.
                                 contextRender.fillText(self.title,
-                                    self.location.x + settings.panel.north.offsetWidth,
+									self.location.x + settings.panel.north.offsetWidth + (self.title !== "Home" ? 0 : 20),
                                     self.location.y + self.currentExtent.height - settings.panel.north.lineHeight + settings.panel.gap,
                                     self.location.x + self.currentExtent.width - settings.glyphs.width - self.location.x - settings.panel.north.offsetWidth - settings.panel.gap);
 
@@ -621,7 +621,7 @@ define(["NextWave/source/utility/prototypes",
                                     // Calculate where the pin is, also used for hittesting.
                                     m_areaGlyph = new Area(
                                         new Point(self.location.x + self.currentExtent.width - settings.glyphs.width,
-                                            self.location.y + self.currentExtent.height - settings.panel.north.lineHeight),
+										self.location.y + self.currentExtent.height - settings.panel.north.lineHeight),	// - (self.title !== "Home" ? 0 : 100)),
                                         new Size(settings.panel.north.lineHeight,
                                             settings.panel.north.lineHeight));
 

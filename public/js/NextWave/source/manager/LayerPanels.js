@@ -59,6 +59,8 @@ define(["NextWave/source/utility/prototypes",
                     self.typesPanel = null;
                     // Panel of centers.
                     self.centerPanel = null;
+					// Panel for Landing Page.
+					self.landingPagePanel = null;
                     // Save configuration.
                     self.iPanelConfiguration = null;
 
@@ -99,7 +101,12 @@ define(["NextWave/source/utility/prototypes",
                                         orientation.west,
                                         new Point(0, settings.layerPanels.typesPanel.y),
                                         new Size(settings.layerPanels.typesPanel.width, settings.layerPanels.typesPanel.height));
-        
+
+                                    self.landingPagePanel = new Panel("Home",
+                                        orientation.north,
+                                        new Point(0, 0),
+                                        new Size(settings.layerPanels.landingPagePanel.width, settings.layerPanels.landingPagePanel.height));
+
                                     // Add the ProjectDialog to the types Panel.
                                     var exceptionRet = m_functionAddProjectDialogToTypesPanel(self.typesPanel);
                                     if (exceptionRet) {
@@ -107,8 +114,16 @@ define(["NextWave/source/utility/prototypes",
                                         throw exceptionRet;
                                     }
 
+                                    // Add the LandingPage to the landingPagePanel panel.
+                                    var exceptionRet = m_functionSetLandingPageInLandingPagePanel(self.landingPagePanel);
+                                    if (exceptionRet) {
+
+                                        throw exceptionRet;
+                                    }
+
                                     // Compile to generic list of panels for looping operations.
                                     m_arrayPanels = [
+										self.landingPagePanel,
                                         self.typesPanel,
                                         self.centerPanel
                                     ];
@@ -272,7 +287,7 @@ define(["NextWave/source/utility/prototypes",
                             window.openProjectDialog = null;
                             window.landingPage = null;
 
-                            // Clear out the possible 
+                            // Clear out the possible
                             // payloads for the center panel.
                             var exceptionRet = m_functionAllocateProjectBuilder();
                             if (exceptionRet) {
@@ -353,7 +368,7 @@ define(["NextWave/source/utility/prototypes",
 					self.resetCenterPanelTitle = function(strTitle) {
 
 						self.centerPanel.resetTitle(strTitle);
-					}					
+					}
 
                     // Put the center panel into different modes.
                     self.switchCenterPanelMode = function(strMode) {
@@ -394,9 +409,6 @@ define(["NextWave/source/utility/prototypes",
                             } else if (strMode === "OpenProject") {
 
                                 return m_functionSetOpenProjectInCenterPanel();
-                            } else if (strMode === "LandingPage") {
-
-                                return m_functionSetLandingPageInCenterPanel();
                             }
                             return null;
                         } catch (e) {
@@ -406,24 +418,35 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Open and Pin all panels.
+					// Except, before opening typesPanel and centerPanel, we close landingPagePanel.
                     self.openAndPinAllPanels = function() {
 
                         m_arrayPanels.forEach(
                             function(panelIth) {
                                 if (panelIth) {
-                                    panelIth.openAndPin();
+
+									if (panelIth.title === "Home") {
+										panelIth.unpin();
+									} else {
+                                    	panelIth.openAndPin();
+									}
                                 }
                             }
                         );
                     }
 
                     // Unpin all panels. They are cleared.
+					// Except, after closing typesPanel and centerPanel, we open and pin landingPagePanel.
                     self.unpinAllPanels = function() {
 
                         m_arrayPanels.forEach(
                             function(panelIth) {
                                 if (panelIth) {
-                                    panelIth.unpin();
+									if (panelIth.title !== "Home") {
+	                                    panelIth.unpin();
+									} else {
+										panelIth.openAndPin();
+									}
                                 }
                             }
                         );
@@ -466,7 +489,7 @@ define(["NextWave/source/utility/prototypes",
                                 }
                             }
 
-                            // Deactivate the old activation in  
+                            // Deactivate the old activation in
                             // the current panel, if it changed.
                             if (panelOriginal &&
                                 m_panelActive !== panelOriginal) {
@@ -574,7 +597,7 @@ define(["NextWave/source/utility/prototypes",
                                 return null;
                             }
 
-                            // Deactivate the activation in  
+                            // Deactivate the activation in
                             // the current panel, if activated.
                             if (m_panelActive) {
 
@@ -1027,6 +1050,30 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+                    // Helper method adds landingPagePanel to landingPagePanel panel.
+                    var m_functionSetLandingPageInLandingPagePanel = function(panelLanding) {
+
+                        try {
+
+                            // Allocate and create the landingPageDialog, passing the initialization object.
+                            window.landingPageDialog = new LandingPage();
+                            var exceptionRet = window.landingPageDialog.create();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
+                            // Set it.
+							panelLanding.setPayload("Home",
+								window.landingPageDialog);
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Helper method sets ProjectBuilder in the method panel.
                     var m_functionSetProjectBuilderInCenterPanel = function() {
 
@@ -1041,7 +1088,6 @@ define(["NextWave/source/utility/prototypes",
                             window.comicBuilder.visible = false;
                             window.projectBuilder.visible = true;
                             window.librarySearchDialog.visible = false;
-                            window.landingPage.visible = false;
                             if (window.newProjectDialog) {
                                 window.newProjectDialog.visible = false;
                             }
@@ -1075,7 +1121,6 @@ define(["NextWave/source/utility/prototypes",
                             window.comicBuilder.visible = true;
                             window.projectBuilder.visible = false;
                             window.librarySearchDialog.visible = false;
-                            window.landingPage.visible = false;
                             if (window.newProjectDialog) {
                                 window.newProjectDialog.visible = false;
                             }
@@ -1109,7 +1154,6 @@ define(["NextWave/source/utility/prototypes",
                             window.comicBuilder.visible = false;
                             window.projectBuilder.visible = false;
                             window.librarySearchDialog.visible = false;
-                            window.landingPage.visible = false;
                             if (window.newProjectDialog) {
                                 window.newProjectDialog.visible = false;
                             }
@@ -1143,7 +1187,6 @@ define(["NextWave/source/utility/prototypes",
                             window.comicBuilder.visible = false;
                             window.projectBuilder.visible = false;
                             window.librarySearchDialog.visible = false;
-                            window.landingPage.visible = false;
                             if (window.newProjectDialog) {
                                 window.newProjectDialog.visible = false;
                             }
@@ -1177,7 +1220,6 @@ define(["NextWave/source/utility/prototypes",
                             window.comicBuilder.visible = false;
                             window.projectBuilder.visible = false;
                             window.librarySearchDialog.visible = false;
-                            window.landingPage.visible = false;
                             if (window.newProjectDialog) {
                                 window.newProjectDialog.visible = false;
                             }
@@ -1211,7 +1253,6 @@ define(["NextWave/source/utility/prototypes",
                             window.comicBuilder.visible = false;
                             window.projectBuilder.visible = false;
                             window.librarySearchDialog.visible = false;
-                            window.landingPage.visible = false;
                             if (window.newProjectDialog) {
                                 window.newProjectDialog.visible = false;
                             }
@@ -1245,7 +1286,6 @@ define(["NextWave/source/utility/prototypes",
                             window.comicBuilder.visible = false;
                             window.projectBuilder.visible = false;
                             window.librarySearchDialog.visible = true;
-                            window.landingPage.visible = false;
                             if (window.newProjectDialog) {
                                 window.newProjectDialog.visible = false;
                             }
@@ -1279,7 +1319,6 @@ define(["NextWave/source/utility/prototypes",
                             window.comicBuilder.visible = false;
                             window.projectBuilder.visible = false;
                             window.librarySearchDialog.visible = false;
-                            window.landingPage.visible = false;
                             if (window.newProjectDialog) {
                                 window.newProjectDialog.visible = true;
                             }
@@ -1313,7 +1352,6 @@ define(["NextWave/source/utility/prototypes",
                             window.comicBuilder.visible = false;
                             window.projectBuilder.visible = false;
                             window.librarySearchDialog.visible = false;
-                            window.landingPage.visible = false;
                             if (window.newProjectDialog) {
                                 window.newProjectDialog.visible = false;
                             }
@@ -1347,7 +1385,6 @@ define(["NextWave/source/utility/prototypes",
                             window.comicBuilder.visible = false;
                             window.projectBuilder.visible = false;
                             window.librarySearchDialog.visible = false;
-                            window.landingPage.visible = false;
                             if (window.newProjectDialog) {
                                 window.newProjectDialog.visible = false;
                             }
@@ -1360,40 +1397,6 @@ define(["NextWave/source/utility/prototypes",
 
                             // Set it in the center panel.
                             return self.centerPanel.setPayload("Open Project",
-                                window.openProjectDialog);
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Helper method sets LandingPage in the method panel.
-                    var m_functionSetLandingPageInCenterPanel = function() {
-
-                        try {
-
-                            // Set visible to property builder.
-                            window.eventBuilder.visible = false;
-                            window.propertyBuilder.visible = false;
-                            window.methodBuilder.visible = false;
-                            window.typeBuilder.visible = false;
-                            window.libraryBuilder.visible = false;
-                            window.comicBuilder.visible = false;
-                            window.projectBuilder.visible = false;
-                            window.librarySearchDialog.visible = false;
-                            if (window.newProjectDialog) {
-                                window.newProjectDialog.visible = false;
-                            }
-                            if (window.newProjectDialog) {
-                                window.saveProjectDialog.visible = false;
-                            }
-                            if (window.newProjectDialog) {
-                                window.openProjectDialog.visible = false;
-                            }
-                            window.landingPage.visible = true;
-
-                            // Set it in the center panel.
-                            return self.centerPanel.setPayload("LandingPage",
                                 window.openProjectDialog);
                         } catch (e) {
 
@@ -1415,7 +1418,6 @@ define(["NextWave/source/utility/prototypes",
                             window.comicBuilder.visible = false;
                             window.projectBuilder.visible = false;
                             window.librarySearchDialog.visible = false;
-                            window.landingPage.visible = false;
                             if (window.newProjectDialog) {
                                 window.newProjectDialog.visible = false;
                             }
