@@ -304,6 +304,9 @@ define(["NextWave/source/utility/prototypes",
                             if (!self.closing) {
 
                                 self.closing = true;
+
+								// Jerry Test
+								self.closed = false;
                             }
                             return null;
                         } catch (e) {
@@ -368,6 +371,9 @@ define(["NextWave/source/utility/prototypes",
 
                             // Start the closing.
                             self.closing = true;
+
+							// Jerry Test
+							self.closed = false;
                         }
                     }
 
@@ -413,7 +419,27 @@ define(["NextWave/source/utility/prototypes",
 
                             // Set the closed and current extent
                             // based on the extent and dock.
-                            if (self.dock === orientation.north) {
+							if (self.dock === orientation.northwest) {
+
+//                                self.location.y = 0;
+                                self.closedExtent = new Size(settings.layerPanels.landingPagePanel.closedWidth * sizeExtent.width,
+                                    settings.panel.closedExtent);
+
+                                // Also set the payload area.
+                                if (self.open) {
+
+                                    m_areaPayload = new Area(new Point(self.location.x,
+                                            0),
+                                        new Size(self.openExtent.width,
+                                            self.openExtent.height - settings.panel.closedExtent));
+                                } else {
+
+                                    m_areaPayload = new Area(new Point(self.location.x,
+                                            0),
+                                        new Size(self.openExtent.width,
+                                            0));
+                                }
+							} else if (self.dock === orientation.north) {
 
                                 self.location.y = 0;
                                 self.closedExtent = new Size(self.openExtent.width,
@@ -533,7 +559,25 @@ define(["NextWave/source/utility/prototypes",
 
                             // Render flat against the docked edge.
                             contextRender.beginPath();
-                            if (self.dock === orientation.north) {
+							if (self.dock === orientation.northwest) {
+
+                                contextRender.moveTo(self.location.x,
+                                    self.location.y);
+                                contextRender.lineTo(self.location.x,
+                                    (self.location.y + self.currentExtent.height) - dCornerRadius);
+                                contextRender.quadraticCurveTo(self.location.x,
+                                    (self.location.y + self.currentExtent.height),
+                                    (self.location.x + dCornerRadius),
+                                    (self.location.y + self.currentExtent.height));
+                                contextRender.lineTo(self.location.x + self.currentExtent.width - dCornerRadius,
+                                    (self.location.y + self.currentExtent.height));
+                                contextRender.quadraticCurveTo(self.location.x + self.currentExtent.width,
+                                    (self.location.y + self.currentExtent.height),
+                                    (self.location.x + self.currentExtent.width),
+                                    (self.location.y + self.currentExtent.height - dCornerRadius));
+                                contextRender.lineTo(self.location.x + self.currentExtent.width,
+                                    (self.location.y));
+							} else if (self.dock === orientation.north) {
 
                                 contextRender.moveTo(self.location.x,
                                     self.location.y);
@@ -598,11 +642,11 @@ define(["NextWave/source/utility/prototypes",
                             // Render title, add-new (if specified) and pushpin.
                             contextRender.fillStyle = settings.panel.fillTitle;
                             contextRender.font = settings.panel.fontTitle;
-                            if (self.dock === orientation.north) {
+							if (self.dock === orientation.northwest) {
 
                                 // Render title.
                                 contextRender.fillText(self.title,
-									self.location.x + settings.panel.north.offsetWidth + (self.title !== "Home" ? 0 : 20),
+									self.location.x + settings.panel.north.offsetWidth,
                                     self.location.y + self.currentExtent.height - settings.panel.north.lineHeight + settings.panel.gap,
                                     self.location.x + self.currentExtent.width - settings.glyphs.width - self.location.x - settings.panel.north.offsetWidth - settings.panel.gap);
 
@@ -621,7 +665,44 @@ define(["NextWave/source/utility/prototypes",
                                     // Calculate where the pin is, also used for hittesting.
                                     m_areaGlyph = new Area(
                                         new Point(self.location.x + self.currentExtent.width - settings.glyphs.width,
-										self.location.y + self.currentExtent.height - settings.panel.north.lineHeight),	// - (self.title !== "Home" ? 0 : 100)),
+											self.location.y + self.currentExtent.height - settings.panel.north.lineHeight),
+                                        new Size(settings.panel.north.lineHeight,
+                                            settings.panel.north.lineHeight));
+
+                                    // Render pushpin.
+                                    var exceptionRet = glyphs.render(contextRender,
+                                        m_areaGlyph,
+                                        glyph,
+                                        settings.manager.showIconBackgrounds);
+                                    if (exceptionRet) {
+
+                                        throw exceptionRet;
+                                    }
+                                }
+							} else if (self.dock === orientation.north) {
+
+                                // Render title.
+                                contextRender.fillText(self.title,
+									self.location.x + settings.panel.north.offsetWidth,
+                                    self.location.y + self.currentExtent.height - settings.panel.north.lineHeight + settings.panel.gap,
+                                    self.location.x + self.currentExtent.width - settings.glyphs.width - self.location.x - settings.panel.north.offsetWidth - settings.panel.gap);
+
+                                // Render the pin if open.
+                                if (self.open) {
+
+                                    var glyph = null;
+                                    if (self.pinned) {
+
+                                        glyph = glyphs.arrowNorth;
+                                    } else {
+
+                                        glyph = glyphs.pushpin;
+                                    }
+
+                                    // Calculate where the pin is, also used for hittesting.
+                                    m_areaGlyph = new Area(
+                                        new Point(self.location.x + self.currentExtent.width - settings.glyphs.width,
+										self.location.y + self.currentExtent.height - settings.panel.north.lineHeight),
                                         new Size(settings.panel.north.lineHeight,
                                             settings.panel.north.lineHeight));
 
@@ -740,8 +821,13 @@ define(["NextWave/source/utility/prototypes",
                                     // Fade in/out if opening or closing.
                                     if (self.opening || self.closing || self.closed) {
 
-                                        contextRender.globalAlpha = m_dPercentOpen * m_dPercentOpen;
-                                    }
+										if (self.dock === orientation.northwest) {
+                                        	contextRender.globalAlpha = m_dPercentOpenHor * m_dPercentOpenVer;
+										} else {
+                                        	contextRender.globalAlpha = m_dPercentOpen * m_dPercentOpen;
+										}
+									}
+
                                     return self.payload.render(contextRender);
                                 } finally {
 
@@ -767,7 +853,38 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            if (self.dock === orientation.north) {
+							if (self.dock === orientation.northwest) {
+
+                                // If there's more work to do. We will work in two dimensions.
+                                if (self.currentExtent.height < self.openExtent.height) {
+
+                                    self.currentExtent.height += settings.panel.heightDelta;
+                                    m_areaPayload.extent.height += settings.panel.heightDelta;
+
+                                    // Calculate how much open the panel is.
+                                    m_dPercentOpenHor = self.currentExtent.height / self.openExtent.height;
+                                }
+
+                                if (self.currentExtent.width < self.openExtent.width) {
+
+                                    self.currentExtent.width += settings.panel.widthDelta;
+                                    m_areaPayload.extent.width += settings.panel.widthDelta;
+
+                                    // Calculate how much open the panel is.
+                                    m_dPercentOpenVer = self.currentExtent.width / self.openExtent.width;
+                                }
+
+								if (Math.abs(m_dPercentOpenHor - 1 + m_dPercentOpenVer - 1) < .01) {
+
+                                    self.currentExtent.height = self.openExtent.height;
+                                    self.currentExtent.width = self.openExtent.width;
+                                    m_areaPayload.extent.height = self.openExtent.height - settings.panel.closedExtent;
+                                    m_areaPayload.extent.width = self.openExtent.width - settings.panel.closedExtent;		// ???
+
+                                    self.open = true;
+                                    self.opening = false;
+								}
+							} else if (self.dock === orientation.north) {
 
                                 // If there's more work to do.
                                 if (self.currentExtent.height < self.openExtent.height) {
@@ -849,7 +966,46 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            if (self.dock === orientation.north) {
+                            if (self.dock === orientation.northwest) {
+
+                                // If there's more work to do. Both hor and vert.
+                                if (self.currentExtent.height > self.closedExtent.height) {
+
+                                    self.currentExtent.height -= settings.panel.heightDelta;
+                                    m_areaPayload.extent.height -= settings.panel.heightDelta;
+
+                                    // Calculate how much open the panel is.
+                                    m_dPercentOpenVer = self.currentExtent.height / self.openExtent.height;
+                                }
+
+                                if (self.currentExtent.width > self.closedExtent.width) {
+
+                                    self.currentExtent.width -= settings.panel.widthDelta;
+                                    m_areaPayload.extent.width -= settings.panel.widthDelta;
+
+                                    // Calculate how much open the panel is.
+                                    m_dPercentOpenHor = self.currentExtent.width / self.openExtent.width;
+                                }
+
+								let bHorDone = false;
+								let bVerDone = false;
+								if (Math.abs(m_dPercentOpenVer - 0.0323) < 0.01) {
+                                    self.currentExtent.height = self.closedExtent.height;
+                                    m_areaPayload.extent.height = 0;
+									bVerDone = true;
+								}
+
+								if (Math.abs(m_dPercentOpenHor - 0.3) < 0.01) {
+                                    self.currentExtent.width = self.closedExtent.width;
+                                    m_areaPayload.extent.width = 0;
+									bHorDone = true;
+								}
+
+								if (bHorDone && bVerDone) {
+                                    self.closed = true;
+                                    self.closing = false;
+                                }
+                            } else if (self.dock === orientation.north) {
 
                                 // If there's more work to do.
                                 if (self.currentExtent.height > self.closedExtent.height) {
@@ -941,6 +1097,8 @@ define(["NextWave/source/utility/prototypes",
                     var m_bInPayload = false;
                     // The percentage of open.
                     var m_dPercentOpen = 0;
+					var m_dPercentOpenHor = 0;
+					var m_dPercentOpenVer = 0;
                 } catch (e) {
 
                     alert(e.message);

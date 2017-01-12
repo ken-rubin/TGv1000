@@ -32,6 +32,8 @@ define(["NextWave/source/utility/prototypes"],
                     self.east = "east";
                     // West.
                     self.west = "west";
+					// Northwest. For Landing Page.
+					self.northwest = "northwest";
                 } catch (e) {
 
                     alert(e.message);

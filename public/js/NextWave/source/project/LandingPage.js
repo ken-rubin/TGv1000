@@ -49,7 +49,7 @@ define(["NextWave/source/utility/prototypes",
 
                             // Create the dialog.
 							let objectConfiguration = {
-								test: {
+								test1: {
 									type: "Label",
 									text: "This is a test. Live with it.",
 									modes: ['Normal user','Privileged user'],
@@ -63,6 +63,18 @@ define(["NextWave/source/utility/prototypes",
 									},
 									width: settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
+								},
+								test2: {
+									type: "ListHost",
+									modes: ['Normal user','Privileged user'],
+									constructorParameterString: "false",
+									x: 2 * settings.general.margin +
+										settings.dialog.firstColumnWidth,
+									y: 5 * settings.general.margin,
+									widthType: "reserve",
+									width: 2 * settings.general.margin +
+										settings.dialog.firstColumnWidth,
+									height: 100
 								}
 							};
                             var exceptionRet = self.dialog.create(objectConfiguration,

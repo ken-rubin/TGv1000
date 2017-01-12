@@ -121,6 +121,7 @@ define(["NextWave/source/utility/prototypes"],
                         fontTitle: "16px Arial",
                         fillTitle: "#123",
                         heightDelta: 10,
+                        widthDelta: 10,
                         gap: 4,
                         north: {
 
@@ -237,23 +238,9 @@ define(["NextWave/source/utility/prototypes"],
                         // For normal projects:
                         typesPanel: {
 
-                            y: 0.0,
+                            y: 0.03,
                             width: 0.3,
-                            height: 1
-                        },
-                        // For normal projects:
-                        systemTypesPanel: {
-
-                            y: 0.0,
-                            width: 0.3,
-                            height: 1
-                        },
-                        // For system types projects:
-                        systemTypesPanelSpecial: {
-
-                            y: 0.0,
-                            width: 0.3,
-                            height: 1
+                            height: 0.97
                         },
                         centerPanel: {
 
@@ -264,7 +251,8 @@ define(["NextWave/source/utility/prototypes"],
 						landingPagePanel: {
 
 							width: 1,
-							height: 1
+							height: 1,
+							closedWidth: 0.3
 						}
                     };
                     self.centerPanel = {

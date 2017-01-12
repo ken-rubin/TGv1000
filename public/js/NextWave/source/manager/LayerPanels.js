@@ -103,7 +103,7 @@ define(["NextWave/source/utility/prototypes",
                                         new Size(settings.layerPanels.typesPanel.width, settings.layerPanels.typesPanel.height));
 
                                     self.landingPagePanel = new Panel("Home",
-                                        orientation.north,
+                                        orientation.northwest,
                                         new Point(0, 0),
                                         new Size(settings.layerPanels.landingPagePanel.width, settings.layerPanels.landingPagePanel.height));
 
@@ -1064,8 +1064,9 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Set it.
-							panelLanding.setPayload("Home",
-								window.landingPageDialog);
+							// Which way???
+//							panelLanding.setPayload("Home", window.landingPageDialog);
+							panelLanding.payload = window.landingPageDialog;
 
                             return null;
                         } catch (e) {
