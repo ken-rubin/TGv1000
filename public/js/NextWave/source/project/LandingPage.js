@@ -17,9 +17,11 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/Area",
     "NextWave/source/utility/DialogHost",
     "NextWave/source/utility/List",
-    "NextWave/source/utility/ListItem"
+    "NextWave/source/utility/ListItem",
+    "NextWave/source/utility/PictureListItem",
+	"Core/resourceHelper"
     ],
-    function (prototypes, settings, Point, Size, Area, DialogHost, List, ListItem) {
+    function (prototypes, settings, Point, Size, Area, DialogHost, List, ListItem, PictureListItem, resourceHelper) {
 
         try {
 
@@ -49,37 +51,266 @@ define(["NextWave/source/utility/prototypes",
 
                             // Create the dialog.
 							let objectConfiguration = {
-								test1: {
+								coreLabel: {
 									type: "Label",
-									text: "This is a test. Live with it.",
-									modes: ['Normal user','Privileged user'],
-									xType: "callback",
-									x: function(area) {
-										return (area.extent.width - settings.dialog.firstColumnWidth) / 2
-									},
+									text: "Core projects",
+									modes: ['Privileged user'],
+									x: 7 * settings.general.margin,
 									yType: "callback",
 									y: function(area) {
-										return area.extent.height / 2
+										return (area.extent.height / 12 + settings.dialog.lineHeight) * 1;
 									},
 									width: settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
 								},
-								test2: {
+								coreProjects: {
+									type: "ListHost",
+									modes: ['Privileged user'],
+									constructorParameterString: "false",
+									x: settings.general.margin +
+										settings.dialog.firstColumnWidth,
+									yType: "callback",
+									y: function(area) {
+										return (area.extent.height / 12 + settings.dialog.lineHeight) * 1;
+									},
+									widthType: "callback",
+									width: function(area) {
+										return (area.extent.width - settings.dialog.firstColumnWidth) / 2;
+									},
+									heightType: "callback",
+									height: function(area) {
+										return area.extent.height / 12;
+									}
+								},
+								yourLabel: {
+									type: "Label",
+									text: "Your projects",
+									modes: ['Normal user','Privileged user'],
+									x: 7 * settings.general.margin,
+									yType: "callback",
+									y: function(area) {
+										return (area.extent.height / 12 + settings.dialog.lineHeight) * 2;
+									},
+									width: settings.dialog.firstColumnWidth,
+									height: settings.dialog.lineHeight
+								},
+								yourProjects: {
 									type: "ListHost",
 									modes: ['Normal user','Privileged user'],
 									constructorParameterString: "false",
-									x: 2 * settings.general.margin +
+									x: settings.general.margin +
 										settings.dialog.firstColumnWidth,
-									y: 5 * settings.general.margin,
-									widthType: "reserve",
-									width: 2 * settings.general.margin +
+									yType: "callback",
+									y: function(area) {
+										return (area.extent.height / 12 + settings.dialog.lineHeight) * 2;
+									},
+									widthType: "callback",
+									width: function(area) {
+										return (area.extent.width - settings.dialog.firstColumnWidth) / 2;
+									},
+									heightType: "callback",
+									height: function(area) {
+										return area.extent.height / 12;
+									}
+								},
+								sharedLabel: {
+									type: "Label",
+									text: "Shared projects",
+									modes: ['Normal user','Privileged user'],
+									x: 7 * settings.general.margin,
+									yType: "callback",
+									y: function(area) {
+										return (area.extent.height / 12 + settings.dialog.lineHeight) * 3;
+									},
+									width: settings.dialog.firstColumnWidth,
+									height: settings.dialog.lineHeight
+								},
+								sharedProjects: {
+									type: "ListHost",
+									modes: ['Normal user','Privileged user'],
+									constructorParameterString: "false",
+									x: settings.general.margin +
 										settings.dialog.firstColumnWidth,
-									height: 100
+									yType: "callback",
+									y: function(area) {
+										return (area.extent.height / 12 + settings.dialog.lineHeight) * 3;
+									},
+									widthType: "callback",
+									width: function(area) {
+										return (area.extent.width - settings.dialog.firstColumnWidth) / 2;
+									},
+									heightType: "callback",
+									height: function(area) {
+										return area.extent.height / 12;
+									}
+								},
+								productsLabel: {
+									type: "Label",
+									text: "Product kits",
+									modes: ['Normal user','Privileged user'],
+									x: 7 * settings.general.margin,
+									yType: "callback",
+									y: function(area) {
+										return (area.extent.height / 12 + settings.dialog.lineHeight) * 4;
+									},
+									width: settings.dialog.firstColumnWidth,
+									height: settings.dialog.lineHeight
+								},
+								productProjects: {
+									type: "ListHost",
+									modes: ['Normal user','Privileged user'],
+									constructorParameterString: "false",
+									x: settings.general.margin +
+										settings.dialog.firstColumnWidth,
+									yType: "callback",
+									y: function(area) {
+										return (area.extent.height / 12 + settings.dialog.lineHeight) * 4;
+									},
+									widthType: "callback",
+									width: function(area) {
+										return (area.extent.width - settings.dialog.firstColumnWidth) / 2;
+									},
+									heightType: "callback",
+									height: function(area) {
+										return area.extent.height / 12;
+									}
+								},
+								classroomLabel: {
+									type: "Label",
+									text: "Local classes",
+									modes: ['Normal user','Privileged user'],
+									x: 7 * settings.general.margin,
+									yType: "callback",
+									y: function(area) {
+										return (area.extent.height / 12 + settings.dialog.lineHeight) * 5;
+									},
+									width: settings.dialog.firstColumnWidth,
+									height: settings.dialog.lineHeight
+								},
+								classroomProjects: {
+									type: "ListHost",
+									modes: ['Normal user','Privileged user'],
+									constructorParameterString: "false",
+									x: settings.general.margin +
+										settings.dialog.firstColumnWidth,
+									yType: "callback",
+									y: function(area) {
+										return (area.extent.height / 12 + settings.dialog.lineHeight) * 5;
+									},
+									widthType: "callback",
+									width: function(area) {
+										return (area.extent.width - settings.dialog.firstColumnWidth) / 2;
+									},
+									heightType: "callback",
+									height: function(area) {
+										return area.extent.height / 12;
+									}
+								},
+								onlineLabel: {
+									type: "Label",
+									text: "Online classes",
+									modes: ['Normal user','Privileged user'],
+									x: 7 * settings.general.margin,
+									yType: "callback",
+									y: function(area) {
+										return (area.extent.height / 12 + settings.dialog.lineHeight) * 6;
+									},
+									width: settings.dialog.firstColumnWidth,
+									height: settings.dialog.lineHeight
+								},
+								onlineProjects: {
+									type: "ListHost",
+									modes: ['Normal user','Privileged user'],
+									constructorParameterString: "false",
+									x: settings.general.margin +
+										settings.dialog.firstColumnWidth,
+									yType: "callback",
+									y: function(area) {
+										return (area.extent.height / 12 + settings.dialog.lineHeight) * 6;
+									},
+									widthType: "callback",
+									width: function(area) {
+										return (area.extent.width - settings.dialog.firstColumnWidth) / 2;
+									},
+									heightType: "callback",
+									height: function(area) {
+										return area.extent.height / 12;
+									}
 								}
 							};
-                            var exceptionRet = self.dialog.create(objectConfiguration,
-							                                 !manager.userAllowedToCreateEditPurchProjs ? 'Normal user' : 'Privileged user'
+							let bPrivileged = (g_profile["can_create_classes"] || 					// Need to do it this way since manager.userAllowedToCreateEditPurchProjs not set yet.
+												g_profile["can_create_products"] ||
+												g_profile["can_create_onlineClasses"]);
+                            let exceptionRet = self.dialog.create(objectConfiguration,
+							                                 (bPrivileged ? 'Privileged user' : 'Normal user')
 							);
+                            if (exceptionRet) {
+                                return exceptionRet;
+                            }
+
+							//////////////////////////////////////
+							// Fill the 5 or 6 ListHosts with project images
+					        var posting = $.post("/BOL/UtilityBO/SearchProjects",
+					        	{
+					        		searchPhrase: '',
+					        		userAllowedToCreateEditPurchProjs: (bPrivileged ? 1 : 0)
+					        	},
+					        	'json'
+							);
+					        posting.done(function(data){
+
+					            if (data.success) {
+
+					                m_searchResultProcessedArray = new Array(6);
+					                m_searchResultRawArray = data.arrayRows;	// [][]
+
+					                for (let n = 0; n < 6; n++) {
+
+										let stripNth = m_searchResultRawArray[n];
+										let lhProjects = self.dialog.controlObject[m_arrayListHostNames[n]];
+										let listProjects = lhProjects.list;
+										let i = 0;
+
+										listProjects.destroy(); // Don't check result because if destroy fails, that's because it hadn't been created, so it's ok.
+
+					                	m_searchResultProcessedArray[n] = new Array();
+
+										// Loop through returned projects for ListHost[stripNum] (lhProjects).
+										let arrayOutput = stripNth.map((rawProj) => {
+
+											let itemIth = stripNth[i];
+											let rliNew = new PictureListItem(itemIth.name, itemIth.projectId, i, resourceHelper.toURL('resources', itemIth.projectImageId, 'image', ''));
+
+											return rliNew;
+										});
+										listProjects.create(arrayOutput);
+
+/*						                for (let i = 0; i < m_searchResultRawArray[stripNum].length; i++) {
+
+						                    let rowIth = m_searchResultRawArray[stripNum][i];
+						                    m_searchResultProcessedArray[stripNum].push(
+						                    	{
+							                    	index: i,	// 2nd dimension index of m_searchResultRawArray
+							                    	id: rowIth.projectId,
+							                    	name: rowIth.projectName,
+							                    	url: resourceHelper.toURL('resources',
+							                    		rowIth.projectImageId,
+							                    		'image',
+							                    		'')
+						                    	}
+						                    );
+						                }
+*/
+					                	//var exceptionRet = m_rebuildCarousel(stripNum);
+					                	//if (exceptionRet) { throw exceptionRet; }
+					                }
+					            } else {
+
+					                // !data.success
+									return new Error(data.message);
+					            }
+					        });
+
 
                             // Because it is!
                             m_bCreated = true;
@@ -117,6 +348,10 @@ define(["NextWave/source/utility/prototypes",
 
                     // Indicates this instance is already created.
                     var m_bCreated = false;
+					// These hold project search info.
+					var m_searchResultProcessedArray;
+					var m_searchResultRawArray;
+					var m_arrayListHostNames = ["coreProjects","yourProjects","sharedProjects","productProjects","classroomProjects","onlineProjects"];
 
                 } catch (e) {
 

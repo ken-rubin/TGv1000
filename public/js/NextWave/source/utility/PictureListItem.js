@@ -21,7 +21,7 @@ define(["NextWave/source/utility/prototypes",
         try {
 
             // Constructor function.
-        	var functionRet = function PictureListItem(strName, id, index) {
+        	var functionRet = function PictureListItem(strName, id, index, url) {
 
                 try {
 
@@ -47,13 +47,18 @@ define(["NextWave/source/utility/prototypes",
                     // Get a reference to the settings for this object.
                     self.settingsNode = settings.list["picture"];
                     // Callback to handle click event.
-                    // Callback must accept click-event-object 
+                    // Callback must accept click-event-object
                     // reference and return an Exception.
                     self.clickHandler = null;
 
                     ////////////////////////
                     // Initialization.
-                    self.url = resourceHelper.toURL("images", null, null, self.name + "Project.png");
+					self.url = null;
+					if (!url) {
+	                    self.url = resourceHelper.toURL("images", null, null, self.name + "Project.png");
+					} else {
+						self.url = url;
+					}
                     var m_image = new Image();
                     var m_bLoaded = false;
                     m_image.onload = function() {
@@ -101,7 +106,7 @@ define(["NextWave/source/utility/prototypes",
                     self.getWidth = function (contextRender) {
 
                         contextRender.font = self.settingsNode.font;
-                        var dWidth = contextRender.measureText(self.name).width + 
+                        var dWidth = contextRender.measureText(self.name).width +
                             4 * settings.general.margin;
 
                         return dWidth;
@@ -196,9 +201,9 @@ define(["NextWave/source/utility/prototypes",
                             if (bVertical) {
 
                                 m_area = new Area(
-                                    new Point(areaRender.location.x + settings.general.margin, 
+                                    new Point(areaRender.location.x + settings.general.margin,
                                         areaRender.location.y + settings.general.margin + dOffset),
-                                    new Size(areaRender.extent.width - 2 * settings.general.margin, 
+                                    new Size(areaRender.extent.width - 2 * settings.general.margin,
                                         self.getHeight() - 2 * settings.general.margin)
                                 );
                             } else {
@@ -208,31 +213,31 @@ define(["NextWave/source/utility/prototypes",
 
                                     // First we'll draw the background (outline) rectangle at normal size.
                                     m_area = new Area(
-                                        new Point(areaRender.location.x + settings.general.margin + dOffset, 
+                                        new Point(areaRender.location.x + settings.general.margin + dOffset,
                                             areaRender.location.y + settings.general.margin),
-                                        new Size(self.getWidth(contextRender) - 2 * settings.general.margin, 
+                                        new Size(self.getWidth(contextRender) - 2 * settings.general.margin,
                                             areaRender.extent.height - 2 * settings.general.margin)
                                     );
                                     contextRender.fillStyle = "rgba(255,0,0,1)";
                                     contextRender.fillRect(
-                                        m_area.location.x, 
+                                        m_area.location.x,
                                         m_area.location.y,
                                         m_area.extent.width,
                                         m_area.extent.height);
 
                                     // Then we'll shrink down a bit so the image drawing below will appear indented.
                                     m_area = new Area(
-                                        new Point(areaRender.location.x + settings.general.margin + dOffset + 5, 
+                                        new Point(areaRender.location.x + settings.general.margin + dOffset + 5,
                                             areaRender.location.y + settings.general.margin + 5),
-                                        new Size(self.getWidth(contextRender) - 2 * settings.general.margin - 10, 
+                                        new Size(self.getWidth(contextRender) - 2 * settings.general.margin - 10,
                                             areaRender.extent.height - 2 * settings.general.margin - 10)
                                     );
                                 } else {
 
                                     m_area = new Area(
-                                        new Point(areaRender.location.x + settings.general.margin + dOffset, 
+                                        new Point(areaRender.location.x + settings.general.margin + dOffset,
                                             areaRender.location.y + settings.general.margin),
-                                        new Size(self.getWidth(contextRender) - 2 * settings.general.margin, 
+                                        new Size(self.getWidth(contextRender) - 2 * settings.general.margin,
                                             areaRender.extent.height - 2 * settings.general.margin)
                                     );
                                 }
@@ -270,10 +275,10 @@ define(["NextWave/source/utility/prototypes",
                             // Render the image.
                             try {
 
-                                contextRender.save();                                
+                                contextRender.save();
                                 contextRender.clip();
                                 contextRender.drawImage(m_image,
-                                    m_area.location.x, 
+                                    m_area.location.x,
                                     m_area.location.y,
                                     m_area.extent.width,
                                     m_area.extent.height);

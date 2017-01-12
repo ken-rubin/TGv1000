@@ -432,13 +432,20 @@ define(["NextWave/source/utility/prototypes",
                                             0),
                                         new Size(self.openExtent.width,
                                             self.openExtent.height - settings.panel.closedExtent));
-                                } else {
+                                } else if (self.closed) {
 
                                     m_areaPayload = new Area(new Point(self.location.x,
                                             0),
                                         new Size(self.openExtent.width,
                                             0));
-                                }
+                                } else {
+									// In the process of opening or closing.
+
+                                    m_areaPayload = new Area(new Point(self.location.x,
+                                            0),
+                                        new Size(self.openExtent.width * m_dPercentOpenHor,
+                                            self.openExtent.height * m_dPercentOpenVer - settings.panel.closedExtent));
+								}
 							} else if (self.dock === orientation.north) {
 
                                 self.location.y = 0;
@@ -874,7 +881,7 @@ define(["NextWave/source/utility/prototypes",
                                     m_dPercentOpenVer = self.currentExtent.width / self.openExtent.width;
                                 }
 
-								if (Math.abs(m_dPercentOpenHor - 1 + m_dPercentOpenVer - 1) < .01) {
+								if ((Math.abs(m_dPercentOpenHor - 1) < .01) && (Math.abs(m_dPercentOpenVer - 1) < .01)) {
 
                                     self.currentExtent.height = self.openExtent.height;
                                     self.currentExtent.width = self.openExtent.width;
