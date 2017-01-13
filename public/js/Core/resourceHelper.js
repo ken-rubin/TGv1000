@@ -27,13 +27,16 @@ define(["Core/errorHelper"],
 						//		resources: return "resources/" + iResourceId + (strResourceType === "image" ? ".png" : ".mp3")
 						//		images: return "media/images/" + strResourceFilename
 						//		panels: return "media/panels/" + strResourceFilename
-						//		comics: return "media/comics/" + iResourceId + ".png" 
+						//		comics: return "media/comics/" + iResourceId + ".png"
 
-						if (strResourceSource === "resources")
+						if (strResourceSource === "resources") {
 							if (iResourceId > 0)
 								return "resources/" + iResourceId + (strResourceType === "image" ? ".png" : ".mp3");
-							else
+							else if (strResourceFilename.length === 0)
 								return "media/images/clicktochange.png";
+							else
+								return strResourceFilename;
+						}
 						else if (strResourceSource === "images")
 							return "media/images/" + strResourceFilename;
 						else if (strResourceSource === "panels")
@@ -57,7 +60,7 @@ define(["Core/errorHelper"],
 				} catch (e) {
 
 					errorHelper.show(e);
-				}		
+				}
 			};
 
 			// Return instance of constructor function as module.

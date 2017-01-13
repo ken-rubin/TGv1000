@@ -30,12 +30,12 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
         console.log("Using remote (real) credit.");
         stripe = require("stripe")("sk_live_FNvxhlz9j5L82jwlyA4vIMK1");
     }
-    
+
     ////////////////////////////////////
     // Public methods
-    
+
     // Router handler functions.
-        
+
     // Simple handler returns public key to client.
     self.routeGetStripePK = function (req, res) {
 
@@ -47,7 +47,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
             pk: (bLocalCredit ? "pk_test_eiDr85dbo39T4J1O8fzNi00a" : "pk_live_XfqMDtVuoHHxfWCJOh6Dlp89")
         });
     };
-    
+
     self.routeProcessCharge = function (req, res) {
 
         try {
@@ -155,7 +155,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                                                     var aORz = (userIth.userName === 'a@a.com' || userIth.userName === 'z@z.com');
                                                     var when = classIth.mntClass1Date.format('dddd, MMMM Do YYYY [at] h:mm:ss a');
                                                     mailOptions = {
-                                             
+
                                                         from: "TechGroms <techgroms@gmail.com>", // sender address
                                                         to: (!aORz) ? userIth.userName : 'jerry@rubintech.com, ken.rubin@live.com, jdsurf@gmail.com',
                                                         subject: "A refund has been issued for the Next Wave Coders class", // Subject line
@@ -325,10 +325,10 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
             console.log("Entered UtilityBO/routeGetPPBuyers w/req.body = " + JSON.stringify(req.body));
             // req.body.projectId  purch. project id
 
-            // Retrieve and build a response containing: 
-            // (1) the project with numEnrollees property added; 
-            // (2) special PP data; 
-            // (3) array of purchasers (users); 
+            // Retrieve and build a response containing:
+            // (1) the project with numEnrollees property added;
+            // (2) special PP data;
+            // (3) array of purchasers (users);
             // (4) array of waitlisted users, if any (in order).
             // (5) array of users in the 24-hour period after being invited to enroll. Will be displayed with active countdown.
             // (6) array of up to 100 latest refunds.
@@ -374,7 +374,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                                 passOn.project["numEnrollees"] = numEnrollees;
                                 return cb(null, passOn);
                             },
-                            function(strError) { 
+                            function(strError) {
 
                                 return cb(new Error("Rec'd error fetching numEnrollees from DB: " + strError), null);
                             }
@@ -565,7 +565,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                             );
                         }
                     );
-                }            
+                }
             );
         } catch (e) {
 
@@ -638,7 +638,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                             );
                         }
                     );
-                }            
+                }
             );
         } catch (e) {
 
@@ -728,7 +728,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
 
 
 
-            
+
 
         } catch (e) {
 
@@ -787,7 +787,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         arrayRows: arrayRows[2]
                     });
                 },
-                function(strError) { 
+                function(strError) {
                     return res.json({
                         success: false,
                         message: "Fetch of resources failed with message: " + strError
@@ -819,7 +819,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                 sql.execute(strQuery,
                     function(rows) {
 
-                        if (rows.length === 0) { 
+                        if (rows.length === 0) {
                             return res.json({
                                 success: false,
                                 message: "Fetch of libraries from the database failed"
@@ -867,7 +867,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                             libraries: arrayRows[2]
                         });
                     },
-                    function(strError) { 
+                    function(strError) {
                         return res.json({
                             success: false,
                             message: "Fetch of libraries failed with message: " + strError
@@ -894,7 +894,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
             // req.user.userName
             // req.body.userAllowedToCreateEditPurchProjs
 
-            // Will return arrayRows: [][] where first dimension is 
+            // Will return arrayRows: [][] where first dimension is
             //  [0] core projects (empty if req.body.userAllowedToCreateEditPurchProjs === "0")
             //  [1] user's own projects
             //  [2] other's projects (if req.body.userAllowedToCreateEditPurchProjs, then ignore public/private; else just public)
@@ -905,7 +905,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
             // Will use async.waterfall to build up passOn javascript object:
             // (1) if req.body.userAllowedToCreateEditPurchProjs === "0", retrieve user's home zipcode;
             // (2) set things up to do soundex match on req.body.searchPhrase; this will result in creating a temporary table of soundex indices in descending order with 0 results ignored.
-            // (3) perform many select statements to get projects that both match searchPhrase and contain correct items based on req.body.userAllowedToCreateEditPurchProjs; 
+            // (3) perform many select statements to get projects that both match searchPhrase and contain correct items based on req.body.userAllowedToCreateEditPurchProjs;
             // (4) if req.body.userAllowedToCreateEditPurchProjs === "0", then winnow classes down by date and distance; onlineclasses by date; and for Products and Online Classes see if already bought.
             // (5) for all surviving classes determine current number of users who bought the class.
             // (6) drop the temp table if it was created.
@@ -944,7 +944,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         }
 
                         let sqlString = '';
-    
+
                         // Gen unique name for this call's temporary table.
                         let guid = m_createGuid();
                         console.log('guid=' + guid);
@@ -957,7 +957,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         console.log(sqlString);
                         sql.execute(sqlString,
                             function (arrayRows) {
-                            
+
                                 // Need to debug into this and see what is returned in arrayRows--just to see if anything needs checking.
                                 // if (arrayRows.length !== 1) { return cb(new Error('PROGRAM ERROR RECEIVED matching search phrase ' + req.body.searchPhrase), null); }
 
@@ -979,10 +979,10 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         // Core projects for privileged users. Empty array for non. req.body.searchPhase (actually passOn.tempTableName) isn't used.
                         // We do this query to fill passOn.projects[0] in any case.
                         if (req.body.userAllowedToCreateEditPurchProjs === "1") {
-                            strQuery = "select p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId from " + self.dbname + "projects p where p.isCoreProject=1;";
+                            strQuery = "select p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.altImagePath as projectAltImagePath from " + self.dbname + "projects p where p.isCoreProject=1;";
                         } else {
                             // We want this to return no rows but use [0].
-                            strQuery = "select p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId from " + self.dbname + "projects p where p.isCoreProject=-1;";
+                            strQuery = "select p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.altImagePath as projectAltImagePath from " + self.dbname + "projects p where p.isCoreProject=-1;";
                         }
 
                         if (passOn.tempTableName.length === 0) {
@@ -990,42 +990,42 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
 
                             // Owned by user. Same for both priv and non-priv.
                             // In this query I'm selecting baseProjectId as the id of the purchased project.
-                            strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.baseProjectId from " + self.dbname + "projects p where p.ownedByUserId=" + req.user.userId + ";";
+                            strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.altImagePath as projectAltImagePath, p.baseProjectId from " + self.dbname + "projects p where p.ownedByUserId=" + req.user.userId + ";";
 
                             // Others' accounts
                             if (req.body.userAllowedToCreateEditPurchProjs === "1") {
                                 // A privileged user doesn't care about public/private.
-                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.isOnlineClass=0;";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.altImagePath as projectAltImagePath from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.isOnlineClass=0;";
                             } else {
                                 // A non-privileged user can retrieve only public projects and only "normal" projects.
-                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.public=1 and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.isOnlineClass=0;";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.altImagePath as projectAltImagePath from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.public=1 and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.isOnlineClass=0;";
                             }
 
                             // Products
                             if (req.body.userAllowedToCreateEditPurchProjs === "1") {
                                 // A privileged user doesn't care about active.
-                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, pr.level, pr.difficulty, pr.productDescription, pr.imageId as prImageId, pr.price, pr.active, pr.videoURL from " + self.dbname + "projects p inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where p.isProduct=1;";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.altImagePath as projectAltImagePath, pr.level, pr.difficulty, pr.productDescription, pr.imageId as prImageId, pr.price, pr.active, pr.videoURL from " + self.dbname + "projects p inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where p.isProduct=1;";
                             } else {
                                 // A non-privileged user just sees active projects.
-                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.isProduct, pr.* from " + self.dbname + "projects p inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where pr.active=1 and p.isProduct=1;";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.altImagePath as projectAltImagePath, p.isProduct, pr.* from " + self.dbname + "projects p inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where pr.active=1 and p.isProduct=1;";
                             }
 
                             // Classes
                             if (req.body.userAllowedToCreateEditPurchProjs === "1") {
                                 // A privileged user doesn't care about active.
-                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, cl.level, cl.difficulty, cl.classDescription, cl.imageId as clImageId, cl.price, cl.schedule, cl.active, cl.classNotes, cl.zip, cl.maxClassSize from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where p.isClass=1;";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.altImagePath as projectAltImagePath, cl.level, cl.difficulty, cl.classDescription, cl.imageId as clImageId, cl.price, cl.schedule, cl.active, cl.classNotes, cl.zip, cl.maxClassSize from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where p.isClass=1;";
                             } else {
                                 // A non-privileged user just sees active classes.
-                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.isClass, cl.* from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where cl.active=1 and p.isClass=1;";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.altImagePath as projectAltImagePath, p.isClass, cl.* from " + self.dbname + "projects p inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where cl.active=1 and p.isClass=1;";
                             }
 
                             // Online classes
                             if (req.body.userAllowedToCreateEditPurchProjs === "1") {
                                 // A privileged user doesn't care about active.
-                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, cl.level, cl.difficulty, cl.classDescription, cl.imageId as clImageId, cl.price, cl.schedule, cl.active, cl.classNotes from " + self.dbname + "projects p inner join " + self.dbname + "onlineclasses cl on cl.baseProjectId=p.id where p.isOnlineClass=1;";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.altImagePath as projectAltImagePath, cl.level, cl.difficulty, cl.classDescription, cl.imageId as clImageId, cl.price, cl.schedule, cl.active, cl.classNotes from " + self.dbname + "projects p inner join " + self.dbname + "onlineclasses cl on cl.baseProjectId=p.id where p.isOnlineClass=1;";
                             } else {
                                 // A non-privileged user just sees active classes.
-                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.isOnlineClass, cl.* from " + self.dbname + "projects p inner join " + self.dbname + "onlineclasses cl on cl.baseProjectId=p.id where cl.active=1 and p.isOnlineClass=1;";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.altImagePath as projectAltImagePath, p.isOnlineClass, cl.* from " + self.dbname + "projects p inner join " + self.dbname + "onlineclasses cl on cl.baseProjectId=p.id where cl.active=1 and p.isOnlineClass=1;";
                             }
                         } else {
 
@@ -1033,42 +1033,42 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
 
                             // Owned by user. Same for both priv and non-priv.
                             // In this query I'm selecting baseProjectId as the id of the purchased project.
-                            strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.baseProjectId, t.sindex from " + self.dbname + "projects p inner join " + passOn.tempTableName + " t on t.projectId=p.id where p.ownedByUserId=" + req.user.userId + " and p.id in (select projectId from " + passOn.tempTableName + " where sindex>0);";
+                            strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.altImagePath as projectAltImagePath, p.baseProjectId, t.sindex from " + self.dbname + "projects p inner join " + passOn.tempTableName + " t on t.projectId=p.id where p.ownedByUserId=" + req.user.userId + " and p.id in (select projectId from " + passOn.tempTableName + " where sindex>0);";
 
                             // Others' accounts
                             if (req.body.userAllowedToCreateEditPurchProjs === "1") {
                                 // A privileged user doesn't care about public/private.
-                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, t.sindex from " + self.dbname + "projects p inner join " + passOn.tempTableName + " t on t.projectId=p.id where p.ownedByUserId<>" + req.user.userId + " and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.isOnlineClass=0 and p.id in (select projectId from " + passOn.tempTableName + " where sindex>0);";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.altImagePath as projectAltImagePath, t.sindex from " + self.dbname + "projects p inner join " + passOn.tempTableName + " t on t.projectId=p.id where p.ownedByUserId<>" + req.user.userId + " and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.isOnlineClass=0 and p.id in (select projectId from " + passOn.tempTableName + " where sindex>0);";
                             } else {
                                 // A non-privileged user can retrieve only public projects and only "normal" projects.
-                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, t.sindex from " + self.dbname + "projects p inner join " + passOn.tempTableName + " t on t.projectId=p.id where p.ownedByUserId<>" + req.user.userId + " and p.public=1 and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.isOnlineClass=0 and p.id in (select projectId from " + passOn.tempTableName + " where sindex>0);";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.altImagePath as projectAltImagePath, t.sindex from " + self.dbname + "projects p inner join " + passOn.tempTableName + " t on t.projectId=p.id where p.ownedByUserId<>" + req.user.userId + " and p.public=1 and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.isOnlineClass=0 and p.id in (select projectId from " + passOn.tempTableName + " where sindex>0);";
                             }
 
                             // Products
                             if (req.body.userAllowedToCreateEditPurchProjs === "1") {
                                 // A privileged user doesn't care about active.
-                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, t.sindex, pr.level, pr.difficulty, pr.productDescription, pr.imageId as prImageId, pr.price, pr.active, pr.videoURL from " + self.dbname + "projects p inner join " + passOn.tempTableName + " t on t.projectId=p.id inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where p.isProduct=1 and p.id in (select projectId from " + passOn.tempTableName + " where sindex>0);";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.altImagePath as projectAltImagePath, t.sindex, pr.level, pr.difficulty, pr.productDescription, pr.imageId as prImageId, pr.price, pr.active, pr.videoURL from " + self.dbname + "projects p inner join " + passOn.tempTableName + " t on t.projectId=p.id inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where p.isProduct=1 and p.id in (select projectId from " + passOn.tempTableName + " where sindex>0);";
                             } else {
                                 // A non-privileged user just sees active projects.
-                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.isProduct, t.sindex, pr.* from " + self.dbname + "projects p inner join " + passOn.tempTableName + " t on t.projectId=p.id inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where pr.active=1 and p.isProduct=1 and p.id in (select projectId from " + passOn.tempTableName + " where sindex>0);";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.altImagePath as projectAltImagePath, p.isProduct, t.sindex, pr.* from " + self.dbname + "projects p inner join " + passOn.tempTableName + " t on t.projectId=p.id inner join " + self.dbname + "products pr on pr.baseProjectId=p.id where pr.active=1 and p.isProduct=1 and p.id in (select projectId from " + passOn.tempTableName + " where sindex>0);";
                             }
 
                             // Classes
                             if (req.body.userAllowedToCreateEditPurchProjs === "1") {
                                 // A privileged user doesn't care about active.
-                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, t.sindex, cl.level, cl.difficulty, cl.classDescription, cl.imageId as clImageId, cl.price, cl.schedule, cl.active, cl.classNotes, cl.zip, cl.maxClassSize from " + self.dbname + "projects p inner join " + passOn.tempTableName + " t on t.projectId=p.id inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where p.isClass=1 and p.id in (select projectId from " + passOn.tempTableName + " where sindex>0);";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.altImagePath as projectAltImagePath, t.sindex, cl.level, cl.difficulty, cl.classDescription, cl.imageId as clImageId, cl.price, cl.schedule, cl.active, cl.classNotes, cl.zip, cl.maxClassSize from " + self.dbname + "projects p inner join " + passOn.tempTableName + " t on t.projectId=p.id inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where p.isClass=1 and p.id in (select projectId from " + passOn.tempTableName + " where sindex>0);";
                             } else {
                                 // A non-privileged user just sees active classes.
-                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, t.sindex, p.isClass, cl.* from " + self.dbname + "projects p inner join " + passOn.tempTableName + " t on t.projectId=p.id inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where cl.active=1 and p.isClass=1 and p.id in (select projectId from " + passOn.tempTableName + " where sindex>0);";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.altImagePath as projectAltImagePath, t.sindex, p.isClass, cl.* from " + self.dbname + "projects p inner join " + passOn.tempTableName + " t on t.projectId=p.id inner join " + self.dbname + "classes cl on cl.baseProjectId=p.id where cl.active=1 and p.isClass=1 and p.id in (select projectId from " + passOn.tempTableName + " where sindex>0);";
                             }
 
                             // Online classes
                             if (req.body.userAllowedToCreateEditPurchProjs === "1") {
                                 // A privileged user doesn't care about active.
-                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, t.sindex, cl.level, cl.difficulty, cl.classDescription, cl.imageId as clImageId, cl.price, cl.schedule, cl.active, cl.classNotes from " + self.dbname + "projects p inner join " + passOn.tempTableName + " t on t.projectId=p.id inner join " + self.dbname + "onlineclasses cl on cl.baseProjectId=p.id where p.isOnlineClass=1 and p.id in (select projectId from " + passOn.tempTableName + " where sindex>0);";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.altImagePath as projectAltImagePath, t.sindex, cl.level, cl.difficulty, cl.classDescription, cl.imageId as clImageId, cl.price, cl.schedule, cl.active, cl.classNotes from " + self.dbname + "projects p inner join " + passOn.tempTableName + " t on t.projectId=p.id inner join " + self.dbname + "onlineclasses cl on cl.baseProjectId=p.id where p.isOnlineClass=1 and p.id in (select projectId from " + passOn.tempTableName + " where sindex>0);";
                             } else {
                                 // A non-privileged user just sees active classes.
-                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, t.sindex, p.isOnlineClass, cl.* from " + self.dbname + "projects p inner join " + passOn.tempTableName + " t on t.projectId=p.id inner join " + self.dbname + "onlineclasses cl on cl.baseProjectId=p.id where cl.active=1 and p.isOnlineClass=1 and p.id in (select projectId from " + passOn.tempTableName + " where sindex>0);";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.altImagePath as projectAltImagePath, t.sindex, p.isOnlineClass, cl.* from " + self.dbname + "projects p inner join " + passOn.tempTableName + " t on t.projectId=p.id inner join " + self.dbname + "onlineclasses cl on cl.baseProjectId=p.id where cl.active=1 and p.isOnlineClass=1 and p.id in (select projectId from " + passOn.tempTableName + " where sindex>0);";
                             }
                         }
 
@@ -1151,7 +1151,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
 
                                     let mntClass1Date = moment(strClass1Date, "YYYY-MM-DD");
                                     if (mntClass1Date.isBefore(mntNow) || mntClass1Date.isAfter(mntNow.clone().add(3, "months"))) {
-                                        
+
                                         // Class started in the past or starts more than 3 months from now.
                                         projectIth.remove = true;
                                         return cb(null);
@@ -1226,7 +1226,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
 
                                     let mntClass1Date = moment(strClass1Date, "YYYY-MM-DD");
                                     if (mntClass1Date.isBefore(mntNow) || mntClass1Date.isAfter(mntNow.clone().add(3, "months"))) {
-                                        
+
                                         // Class started in the past or starts more than 3 months from now.
                                         projectIth.remove = true;
                                     }
@@ -1493,7 +1493,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
 
                 // Return success: true
                 res.json({
-                    
+
                     success: true
                 });
             }

@@ -261,7 +261,7 @@ define(["NextWave/source/utility/prototypes",
 
 					            if (data.success) {
 
-					                m_searchResultProcessedArray = new Array(6);
+					                //m_searchResultProcessedArray = new Array(6);
 					                m_searchResultRawArray = data.arrayRows;	// [][]
 
 					                for (let n = 0; n < 6; n++) {
@@ -273,14 +273,31 @@ define(["NextWave/source/utility/prototypes",
 
 										listProjects.destroy(); // Don't check result because if destroy fails, that's because it hadn't been created, so it's ok.
 
-					                	m_searchResultProcessedArray[n] = new Array();
+					                	//m_searchResultProcessedArray[n] = new Array();
 
 										// Loop through returned projects for ListHost[stripNum] (lhProjects).
 										let arrayOutput = stripNth.map((rawProj) => {
 
 											let itemIth = stripNth[i];
-											let rliNew = new PictureListItem(itemIth.name, itemIth.projectId, i, resourceHelper.toURL('resources', itemIth.projectImageId, 'image', ''));
+											let rliNew = new PictureListItem(itemIth.projectName, itemIth.projectId, i++, resourceHelper.toURL('resources', itemIth.projectImageId, 'image', itemIth.projectAltImagePath));
+											rliNew.clickHandler = (id) => {
 
+												m_projectId = id;
+
+												striploop:
+												for (let strip = 0; strip < 6; strip++) {
+
+													for (let ind = 0; ind < m_searchResultRawArray[strip].length; ind++) {
+
+														let item = m_searchResultRawArray[strip][ind];
+														if (item.projectId === id) {
+
+															alert("You clicked the project named " + item.projectName + ".");
+															break striploop;
+														}
+													}
+												}
+											}
 											return rliNew;
 										});
 										listProjects.create(arrayOutput);
@@ -349,9 +366,11 @@ define(["NextWave/source/utility/prototypes",
                     // Indicates this instance is already created.
                     var m_bCreated = false;
 					// These hold project search info.
-					var m_searchResultProcessedArray;
+					//var m_searchResultProcessedArray;
 					var m_searchResultRawArray;
 					var m_arrayListHostNames = ["coreProjects","yourProjects","sharedProjects","productProjects","classroomProjects","onlineProjects"];
+					// The project id for the user's selected project.
+					var m_projectId = 0;
 
                 } catch (e) {
 
