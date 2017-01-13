@@ -21,7 +21,11 @@ define(["NextWave/source/utility/prototypes",
         try {
 
             // Constructor function.
-        	var functionRet = function PictureListItem(strName, id, index, url) {
+			//
+			// One of pxFixedWidth or pxFixedHeight will be 0 and the other will not be.
+			// This will be used to determine which dimension of the image to fix and which to calculate
+			// in order to maintain aspect ratio of the original image.
+        	var functionRet = function PictureListItem(strName, id, index, url, pxFixedHeight, pxFixedWidth) {
 
                 try {
 
@@ -50,15 +54,14 @@ define(["NextWave/source/utility/prototypes",
                     // Callback must accept click-event-object
                     // reference and return an Exception.
                     self.clickHandler = null;
+					// One of the next two will be zero. One will not.
+					self.pxFixedWidth = pxFixedWidth;
+					self.pxFixedHeight = pxFixedHeight;
+					// Save url and initiate image retrieval.
+					self.url = url;
 
-                    ////////////////////////
-                    // Initialization.
-					self.url = null;
-					if (!url) {
-	                    self.url = resourceHelper.toURL("images", null, null, self.name + "Project.png");
-					} else {
-						self.url = url;
-					}
+					/////////////////////////
+					// Image initialization.
                     var m_image = new Image();
                     var m_bLoaded = false;
                     m_image.onload = function() {
@@ -98,18 +101,39 @@ define(["NextWave/source/utility/prototypes",
                     // Returns the height of this item.
                     self.getHeight = function () {
 
-                        var dHeight = self.settingsNode.lineHeight + 2 * settings.general.margin;
-                        return dHeight;
+						if (self.pxFixedHeight) {
+							return self.pxFixedHeight;
+						}
+
+						// Need to calculate height to preserve aspect ratio of original image.
+						// Can do that only if m_bLoaded === true. Else, we have no idea, so we'll make it square
+						// and hopefully be called again to make it right.
+						if (!m_bLoaded) {
+							return self.pxFixedHeight;
+						}
+
+						// The image exists in m_image. We know its true dimensions and we know the width we want.
+						// So we'll calculate its height, given the other 3 numbers.
+						return self.pxFixedWidth / m_image.width * m_image.height;
                     };
 
                     // Returns the width of this item.
                     self.getWidth = function (contextRender) {
 
-                        contextRender.font = self.settingsNode.font;
-                        var dWidth = contextRender.measureText(self.name).width +
-                            4 * settings.general.margin;
+						if (self.pxFixedWidth) {
+							return self.pxFixedWidth;
+						}
 
-                        return dWidth;
+						// Need to calculate width to preserve aspect ratio of original image.
+						// Can do that only if m_bLoaded === true. Else, we have no idea, so we'll make it square
+						// and hopefully be called again to make it right.
+						if (!m_bLoaded) {
+							return self.pxFixedWidth;
+						}
+
+						// The image exists in m_image. We know its true dimensions and we know the height we want.
+						// So we'll calculate its width, given the other 3 numbers.
+						return self.pxFixedHeight / m_image.height * m_image.width;
                     };
 
                     // Test if the point is in this item.

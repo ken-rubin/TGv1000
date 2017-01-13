@@ -230,11 +230,13 @@ define(["NextWave/source/utility/prototypes",
 									},
 									widthType: "callback",
 									width: function(area) {
-										return (area.extent.width - settings.dialog.firstColumnWidth) / 2;
+										m_pxFixedWidth = (area.extent.width - settings.dialog.firstColumnWidth) / 2;
+										return m_pxFixedWidth;
 									},
 									heightType: "callback",
 									height: function(area) {
-										return area.extent.height / 12;
+										m_pxFixedHeight = area.extent.height / 12;
+										return m_pxFixedWidth;
 									}
 								}
 							};
@@ -269,6 +271,7 @@ define(["NextWave/source/utility/prototypes",
 										let stripNth = m_searchResultRawArray[n];
 										let lhProjects = self.dialog.controlObject[m_arrayListHostNames[n]];
 										let listProjects = lhProjects.list;
+										let bVertical = (lhProjects.constructorParameterString === "true"); // If the ListHost is vertical.
 										let i = 0;
 
 										listProjects.destroy(); // Don't check result because if destroy fails, that's because it hadn't been created, so it's ok.
@@ -279,7 +282,7 @@ define(["NextWave/source/utility/prototypes",
 										let arrayOutput = stripNth.map((rawProj) => {
 
 											let itemIth = stripNth[i];
-											let rliNew = new PictureListItem(itemIth.projectName, itemIth.projectId, i++, resourceHelper.toURL('resources', itemIth.projectImageId, 'image', itemIth.projectAltImagePath));
+											let rliNew = new PictureListItem(itemIth.projectName, itemIth.projectId, i++, resourceHelper.toURL('resources', itemIth.projectImageId, 'image', itemIth.projectAltImagePath), (bVertical ? m_pxFixedWidth : 0), (!bVertical ? 0 : m_pxFixedHeight));
 											rliNew.clickHandler = (id) => {
 
 												m_projectId = id;
@@ -371,6 +374,9 @@ define(["NextWave/source/utility/prototypes",
 					var m_arrayListHostNames = ["coreProjects","yourProjects","sharedProjects","productProjects","classroomProjects","onlineProjects"];
 					// The project id for the user's selected project.
 					var m_projectId = 0;
+					// Hold fixed width or height of ListHosts.
+					var m_pxFixedHeight = 0;
+					var m_pxFixedWidth = 0;
 
                 } catch (e) {
 

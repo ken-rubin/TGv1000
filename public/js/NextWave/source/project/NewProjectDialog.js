@@ -1282,7 +1282,7 @@ Controls arranged by Mode
                             listProjectTypes.destroy(); // Don't check result because if destroy fails, that's because it hadn't been created, so it's ok.
                             let arrayOutput = arrayAvailProjTypes.map((projTypeId) => {
 
-                                let pliNew = new PictureListItem(m_arrayProjectTypeNames[projTypeId - 1], projTypeId, index++);
+                                let pliNew = new PictureListItem(m_arrayProjectTypeNames[projTypeId - 1], projTypeId, index++, resourceHelper.toURL("images", null, null, m_arrayProjectTypeNames[projTypeId - 1] + "Project.png"), 0, 100);
                                 pliNew.clickHandler = (id) => {
 
                                     // self is NewProjectDialog instance.
