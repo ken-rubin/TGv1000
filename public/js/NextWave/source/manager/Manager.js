@@ -25,6 +25,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/manager/LayerDebug",
     "NextWave/source/manager/LayerDrag",
     "NextWave/source/manager/LayerAl",
+    "NextWave/source/manager/LayerLandingPage",
     "NextWave/source/expression/Expression",
     "NextWave/source/literal/Literal",
     "NextWave/source/statement/Statement",
@@ -41,7 +42,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/project/Method",
     "NextWave/source/project/Property",
     "NextWave/source/project/Event"],
-    function (prototypes, settings, simulator, Area, Point, Size, Layer, LayerBackground, LayerCanvas, LayerPanels, LayerDebug, LayerDrag, LayerAl, Expression, Literal, Statement, Name, CodeExpression, CodeStatement, Parameter, ParameterList, StatementList, Project, Comic, Library, Type, Method, Property, Event) {
+    function (prototypes, settings, simulator, Area, Point, Size, Layer, LayerBackground, LayerCanvas, LayerPanels, LayerDebug, LayerDrag, LayerAl, LayerLandingPage, Expression, Literal, Statement, Name, CodeExpression, CodeStatement, Parameter, ParameterList, StatementList, Project, Comic, Library, Type, Method, Property, Event) {
 
         try {
 
@@ -65,6 +66,8 @@ define(["NextWave/source/utility/prototypes",
                     self.debugLayer = null;
                     // Holds the active panelLayer.
                     self.panelLayer = null;
+					// Holds reference to the LandingPage layer.
+					self.landingPageLayer = null;
                     // Holds reference to the designer layer.
                     // self.designerLayer = null;
                     // Object used to initialize this instance.
@@ -126,6 +129,14 @@ define(["NextWave/source/utility/prototypes",
                                 throw exceptionRet;
                             }
 
+                            // Allocate and create the landing page layer.
+                            self.landingPageLayer = new LayerLandingPage();
+                            exceptionRet = self.landingPageLayer.create();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
                             // Allocate and create the drag layer.
                             self.dragLayer = new LayerDrag();
                             exceptionRet = self.dragLayer.create();
@@ -163,6 +174,7 @@ define(["NextWave/source/utility/prototypes",
                                     self.backgroundLayer,
                                     self.canvasLayer,
                                     self.panelLayer,
+									self.landingPageLayer,
                                     self.debugLayer,
                                     self.dragLayer
                                 ];
@@ -247,6 +259,7 @@ define(["NextWave/source/utility/prototypes",
                                     self.backgroundLayer,
                                     self.canvasLayer,
                                     self.panelLayer,
+									self.landingPageLayer,
                                     self.debugLayer,
                                     self.dragLayer
                                 ];
@@ -358,8 +371,9 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            // Hide panels, ai, and drag.
+                            // Hide panels, ai, landingPage and drag.
                             self.canvasLayer.active = true;
+							self.landingPageLayer.active = false;
                             self.panelLayer.active = false;
                             self.dragLayer.active = false;
 
@@ -388,6 +402,7 @@ define(["NextWave/source/utility/prototypes",
                             // Re-enable panels and drag.
                             self.canvasLayer.active = false;
                             self.panelLayer.active = true;
+							self.landingPageLayer.active = true;
                             self.dragLayer.active = true;
 
                             // Cause a resize.
@@ -1423,18 +1438,18 @@ define(["NextWave/source/utility/prototypes",
                             // Get the size from the container,
                             // if possible, or default (?).
                             m_dWidth = m_jqParent.width();
-                            if (m_dWidth === undefined ||
+/*                            if (m_dWidth === undefined ||
                                 m_dWidth === 0) {
 
                                 m_dWidth = settings.manager.defaultWidth;
                             }
-                            m_dHeight = m_jqParent.height();
-                            if (m_dHeight === undefined ||
+*/                            m_dHeight = m_jqParent.height();
+/*                            if (m_dHeight === undefined ||
                                 m_dHeight === 0) {
 
                                 m_dHeight = settings.manager.defaultHeight;
                             }
-
+*/
                             // Update canvas sizes--do this last to minimize the time that the canvas is blank.
                             m_canvasRender.width = m_dWidth;
                             m_canvasRender.height = m_dHeight;
@@ -1549,8 +1564,6 @@ define(["NextWave/source/utility/prototypes",
                     var m_dWidth = 0;
                     // Height of object.
                     var m_dHeight = 0;
-                    // The whole area.
-                    var m_areaMaximal = null;
                     // Collection of layers to render in order.
                     var m_arrayLayers = null;
                     // Size of entire manager.

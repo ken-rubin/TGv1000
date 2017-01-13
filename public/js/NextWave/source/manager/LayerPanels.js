@@ -35,10 +35,9 @@ define(["NextWave/source/utility/prototypes",
         "NextWave/source/project/LibrarySearchDialog",
         "NextWave/source/project/NewProjectDialog",
         "NextWave/source/project/SaveProjectDialog",
-        "NextWave/source/project/OpenProjectDialog",
-        "NextWave/source/project/LandingPage"
+        "NextWave/source/project/OpenProjectDialog"
         ],
-    function(prototypes, settings, orientation, Area, Point, Size, Layer, Panel, ProjectDialog, Type, ProjectBuilder, ComicBuilder, LibraryBuilder, TypeBuilder, PropertyBuilder, EventBuilder, NameList, Name, StatementListPayload, ExpressionList, LiteralList, MethodBuilder, LibrarySearchDialog, NewProjectDialog, SaveProjectDialog, OpenProjectDialog, LandingPage) {
+    function(prototypes, settings, orientation, Area, Point, Size, Layer, Panel, ProjectDialog, Type, ProjectBuilder, ComicBuilder, LibraryBuilder, TypeBuilder, PropertyBuilder, EventBuilder, NameList, Name, StatementListPayload, ExpressionList, LiteralList, MethodBuilder, LibrarySearchDialog, NewProjectDialog, SaveProjectDialog, OpenProjectDialog) {
 
         try {
 
@@ -59,8 +58,6 @@ define(["NextWave/source/utility/prototypes",
                     self.typesPanel = null;
                     // Panel of centers.
                     self.centerPanel = null;
-					// Panel for Landing Page.
-					self.landingPagePanel = null;
                     // Save configuration.
                     self.iPanelConfiguration = null;
 
@@ -102,11 +99,6 @@ define(["NextWave/source/utility/prototypes",
                                         new Point(0, settings.layerPanels.typesPanel.y),
                                         new Size(settings.layerPanels.typesPanel.width, settings.layerPanels.typesPanel.height));
 
-                                    self.landingPagePanel = new Panel("Home",
-                                        orientation.northwest,
-                                        new Point(0, 0),
-                                        new Size(settings.layerPanels.landingPagePanel.width, settings.layerPanels.landingPagePanel.height));
-
                                     // Add the ProjectDialog to the types Panel.
                                     var exceptionRet = m_functionAddProjectDialogToTypesPanel(self.typesPanel);
                                     if (exceptionRet) {
@@ -114,16 +106,8 @@ define(["NextWave/source/utility/prototypes",
                                         throw exceptionRet;
                                     }
 
-                                    // Add the LandingPage to the landingPagePanel panel.
-                                    var exceptionRet = m_functionSetLandingPageInLandingPagePanel(self.landingPagePanel);
-                                    if (exceptionRet) {
-
-                                        throw exceptionRet;
-                                    }
-
                                     // Compile to generic list of panels for looping operations.
                                     m_arrayPanels = [
-										self.landingPagePanel,
                                         self.typesPanel,
                                         self.centerPanel
                                     ];
@@ -200,11 +184,6 @@ define(["NextWave/source/utility/prototypes",
 
                                 throw exceptionRet;
                             }
-                            exceptionRet = m_functionAllocateLandingPage();
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }
                             // Not allocating these three center panels yet.
                             // They'll be allocated when first needed and data to pass in is available.
 /*                            exceptionRet = m_functionAllocateNewProject();
@@ -255,7 +234,6 @@ define(["NextWave/source/utility/prototypes",
                         window.newProjectDialog.destroy();
                         window.saveProjectDialog.destroy();
                         window.openProjectDialog.destroy();
-                        window.landingPage.destroy();
                     }
 
                     // Clear the center panel.
@@ -285,7 +263,6 @@ define(["NextWave/source/utility/prototypes",
                             window.newProjectDialog = null;
                             window.saveProjectDialog = null;
                             window.openProjectDialog = null;
-                            window.landingPage = null;
 
                             // Clear out the possible
                             // payloads for the center panel.
@@ -340,11 +317,6 @@ define(["NextWave/source/utility/prototypes",
                                 return exceptionRet;
                             }
                             exceptionRet = m_functionAllocateOpenProject();
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-                            exceptionRet = m_functionAllocateLandingPage();
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -418,35 +390,24 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Open and Pin all panels.
-					// Except, before opening typesPanel and centerPanel, we close landingPagePanel.
                     self.openAndPinAllPanels = function() {
 
                         m_arrayPanels.forEach(
                             function(panelIth) {
                                 if (panelIth) {
-
-									if (panelIth.title === "Home") {
-										panelIth.unpin();
-									} else {
-                                    	panelIth.openAndPin();
-									}
+                                   	panelIth.openAndPin();
                                 }
                             }
                         );
                     }
 
                     // Unpin all panels. They are cleared.
-					// Except, after closing typesPanel and centerPanel, we open and pin landingPagePanel.
                     self.unpinAllPanels = function() {
 
                         m_arrayPanels.forEach(
                             function(panelIth) {
                                 if (panelIth) {
-									if (panelIth.title !== "Home") {
-	                                    panelIth.unpin();
-									} else {
-										panelIth.openAndPin();
-									}
+									panelIth.openAndPin();
                                 }
                             }
                         );
@@ -1001,32 +962,6 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // Allocate LandingPage instance.
-                    var m_functionAllocateLandingPage = function() {
-
-                        try {
-
-                            // For now, only allocate once.
-                            if (window.landingPage) {
-
-                                return null;
-                            }
-
-                            // Allocate and create the LandingPage.
-                            window.landingPage = new LandingPage();
-                            var exceptionRet = window.landingPage.create();
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }
-
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
                     // Helper method adds ProjectDialog to types panel.
                     var m_functionAddProjectDialogToTypesPanel = function(panelTypes) {
 
@@ -1042,31 +977,6 @@ define(["NextWave/source/utility/prototypes",
 
                             // Set it.
                             panelTypes.payload = window.projectDialog;
-
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Helper method adds landingPagePanel to landingPagePanel panel.
-                    var m_functionSetLandingPageInLandingPagePanel = function(panelLanding) {
-
-                        try {
-
-                            // Allocate and create the landingPageDialog, passing the initialization object.
-                            window.landingPageDialog = new LandingPage();
-                            var exceptionRet = window.landingPageDialog.create();
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }
-
-                            // Set it.
-							// Which way???
-//							panelLanding.setPayload("Home", window.landingPageDialog);
-							panelLanding.payload = window.landingPageDialog;
 
                             return null;
                         } catch (e) {

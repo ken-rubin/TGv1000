@@ -238,22 +238,16 @@ define(["NextWave/source/utility/prototypes"],
                         // For normal projects:
                         typesPanel: {
 
-                            y: 0.03,
+                            y: 0,
                             width: 0.3,
-                            height: 0.97
+                            height: 1
                         },
                         centerPanel: {
 
                             x: 0.3,
                             width: 0.7,
                             height: 1
-                        },
-						landingPagePanel: {
-
-							width: 1,
-							height: 1,
-							closedWidth: 0.3
-						}
+                        }
                     };
                     self.centerPanel = {
 

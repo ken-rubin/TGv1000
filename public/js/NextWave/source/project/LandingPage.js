@@ -75,11 +75,13 @@ define(["NextWave/source/utility/prototypes",
 									},
 									widthType: "callback",
 									width: function(area) {
-										return (area.extent.width - settings.dialog.firstColumnWidth) / 2;
+										m_pxFixedWidth = (area.extent.width - settings.dialog.firstColumnWidth) / 2;
+										return m_pxFixedWidth;
 									},
 									heightType: "callback",
 									height: function(area) {
-										return area.extent.height / 12;
+										m_pxFixedHeight = area.extent.height / 12;
+										return m_pxFixedHeight;
 									}
 								},
 								yourLabel: {
@@ -236,7 +238,7 @@ define(["NextWave/source/utility/prototypes",
 									heightType: "callback",
 									height: function(area) {
 										m_pxFixedHeight = area.extent.height / 12;
-										return m_pxFixedWidth;
+										return m_pxFixedHeight;
 									}
 								}
 							};
