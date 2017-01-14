@@ -51,9 +51,9 @@ define(["NextWave/source/utility/prototypes",
 
                             // Create the dialog.
 							let objectConfiguration = {
-								coreLabel: {
+								coreLabelP1: {
 									type: "Label",
-									text: "Core projects",
+									text: "Core projects. Click to edit or",
 									modes: ['Privileged user'],
 									x: 7 * settings.general.margin,
 									yType: "callback",
@@ -63,9 +63,47 @@ define(["NextWave/source/utility/prototypes",
 									width: settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
 								},
+								coreLabelP2: {
+									type: "Label",
+									text: "build new project based on it.",
+									modes: ['Privileged user'],
+									x: 7 * settings.general.margin,
+									yType: "callback",
+									y: function(area) {
+										return (area.extent.height / 12 + settings.dialog.lineHeight) * 1 +
+											settings.dialog.lineHeight;
+									},
+									width: settings.dialog.firstColumnWidth,
+									height: settings.dialog.lineHeight
+								},
+								coreLabelN1: {
+									type: "Label",
+									text: "Click a project type",
+									modes: ['Normal user'],
+									x: 7 * settings.general.margin,
+									yType: "callback",
+									y: function(area) {
+										return (area.extent.height / 12 + settings.dialog.lineHeight) * 1;
+									},
+									width: settings.dialog.firstColumnWidth,
+									height: settings.dialog.lineHeight
+								},
+								coreLabelN2: {
+									type: "Label",
+									text: "to build a new project based on it.",
+									modes: ['Normal user'],
+									x: 7 * settings.general.margin,
+									yType: "callback",
+									y: function(area) {
+										return (area.extent.height / 12 + settings.dialog.lineHeight) * 1 +
+											settings.dialog.lineHeight;
+									},
+									width: settings.dialog.firstColumnWidth,
+									height: settings.dialog.lineHeight
+								},
 								coreProjects: {
 									type: "ListHost",
-									modes: ['Privileged user'],
+									modes: ['Normal user','Privileged user'],
 									constructorParameterString: "false",
 									x: settings.general.margin +
 										settings.dialog.firstColumnWidth,

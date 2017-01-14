@@ -364,29 +364,6 @@ define(["NextWave/source/utility/prototypes",
                     //////////////////////////
                     // Private methods.
 
-                    // Helper method adds LandingPage to panel.
-                    var m_functionAddLandingPageDialogToThePanel = function(panel) {
-
-                        try {
-
-                            // Allocate and create the LandingPage "Dialog", passing the initialization object.
-                            window.landingPageDialog = new LandingPage();
-                            var exceptionRet = window.landingPageDialog.create();
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }
-
-                            // Set it.
-                            panel.payload = window.landingPageDialog;
-
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
                     //////////////////////////
                     // Private fields.
 

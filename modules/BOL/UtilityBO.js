@@ -976,14 +976,10 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         // We're just selecting: enough to create the image (with project.id) in the carousel; information for fairly
                         // detailed tooltips for purchasable prjects; and, for classes and products, to decide if the project should be retrieved in the first place.
 
-                        // Core projects for privileged users. Empty array for non. req.body.searchPhase (actually passOn.tempTableName) isn't used.
-                        // We do this query to fill passOn.projects[0] in any case.
-                        if (req.body.userAllowedToCreateEditPurchProjs === "1") {
-                            strQuery = "select p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.altImagePath as projectAltImagePath from " + self.dbname + "projects p where p.isCoreProject=1;";
-                        } else {
-                            // We want this to return no rows but use [0].
-                            strQuery = "select p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.altImagePath as projectAltImagePath from " + self.dbname + "projects p where p.isCoreProject=-1;";
-                        }
+                        // Core projects for all users. Privileged can create new projects or edit the core project.
+						// Non-privileged users can use the core projects to create a new project based on the chosen one.
+						// req.body.searchPhase (actually passOn.tempTableName) isn't used.
+                        strQuery = "select p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.altImagePath as projectAltImagePath from " + self.dbname + "projects p where p.isCoreProject=1;";
 
                         if (passOn.tempTableName.length === 0) {
                             // Not including temp table in queries, since there was no req.body.searchPhrase.

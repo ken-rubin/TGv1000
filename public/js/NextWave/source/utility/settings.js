@@ -117,6 +117,7 @@ define(["NextWave/source/utility/prototypes"],
 
                         closedExtent: 30,
                         fillBackground: "rgba(200, 200, 250, 0.75)",
+                        landingPageFillBackground: "rgba(0,0,0, 0.75)",
                         cornerRadius: 4,
                         fontTitle: "16px Arial",
                         fillTitle: "#123",
