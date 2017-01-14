@@ -229,7 +229,7 @@ define(["Core/errorHelper"],
 
 							$("#LPBtn").click(function () {
 
-								manager.toggleLayers();
+								manager.toggleLPLayer();
 							});
 
 							if (g_profile.can_visit_adminzone) {

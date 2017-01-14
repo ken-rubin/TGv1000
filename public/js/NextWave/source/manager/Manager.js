@@ -276,15 +276,11 @@ define(["NextWave/source/utility/prototypes",
                         }
                     }
 
-					// Toggle layers active -> !active -> active.
-					self.toggleLayers = function() {
+					// Toggle Landing Page layer: active -> !active -> active.
+					self.toggleLPLayer = function() {
 
-/*						for (let i = 0; i < m_arrayLayers.length; i++) {
-
-							let lIth = m_arrayLayers[i];
-							lIth.active = !lIth.active;
-						}
-*/					}
+						self.landingPageLayer.active = !self.landingPageLayer.active;
+					}
 
 					// Outer public function to reset title of panel in center.
 					self.resetCenterPanelTitle = function(strTitle) {

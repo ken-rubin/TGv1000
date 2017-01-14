@@ -52,6 +52,56 @@ define(["NextWave/source/utility/prototypes",
 
                             // Create the dialog.
 							let objectConfiguration = {
+								searchLabel: {
+									type: "Label",
+									text: "Search string (opt.)",
+									modes: [lpModes.normaluser,lpModes.privilegeduser],
+									x: settings.general.margin,
+									y: settings.dialog.lineHeight,
+									width: settings.dialog.firstColumnWidth,
+									height: settings.dialog.lineHeight
+								},
+								searchEdit: {
+									type: "Edit",
+									modes: [lpModes.normaluser,lpModes.privilegeduser],
+                                    multiline: true,
+									x: settings.general.margin +
+										settings.dialog.firstColumnWidth,
+									y: settings.dialog.lineHeight,
+									widthType: "callback",
+									width: function(area) {
+										return (area.extent.width - settings.dialog.firstColumnWidth) / 3;
+									},
+									height: settings.dialog.lineHeight * 2,
+									exitFocus: function (localSelf) {
+										try {
+											// Save off description.
+											m_strSearch = localSelf.getText();
+
+										} catch (e) {
+											alert(e.message);
+										}
+									}
+								},
+								searchButton: {
+									type: "Button",
+									modes: [lpModes.normaluser,lpModes.privilegeduser],
+									text: "Search",
+									constructorParameterString: "'15px Arial'",
+									xType: "callback",
+									x: function(area) {
+										return settings.general.margin +
+										settings.dialog.firstColumnWidth +
+										(area.extent.width - settings.dialog.firstColumnWidth) / 3 +
+										15
+									},
+									y: 1.5 * settings.dialog.lineHeight,
+									width: 140,
+									height: 40,
+									click: function() {
+
+									}
+								},
 								coreLabelP1: {
 									type: "Label",
 									text: "Core projects. Click to",
@@ -59,7 +109,7 @@ define(["NextWave/source/utility/prototypes",
 									x: settings.general.margin,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height / 12 + settings.dialog.lineHeight) * 1;
+										return (area.extent.height / 15 + settings.dialog.lineHeight) * 1;
 									},
 									width: settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
@@ -71,7 +121,7 @@ define(["NextWave/source/utility/prototypes",
 									x: settings.general.margin,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height / 12 + settings.dialog.lineHeight) * 1 +
+										return (area.extent.height / 15 + settings.dialog.lineHeight) * 1 +
 											0.65 * settings.dialog.lineHeight;
 									},
 									width: settings.dialog.firstColumnWidth,
@@ -84,7 +134,7 @@ define(["NextWave/source/utility/prototypes",
 									x: settings.general.margin,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height / 12 + settings.dialog.lineHeight) * 1 +
+										return (area.extent.height / 15 + settings.dialog.lineHeight) * 1 +
 											1.3 * settings.dialog.lineHeight;
 									},
 									width: settings.dialog.firstColumnWidth,
@@ -97,7 +147,7 @@ define(["NextWave/source/utility/prototypes",
 									x: settings.general.margin,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height / 12 + settings.dialog.lineHeight) * 1;
+										return (area.extent.height / 15 + settings.dialog.lineHeight) * 1;
 									},
 									width: settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
@@ -109,7 +159,7 @@ define(["NextWave/source/utility/prototypes",
 									x: settings.general.margin,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height / 12 + settings.dialog.lineHeight) * 1 +
+										return (area.extent.height / 15 + settings.dialog.lineHeight) * 1 +
 											0.65 * settings.dialog.lineHeight;
 									},
 									width: settings.dialog.firstColumnWidth,
@@ -122,7 +172,7 @@ define(["NextWave/source/utility/prototypes",
 									x: settings.general.margin,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height / 12 + settings.dialog.lineHeight) * 1 +
+										return (area.extent.height / 15 + settings.dialog.lineHeight) * 1 +
 											1.3 * settings.dialog.lineHeight;
 									},
 									width: settings.dialog.firstColumnWidth,
@@ -136,25 +186,38 @@ define(["NextWave/source/utility/prototypes",
 										settings.dialog.firstColumnWidth,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height / 12 + settings.dialog.lineHeight) * 1;
+										return (area.extent.height / 15 + settings.dialog.lineHeight) * 1;
 									},
 									widthType: "callback",
 									width: function(area) {
-										return (area.extent.width - settings.dialog.firstColumnWidth) / 2;
+										return (area.extent.width - settings.dialog.firstColumnWidth) / 3;
 									},
 									heightType: "callback",
 									height: function(area) {
 										return (area.extent.height / 12);
 									}
 								},
-								yourLabel: {
+								yourLabel1: {
 									type: "Label",
-									text: "Your projects",
+									text: "Your projects.",
 									modes: [lpModes.normaluser,lpModes.privilegeduser],
 									x: settings.general.margin,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height / 12 + settings.dialog.lineHeight) * 2;
+										return (area.extent.height / 15 + settings.dialog.lineHeight) * 2;
+									},
+									width: settings.dialog.firstColumnWidth,
+									height: settings.dialog.lineHeight
+								},
+								yourLabel2: {
+									type: "Label",
+									text: "Click to edit.",
+									modes: [lpModes.normaluser,lpModes.privilegeduser],
+									x: settings.general.margin,
+									yType: "callback",
+									y: function(area) {
+										return (area.extent.height / 15 + settings.dialog.lineHeight) * 2 +
+											0.65 * settings.dialog.lineHeight;
 									},
 									width: settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
@@ -167,25 +230,38 @@ define(["NextWave/source/utility/prototypes",
 										settings.dialog.firstColumnWidth,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height / 12 + settings.dialog.lineHeight) * 2;
+										return (area.extent.height / 15 + settings.dialog.lineHeight) * 2;
 									},
 									widthType: "callback",
 									width: function(area) {
-										return (area.extent.width - settings.dialog.firstColumnWidth) / 2;
+										return (area.extent.width - settings.dialog.firstColumnWidth) / 3;
 									},
 									heightType: "callback",
 									height: function(area) {
 										return area.extent.height / 12;
 									}
 								},
-								sharedLabel: {
+								sharedLabel1: {
 									type: "Label",
-									text: "Shared projects",
+									text: "Shared projects.",
 									modes: [lpModes.normaluser,lpModes.privilegeduser],
 									x: settings.general.margin,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height / 12 + settings.dialog.lineHeight) * 3;
+										return (area.extent.height / 15 + settings.dialog.lineHeight) * 3;
+									},
+									width: settings.dialog.firstColumnWidth,
+									height: settings.dialog.lineHeight
+								},
+								sharedLabel2: {
+									type: "Label",
+									text: "Click to copy.",
+									modes: [lpModes.normaluser,lpModes.privilegeduser],
+									x: settings.general.margin,
+									yType: "callback",
+									y: function(area) {
+										return (area.extent.height / 15 + settings.dialog.lineHeight) * 3 +
+											0.65 * settings.dialog.lineHeight;
 									},
 									width: settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
@@ -198,25 +274,38 @@ define(["NextWave/source/utility/prototypes",
 										settings.dialog.firstColumnWidth,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height / 12 + settings.dialog.lineHeight) * 3;
+										return (area.extent.height / 15 + settings.dialog.lineHeight) * 3;
 									},
 									widthType: "callback",
 									width: function(area) {
-										return (area.extent.width - settings.dialog.firstColumnWidth) / 2;
+										return (area.extent.width - settings.dialog.firstColumnWidth) / 3;
 									},
 									heightType: "callback",
 									height: function(area) {
 										return area.extent.height / 12;
 									}
 								},
-								productsLabel: {
+								productsLabel1: {
 									type: "Label",
-									text: "Product kits",
+									text: "Product kits.",
 									modes: [lpModes.normaluser,lpModes.privilegeduser],
 									x: settings.general.margin,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height / 12 + settings.dialog.lineHeight) * 4;
+										return (area.extent.height / 15 + settings.dialog.lineHeight) * 4;
+									},
+									width: settings.dialog.firstColumnWidth,
+									height: settings.dialog.lineHeight
+								},
+								productsLabel2: {
+									type: "Label",
+									text: "Click for info.",
+									modes: [lpModes.normaluser,lpModes.privilegeduser],
+									x: settings.general.margin,
+									yType: "callback",
+									y: function(area) {
+										return (area.extent.height / 15 + settings.dialog.lineHeight) * 4 +
+											0.65 * settings.dialog.lineHeight;
 									},
 									width: settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
@@ -229,25 +318,38 @@ define(["NextWave/source/utility/prototypes",
 										settings.dialog.firstColumnWidth,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height / 12 + settings.dialog.lineHeight) * 4;
+										return (area.extent.height / 15 + settings.dialog.lineHeight) * 4;
 									},
 									widthType: "callback",
 									width: function(area) {
-										return (area.extent.width - settings.dialog.firstColumnWidth) / 2;
+										return (area.extent.width - settings.dialog.firstColumnWidth) / 3;
 									},
 									heightType: "callback",
 									height: function(area) {
 										return area.extent.height / 12;
 									}
 								},
-								classroomLabel: {
+								classroomLabel1: {
 									type: "Label",
-									text: "Local classes",
+									text: "Local classes.",
 									modes: [lpModes.normaluser,lpModes.privilegeduser],
 									x: settings.general.margin,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height / 12 + settings.dialog.lineHeight) * 5;
+										return (area.extent.height / 15 + settings.dialog.lineHeight) * 5;
+									},
+									width: settings.dialog.firstColumnWidth,
+									height: settings.dialog.lineHeight
+								},
+								classroomLabel2: {
+									type: "Label",
+									text: "Click for info.",
+									modes: [lpModes.normaluser,lpModes.privilegeduser],
+									x: settings.general.margin,
+									yType: "callback",
+									y: function(area) {
+										return (area.extent.height / 15 + settings.dialog.lineHeight) * 5 +
+											0.65 * settings.dialog.lineHeight;
 									},
 									width: settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
@@ -260,25 +362,38 @@ define(["NextWave/source/utility/prototypes",
 										settings.dialog.firstColumnWidth,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height / 12 + settings.dialog.lineHeight) * 5;
+										return (area.extent.height / 15 + settings.dialog.lineHeight) * 5;
 									},
 									widthType: "callback",
 									width: function(area) {
-										return (area.extent.width - settings.dialog.firstColumnWidth) / 2;
+										return (area.extent.width - settings.dialog.firstColumnWidth) / 3;
 									},
 									heightType: "callback",
 									height: function(area) {
 										return area.extent.height / 12;
 									}
 								},
-								onlineLabel: {
+								onlineLabel1: {
 									type: "Label",
-									text: "Online classes",
+									text: "Online classes.",
 									modes: [lpModes.normaluser,lpModes.privilegeduser],
 									x: settings.general.margin,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height / 12 + settings.dialog.lineHeight) * 6;
+										return (area.extent.height / 15 + settings.dialog.lineHeight) * 6;
+									},
+									width: settings.dialog.firstColumnWidth,
+									height: settings.dialog.lineHeight
+								},
+								onlineLabel2: {
+									type: "Label",
+									text: "Click for info.",
+									modes: [lpModes.normaluser,lpModes.privilegeduser],
+									x: settings.general.margin,
+									yType: "callback",
+									y: function(area) {
+										return (area.extent.height / 15 + settings.dialog.lineHeight) * 6 +
+											0.65 * settings.dialog.lineHeight;
 									},
 									width: settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
@@ -291,11 +406,11 @@ define(["NextWave/source/utility/prototypes",
 										settings.dialog.firstColumnWidth,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height / 12 + settings.dialog.lineHeight) * 6;
+										return (area.extent.height / 15 + settings.dialog.lineHeight) * 6;
 									},
 									widthType: "callback",
 									width: function(area) {
-										return (area.extent.width - settings.dialog.firstColumnWidth) / 2;
+										return (area.extent.width - settings.dialog.firstColumnWidth) / 3;
 									},
 									heightType: "callback",
 									height: function(area) {
@@ -446,6 +561,8 @@ define(["NextWave/source/utility/prototypes",
 					var m_projectId = 0;
 					// Hold maximalArea.
 					var m_area = null;
+					// Search string.
+					var m_strSearch = "";
 
                 } catch (e) {
 
