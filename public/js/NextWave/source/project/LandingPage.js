@@ -75,13 +75,11 @@ define(["NextWave/source/utility/prototypes",
 									},
 									widthType: "callback",
 									width: function(area) {
-										m_pxFixedWidth = (area.extent.width - settings.dialog.firstColumnWidth) / 2;
-										return m_pxFixedWidth;
+										return (area.extent.width - settings.dialog.firstColumnWidth) / 2;
 									},
 									heightType: "callback",
 									height: function(area) {
-										m_pxFixedHeight = area.extent.height / 12;
-										return m_pxFixedHeight;
+										return (area.extent.height / 12);
 									}
 								},
 								yourLabel: {
@@ -232,13 +230,11 @@ define(["NextWave/source/utility/prototypes",
 									},
 									widthType: "callback",
 									width: function(area) {
-										m_pxFixedWidth = (area.extent.width - settings.dialog.firstColumnWidth) / 2;
-										return m_pxFixedWidth;
+										return (area.extent.width - settings.dialog.firstColumnWidth) / 2;
 									},
 									heightType: "callback",
 									height: function(area) {
-										m_pxFixedHeight = area.extent.height / 12;
-										return m_pxFixedHeight;
+										return (area.extent.height / 12);
 									}
 								}
 							};
@@ -246,92 +242,99 @@ define(["NextWave/source/utility/prototypes",
 												g_profile["can_create_products"] ||
 												g_profile["can_create_onlineClasses"]);
                             let exceptionRet = self.dialog.create(objectConfiguration,
-							                                 (bPrivileged ? 'Privileged user' : 'Normal user')
+							                                 (bPrivileged ? 'Privileged user' : 'Normal user'),
+															 function(area) {
+																 try {
+
+																	//////////////////////////////////////
+																	// Fill the 5 or 6 ListHosts with project images
+																	var posting = $.post("/BOL/UtilityBO/SearchProjects",
+																		{
+																			searchPhrase: '',
+																			userAllowedToCreateEditPurchProjs: (bPrivileged ? 1 : 0)
+																		},
+																		'json'
+																	);
+																	posting.done(function(data){
+
+																		if (data.success) {
+
+																			//m_searchResultProcessedArray = new Array(6);
+																			m_searchResultRawArray = data.arrayRows;	// [][]
+
+																			for (let n = 0; n < 6; n++) {
+
+																				let stripNth = m_searchResultRawArray[n];
+																				let lhProjects = self.dialog.controlObject[m_arrayListHostNames[n]];
+																				let listProjects = lhProjects.list;
+																				let bVertical = (lhProjects.constructorParameterString === "true"); // If the ListHost is vertical.
+																				let i = 0;
+
+																				listProjects.destroy(); // Don't check result because if destroy fails, that's because it hadn't been created, so it's ok.
+
+																				//m_searchResultProcessedArray[n] = new Array();
+
+																				// Loop through returned projects for ListHost[stripNum] (lhProjects).
+																				let arrayOutput = stripNth.map((rawProj) => {
+
+																					let itemIth = stripNth[i];
+																					let rliNew = new PictureListItem(itemIth.projectName, itemIth.projectId, i++, resourceHelper.toURL('resources', itemIth.projectImageId, 'image', itemIth.projectAltImagePath), (bVertical ? (area.extent.width - settings.dialog.firstColumnWidth) / 2 : 0), (!bVertical ? area.extent.height / 12 : 0));
+																					rliNew.clickHandler = (id) => {
+
+																						m_projectId = id;
+
+																						striploop:
+																						for (let strip = 0; strip < 6; strip++) {
+
+																							for (let ind = 0; ind < m_searchResultRawArray[strip].length; ind++) {
+
+																								let item = m_searchResultRawArray[strip][ind];
+																								if (item.projectId === id) {
+
+																									alert("You clicked the project named " + item.projectName + ".");
+																									break striploop;
+																								}
+																							}
+																						}
+																					}
+																					return rliNew;
+																				});
+																				listProjects.create(arrayOutput);
+
+										/*						                for (let i = 0; i < m_searchResultRawArray[stripNum].length; i++) {
+
+																					let rowIth = m_searchResultRawArray[stripNum][i];
+																					m_searchResultProcessedArray[stripNum].push(
+																						{
+																							index: i,	// 2nd dimension index of m_searchResultRawArray
+																							id: rowIth.projectId,
+																							name: rowIth.projectName,
+																							url: resourceHelper.toURL('resources',
+																								rowIth.projectImageId,
+																								'image',
+																								'')
+																						}
+																					);
+																				}
+										*/
+																				//var exceptionRet = m_rebuildCarousel(stripNum);
+																				//if (exceptionRet) { throw exceptionRet; }
+																			}
+																		} else {
+
+																			// !data.success
+																			return new Error(data.message);
+																		}
+																	});
+
+																 } catch(e) {
+																	 return e;
+																 }
+															 }
 							);
                             if (exceptionRet) {
                                 return exceptionRet;
                             }
-
-							//////////////////////////////////////
-							// Fill the 5 or 6 ListHosts with project images
-					        var posting = $.post("/BOL/UtilityBO/SearchProjects",
-					        	{
-					        		searchPhrase: '',
-					        		userAllowedToCreateEditPurchProjs: (bPrivileged ? 1 : 0)
-					        	},
-					        	'json'
-							);
-					        posting.done(function(data){
-
-					            if (data.success) {
-
-					                //m_searchResultProcessedArray = new Array(6);
-					                m_searchResultRawArray = data.arrayRows;	// [][]
-
-					                for (let n = 0; n < 6; n++) {
-
-										let stripNth = m_searchResultRawArray[n];
-										let lhProjects = self.dialog.controlObject[m_arrayListHostNames[n]];
-										let listProjects = lhProjects.list;
-										let bVertical = (lhProjects.constructorParameterString === "true"); // If the ListHost is vertical.
-										let i = 0;
-
-										listProjects.destroy(); // Don't check result because if destroy fails, that's because it hadn't been created, so it's ok.
-
-					                	//m_searchResultProcessedArray[n] = new Array();
-
-										// Loop through returned projects for ListHost[stripNum] (lhProjects).
-										let arrayOutput = stripNth.map((rawProj) => {
-
-											let itemIth = stripNth[i];
-											let rliNew = new PictureListItem(itemIth.projectName, itemIth.projectId, i++, resourceHelper.toURL('resources', itemIth.projectImageId, 'image', itemIth.projectAltImagePath), (bVertical ? m_pxFixedWidth : 0), (!bVertical ? 0 : m_pxFixedHeight));
-											rliNew.clickHandler = (id) => {
-
-												m_projectId = id;
-
-												striploop:
-												for (let strip = 0; strip < 6; strip++) {
-
-													for (let ind = 0; ind < m_searchResultRawArray[strip].length; ind++) {
-
-														let item = m_searchResultRawArray[strip][ind];
-														if (item.projectId === id) {
-
-															alert("You clicked the project named " + item.projectName + ".");
-															break striploop;
-														}
-													}
-												}
-											}
-											return rliNew;
-										});
-										listProjects.create(arrayOutput);
-
-/*						                for (let i = 0; i < m_searchResultRawArray[stripNum].length; i++) {
-
-						                    let rowIth = m_searchResultRawArray[stripNum][i];
-						                    m_searchResultProcessedArray[stripNum].push(
-						                    	{
-							                    	index: i,	// 2nd dimension index of m_searchResultRawArray
-							                    	id: rowIth.projectId,
-							                    	name: rowIth.projectName,
-							                    	url: resourceHelper.toURL('resources',
-							                    		rowIth.projectImageId,
-							                    		'image',
-							                    		'')
-						                    	}
-						                    );
-						                }
-*/
-					                	//var exceptionRet = m_rebuildCarousel(stripNum);
-					                	//if (exceptionRet) { throw exceptionRet; }
-					                }
-					            } else {
-
-					                // !data.success
-									return new Error(data.message);
-					            }
-					        });
 
 
                             // Because it is!
@@ -376,9 +379,8 @@ define(["NextWave/source/utility/prototypes",
 					var m_arrayListHostNames = ["coreProjects","yourProjects","sharedProjects","productProjects","classroomProjects","onlineProjects"];
 					// The project id for the user's selected project.
 					var m_projectId = 0;
-					// Hold fixed width or height of ListHosts.
-					var m_pxFixedHeight = 0;
-					var m_pxFixedWidth = 0;
+					// Hold maximalArea.
+					var m_area = null;
 
                 } catch (e) {
 

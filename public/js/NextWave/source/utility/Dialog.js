@@ -48,6 +48,8 @@ define(["NextWave/source/utility/prototypes",
                     self.position = new Area();
                     // THe highlighted control, if non-null.
                     self.highlightControl = null;
+					// A callback in case more dialog initialization is needed after cself.calculateLayout runs.
+					self.callback = null;
 
                     ///////////////////////
                     // Public methods.
@@ -79,7 +81,7 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Create this dialog
-                    self.create = function (objectConfiguration, mode) {
+                    self.create = function (objectConfiguration, mode, callback) {
 
                         try {
 
@@ -94,6 +96,7 @@ define(["NextWave/source/utility/prototypes",
                             // then objectControlIth will be created and rendered only if m_mode is in objectControlIth.modes (an array of ints).
 
                             m_mode = mode || null;
+							self.callback = callback || null;
 
                             // Process configuration.
                             var arrayKeys = Object.keys(objectConfiguration);
@@ -189,7 +192,7 @@ define(["NextWave/source/utility/prototypes",
 								if (!m_mode || !controlIth.hasOwnProperty("modes") || controlIth.modes.includes(m_mode)) {
 
 									// If control contains point, then highlight.
-									var bRet = controlIth.pointIn(objectReference.renderContent, 
+									var bRet = controlIth.pointIn(objectReference.renderContent,
 										objectReference.pointCursor);
 									if (bRet) {
 
@@ -345,7 +348,7 @@ define(["NextWave/source/utility/prototypes",
                                 // Get the ith control.
                                 var controlIth = self.controls[i];
 
-                                // Its configuration determines its location, 
+                                // Its configuration determines its location,
                                 // given the dialog's current position.
                                 var dX = self.position.location.x;
                                 if (controlIth.configuration.xType === "configuration" ||
@@ -400,7 +403,7 @@ define(["NextWave/source/utility/prototypes",
                                 }
 
                                 // Set the layout for the controls.
-                                var exceptionRet = controlIth.calculateLayout(new Area(new Point(dX, 
+                                var exceptionRet = controlIth.calculateLayout(new Area(new Point(dX,
                                         dY),
                                     new Size(dWidth,
                                         dHeight)),
@@ -411,7 +414,11 @@ define(["NextWave/source/utility/prototypes",
                                 }
                             }
 
-                            return null;
+							if ($.isFunction(self.callback)) {
+								return self.callback(areaMaximal);
+							} else {
+								return null;
+							}
                         } catch (e) {
 
                             return e;

@@ -25,7 +25,7 @@ define(["NextWave/source/utility/prototypes",
 			// One of pxFixedWidth or pxFixedHeight will be 0 and the other will not be.
 			// This will be used to determine which dimension of the image to fix and which to calculate
 			// in order to maintain aspect ratio of the original image.
-        	var functionRet = function PictureListItem(strName, id, index, url, pxFixedHeight, pxFixedWidth) {
+        	var functionRet = function PictureListItem(strName, id, index, url, pxFixedWidth, pxFixedHeight) {
 
                 try {
 

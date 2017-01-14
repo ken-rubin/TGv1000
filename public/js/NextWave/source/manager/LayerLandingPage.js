@@ -58,11 +58,15 @@ define(["NextWave/source/utility/prototypes",
                             }
 
 							self.panel = new Panel("Home",
-								orientation.north,
+								orientation.full,
 								new Point(0,0),
-								new Size(500,500));   /*self.extent.width, self.extent.height*/ 
+								new Size(self.extent.width, self.extent.height));   /**/
 
 							self.panel.open = true;
+							self.panel.closed = false;
+							self.panel.opening = false;
+							self.panel.closing = false;
+							self.panel.pinned = true;
 
 							// Add the LandingPage to the panel.
 							try {
@@ -76,7 +80,7 @@ define(["NextWave/source/utility/prototypes",
 								}
 
 								// Set it.
-								self.panel.payload = window.landingPageDialog;
+								self.panel.setPayload("Home",window.landingPageDialog);
 							} catch (e) {
 
 								throw exceptionRet;

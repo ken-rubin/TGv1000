@@ -419,7 +419,14 @@ define(["NextWave/source/utility/prototypes",
 
                             // Set the closed and current extent
                             // based on the extent and dock.
-							if (self.dock === orientation.north) {
+							if (self.dock === "full") {
+
+								self.location = new Point(4,4);
+								self.openExtent = sizeExtent.clone();
+								self.closedExtent = sizeExtent.clone();
+								m_areaPayload = new Area(self.location, self.openExtent);
+
+							} else if (self.dock === orientation.north) {
 
                                 self.location.y = 0;
                                 self.closedExtent = new Size(self.openExtent.width,

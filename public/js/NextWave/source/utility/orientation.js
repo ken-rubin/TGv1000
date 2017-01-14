@@ -32,6 +32,8 @@ define(["NextWave/source/utility/prototypes"],
                     self.east = "east";
                     // West.
                     self.west = "west";
+					// Full.
+					self.full = "full";
                 } catch (e) {
 
                     alert(e.message);
