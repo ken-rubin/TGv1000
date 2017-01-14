@@ -1,5 +1,5 @@
 //- Navbar section.
-//- 
+//-
 //- Area of general site navigation and major function activation.
 //-
 
@@ -62,6 +62,8 @@ nav.navbar.navbar-default.navbar-inverse.navbar-fixed-top(role="navigation")
               li#SZProjectsLI
                 a#SZProjectsButton(href="#") Projects...
 
+      button#LPBtn.btn.navbar-right(type="button" data-toggle="tooltip" title="Toggle home page" aria-label="Toggle Home page" style="margin-left: 10px; margin-right: 10px; margin-top: 10px;")
+        span.glyphicon.glyphicon-home(aria-hidden="true")
       button#StopBtn.btn.disabledifnoproj.hiddenifnotrunning.navbar-right(type="button" data-toggle="tooltip" title="Stop Simulation" aria-label="Stop Simulation" style="margin-left: 10px; margin-right: 10px; margin-top: 10px;")
         span.glyphicon.glyphicon-stop(aria-hidden="true")
       button#PlayBtn.btn.btn-default.disabledifnoproj.hiddenifrunning.navbar-right(type="button" data-toggle="tooltip" title="Run Simulation" aria-label="Run Simulation" style="margin-right: 10px; margin-top: 10px;")

@@ -5,7 +5,7 @@
 //
 
 // Define module.
-define(["Core/errorHelper"], 
+define(["Core/errorHelper"],
 	function (errorHelper) {
 
 		try {
@@ -42,7 +42,7 @@ define(["Core/errorHelper"],
 										} else {
 
 											// For a normal user, we have to see what's available.
-											var posting = $.post("/BOL/ProjectBO/FetchNormalUserNewProjectTypes", 
+											var posting = $.post("/BOL/ProjectBO/FetchNormalUserNewProjectTypes",
 												{},
 												'json');
 											posting.done(function(data){
@@ -67,7 +67,7 @@ define(["Core/errorHelper"],
 
 
 										}
-									}, 
+									},
 									true);	// true means to show the Abandon dlg if applicable.
 								} catch (e) { errorHelper.show(e); }
 							});
@@ -82,7 +82,7 @@ define(["Core/errorHelper"],
 											// This callback is executed if user decided to abandon or if there was no project to begin with.
 											// If user decides not to abandon the current project, OpenProjectDialog won't call this callback
 											// and he'll continue with the current project as if he never clicked the Search menu item.
-											function() {		
+											function() {
 
 												try {
 													var exceptionRet = client.showOpenProjectDialog(
@@ -130,7 +130,7 @@ define(["Core/errorHelper"],
 																				};
 
 																				$.extend(true, client.project.specialProjectData, specialProjectData);
-																	    		
+
 																	    		exceptionRet = manager.loadProject(client.project);
 																	    		if (exceptionRet) { throw exceptionRet; }
 
@@ -178,7 +178,7 @@ define(["Core/errorHelper"],
 
 								if (manager.projectLoaded) {
 
-									client.unloadProject(function(){ 
+									client.unloadProject(function(){
 
 										setTimeout(function() {
 
@@ -225,6 +225,11 @@ define(["Core/errorHelper"],
 								} catch(e) {
 									errorHelper.show(e);
 								}
+							});
+
+							$("#LPBtn").click(function () {
+
+								manager.toggleLayers();
 							});
 
 							if (g_profile.can_visit_adminzone) {
@@ -409,7 +414,7 @@ define(["Core/errorHelper"],
 						} else {
 							m_functionDisable("Projects");
 						}
-							
+
 						if (g_profile.can_activate_PPs) {
 							m_functionEnable("ActivatePP");
 						} else {

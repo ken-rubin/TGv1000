@@ -341,6 +341,13 @@ define(["NextWave/source/utility/prototypes",
                                 return null;
                             }
 
+							// Render background.
+							contextRender.fillStyle = "rgba(255,255,255,0.85)";
+							contextRender.fillRect(0,
+								0,
+								self.extent.width,
+								self.extent.height);
+
                             // Render the panels.
                             for (var i = m_arrayPanels.length - 1; i >= 0; i--) {
 

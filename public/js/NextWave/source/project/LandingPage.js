@@ -12,6 +12,7 @@
 // Require-AMD, and dependencies.
 define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/settings",
+    "NextWave/source/utility/lpModes",
     "NextWave/source/utility/Point",
     "NextWave/source/utility/Size",
     "NextWave/source/utility/Area",
@@ -21,7 +22,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/PictureListItem",
 	"Core/resourceHelper"
     ],
-    function (prototypes, settings, Point, Size, Area, DialogHost, List, ListItem, PictureListItem, resourceHelper) {
+    function (prototypes, settings, lpModes, Point, Size, Area, DialogHost, List, ListItem, PictureListItem, resourceHelper) {
 
         try {
 
@@ -53,9 +54,9 @@ define(["NextWave/source/utility/prototypes",
 							let objectConfiguration = {
 								coreLabelP1: {
 									type: "Label",
-									text: "Core projects. Click to edit or",
-									modes: ['Privileged user'],
-									x: 7 * settings.general.margin,
+									text: "Core projects. Click to",
+									modes: [lpModes.privilegeduser],
+									x: settings.general.margin,
 									yType: "callback",
 									y: function(area) {
 										return (area.extent.height / 12 + settings.dialog.lineHeight) * 1;
@@ -65,13 +66,26 @@ define(["NextWave/source/utility/prototypes",
 								},
 								coreLabelP2: {
 									type: "Label",
-									text: "build new project based on it.",
-									modes: ['Privileged user'],
-									x: 7 * settings.general.margin,
+									text: "edit or build a new",
+									modes: [lpModes.privilegeduser],
+									x: settings.general.margin,
 									yType: "callback",
 									y: function(area) {
 										return (area.extent.height / 12 + settings.dialog.lineHeight) * 1 +
-											settings.dialog.lineHeight;
+											0.65 * settings.dialog.lineHeight;
+									},
+									width: settings.dialog.firstColumnWidth,
+									height: settings.dialog.lineHeight
+								},
+								coreLabelP3: {
+									type: "Label",
+									text: "project based on it.",
+									modes: [lpModes.privilegeduser],
+									x: settings.general.margin,
+									yType: "callback",
+									y: function(area) {
+										return (area.extent.height / 12 + settings.dialog.lineHeight) * 1 +
+											1.3 * settings.dialog.lineHeight;
 									},
 									width: settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
@@ -79,8 +93,8 @@ define(["NextWave/source/utility/prototypes",
 								coreLabelN1: {
 									type: "Label",
 									text: "Click a project type",
-									modes: ['Normal user'],
-									x: 7 * settings.general.margin,
+									modes: [lpModes.normaluser],
+									x: settings.general.margin,
 									yType: "callback",
 									y: function(area) {
 										return (area.extent.height / 12 + settings.dialog.lineHeight) * 1;
@@ -90,20 +104,33 @@ define(["NextWave/source/utility/prototypes",
 								},
 								coreLabelN2: {
 									type: "Label",
-									text: "to build a new project based on it.",
-									modes: ['Normal user'],
-									x: 7 * settings.general.margin,
+									text: "to build a new",
+									modes: [lpModes.normaluser],
+									x: settings.general.margin,
 									yType: "callback",
 									y: function(area) {
 										return (area.extent.height / 12 + settings.dialog.lineHeight) * 1 +
-											settings.dialog.lineHeight;
+											0.65 * settings.dialog.lineHeight;
+									},
+									width: settings.dialog.firstColumnWidth,
+									height: settings.dialog.lineHeight
+								},
+								coreLabelN3: {
+									type: "Label",
+									text: "project based on it.",
+									modes: [lpModes.normaluser],
+									x: settings.general.margin,
+									yType: "callback",
+									y: function(area) {
+										return (area.extent.height / 12 + settings.dialog.lineHeight) * 1 +
+											1.3 * settings.dialog.lineHeight;
 									},
 									width: settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
 								},
 								coreProjects: {
 									type: "ListHost",
-									modes: ['Normal user','Privileged user'],
+									modes: [lpModes.normaluser,lpModes.privilegeduser],
 									constructorParameterString: "false",
 									x: settings.general.margin +
 										settings.dialog.firstColumnWidth,
@@ -123,8 +150,8 @@ define(["NextWave/source/utility/prototypes",
 								yourLabel: {
 									type: "Label",
 									text: "Your projects",
-									modes: ['Normal user','Privileged user'],
-									x: 7 * settings.general.margin,
+									modes: [lpModes.normaluser,lpModes.privilegeduser],
+									x: settings.general.margin,
 									yType: "callback",
 									y: function(area) {
 										return (area.extent.height / 12 + settings.dialog.lineHeight) * 2;
@@ -134,7 +161,7 @@ define(["NextWave/source/utility/prototypes",
 								},
 								yourProjects: {
 									type: "ListHost",
-									modes: ['Normal user','Privileged user'],
+									modes: [lpModes.normaluser,lpModes.privilegeduser],
 									constructorParameterString: "false",
 									x: settings.general.margin +
 										settings.dialog.firstColumnWidth,
@@ -154,8 +181,8 @@ define(["NextWave/source/utility/prototypes",
 								sharedLabel: {
 									type: "Label",
 									text: "Shared projects",
-									modes: ['Normal user','Privileged user'],
-									x: 7 * settings.general.margin,
+									modes: [lpModes.normaluser,lpModes.privilegeduser],
+									x: settings.general.margin,
 									yType: "callback",
 									y: function(area) {
 										return (area.extent.height / 12 + settings.dialog.lineHeight) * 3;
@@ -165,7 +192,7 @@ define(["NextWave/source/utility/prototypes",
 								},
 								sharedProjects: {
 									type: "ListHost",
-									modes: ['Normal user','Privileged user'],
+									modes: [lpModes.normaluser,lpModes.privilegeduser],
 									constructorParameterString: "false",
 									x: settings.general.margin +
 										settings.dialog.firstColumnWidth,
@@ -185,8 +212,8 @@ define(["NextWave/source/utility/prototypes",
 								productsLabel: {
 									type: "Label",
 									text: "Product kits",
-									modes: ['Normal user','Privileged user'],
-									x: 7 * settings.general.margin,
+									modes: [lpModes.normaluser,lpModes.privilegeduser],
+									x: settings.general.margin,
 									yType: "callback",
 									y: function(area) {
 										return (area.extent.height / 12 + settings.dialog.lineHeight) * 4;
@@ -196,7 +223,7 @@ define(["NextWave/source/utility/prototypes",
 								},
 								productProjects: {
 									type: "ListHost",
-									modes: ['Normal user','Privileged user'],
+									modes: [lpModes.normaluser,lpModes.privilegeduser],
 									constructorParameterString: "false",
 									x: settings.general.margin +
 										settings.dialog.firstColumnWidth,
@@ -216,8 +243,8 @@ define(["NextWave/source/utility/prototypes",
 								classroomLabel: {
 									type: "Label",
 									text: "Local classes",
-									modes: ['Normal user','Privileged user'],
-									x: 7 * settings.general.margin,
+									modes: [lpModes.normaluser,lpModes.privilegeduser],
+									x: settings.general.margin,
 									yType: "callback",
 									y: function(area) {
 										return (area.extent.height / 12 + settings.dialog.lineHeight) * 5;
@@ -227,7 +254,7 @@ define(["NextWave/source/utility/prototypes",
 								},
 								classroomProjects: {
 									type: "ListHost",
-									modes: ['Normal user','Privileged user'],
+									modes: [lpModes.normaluser,lpModes.privilegeduser],
 									constructorParameterString: "false",
 									x: settings.general.margin +
 										settings.dialog.firstColumnWidth,
@@ -247,8 +274,8 @@ define(["NextWave/source/utility/prototypes",
 								onlineLabel: {
 									type: "Label",
 									text: "Online classes",
-									modes: ['Normal user','Privileged user'],
-									x: 7 * settings.general.margin,
+									modes: [lpModes.normaluser,lpModes.privilegeduser],
+									x: settings.general.margin,
 									yType: "callback",
 									y: function(area) {
 										return (area.extent.height / 12 + settings.dialog.lineHeight) * 6;
@@ -258,7 +285,7 @@ define(["NextWave/source/utility/prototypes",
 								},
 								onlineProjects: {
 									type: "ListHost",
-									modes: ['Normal user','Privileged user'],
+									modes: [lpModes.normaluser,lpModes.privilegeduser],
 									constructorParameterString: "false",
 									x: settings.general.margin +
 										settings.dialog.firstColumnWidth,
@@ -280,7 +307,7 @@ define(["NextWave/source/utility/prototypes",
 												g_profile["can_create_products"] ||
 												g_profile["can_create_onlineClasses"]);
                             let exceptionRet = self.dialog.create(objectConfiguration,
-							                                 (bPrivileged ? 'Privileged user' : 'Normal user'),
+							                                 (bPrivileged ? lpModes.privilegeduser : lpModes.normaluser),
 															 function(area) {
 																 try {
 

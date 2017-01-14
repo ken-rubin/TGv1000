@@ -35,7 +35,7 @@ define(["NextWave/source/utility/prototypes",
 
                     // Size of layer.
                     self.extent = new Size(0, 0);
-                    // Indicates that this layer is active, 
+                    // Indicates that this layer is active,
                     // displays itself and responds to events.
                     self.active = true;
 
@@ -50,10 +50,10 @@ define(["NextWave/source/utility/prototypes",
 
                     // Render out the layer.
                     self.render = function (contextRender, iMS) {
-                        
+
                         if (self.active) {
 
-                            return self.innerRender(contextRender, 
+                            return self.innerRender(contextRender,
                                 iMS);
                         }
                         return null;
@@ -61,7 +61,7 @@ define(["NextWave/source/utility/prototypes",
 
                     // Render out the layer.
                     self.innerRender = function (contextRender) {
-                        
+
                         return null;
                     };
 
@@ -71,7 +71,7 @@ define(["NextWave/source/utility/prototypes",
                         self.extent = sizeExtent;
                         if (self.active) {
 
-                            return self.innerCalculateLayout(sizeExtent, 
+                            return self.innerCalculateLayout(sizeExtent,
                                 contextRender);
                         }
                         return null;
@@ -79,7 +79,7 @@ define(["NextWave/source/utility/prototypes",
 
                     // Render out the layer.
                     self.innerCalculateLayout = function (sizeExtent, contextRender) {
-                        
+
                         return null;
                     };
 

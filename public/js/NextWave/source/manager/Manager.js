@@ -105,6 +105,7 @@ define(["NextWave/source/utility/prototypes",
                             // so it is universally accessible.
                             window.manager = self;
 
+							// All layers except canvasLayer will be created active.
                             // Allocate and create the background layer.
                             self.backgroundLayer = new LayerBackground();
                             var exceptionRet = self.backgroundLayer.create();
@@ -274,6 +275,16 @@ define(["NextWave/source/utility/prototypes",
                             return e;
                         }
                     }
+
+					// Toggle layers active -> !active -> active.
+					self.toggleLayers = function() {
+
+/*						for (let i = 0; i < m_arrayLayers.length; i++) {
+
+							let lIth = m_arrayLayers[i];
+							lIth.active = !lIth.active;
+						}
+*/					}
 
 					// Outer public function to reset title of panel in center.
 					self.resetCenterPanelTitle = function(strTitle) {
