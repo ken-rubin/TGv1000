@@ -976,13 +976,13 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         // We're just selecting: enough to create the image (with project.id) in the carousel; information for fairly
                         // detailed tooltips for purchasable prjects; and, for classes and products, to decide if the project should be retrieved in the first place.
 
-                        // Core projects for all users. Privileged can create new projects or edit the core project.
-						// Non-privileged users can use the core projects to create a new project based on the chosen one.
-						// req.body.searchPhase (actually passOn.tempTableName) isn't used.
-                        strQuery = "select p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.altImagePath as projectAltImagePath from " + self.dbname + "projects p where p.isCoreProject=1;";
-
                         if (passOn.tempTableName.length === 0) {
                             // Not including temp table in queries, since there was no req.body.searchPhrase.
+
+							// Core projects for all users. Privileged can create new projects or edit the core project.
+							// Non-privileged users can use the core projects to create a new project based on the chosen one.
+							// req.body.searchPhase (actually passOn.tempTableName) isn't used.
+							strQuery = "select p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.altImagePath as projectAltImagePath from " + self.dbname + "projects p where p.isCoreProject=1;";
 
                             // Owned by user. Same for both priv and non-priv.
                             // In this query I'm selecting baseProjectId as the id of the purchased project.
@@ -1026,6 +1026,10 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
                         } else {
 
                             // A searchPhrase was entered by the user and some non-0-index projects were found. Include temp table in queries.
+
+							// Core projects for all users. Privileged can create new projects or edit the core project.
+							// Non-privileged users can use the core projects to create a new project based on the chosen one.
+							strQuery = "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.altImagePath as projectAltImagePath, t.sindex from " + self.dbname + "projects p inner join " + passOn.tempTableName + " t on t.projectId=p.id where p.isCoreProject=1 and p.id in (select projectId from " + passOn.tempTableName + " where sindex>0);";
 
                             // Owned by user. Same for both priv and non-priv.
                             // In this query I'm selecting baseProjectId as the id of the purchased project.

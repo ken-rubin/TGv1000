@@ -415,8 +415,10 @@ define(["NextWave/source/utility/prototypes",
                             }
 
 							if ($.isFunction(self.callback)) {
-								return self.callback(areaMaximal);
+
+								return self.callback();
 							} else {
+								
 								return null;
 							}
                         } catch (e) {

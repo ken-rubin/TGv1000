@@ -113,12 +113,12 @@ define(["NextWave/source/utility/prototypes",
                     self.getWidth = function (contextRender) {
 
                         contextRender.font = settings.general.monoSpaceFont;
-                        return contextRender.measureText(self.text).width + 2 * settings.general.margin;                            
+                        return contextRender.measureText(self.text).width + 2 * settings.general.margin;
                     }
 
                     self.getHeight = function () {
 
-                        return self.position.extent.height + 2 * settings.general.margin;                            
+                        return self.position.extent.height + 2 * settings.general.margin;
                     }
 
                     // Helper method calculates usable total extent of list.
@@ -155,23 +155,23 @@ define(["NextWave/source/utility/prototypes",
                             // Position scroll stubs--they may not be visible.
                             if (self.multiline) {
 
-                                self.scrollStubArea[0] = new Area(new Point(areaMaximal.location.x + (areaMaximal.extent.width - settings.general.scrollStub.width) / 2, 
-                                        areaMaximal.location.y + settings.general.scrollStub.yOffset), 
+                                self.scrollStubArea[0] = new Area(new Point(areaMaximal.location.x + (areaMaximal.extent.width - settings.general.scrollStub.width) / 2,
+                                        areaMaximal.location.y + settings.general.scrollStub.yOffset),
                                     new Size(settings.general.scrollStub.width, settings.general.scrollStub.height));
 
-                                self.scrollStubArea[1] = new Area(new Point(areaMaximal.location.x + (areaMaximal.extent.width - settings.general.scrollStub.width) / 2, 
-                                        areaMaximal.location.y + areaMaximal.extent.height + settings.general.scrollStub.yOffset), 
+                                self.scrollStubArea[1] = new Area(new Point(areaMaximal.location.x + (areaMaximal.extent.width - settings.general.scrollStub.width) / 2,
+                                        areaMaximal.location.y + areaMaximal.extent.height + settings.general.scrollStub.yOffset),
                                     new Size(settings.general.scrollStub.width, settings.general.scrollStub.height));
                             } else {
 
-                                self.scrollStubArea[0] = new Area(new Point(areaMaximal.location.x - settings.general.scrollStub.height / 2, 
-                                        areaMaximal.location.y - settings.general.scrollStub.yOffset / 5), 
-                                    new Size(settings.general.scrollStub.height /* this one is on its side */, 
+                                self.scrollStubArea[0] = new Area(new Point(areaMaximal.location.x - settings.general.scrollStub.height / 2,
+                                        areaMaximal.location.y - settings.general.scrollStub.yOffset / 5),
+                                    new Size(settings.general.scrollStub.height /* this one is on its side */,
                                         areaMaximal.extent.height + 2 * settings.general.scrollStub.yOffset / 5));
 
-                                self.scrollStubArea[1] = new Area(new Point(areaMaximal.location.x + areaMaximal.extent.width - settings.general.scrollStub.height / 2, 
-                                        areaMaximal.location.y - settings.general.scrollStub.yOffset / 5), 
-                                    new Size(settings.general.scrollStub.height /* this one is on its side */, 
+                                self.scrollStubArea[1] = new Area(new Point(areaMaximal.location.x + areaMaximal.extent.width - settings.general.scrollStub.height / 2,
+                                        areaMaximal.location.y - settings.general.scrollStub.yOffset / 5),
+                                    new Size(settings.general.scrollStub.height /* this one is on its side */,
                                         areaMaximal.extent.height + 2 * settings.general.scrollStub.yOffset / 5));
                             }
 
@@ -190,7 +190,7 @@ define(["NextWave/source/utility/prototypes",
 
                             // Configuration data in self.configuration.
 
-                            // Set multiline and comcamitant properties.
+                            // Set multiline and related properties.
                             self.multiline = self.configuration.multiline;
                             if (self.multiline === undefined) {
 
@@ -253,7 +253,7 @@ define(["NextWave/source/utility/prototypes",
                             var iNow = (new Date()).getTime();
                             if (iNow - m_iLast < 500) {
 
-                                // If the selection length is 
+                                // If the selection length is
                                 // 0 then select the local word.
                                 if (m_iSelectionLength === 0) {
 
@@ -335,7 +335,7 @@ define(["NextWave/source/utility/prototypes",
                                 }
 
                                 // Set the start to the column index at the row.
-                                m_iSelectionStart = lineClick.startIndex + iColumn;                            
+                                m_iSelectionStart = lineClick.startIndex + iColumn;
                             } else {
 
                                 // Just figure out the column.
@@ -350,7 +350,7 @@ define(["NextWave/source/utility/prototypes",
                                 }
 
                                 // Set the start to the column index.
-                                m_iSelectionStart = iColumn;                            
+                                m_iSelectionStart = iColumn;
                             }
 
                             // Always set selection length to 0.
@@ -594,7 +594,7 @@ define(["NextWave/source/utility/prototypes",
                                     String.fromCharCode(e.which) +
                                     self.text.substr(m_iSelectionStart + m_iSelectionLength);
                                 self.text = self.text.replace('"', "'");
-           
+
                                 // Move the selection over one place and ensure narrow selection.
                                 m_iSelectionStart++;
                                 m_iSelectionLength = 0;
@@ -642,7 +642,7 @@ define(["NextWave/source/utility/prototypes",
                                 return null;
                             }
 
-                            // Let derived class do something  
+                            // Let derived class do something
                             // before handling the key press.
                             var exceptionRet = self.possiblyEnsureCaretVisible();
                             if (exceptionRet) {
@@ -714,7 +714,7 @@ define(["NextWave/source/utility/prototypes",
                                 // Key is handled.
                                 e.stopPropagation();
                             } else if (e.which === 46) {                      // Delete.
-               
+
                                 // Fix up the selection length if negative.
                                 if (m_iSelectionLength < 0) {
 
@@ -748,13 +748,13 @@ define(["NextWave/source/utility/prototypes",
                                 // Resize the selection if shift.
                                 if (bShift) {
 
-                                    // Don't allow stretch that can go before the first character.  
+                                    // Don't allow stretch that can go before the first character.
                                     // But do, incidentally, allow for negative length values.
                                     if (m_iSelectionStart + m_iSelectionLength > 0) {
 
                                         m_iSelectionLength--;
 
-                                        // If the control key is down, move across a word. 
+                                        // If the control key is down, move across a word.
                                         if (bCtrl) {
 
                                             while ((m_iSelectionStart + m_iSelectionLength > 0) &&
@@ -784,7 +784,7 @@ define(["NextWave/source/utility/prototypes",
                                             m_iSelectionStart--;
                                         }
 
-                                        // If the control key is down, move across a word. 
+                                        // If the control key is down, move across a word.
                                         if (bCtrl) {
 
                                             while ((m_iSelectionStart > 0) &&
@@ -870,7 +870,7 @@ define(["NextWave/source/utility/prototypes",
 
                                         m_iSelectionLength++;
 
-                                        // If the control key is down, move across a word. 
+                                        // If the control key is down, move across a word.
                                         if (bCtrl) {
 
                                             while ((m_iSelectionStart + m_iSelectionLength < self.text.length) &&
@@ -899,7 +899,7 @@ define(["NextWave/source/utility/prototypes",
 
                                             m_iSelectionStart++;
 
-                                            // If the control key is down, move across a word. 
+                                            // If the control key is down, move across a word.
                                             if (bCtrl) {
 
                                                 while ((m_iSelectionStart < self.text.length) &&
@@ -907,7 +907,7 @@ define(["NextWave/source/utility/prototypes",
 
                                                     m_iSelectionStart++;
                                                 }
-                                            }                                        
+                                            }
                                         }
                                     } else {
 
@@ -971,13 +971,13 @@ define(["NextWave/source/utility/prototypes",
                                 // Don't go too far.
                                 if (m_iSelectionStart > self.text.length) {
 
-                                    m_iSelectionStart > self.text.length;                                    
+                                    m_iSelectionStart > self.text.length;
                                 }
 
                                 // Key is handled.
                                 e.stopPropagation();
                             } else if (e.which === 13) {                    // Enter.
-               
+
                                 // Intercept the dredded enter key!
 
                                 // Stop browser from doing what it might other wise so--that is, scroll.
@@ -1018,9 +1018,9 @@ define(["NextWave/source/utility/prototypes",
                                         m_iSelectionLength *= -1;
                                     }
                                     // Paste from clipboard.
-                                    self.text = self.text.substr(0, 
-                                            m_iSelectionStart) + 
-                                        window.clipboardString + 
+                                    self.text = self.text.substr(0,
+                                            m_iSelectionStart) +
+                                        window.clipboardString +
                                         self.text.substr(m_iSelectionStart +
                                             m_iSelectionLength);
                                     m_iSelectionStart += window.clipboardString.length;
@@ -1030,7 +1030,7 @@ define(["NextWave/source/utility/prototypes",
                                     self.lines = "requireFormat";
                                 }
                             } else if (e.which === " ".charCodeAt(0)) {
-               
+
                                 // Intercept the dredded space key too!
 
                                 // Stop browser from doing what it might other wise so--that is, scroll.
@@ -1067,7 +1067,7 @@ define(["NextWave/source/utility/prototypes",
                                     ))) {
 
                                 // Call calculate layout.
-                                var exceptionRet = self.calculateLayout(areaRender, 
+                                var exceptionRet = self.calculateLayout(areaRender,
                                     contextRender);
                                 if (exceptionRet) {
 
@@ -1084,7 +1084,7 @@ define(["NextWave/source/utility/prototypes",
                                 bRenderBackground = true;
                             }
 
-                            // Set the font up front, before 
+                            // Set the font up front, before
                             // potentially formatting lines.
                             contextRender.font = settings.general.monoSpaceFont;
 
@@ -1102,10 +1102,10 @@ define(["NextWave/source/utility/prototypes",
                                 } else {
 
                                     self.characterWidth = contextRender.measureText("w").width;
-                                    self.lines = [{ 
+                                    self.lines = [{
 
-                                        text: self.text, 
-                                        selectionStart: m_iSelectionStart, 
+                                        text: self.text,
+                                        selectionStart: m_iSelectionStart,
                                         selectionLength: m_iSelectionLength
                                     }]
                                 }
@@ -1119,7 +1119,7 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Determine if the focus element has focus.
-                            var bFocused = window.manager.hasFocus(self) && 
+                            var bFocused = window.manager.hasFocus(self) &&
                                 !window.draggingObject;
 
                             // Caret should always be visible if focused.
@@ -1142,7 +1142,7 @@ define(["NextWave/source/utility/prototypes",
                                 // Adjust down the scroll, if necessary.
                                 if (m_dScrollOffset > (dTotalExtent - self.position.extent[self.propertyAccessor])) {
 
-                                    m_dScrollOffset = Math.max(0, 
+                                    m_dScrollOffset = Math.max(0,
                                         dTotalExtent - self.position.extent[self.propertyAccessor]);
                                 } else if (m_dScrollOffset < 0) {
 
@@ -1196,7 +1196,7 @@ define(["NextWave/source/utility/prototypes",
                                     bFocused,
                                     new Area(new Point(self.position.location.x - m_dScrollOffset,
                                             self.position.location.y +
-                                            (self.position.extent.height - 
+                                            (self.position.extent.height -
                                                 settings.dialog.lineHeight) / 2),
                                         new Size(dExtent,
                                             settings.dialog.lineHeight)));
@@ -1248,7 +1248,7 @@ define(["NextWave/source/utility/prototypes",
 
                             // Restore original canvas state.
                             contextRender.restore();
-                            
+
                             return null;
                         } catch (e) {
 
@@ -1259,13 +1259,13 @@ define(["NextWave/source/utility/prototypes",
                     ///////////////////////
                     // Private methods.
 
-                    // Scroll to ensure the caret is 
+                    // Scroll to ensure the caret is
                     // visible called after a keypress.
                     var m_functionEnsureCaretIsVisible = function () {
 
                         try {
 
-                            // If multiline, ensure the end-of-selection location is 
+                            // If multiline, ensure the end-of-selection location is
                             // visible vertically, else horizontally.
                             if (self.multiline) {
 
@@ -1311,7 +1311,7 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            // Need to apply selection to lines 
+                            // Need to apply selection to lines
                             // so make an updateable copy here.
                             var iLocalSelectionStart = m_iSelectionStart;
                             var iLocalSelectionLength = m_iSelectionLength;
@@ -1347,7 +1347,7 @@ define(["NextWave/source/utility/prototypes",
                                 // Get the next word.
                                 var strWordIth = arrayWords[i];
 
-                                // If this is not the first word, then prefix it 
+                                // If this is not the first word, then prefix it
                                 // with a space to separate it from the rest of
                                 // the words on this line.  Removed each new line.
                                 if (i > 0 &&
@@ -1364,7 +1364,7 @@ define(["NextWave/source/utility/prototypes",
                                     bEndLineAfterWordRegardlessOfCursor = true;
                                     var strNextWord = strWordIth.substr(iIndexOfNewLineCharacter + 1);
                                     arrayWords.splice(i + 1, 0, strNextWord);
-                                    strWordIth = strWordIth.substr(0, 
+                                    strWordIth = strWordIth.substr(0,
                                         iIndexOfNewLineCharacter);
                                 }
 
@@ -1429,7 +1429,7 @@ define(["NextWave/source/utility/prototypes",
                                     dCursor = contextRender.measureText(strAccumulator).width;
                                 }
 
-                                // Now deal with end of line after this word--which may 
+                                // Now deal with end of line after this word--which may
                                 // have been too long as above, but must also end a line:
                                 // This is the *CRLF* new-line.
                                 if (bEndLineAfterWordRegardlessOfCursor) {
@@ -1450,7 +1450,7 @@ define(["NextWave/source/utility/prototypes",
 
                             // Complete final line.
                             // This is the *All that's left* new-line.
-                            self.lines.push({ 
+                            self.lines.push({
 
                                 text: strCurrentLine,
                                 endOfLine: 0
@@ -1465,7 +1465,7 @@ define(["NextWave/source/utility/prototypes",
                                 // Get ith line.
                                 var objectLine = self.lines[i];
 
-                                // iLocalSelectionStart is set to -1 when the end of the selection 
+                                // iLocalSelectionStart is set to -1 when the end of the selection
                                 // span has been reached and all subsequent lines should be left alone.
                                 if (iLocalSelectionStart === -1) {
 
@@ -1483,23 +1483,23 @@ define(["NextWave/source/utility/prototypes",
                                         self.startingColumn = objectLine.selectionStart;
                                     }
 
-                                    // Just use the entire length--if it is too long, 
+                                    // Just use the entire length--if it is too long,
                                     // it will be adjusted on the next statement.
                                     objectLine.selectionLength = iLocalSelectionLength;
 
                                     // Test if the selection length is too long.
                                     if (objectLine.selectionLength > objectLine.text.length - objectLine.selectionStart) {
 
-                                        // Adjust the selection length to just 
+                                        // Adjust the selection length to just
                                         // cover the remaining text in this line.
                                         objectLine.selectionLength = objectLine.text.length - objectLine.selectionStart;
                                     }
 
-                                    // Here, reduce the remaining selection 
+                                    // Here, reduce the remaining selection
                                     // length by the width of the line.
                                     iLocalSelectionLength -= (objectLine.selectionLength + objectLine.endOfLine);
 
-                                    // If their is no selection length 
+                                    // If their is no selection length
                                     // left, then stop selecting lines
                                     // otherwise always set back to 0.
                                     if (iLocalSelectionLength <= 0) {
@@ -1531,7 +1531,7 @@ define(["NextWave/source/utility/prototypes",
                                         break;
                                     } else {
 
-                                        // Update the iLocalSelectionStart so that 
+                                        // Update the iLocalSelectionStart so that
                                         // the next line will immediately begin.
                                         iLocalSelectionStart = 0;
                                     }
@@ -1625,8 +1625,8 @@ define(["NextWave/source/utility/prototypes",
                                     objectLine,
                                     bFocused,
                                     new Area(new Point(self.position.location.x - (!self.multiline ? m_dScrollOffset : 0),
-                                                self.position.location.y + 
-                                                i * settings.dialog.lineHeight - 
+                                                self.position.location.y +
+                                                i * settings.dialog.lineHeight -
                                                 (self.multiline ? m_dScrollOffset : 0)),
                                         new Size(self.position.extent.width,
                                             settings.dialog.lineHeight)));
@@ -1694,7 +1694,7 @@ define(["NextWave/source/utility/prototypes",
                                 // If selecting a region, then color differently to instruct the user.
                                 if (m_bShowCursor ||
                                     m_iSelectionLength !== 0) {
-               
+
                                     contextRender.fillStyle = "rgba(0,0,0,0.7)";
                                     contextRender.fillRect(areaRender.location.x + settings.general.margin + dStartOffset - 1,
                                         areaRender.location.y + 0.5 * settings.general.margin,
@@ -1752,7 +1752,7 @@ define(["NextWave/source/utility/prototypes",
                     var m_bPossiblyAdjustScrollOffsets = false;
                     // Update caret visiblity on next render.
                     var m_bPossiblyEnsureCaretVisible = false;
-                    // Cached Area for Edits which are passed an Area 
+                    // Cached Area for Edits which are passed an Area
                     // in render--to minimally call calculateLayout.
                     var m_areaLast = null;
                     // Time of the previous last click--used to calculate triple-click.
@@ -1767,7 +1767,7 @@ define(["NextWave/source/utility/prototypes",
                 }
         	};
 
-            // Inherit from Control.  Wire 
+            // Inherit from Control.  Wire
             // up prototype chain to Control.
             functionRet.inheritsFrom(Control);
 

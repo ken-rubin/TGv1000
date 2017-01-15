@@ -20,9 +20,10 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/List",
     "NextWave/source/utility/ListItem",
     "NextWave/source/utility/PictureListItem",
-	"Core/resourceHelper"
+	"Core/resourceHelper",
+	"Core/errorHelper"
     ],
-    function (prototypes, settings, lpModes, Point, Size, Area, DialogHost, List, ListItem, PictureListItem, resourceHelper) {
+    function (prototypes, settings, lpModes, Point, Size, Area, DialogHost, List, ListItem, PictureListItem, resourceHelper, errorHelper) {
 
         try {
 
@@ -57,7 +58,7 @@ define(["NextWave/source/utility/prototypes",
 									text: "Search string (opt.)",
 									modes: [lpModes.normaluser,lpModes.privilegeduser],
 									x: settings.general.margin,
-									y: settings.dialog.lineHeight,
+									y: settings.general.margin,
 									width: settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
 								},
@@ -67,7 +68,7 @@ define(["NextWave/source/utility/prototypes",
                                     multiline: true,
 									x: settings.general.margin +
 										settings.dialog.firstColumnWidth,
-									y: settings.dialog.lineHeight,
+									y: settings.general.margin,
 									widthType: "callback",
 									width: function(area) {
 										return (area.extent.width - settings.dialog.firstColumnWidth) / 3;
@@ -95,11 +96,18 @@ define(["NextWave/source/utility/prototypes",
 										(area.extent.width - settings.dialog.firstColumnWidth) / 3 +
 										15
 									},
-									y: 1.5 * settings.dialog.lineHeight,
+									y: 2 * settings.general.margin,
 									width: 140,
 									height: 40,
 									click: function() {
-
+										try {
+											let exceptionRet = m_functionSearchAndReload();
+											if (exceptionRet) {
+												throw exceptionRet;
+											}
+										} catch(e) {
+											errorHelper(e);
+										}
 									}
 								},
 								coreLabelP1: {
@@ -194,7 +202,7 @@ define(["NextWave/source/utility/prototypes",
 									},
 									heightType: "callback",
 									height: function(area) {
-										return (area.extent.height / 12);
+										return (area.extent.height / 15);
 									}
 								},
 								yourLabel1: {
@@ -238,7 +246,7 @@ define(["NextWave/source/utility/prototypes",
 									},
 									heightType: "callback",
 									height: function(area) {
-										return area.extent.height / 12;
+										return area.extent.height / 15;
 									}
 								},
 								sharedLabel1: {
@@ -282,7 +290,7 @@ define(["NextWave/source/utility/prototypes",
 									},
 									heightType: "callback",
 									height: function(area) {
-										return area.extent.height / 12;
+										return area.extent.height / 15;
 									}
 								},
 								productsLabel1: {
@@ -326,7 +334,7 @@ define(["NextWave/source/utility/prototypes",
 									},
 									heightType: "callback",
 									height: function(area) {
-										return area.extent.height / 12;
+										return area.extent.height / 15;
 									}
 								},
 								classroomLabel1: {
@@ -370,7 +378,7 @@ define(["NextWave/source/utility/prototypes",
 									},
 									heightType: "callback",
 									height: function(area) {
-										return area.extent.height / 12;
+										return area.extent.height / 15;
 									}
 								},
 								onlineLabel1: {
@@ -414,108 +422,21 @@ define(["NextWave/source/utility/prototypes",
 									},
 									heightType: "callback",
 									height: function(area) {
-										return (area.extent.height / 12);
+										m_area = area;	// Set it aside. Works in this case.
+										return (area.extent.height / 15);
 									}
 								}
 							};
-							let bPrivileged = (g_profile["can_create_classes"] || 					// Need to do it this way since manager.userAllowedToCreateEditPurchProjs not set yet.
+							m_bPrivileged = (g_profile["can_create_classes"] || 					// Need to do it this way since manager.userAllowedToCreateEditPurchProjs not set yet.
 												g_profile["can_create_products"] ||
 												g_profile["can_create_onlineClasses"]);
                             let exceptionRet = self.dialog.create(objectConfiguration,
-							                                 (bPrivileged ? lpModes.privilegeduser : lpModes.normaluser),
-															 function(area) {
-																 try {
-
-																	//////////////////////////////////////
-																	// Fill the 5 or 6 ListHosts with project images
-																	var posting = $.post("/BOL/UtilityBO/SearchProjects",
-																		{
-																			searchPhrase: '',
-																			userAllowedToCreateEditPurchProjs: (bPrivileged ? 1 : 0)
-																		},
-																		'json'
-																	);
-																	posting.done(function(data){
-
-																		if (data.success) {
-
-																			//m_searchResultProcessedArray = new Array(6);
-																			m_searchResultRawArray = data.arrayRows;	// [][]
-
-																			for (let n = 0; n < 6; n++) {
-
-																				let stripNth = m_searchResultRawArray[n];
-																				let lhProjects = self.dialog.controlObject[m_arrayListHostNames[n]];
-																				let listProjects = lhProjects.list;
-																				let bVertical = (lhProjects.constructorParameterString === "true"); // If the ListHost is vertical.
-																				let i = 0;
-
-																				listProjects.destroy(); // Don't check result because if destroy fails, that's because it hadn't been created, so it's ok.
-
-																				//m_searchResultProcessedArray[n] = new Array();
-
-																				// Loop through returned projects for ListHost[stripNum] (lhProjects).
-																				let arrayOutput = stripNth.map((rawProj) => {
-
-																					let itemIth = stripNth[i];
-																					let rliNew = new PictureListItem(itemIth.projectName, itemIth.projectId, i++, resourceHelper.toURL('resources', itemIth.projectImageId, 'image', itemIth.projectAltImagePath), (bVertical ? (area.extent.width - settings.dialog.firstColumnWidth) / 2 : 0), (!bVertical ? area.extent.height / 12 : 0));
-																					rliNew.clickHandler = (id) => {
-
-																						m_projectId = id;
-
-																						striploop:
-																						for (let strip = 0; strip < 6; strip++) {
-
-																							for (let ind = 0; ind < m_searchResultRawArray[strip].length; ind++) {
-
-																								let item = m_searchResultRawArray[strip][ind];
-																								if (item.projectId === id) {
-
-																									alert("You clicked the project named " + item.projectName + ".");
-																									break striploop;
-																								}
-																							}
-																						}
-																					}
-																					return rliNew;
-																				});
-																				listProjects.create(arrayOutput);
-
-										/*						                for (let i = 0; i < m_searchResultRawArray[stripNum].length; i++) {
-
-																					let rowIth = m_searchResultRawArray[stripNum][i];
-																					m_searchResultProcessedArray[stripNum].push(
-																						{
-																							index: i,	// 2nd dimension index of m_searchResultRawArray
-																							id: rowIth.projectId,
-																							name: rowIth.projectName,
-																							url: resourceHelper.toURL('resources',
-																								rowIth.projectImageId,
-																								'image',
-																								'')
-																						}
-																					);
-																				}
-										*/
-																				//var exceptionRet = m_rebuildCarousel(stripNum);
-																				//if (exceptionRet) { throw exceptionRet; }
-																			}
-																		} else {
-
-																			// !data.success
-																			return new Error(data.message);
-																		}
-																	});
-
-																 } catch(e) {
-																	 return e;
-																 }
-															 }
+							                                 	(m_bPrivileged ? lpModes.privilegeduser : lpModes.normaluser),
+																m_functionSearchAndReload
 							);
                             if (exceptionRet) {
                                 return exceptionRet;
                             }
-
 
                             // Because it is!
                             m_bCreated = true;
@@ -548,6 +469,94 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+					///////////////////////
+					// Private methods
+
+					var m_functionSearchAndReload = function() {
+
+						try {
+
+							//////////////////////////////////////
+							// Fill the 6 ListHosts with project images
+							var posting = $.post("/BOL/UtilityBO/SearchProjects",
+								{
+									searchPhrase: m_strSearch,
+									userAllowedToCreateEditPurchProjs: (m_bPrivileged ? 1 : 0)
+								},
+								'json'
+							);
+							posting.done(function(data){
+
+								if (data.success) {
+
+									m_searchResultRawArray = data.arrayRows;	// [][]
+
+									for (let n = 0; n < 6; n++) {
+
+										let stripNth = m_searchResultRawArray[n];
+										let lhProjects = self.dialog.controlObject[m_arrayListHostNames[n]];
+										let listProjects = lhProjects.list;
+										let bVertical = (lhProjects.constructorParameterString === "true");
+										let i = 0;
+
+										listProjects.destroy(); // Don't check result because if destroy fails, that's because it hadn't been created, so it's ok.
+
+										// Loop through returned projects for ListHost[stripNum] (lhProjects).
+										let arrayOutput = stripNth.map((rawProj) => {
+
+											let itemIth = stripNth[i];
+											let rliNew = new PictureListItem(itemIth.projectName, itemIth.projectId, i++, resourceHelper.toURL('resources', itemIth.projectImageId, 'image', itemIth.projectAltImagePath), (bVertical ? (m_area.extent.width - settings.dialog.firstColumnWidth) / 2 : 0), (!bVertical ? m_area.extent.height / 15 : 0));
+											rliNew.clickHandler = (id) => {
+
+												m_projectId = id;
+
+												striploop:
+												for (let strip = 0; strip < 6; strip++) {
+
+													for (let ind = 0; ind < m_searchResultRawArray[strip].length; ind++) {
+
+														let item = m_searchResultRawArray[strip][ind];
+														if (item.projectId === id) {
+
+															alert("You clicked the project named " + item.projectName + ".");
+															break striploop;
+														}
+													}
+												}
+											}
+											return rliNew;
+										});
+										listProjects.create(arrayOutput);
+
+	/*						                for (let i = 0; i < m_searchResultRawArray[stripNum].length; i++) {
+
+											let rowIth = m_searchResultRawArray[stripNum][i];
+											m_searchResultProcessedArray[stripNum].push(
+												{
+													index: i,	// 2nd dimension index of m_searchResultRawArray
+													id: rowIth.projectId,
+													name: rowIth.projectName,
+													url: resourceHelper.toURL('resources',
+														rowIth.projectImageId,
+														'image',
+														'')
+												}
+											);
+										}
+	*/
+									}
+									return null;
+								} else {
+
+									// !data.success
+									return new Error(data.message);
+								}
+							});
+						} catch(e) {
+							return e;
+						}
+					}
+
                     ///////////////////////
                     // Private fields.
 
@@ -563,6 +572,8 @@ define(["NextWave/source/utility/prototypes",
 					var m_area = null;
 					// Search string.
 					var m_strSearch = "";
+					// Privileged user or not.
+					var m_bPrivileged = false;
 
                 } catch (e) {
 
