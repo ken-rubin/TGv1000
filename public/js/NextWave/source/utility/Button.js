@@ -35,6 +35,7 @@ define(["NextWave/source/utility/prototypes",
 
 					if (objectParameters) {
 
+						// Format like in settings.js: "20px Courier New"
 						self.font = objectParameters;
 					}
 
@@ -98,7 +99,7 @@ define(["NextWave/source/utility/prototypes",
                                                                 (m_bMouseDown ?
                                                                     settings.button.backgroundMouseDown :
                                                                     settings.button.backgroundMouseIn) :
-                                                                settings.button.background);
+                                                                	settings.button.background);
                                 }
                                 contextRender.strokeStyle = settings.general.strokeBackground;
                                 contextRender.fill();
@@ -109,19 +110,42 @@ define(["NextWave/source/utility/prototypes",
                                 contextRender.textBaseline = "middle";
                                 contextRender.textAlign = "center";
 
-                                // Again, if self.protected, nothing special for the text.
-                                if (self.protected) {
+                                // Again, if self.protected, no special offset.
+								if (self.configuration.text instanceof Area) {
+									// We have a glyph to render.
 
-                                    contextRender.fillText(self.configuration.text,
-                                        m_area.location.x + m_area.extent.width / 2,
-                                        m_area.location.y + m_area.extent.height / 2);
+									let gly = self.configuration.text;
 
-                                } else {
+									if (self.protected) {
 
-                                    contextRender.fillText(self.configuration.text,
-                                        m_area.location.x + m_area.extent.width / 2 + (m_bMouseDown ? 3 : 0),
-                                        m_area.location.y + m_area.extent.height / 2+ (m_bMouseDown ? 3 : 0));
-                                }
+										glyphs.render(contextRender,
+											self.position,
+											gly,
+											settings.manager.showIconBackgrounds);
+									} else {
+
+										glyphs.render(contextRender,
+											new Area(new Point(self.position.location.x + (m_bMouseDown ? 3 : 0),
+																self.position.location.y + (m_bMouseDown ? 3 : 0)),
+													self.position.extent
+											),
+											gly,
+											settings.manager.showIconBackgrounds);
+									}
+								} else {
+									if (self.protected) {
+
+										contextRender.fillText(self.configuration.text,
+											m_area.location.x + m_area.extent.width / 2,
+											m_area.location.y + m_area.extent.height / 2);
+
+									} else {
+
+										contextRender.fillText(self.configuration.text,
+											m_area.location.x + m_area.extent.width / 2 + (m_bMouseDown ? 3 : 0),
+											m_area.location.y + m_area.extent.height / 2 + (m_bMouseDown ? 3 : 0));
+									}
+								}
                         } finally {
 
                                 contextRender.restore();
