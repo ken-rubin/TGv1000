@@ -108,7 +108,7 @@ define(["NextWave/source/utility/prototypes",
 												throw exceptionRet;
 											}
 										} catch(e) {
-											errorHelper(e);
+											errorHelper.show(e);
 										}
 									}
 								},
@@ -536,7 +536,11 @@ define(["NextWave/source/utility/prototypes",
 														let item = m_searchResultRawArray[strip][ind];
 														if (item.projectId === id) {
 
-															alert("You clicked the project named " + item.projectName + ".");
+															let exceptionRet = m_functionSetSelectedProject(item, strip, ind);
+															if (exceptionRet) {
+																errorHelper.show(exceptionRet);
+															}
+
 															break striploop;
 														}
 													}
@@ -545,23 +549,6 @@ define(["NextWave/source/utility/prototypes",
 											return rliNew;
 										});
 										listProjects.create(arrayOutput);
-
-	/*						                for (let i = 0; i < m_searchResultRawArray[stripNum].length; i++) {
-
-											let rowIth = m_searchResultRawArray[stripNum][i];
-											m_searchResultProcessedArray[stripNum].push(
-												{
-													index: i,	// 2nd dimension index of m_searchResultRawArray
-													id: rowIth.projectId,
-													name: rowIth.projectName,
-													url: resourceHelper.toURL('resources',
-														rowIth.projectImageId,
-														'image',
-														'')
-												}
-											);
-										}
-	*/
 									}
 									return null;
 								} else {
@@ -571,6 +558,53 @@ define(["NextWave/source/utility/prototypes",
 								}
 							});
 						} catch(e) {
+							return e;
+						}
+					}
+
+					//
+					var m_functionSetSelectedProject = function(rawItem, strip, index) {
+
+						try {
+
+							//errorHelper.show("You clicked the project named " + rawItem.projectName + ".");
+							if (m_bPrivileged) {
+
+								switch(strip) {
+									case 0:		// Core--need to ask if editing a core project or starting a new normal or purchasable project.
+										break;
+									case 1:		// Your own--editing. May save with new name.
+										break;
+									case 2:		// Shared--cloning.
+										break;
+									case 3:		// Product--cannot purchase, so must be opened for editing.
+										break;
+									case 4:		// Classroom--cannot purchase, so must be opened for editing.
+										break;
+									case 5:		// Online--cannot purchase, so must be opened for editing.
+										break;
+								}
+							} else {
+
+								switch(strip) {
+									case 0:		// Core--will create new normal project based on it.
+										break;
+									case 1:		// Your own--editing. May save with a new name.
+										break;
+									case 2:		// Shared--cloning.
+										break;
+									case 3:		// Product--will make buying decision.
+										break;
+									case 4:		// Classroom--will make buying or waitlist decision.
+										break;
+									case 5:		// Online--will make buying decision. There is no max number of enrollees.
+										break;
+								}
+							}
+
+							return null;
+						} catch(e) {
+
 							return e;
 						}
 					}
