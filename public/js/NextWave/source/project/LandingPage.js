@@ -524,9 +524,9 @@ define(["NextWave/source/utility/prototypes",
 
 											let itemIth = stripNth[i];
 											let rliNew = new PictureListItem(itemIth.projectName, itemIth.projectId, i++, resourceHelper.toURL('resources', itemIth.projectImageId, 'image', itemIth.projectAltImagePath), (bVertical ? (m_area.extent.width - settings.dialog.firstColumnWidth) / 2 : 0), (!bVertical ? m_area.extent.height / 15 : 0));
-											rliNew.clickHandler = (id) => {
+											rliNew.clickHandler = (projectId) => {
 
-												m_projectId = id;
+												m_projectId = projectId;
 
 												striploop:
 												for (let strip = 0; strip < 6; strip++) {
@@ -534,7 +534,7 @@ define(["NextWave/source/utility/prototypes",
 													for (let ind = 0; ind < m_searchResultRawArray[strip].length; ind++) {
 
 														let item = m_searchResultRawArray[strip][ind];
-														if (item.projectId === id) {
+														if (item.projectId === m_projectId) {
 
 															let exceptionRet = m_functionSetSelectedProject(item, strip, ind);
 															if (exceptionRet) {
@@ -571,33 +571,45 @@ define(["NextWave/source/utility/prototypes",
 							if (m_bPrivileged) {
 
 								switch(strip) {
-									case 0:		// Core--need to ask if editing a core project or starting a new normal or purchasable project.
+									case 0:		// Core--priv. user makes choice of editing a core project or starting a new normal or purchasable project based on the selected core project.
+										errorHelper.show("Core--priv. user makes choice of editing a core project or starting a new normal or purchasable project based on the selected core project.");
 										break;
-									case 1:		// Your own--editing. May save with new name.
+									case 1:		// Your own--editing. May save with new name. May also make public.
+										errorHelper.show("Your own--editing. May save with new name. May also make public.");
 										break;
-									case 2:		// Shared--cloning.
+									case 2:		// Shared--cloning. Another possibility is that it's being reviewed for approval to be made public.
+										errorHelper.show("Shared--cloning. Another possibility is that it's being reviewed for approval to be made public.");
 										break;
-									case 3:		// Product--cannot purchase, so must be opened for editing.
+									case 3:		// Product--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.
+										errorHelper.show("Product--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.");
 										break;
-									case 4:		// Classroom--cannot purchase, so must be opened for editing.
+									case 4:		// Classroom--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.
+										errorHelper.show("Classroom--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.");
 										break;
-									case 5:		// Online--cannot purchase, so must be opened for editing.
+									case 5:		// Online--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.
+										errorHelper.show("Online--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.");
 										break;
 								}
 							} else {
 
 								switch(strip) {
-									case 0:		// Core--will create new normal project based on it.
+									case 0:		// Core--will create new normal project based on it. Cannot edit and save replacing itself.
+										errorHelper.show("Core--will create new normal project based on it. Cannot edit and save replacing itself.");
 										break;
-									case 1:		// Your own--editing. May save with a new name.
+									case 1:		// Your own--editing. May save with a new name as a new project.
+										errorHelper.show("Your own--editing. May save with a new name as a new project.");
 										break;
-									case 2:		// Shared--cloning.
+									case 2:		// Shared public project--cloning.
+										errorHelper.show("Shared public project--cloning.");
 										break;
-									case 3:		// Product--will make buying decision.
+									case 3:		// Product that is active--will make buying decision.
+										errorHelper.show("Product that is active--will make buying decision.");
 										break;
-									case 4:		// Classroom--will make buying or waitlist decision.
+									case 4:		// Classroom (active, soon and nearby)--will make buying or waitlist decision.
+										errorHelper.show("Classroom (active, soon and nearby)--will make buying or waitlist decision.");
 										break;
-									case 5:		// Online--will make buying decision. There is no max number of enrollees.
+									case 5:		// Online (active and soon)--will make buying decision. There is no max number of enrollees.
+										errorHelper.show("Online (active and soon)--will make buying decision. There is no max number of enrollees.");
 										break;
 								}
 							}

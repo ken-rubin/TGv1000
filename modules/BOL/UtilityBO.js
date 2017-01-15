@@ -986,15 +986,15 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
 
                             // Owned by user. Same for both priv and non-priv.
                             // In this query I'm selecting baseProjectId as the id of the purchased project.
-                            strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.altImagePath as projectAltImagePath, p.baseProjectId from " + self.dbname + "projects p where p.ownedByUserId=" + req.user.userId + ";";
+                            strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.altImagePath as projectAltImagePath, p.baseProjectId from " + self.dbname + "projects p where p.isProduct+p.isClass+p.isOnlineClass=0 and p.ownedByUserId=" + req.user.userId + ";";
 
                             // Others' accounts
                             if (req.body.userAllowedToCreateEditPurchProjs === "1") {
                                 // A privileged user doesn't care about public/private.
-                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.altImagePath as projectAltImagePath from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.isOnlineClass=0;";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.altImagePath as projectAltImagePath from " + self.dbname + "projects p where p.isProduct+p.isClass+p.isOnlineClass=0 and p.ownedByUserId<>" + req.user.userId + " and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.isOnlineClass=0;";
                             } else {
                                 // A non-privileged user can retrieve only public projects and only "normal" projects.
-                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.altImagePath as projectAltImagePath from " + self.dbname + "projects p where p.ownedByUserId<>" + req.user.userId + " and p.public=1 and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.isOnlineClass=0;";
+                                strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.altImagePath as projectAltImagePath from " + self.dbname + "projects p where p.isProduct+p.isClass+p.isOnlineClass=0 and p.ownedByUserId<>" + req.user.userId + " and p.public=1 and p.isCoreProject=0 and p.isProduct=0 and p.isClass=0 and p.isOnlineClass=0;";
                             }
 
                             // Products
@@ -1033,7 +1033,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
 
                             // Owned by user. Same for both priv and non-priv.
                             // In this query I'm selecting baseProjectId as the id of the purchased project.
-                            strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.altImagePath as projectAltImagePath, p.baseProjectId, t.sindex from " + self.dbname + "projects p inner join " + passOn.tempTableName + " t on t.projectId=p.id where p.ownedByUserId=" + req.user.userId + " and p.id in (select projectId from " + passOn.tempTableName + " where sindex>0);";
+                            strQuery += "select distinct p.id as projectId, p.name as projectName, p.description as projectDescription, p.imageId as projectImageId, p.altImagePath as projectAltImagePath, p.baseProjectId, t.sindex from " + self.dbname + "projects p inner join " + passOn.tempTableName + " t on t.projectId=p.id where p.isProduct+p.isClass+p.isOnlineClass=0 and p.ownedByUserId=" + req.user.userId + " and p.id in (select projectId from " + passOn.tempTableName + " where sindex>0);";
 
                             // Others' accounts
                             if (req.body.userAllowedToCreateEditPurchProjs === "1") {
