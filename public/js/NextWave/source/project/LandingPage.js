@@ -443,6 +443,24 @@ define(["NextWave/source/utility/prototypes",
 										m_area = area;	// Set it aside. Works in this case.
 										return (area.extent.height / 15);
 									}
+								},
+								encouragementLabel: {
+									type: "Label",
+									text: "By clicking one of the project images above, you are not committing to any course of action. You will be shown more information about the project and will be able to proceed or go back.",
+									modes: [lpModes.normaluser,lpModes.privilegeduser],
+									font: "oblique " + settings.general.boldFont,
+									x: settings.general.margin,
+									yType: "callback",
+									y: function(area) {
+										return (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 6 +
+											(area.extent.height / 15) +
+											0.65 * settings.dialog.lineHeight;
+									},
+									widthType: "callback",
+									width: function(area) {
+										return area.extent.width;
+									},
+									height: settings.dialog.lineHeight
 								}
 							};
 							m_bPrivileged = (g_profile["can_create_classes"] || 					// Need to do it this way since manager.userAllowedToCreateEditPurchProjs not set yet.
@@ -572,44 +590,44 @@ define(["NextWave/source/utility/prototypes",
 
 								switch(strip) {
 									case 0:		// Core--priv. user makes choice of editing a core project or starting a new normal or purchasable project based on the selected core project.
-										errorHelper.show("Core--priv. user makes choice of editing a core project or starting a new normal or purchasable project based on the selected core project.");
+										errorHelper.show(rawItem.projectName + ": Core--priv. user makes choice of editing a core project or starting a new normal or purchasable project based on the selected core project.");
 										break;
 									case 1:		// Your own--editing. May save with new name. May also make public.
-										errorHelper.show("Your own--editing. May save with new name. May also make public.");
+										errorHelper.show(rawItem.projectName + ": Your own--editing. May save with new name. May also make public.");
 										break;
 									case 2:		// Shared--cloning. Another possibility is that it's being reviewed for approval to be made public.
-										errorHelper.show("Shared--cloning. Another possibility is that it's being reviewed for approval to be made public.");
+										errorHelper.show(rawItem.projectName + ": Shared--cloning. Another possibility is that it's being reviewed for approval to be made public.");
 										break;
 									case 3:		// Product--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.
-										errorHelper.show("Product--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.");
+										errorHelper.show(rawItem.projectName + ": Product--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.");
 										break;
 									case 4:		// Classroom--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.
-										errorHelper.show("Classroom--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.");
+										errorHelper.show(rawItem.projectName + ": Classroom--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.");
 										break;
 									case 5:		// Online--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.
-										errorHelper.show("Online--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.");
+										errorHelper.show(rawItem.projectName + ": Online--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.");
 										break;
 								}
 							} else {
 
 								switch(strip) {
 									case 0:		// Core--will create new normal project based on it. Cannot edit and save replacing itself.
-										errorHelper.show("Core--will create new normal project based on it. Cannot edit and save replacing itself.");
+										errorHelper.show(rawItem.projectName + ": Core--will create new normal project based on it. Cannot edit and save replacing itself.");
 										break;
 									case 1:		// Your own--editing. May save with a new name as a new project.
-										errorHelper.show("Your own--editing. May save with a new name as a new project.");
+										errorHelper.show(rawItem.projectName + ": Your own--editing. May save with a new name as a new project.");
 										break;
 									case 2:		// Shared public project--cloning.
-										errorHelper.show("Shared public project--cloning.");
+										errorHelper.show(rawItem.projectName + ": Shared public project--cloning.");
 										break;
 									case 3:		// Product that is active--will make buying decision.
-										errorHelper.show("Product that is active--will make buying decision.");
+										errorHelper.show(rawItem.projectName + ": Product that is active--will make buying decision.");
 										break;
 									case 4:		// Classroom (active, soon and nearby)--will make buying or waitlist decision.
-										errorHelper.show("Classroom (active, soon and nearby)--will make buying or waitlist decision.");
+										errorHelper.show(rawItem.projectName + ": Classroom (active, soon and nearby)--will make buying or waitlist decision.");
 										break;
 									case 5:		// Online (active and soon)--will make buying decision. There is no max number of enrollees.
-										errorHelper.show("Online (active and soon)--will make buying decision. There is no max number of enrollees.");
+										errorHelper.show(rawItem.projectName + ": Online (active and soon)--will make buying decision. There is no max number of enrollees.");
 										break;
 								}
 							}

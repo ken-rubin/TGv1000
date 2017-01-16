@@ -1,5 +1,5 @@
 ///////////////////////////////////////
-// LayerLandingPage module.
+// LayerNavbar module.
 //
 // Maintains collection of panels (one of which can be active, e.g. has focus).
 // Also responsible for scaling to the display dimension (e.g. responsiveness).
@@ -18,14 +18,14 @@ define(["NextWave/source/utility/prototypes",
         "NextWave/source/utility/Size",
         "NextWave/source/manager/Layer",
         "NextWave/source/utility/Panel",
-        "NextWave/source/project/LandingPage"
+        "NextWave/source/project/Navbar"
         ],
-    function(prototypes, settings, orientation, Area, Point, Size, Layer, Panel, LandingPage) {
+    function(prototypes, settings, orientation, Area, Point, Size, Layer, Panel, Navbar) {
 
         try {
 
             // Constructor function.
-            var functionRet = function LayerLandingPage() {
+            var functionRet = function LayerNavbar() {
 
                 try {
 
@@ -53,14 +53,14 @@ define(["NextWave/source/utility/prototypes",
 
                                 throw {
 
-                                    message: "LayerLandingPage: Instance already created!"
+                                    message: "LayerNavbar: Instance already created!"
                                 };
                             }
 
-							self.panel = new Panel("Home",
+							self.panel = new Panel("Navbar",
 								orientation.full,
 								new Point(0,0),
-								new Size(self.extent.width, self.extent.height));   /**/
+								new Size(self.extent.width, self.extent.height));
 
 							self.panel.open = true;
 							self.panel.closed = false;
@@ -68,19 +68,19 @@ define(["NextWave/source/utility/prototypes",
 							self.panel.closing = false;
 							self.panel.pinned = true;
 
-							// Add the LandingPage to the panel.
+							// Add the Navbar to the panel.
 							try {
 
-								// Allocate and create the LandingPage "Dialog", passing the initialization object.
-								window.landingPageDialog = new LandingPage();
-								var exceptionRet = window.landingPageDialog.create();
+								// Allocate and create the Navbar "Dialog", passing the initialization object.
+								window.navbarDialog = new Navbar();
+								var exceptionRet = window.navbarDialog.create();
 								if (exceptionRet) {
 
 									throw exceptionRet;
 								}
 
 								// Set it.
-								self.panel.setPayload("Home",window.landingPageDialog);
+								self.panel.setPayload("Navbar",window.navbarDialog);
 							} catch (e) {
 
 								throw exceptionRet;
@@ -101,7 +101,7 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // Destroy LayerLandingPage--we're about to create a new one with a different configuration.
+                    // Destroy LayerNavbar--we're about to create a new one with a different configuration.
                     self.destroy = function() {
 
 						self.panel.destroy();
@@ -342,7 +342,7 @@ define(["NextWave/source/utility/prototypes",
                             }
 
 							// Render background.
-							contextRender.fillStyle = "rgba(0,204,204,0.95)";
+							contextRender.fillStyle = "rgba(255,255,255,0.10)";
 							contextRender.fillRect(0,
 								0,
 								self.extent.width,
@@ -380,6 +380,7 @@ define(["NextWave/source/utility/prototypes",
                     var m_arrayPanels = null;
                     // Panel in which the mouse is located.
                     var m_panelActive = null;
+
                 } catch (e) {
 
                     alert(e.message);

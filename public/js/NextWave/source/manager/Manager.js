@@ -26,6 +26,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/manager/LayerDrag",
     "NextWave/source/manager/LayerAl",
     "NextWave/source/manager/LayerLandingPage",
+    "NextWave/source/manager/LayerNavbar",
     "NextWave/source/expression/Expression",
     "NextWave/source/literal/Literal",
     "NextWave/source/statement/Statement",
@@ -42,7 +43,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/project/Method",
     "NextWave/source/project/Property",
     "NextWave/source/project/Event"],
-    function (prototypes, settings, simulator, Area, Point, Size, Layer, LayerBackground, LayerCanvas, LayerPanels, LayerDebug, LayerDrag, LayerAl, LayerLandingPage, Expression, Literal, Statement, Name, CodeExpression, CodeStatement, Parameter, ParameterList, StatementList, Project, Comic, Library, Type, Method, Property, Event) {
+    function (prototypes, settings, simulator, Area, Point, Size, Layer, LayerBackground, LayerCanvas, LayerPanels, LayerDebug, LayerDrag, LayerAl, LayerLandingPage, LayerNavbar, Expression, Literal, Statement, Name, CodeExpression, CodeStatement, Parameter, ParameterList, StatementList, Project, Comic, Library, Type, Method, Property, Event) {
 
         try {
 
@@ -68,6 +69,8 @@ define(["NextWave/source/utility/prototypes",
                     self.panelLayer = null;
 					// Holds reference to the LandingPage layer.
 					self.landingPageLayer = null;
+					// Holds reference to the Navbar layer--a set of buttons.
+					self.navbarLayer = null;
                     // Holds reference to the designer layer.
                     // self.designerLayer = null;
                     // Object used to initialize this instance.
@@ -138,6 +141,14 @@ define(["NextWave/source/utility/prototypes",
                                 throw exceptionRet;
                             }
 
+                            // Allocate and create the navbar layer.
+                            self.navbarLayer = new LayerNavbar();
+                            exceptionRet = self.navbarLayer.create();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
                             // Allocate and create the drag layer.
                             self.dragLayer = new LayerDrag();
                             exceptionRet = self.dragLayer.create();
@@ -177,7 +188,8 @@ define(["NextWave/source/utility/prototypes",
                                     self.panelLayer,
 									self.landingPageLayer,
                                     self.debugLayer,
-                                    self.dragLayer
+                                    self.dragLayer,
+									self.navbarLayer
                                 ];
 
                             // Get the parent references.
@@ -262,7 +274,8 @@ define(["NextWave/source/utility/prototypes",
                                     self.panelLayer,
 									self.landingPageLayer,
                                     self.debugLayer,
-                                    self.dragLayer
+                                    self.dragLayer,
+									self.navbarLayer
                                 ];
 
                             // Reset *Loaded.
