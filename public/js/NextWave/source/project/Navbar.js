@@ -57,10 +57,10 @@ define(["NextWave/source/utility/prototypes",
 								toggleLandingPageButton: {
 									type: "Button",
 									modes: [lpModes.normaluser,lpModes.privilegeduser],
-									text: glyphs.pushpin,
+									text: glyphs.home,
 									constructorParameterString: "'15px Arial'",
 									xType: "reserve",
-									x: settings.dialog.firstColumnWidth,
+									x: settings.dialog.firstColumnWidth / 2,
 									y: 2 * settings.general.margin,
 									width: 30,
 									height: 30,
@@ -71,10 +71,10 @@ define(["NextWave/source/utility/prototypes",
 								runButton: {
 									type: "Button",
 									modes: [lpModes.normaluser,lpModes.privilegeduser],
-									text: glyphs.arrowNorth,
+									text: glyphs.play,
 									constructorParameterString: "'15px Arial'",
 									xType: "reserve",
-									x: settings.dialog.firstColumnWidth,
+									x: settings.dialog.firstColumnWidth / 2,
 									y: 2 * settings.general.margin + 50,
 									width: 30,
 									height: 30,
@@ -85,10 +85,10 @@ define(["NextWave/source/utility/prototypes",
 								stopButton: {
 									type: "Button",
 									modes: [lpModes.normaluser,lpModes.privilegeduser],
-									text: glyphs.arrowSouth,
+									text: glyphs.stop,
 									constructorParameterString: "'15px Arial'",
 									xType: "reserve",
-									x: settings.dialog.firstColumnWidth,
+									x: settings.dialog.firstColumnWidth / 2,
 									y: 2 * settings.general.margin + 100,
 									width: 30,
 									height: 30,
@@ -128,7 +128,7 @@ define(["NextWave/source/utility/prototypes",
                                 throw { message: "Instance not created!" };
                             }
 
-                            window.landingPage = null;
+                            window.navbarDialog = null;
                             m_bCreated = false;
 
                             return null;

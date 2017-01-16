@@ -67,15 +67,13 @@ define(["NextWave/source/utility/prototypes",
 								searchEdit: {
 									type: "Edit",
 									modes: [lpModes.normaluser,lpModes.privilegeduser],
-                                    multiline: true,
+                                    multiline: false,
 									x: settings.general.margin +
 										settings.dialog.firstColumnWidth,
 									y: settings.general.margin,
-									widthType: "callback",
-									width: function(area) {
-										return (area.extent.width - settings.dialog.firstColumnWidth) / 3;
-									},
-									height: settings.dialog.lineHeight * 2,
+									widthType: "reserve",
+									width: 3 * settings.dialog.firstColumnWidth + 30,
+									height: settings.dialog.lineHeight,
 									exitFocus: function (localSelf) {
 										try {
 											// Save off description.
@@ -91,14 +89,9 @@ define(["NextWave/source/utility/prototypes",
 									modes: [lpModes.normaluser,lpModes.privilegeduser],
 									text: glyphs.search,
 									constructorParameterString: "'15px Arial'",
-									xType: "callback",
-									x: function(area) {
-										return settings.general.margin +
-										settings.dialog.firstColumnWidth +
-										(area.extent.width - settings.dialog.firstColumnWidth) / 3 +
-										15
-									},
-									y: 2 * settings.general.margin,
+									xType: "reserve",
+									x: 2 * settings.dialog.firstColumnWidth,
+									y: settings.general.margin,
 									width: 30,
 									height: 30,
 									click: function() {
@@ -446,7 +439,7 @@ define(["NextWave/source/utility/prototypes",
 								},
 								encouragementLabel: {
 									type: "Label",
-									text: "By clicking one of the project images above, you are not committing to any course of action. You will be shown more information about the project and will be able to proceed or go back.",
+									text: "Click one of the project images above for more information about that project.",
 									modes: [lpModes.normaluser,lpModes.privilegeduser],
 									font: "oblique " + settings.general.boldFont,
 									x: settings.general.margin,
@@ -495,7 +488,7 @@ define(["NextWave/source/utility/prototypes",
                                 throw { message: "Instance not created!" };
                             }
 
-                            window.landingPage = null;
+                            window.landingPageDialog = null;
                             m_bCreated = false;
 
                             return null;

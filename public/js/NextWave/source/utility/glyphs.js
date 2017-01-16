@@ -66,11 +66,20 @@ define(["NextWave/source/utility/prototypes",
                     // cloudDownload.
                     self.cloudDownload = new Area(new Point(settings.glyphs.cloudDownload.x,settings.glyphs.cloudDownload.y),
                         new Size(settings.glyphs.width, settings.glyphs.width));
+                    // stop.
+                    self.stop = new Area(new Point(settings.glyphs.stop.x,settings.glyphs.stop.y),
+                        new Size(settings.glyphs.width, settings.glyphs.width));
+                    // play.
+                    self.play = new Area(new Point(settings.glyphs.play.x,settings.glyphs.play.y),
+                        new Size(settings.glyphs.width, settings.glyphs.width));
+                    // home.
+                    self.home = new Area(new Point(settings.glyphs.home.x,settings.glyphs.home.y),
+                        new Size(settings.glyphs.width, settings.glyphs.width));
 
                     ///////////////////////
                     // Public methods.
 
-                    // Helper method loads up icons and 
+                    // Helper method loads up icons and
                     // then calls back to specified callback.
                     self.create = function (functionComplete) {
 
@@ -97,7 +106,7 @@ define(["NextWave/source/utility/prototypes",
 
                     // Draw an icon.
                     self.render = function (contextRender, areaRender, areaIcon, bBackground) {
-                        
+
                         try {
 
                         	if (m_bCreated) {
@@ -106,7 +115,7 @@ define(["NextWave/source/utility/prototypes",
 
                                     // Render the background in place.
                                     contextRender.fillStyle = settings.glyphs.fillBackground;
-                                    contextRender.fillRect(areaRender.location.x, 
+                                    contextRender.fillRect(areaRender.location.x,
                                         areaRender.location.y,
                                         areaRender.extent.width,
                                         areaRender.extent.height);
@@ -118,14 +127,14 @@ define(["NextWave/source/utility/prototypes",
 	                                areaIcon.location.y,
 	                                areaIcon.extent.width,
 	                                areaIcon.extent.height,
-	                                areaRender.location.x, 
+	                                areaRender.location.x,
 	                                areaRender.location.y,
 	                                areaRender.extent.width,
 	                                areaRender.extent.height);
 	                        }
                             return null;
                         } catch (e) {
-                            
+
                             return e;
                         }
                     };

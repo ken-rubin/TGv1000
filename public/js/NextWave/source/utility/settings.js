@@ -150,6 +150,9 @@ define(["NextWave/source/utility/prototypes"],
                         // 2) The average icon size is: 60.833 pixels high and 57.333 pixels wide.
                         // 3) Do the math.
                         // 4) Adjust....
+						// Or, better yet, open the Icon sheet in paint.net, position your cursor at the upper left
+						// corner of your selected glyphicon and use those coordinates.
+						// Small adjustments will still be necessary.
                         //
                         pushpin: {
 
@@ -206,6 +209,21 @@ define(["NextWave/source/utility/prototypes"],
 							x: 1038,
 							y: 373
 						},
+						stop: {
+
+							x: 1891,
+							y: 248
+						},
+						play: {
+
+							x: 1801,
+							y: 249
+						},
+						home: {
+
+							x: 688,
+							y: 128
+						},
                         openFile: {
 
                             x: 183,
@@ -238,7 +256,6 @@ define(["NextWave/source/utility/prototypes"],
                             width: 0.25,
                             height: 0.25
                         },
-                        // For normal projects:
                         typesPanel: {
 
                             y: 0,
