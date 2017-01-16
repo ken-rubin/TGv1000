@@ -105,7 +105,7 @@ define(["NextWave/source/utility/prototypes",
                     self.destroy = function() {
 
 						self.panel.destroy();
-                        window.openProjectDialog.destroy();
+                        window.navbarDialog.destroy();
                     }
 
                     // Take mouse move--set handled in reference object if handled.
