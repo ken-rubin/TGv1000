@@ -178,58 +178,9 @@ define(["Core/errorHelper"],
 
 								if (manager.projectLoaded) {
 
-									client.unloadProject(function(){
-
-										setTimeout(function() {
-
-											if (manager.userCanWorkWithSystemLibsAndTypes) {
-
-												client.loadSystemTypesAndPinPanels(function() {
-
-													client.setBrowserTabAndBtns();
-												});
-											}
-										}, 1000);
-									}, true, true);		// The final true is telling client.unloadProject that we're unloading due to user clicking the Close Project menu item and not because we're about to search for and open or new a project.
+									client.unloadProject(null, true, true);		// The final true is telling client.unloadProject that we're unloading due to user clicking the Close Project menu item and not because we're about to search for and open or new a project.
 
 								}
-							});
-
-							$("#PlayBtn").click(function () {
-
-								if ($("#PlayBtn").hasClass('disabled')) { return false; }
-								try {
-
-									var exceptionRet = manager.runButtonClicked();
-									if (exceptionRet) { errorHelper.show(exceptionRet); }
-
-									$("#StopBtn").removeClass("disabled");
-									$("#PlayBtn").addClass("disabled");
-
-								} catch(e) {
-									errorHelper.show(e);
-								}
-							});
-
-							$("#StopBtn").click(function () {
-
-								if ($("#StopBtn").hasClass('disabled')) { return false; }
-								try {
-
-									var exceptionRet = manager.stopButtonClicked();
-									if (exceptionRet) { errorHelper.show(exceptionRet); }
-
-									$("#StopBtn").addClass("disabled");
-									$("#PlayBtn").removeClass("disabled");
-
-								} catch(e) {
-									errorHelper.show(e);
-								}
-							});
-
-							$("#LPBtn").click(function () {
-
-								manager.toggleLPLayer();
 							});
 
 							if (g_profile.can_visit_adminzone) {

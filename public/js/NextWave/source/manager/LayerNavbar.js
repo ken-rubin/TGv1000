@@ -101,6 +101,13 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+					// Project has just been loaded or unloaded in Manager.
+					// Update protectedness of Navbar's run and stopButtons.
+					self.projectLoadedStateHasChangedTo = function(bLoaded) {
+
+						window.navbarDialog.projectLoadedStateHasChangedTo(bLoaded);
+					}
+
                     // Destroy LayerNavbar--we're about to create a new one with a different configuration.
                     self.destroy = function() {
 

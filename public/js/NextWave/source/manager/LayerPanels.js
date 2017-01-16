@@ -58,15 +58,12 @@ define(["NextWave/source/utility/prototypes",
                     self.typesPanel = null;
                     // Panel of centers.
                     self.centerPanel = null;
-                    // Save configuration.
-                    self.iPanelConfiguration = null;
 
                     ////////////////////////
                     // Public methods.
 
                     // Initialze instance.
-                    // iPanelConfiguration: 0 = no panels; 1 = normal project; 2 = system types project
-                    self.create = function(iPanelConfiguration) {
+                    self.create = function() {
 
                         try {
 
@@ -79,69 +76,28 @@ define(["NextWave/source/utility/prototypes",
                                 };
                             }
 
-                            self.iPanelConfiguration = iPanelConfiguration;
-                            switch (self.iPanelConfiguration) {
+							self.centerPanel = new Panel("Method",
+								orientation.south,
+								new Point(settings.layerPanels.centerPanel.x, 0),
+								new Size(settings.layerPanels.centerPanel.width, settings.layerPanels.centerPanel.height));
 
-                                case 0:
+							self.typesPanel = new Panel("Types",
+								orientation.west,
+								new Point(0, settings.layerPanels.typesPanel.y),
+								new Size(settings.layerPanels.typesPanel.width, settings.layerPanels.typesPanel.height));
 
-                                    m_arrayPanels = [];
-                                    break;
+							// Add the ProjectDialog to the types Panel.
+							var exceptionRet = m_functionAddProjectDialogToTypesPanel(self.typesPanel);
+							if (exceptionRet) {
 
-                                case 1:
+								throw exceptionRet;
+							}
 
-                                    self.centerPanel = new Panel("Method",
-                                        orientation.south,
-                                        new Point(settings.layerPanels.centerPanel.x, 0),
-                                        new Size(settings.layerPanels.centerPanel.width, settings.layerPanels.centerPanel.height));
-
-                                    self.typesPanel = new Panel("Types",
-                                        orientation.west,
-                                        new Point(0, settings.layerPanels.typesPanel.y),
-                                        new Size(settings.layerPanels.typesPanel.width, settings.layerPanels.typesPanel.height));
-
-                                    // Add the ProjectDialog to the types Panel.
-                                    var exceptionRet = m_functionAddProjectDialogToTypesPanel(self.typesPanel);
-                                    if (exceptionRet) {
-
-                                        throw exceptionRet;
-                                    }
-
-                                    // Compile to generic list of panels for looping operations.
-                                    m_arrayPanels = [
-                                        self.typesPanel,
-                                        self.centerPanel
-                                    ];
-
-                                    // To be replaced by: load type/method.
-                                    // Add the MethodBuilder to the center Panel.
-                                    exceptionRet = self.switchCenterPanelMode("Method");
-                                    if (exceptionRet) {
-
-                                        throw exceptionRet;
-                                    }
-                                    break;
-
-                                case 2:
-
-                                    self.centerPanel = new Panel("Method",
-                                        orientation.south,
-                                        new Point(settings.layerPanels.centerPanel.x, 0),
-                                        new Size(settings.layerPanels.centerPanel.width, settings.layerPanels.centerPanel.height));
-
-                                    // Compile to generic list of panels for looping operations.
-                                    m_arrayPanels = [
-                                        self.centerPanel
-                                    ];
-
-                                    // To be replaced by: load type/method.
-                                    // Add the MethodBuilder to the center Panel.
-                                    exceptionRet = self.switchCenterPanelMode("Method");
-                                    if (exceptionRet) {
-
-                                        throw exceptionRet;
-                                    }
-                                    break;
-                            }
+							// Compile to generic list of panels for looping operations.
+							m_arrayPanels = [
+								self.typesPanel,
+								self.centerPanel
+							];
 
                             // Allocate the payloads of the center panel:
                             exceptionRet = m_functionAllocateProjectBuilder();
@@ -202,6 +158,14 @@ define(["NextWave/source/utility/prototypes",
                                 throw exceptionRet;
                             }
 */
+							// To be replaced by: load type/method.
+							// Add the MethodBuilder to the center Panel.
+							exceptionRet = self.switchCenterPanelMode("Method");
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
                             // Indicate current state.
                             m_bCreated = true;
 

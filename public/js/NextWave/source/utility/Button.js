@@ -88,7 +88,7 @@ define(["NextWave/source/utility/prototypes",
                                 contextRender.save();
                                 contextRender.clip();
 
-                                // Fill and stroke the path. If self.protected, no special background.
+                                // Fill and stroke the path. If self.protected, no mouse-influenced background.
                                 if (self.protected) {
 
                                     contextRender.fillStyle = settings.button.background;
@@ -105,23 +105,20 @@ define(["NextWave/source/utility/prototypes",
                                 contextRender.fill();
                                 contextRender.stroke();
 
-                                contextRender.font = self.font;
-                                contextRender.fillStyle = "rgba(0,0,0,0.7)";
-                                contextRender.textBaseline = "middle";
-                                contextRender.textAlign = "center";
-
-                                // Again, if self.protected, no special offset.
+                                // Content of Button is either a glyph or a text string. Thus, the following if:
 								if (self.configuration.text instanceof Area) {
 									// We have a glyph to render.
 
 									let gly = self.configuration.text;
 
 									if (self.protected) {
+		                                // Again, if self.protected, no special offset.
 
 										glyphs.render(contextRender,
 											self.position,
 											gly,
-											settings.manager.showIconBackgrounds);
+											settings.manager.showIconBackgrounds,
+											true);
 									} else {
 
 										glyphs.render(contextRender,
@@ -133,11 +130,21 @@ define(["NextWave/source/utility/prototypes",
 											settings.manager.showIconBackgrounds);
 									}
 								} else {
-									if (self.protected) {
+									// We have a text string to render.
 
+									contextRender.font = self.font;
+									contextRender.fillStyle = "rgba(0,0,0,0.7)";
+									contextRender.textBaseline = "middle";
+									contextRender.textAlign = "center";
+
+									if (self.protected) {
+		                                // Again, if self.protected, no special offset.
+
+										contextRender.globalAlpha = 0.35;
 										contextRender.fillText(self.configuration.text,
 											m_area.location.x + m_area.extent.width / 2,
 											m_area.location.y + m_area.extent.height / 2);
+										contextRender.globalAlpha = 1.0;
 
 									} else {
 

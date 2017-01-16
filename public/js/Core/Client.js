@@ -138,38 +138,6 @@ define(["Core/errorHelper",
 						} catch (e) { return e; }
 					}
 
-					// Called here in client, but also by navbar.
-					// self.loadSystemTypesAndPinPanels = function (callback) {
-
-					// 	// While others get all system types, statements, literals and expressions loaded.
-					// 	var posting = $.post("/BOL/ProjectBO/FetchForPanels_S_L_E_ST",
-					// 		{},
-					// 		'json');
-					// 	posting.done(function(data){
-
-					// 		if (data.success) {
-
-					// 			var exceptionRet = manager.loadSystemTypesProject(data.data);
-					// 			if (exceptionRet) {
-
-					// 				errorHelper.show(exceptionRet);
-					// 			}
-
-					// 			if ($.isFunction(callback)) {
-					// 				callback();
-					// 			}
-					// 		} else {
-
-					// 			// !data.success
-					// 			errorHelper.show(data.message);
-
-					// 			if ($.isFunction(callback)) {
-					// 				callback();
-					// 			}
-					// 		}
-					// 	});
-					// }
-
 					//////////////////////////////
 					// Dialog creators/openers
 
@@ -748,22 +716,14 @@ define(["Core/errorHelper",
 
 							var closeProjectMenuItem = bFromCloseProjectMenuItem || false;
 
-							if (manager.projectLoaded || manager.systemTypesLoaded) {
+							if (manager.projectLoaded) {
 
 								m_functionAbandonProjectDialog(function() {
 
 									// This callback will be called if the user wants to abandon the open project.
 									try {
 
-										var exceptionRet;
-										if (bFromCloseProjectMenuItem || false) {
-
-											exceptionRet = manager.loadProject(null);	// Used to be manager.loadNoProject(), but that's gone now.
-
-										} else {
-
-											exceptionRet = manager.loadProject(null);
-										}
+										var exceptionRet= manager.loadProject(null);
 										if (exceptionRet) { throw exceptionRet; }
 
 										self.setBrowserTabAndBtns();

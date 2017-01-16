@@ -79,7 +79,19 @@ define(["NextWave/source/utility/prototypes",
 									width: 30,
 									height: 30,
 									click: function() {
-										manager.toggleLPLayer();
+
+										try {
+
+											var exceptionRet = manager.runButtonClicked();
+											if (exceptionRet) { errorHelper.show(exceptionRet); }
+
+											// Protect run, unprotect stop.
+											self.dialog.controlObject["runButton"].setProtected(true);
+											self.dialog.controlObject["stopButton"].setProtected(false);
+
+										} catch(e) {
+											errorHelper.show(e);
+										}
 									}
 								},
 								stopButton: {
@@ -93,7 +105,41 @@ define(["NextWave/source/utility/prototypes",
 									width: 30,
 									height: 30,
 									click: function() {
-										manager.toggleLPLayer();
+
+										try {
+
+											var exceptionRet = manager.stopButtonClicked();
+											if (exceptionRet) { errorHelper.show(exceptionRet); }
+
+											// Unprotect run, protect stop.
+											self.dialog.controlObject["runButton"].setProtected(false);
+											self.dialog.controlObject["stopButton"].setProtected(true);
+
+										} catch(e) {
+											errorHelper.show(e);
+										}
+									}
+								},
+								testButton: {
+									type: "Button",
+									modes: [lpModes.normaluser,lpModes.privilegeduser],
+									text: "Test: Click to Protect",
+									constructorParameterString: "'15px Arial'",
+									x: settings.general.margin,
+									yType: "reserve",
+									y: 200,
+									width: 230,
+									height: 30,
+									click: function() {
+
+										try {
+
+											let testBtn = self.dialog.controlObject["testButton"];
+											testBtn.setProtected(true);
+
+										} catch(e) {
+											errorHelper.show(e);
+										}
 									}
 								}
 							};
@@ -137,6 +183,14 @@ define(["NextWave/source/utility/prototypes",
                             return e;
                         }
                     };
+
+					// Project has just been loaded or unloaded in Manager.
+					// Update protectedness of Navbar's run and stopButtons.
+					self.projectLoadedStateHasChangedTo = function(bLoaded) {
+
+						self.dialog.controlObject["runButton"].setProtected(!bLoaded);
+						self.dialog.controlObject["stopButton"].setProtected(bLoaded);
+					}
 
 					///////////////////////
 					// Private methods

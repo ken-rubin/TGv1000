@@ -104,8 +104,8 @@ define(["NextWave/source/utility/prototypes",
                     	}
                     }
 
-                    // Draw an icon.
-                    self.render = function (contextRender, areaRender, areaIcon, bBackground) {
+                    // Draw an icon. If bProtected, we will temporarily decrease globalAlpha.
+                    self.render = function (contextRender, areaRender, areaIcon, bBackground, bProtected) {
 
                         try {
 
@@ -121,6 +121,10 @@ define(["NextWave/source/utility/prototypes",
                                         areaRender.extent.height);
                                 }
 
+								if (bProtected) {
+									contextRender.globalAlpha = 0.35;
+								}
+
                         		// Render the icon in place.
 	                            contextRender.drawImage(m_imageGlyphs,
 	                                areaIcon.location.x,
@@ -131,6 +135,10 @@ define(["NextWave/source/utility/prototypes",
 	                                areaRender.location.y,
 	                                areaRender.extent.width,
 	                                areaRender.extent.height);
+
+								if (bProtected) {
+									contextRender.globalAlpha = 1.0;
+								}
 	                        }
                             return null;
                         } catch (e) {

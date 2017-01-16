@@ -78,14 +78,8 @@ define(["NextWave/source/utility/prototypes",
                     // Directly set focus object, overrides dragObject.
                     self.alternateFocus = null;
 
-                    // Only one of the following can be true, but both can be false.
                     // Indicates there is a project which has been loaded up into this manager.
                     self.projectLoaded = false;
-                    // Holds currently displayed version of panelLayer.
-                    // 0 means panelLayer has no panels at all. [OBSOLETE]
-                    // 1 means panels are set for normal projects with all panels present.
-                    // 2 means System project. [OBSOLETE]
-                    self.iPanelArrangement = 0;
 
                     // Indicates that the current user is allowed to create or edit classes, products or online classes.
                     self.userAllowedToCreateEditPurchProjs = false;
@@ -157,15 +151,10 @@ define(["NextWave/source/utility/prototypes",
                                 throw exceptionRet;
                             }
 
-                            // Allocate and create the 3 panel layers. 0 = no panels; 1 = normal project; 2 = system types project.
-                            // Of course, only 1 is now used.
-                            for (var i = 0; i < 2; i++) {
-
-                                var pl = new LayerPanels();
-                                exceptionRet = pl.create(i);
-                                if (exceptionRet) { throw exceptionRet; }
-                                m_arrayPanelLayers.push(pl);
-                            }
+                            // Allocate and create the panel layer.
+							self.panelLayer = new LayerPanels();
+							exceptionRet = self.panelLayer.create();
+							if (exceptionRet) { throw exceptionRet; }
 
                             // Allocate and create the Al layer.
                             var la = new LayerAl();
@@ -243,7 +232,7 @@ define(["NextWave/source/utility/prototypes",
                                 m_functionKeyUp);
 
                             // Now activate the empty panelLayer.
-                            exceptionRet = self.clearPanels(1);
+                            exceptionRet = self.clearPanels();
                             if (exceptionRet) { return exceptionRet; }
 
                             // Start the rendering.
@@ -257,16 +246,12 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Clear panels.
-                    // iPanelArrangement = 0 for an empty panelLayer. [OBSOLETE]
-                    // iPanelArrangement = 1 for a normal project.
-                    self.clearPanels = function (iPanelArrangement) {
+                    self.clearPanels = function () {
 
                         try {
 
                             var exceptionRet;
 
-                            self.iPanelArrangement = iPanelArrangement || 1;
-                            self.panelLayer = m_arrayPanelLayers[self.iPanelArrangement];
                             m_arrayLayers =
                                 [
                                     self.backgroundLayer,
@@ -279,7 +264,7 @@ define(["NextWave/source/utility/prototypes",
                                 ];
 
                             // Reset *Loaded.
-                            self.projectLoaded = false;
+							self.setProjectLoaded(false);
 
                             // Clear panel data.
                             return self.panelLayer.clearCenter();
@@ -323,7 +308,7 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            var exceptionRet = self.clearPanels(1);
+                            var exceptionRet = self.clearPanels();
                             if (exceptionRet) {
 
                                 return exceptionRet;
@@ -355,7 +340,7 @@ define(["NextWave/source/utility/prototypes",
                                 if (exceptionRet) { return exceptionRet; }
 
                                 // Set loaded.
-                                self.projectLoaded = true;
+								self.setProjectLoaded(true);
 
 								// Used to start this way:
                                 // self.panelLayer.openAndPinAllPanels();
@@ -367,6 +352,13 @@ define(["NextWave/source/utility/prototypes",
                             return null;
                         } catch (e) { return e; }
                     }
+
+					// Set self.projectLoaded, but also enable/disable navbarLayer's run and stop buttons.
+					self.setProjectLoaded = function(bLoaded) {
+
+						self.projectLoaded = bLoaded;
+						self.navbarLayer.projectLoadedStateHasChangedTo(bLoaded);
+					}
 
                     // Method invoked when a project is saved.
                     self.save = function () {
@@ -986,7 +978,7 @@ define(["NextWave/source/utility/prototypes",
                         try {
 
                             // Setting dirty causes the next render to calculate layout.
-                            m_bDirty[self.iPanelArrangement] = true;
+                            m_bDirty = true;
                         } catch (e) {
 
                             alert(e.message);
@@ -1509,7 +1501,7 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // These pipes are clean!
-                            m_bDirty[self.iPanelArrangement] = false;
+                            m_bDirty = false;
 
                             return null;
                         } catch (e) {
@@ -1528,7 +1520,7 @@ define(["NextWave/source/utility/prototypes",
 
                             // Calculate the layout whenever dirty.
                             var exceptionRet = null;
-                            if (m_bDirty[self.iPanelArrangement]) {
+                            if (m_bDirty) {
 
                                 exceptionRet = m_functionCalculateLayout();
                                 if (exceptionRet !== null) {
@@ -1564,8 +1556,6 @@ define(["NextWave/source/utility/prototypes",
                     //////////////////////////
                     // Private fields.
 
-                    // Hold reference to the panel layer array. See self.create here and LayerPanels for explanations.
-                    var m_arrayPanelLayers = [];
                     // Cookie for animation callback.
                     var m_iAnimationFrameSequence = 0;
                     // jQuery object wrapping the parent DOM element.
@@ -1579,7 +1569,7 @@ define(["NextWave/source/utility/prototypes",
                     // Indicates this instance is already created.
                     var m_bCreated = false;
                     // Define the dirty state.
-                    var m_bDirty = [true, true, true];
+                    var m_bDirty = true;
                     // Width of object.
                     var m_dWidth = 0;
                     // Height of object.
