@@ -232,7 +232,7 @@ define(["NextWave/source/utility/prototypes",
                             // Raise event handler, if specified.
                             if (self.configuration.click) {
 
-                                self.configuration.click();
+                                self.configuration.click(objectReference);
                             }
                             return null;
                         } catch (e) {

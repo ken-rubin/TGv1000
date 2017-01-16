@@ -12,15 +12,20 @@
 // Require-AMD, and dependencies.
 define(["NextWave/source/utility/prototypes",
         "NextWave/source/utility/settings",
-        "NextWave/source/utility/orientation",
+        "NextWave/source/utility/lpModes",
         "NextWave/source/utility/Area",
         "NextWave/source/utility/Point",
         "NextWave/source/utility/Size",
         "NextWave/source/manager/Layer",
-        "NextWave/source/utility/Panel",
-        "NextWave/source/project/Navbar"
+        "NextWave/source/utility/Dialog",
+		"NextWave/source/utility/List",
+		"NextWave/source/utility/ListItem",
+		"NextWave/source/utility/PictureListItem",
+		"NextWave/source/utility/glyphs",
+		"Core/resourceHelper",
+		"Core/errorHelper"
         ],
-    function(prototypes, settings, orientation, Area, Point, Size, Layer, Panel, Navbar) {
+    function(prototypes, settings, lpModes, Area, Point, Size, Layer, Dialog, List, ListItem, PictureListItem, glyphs, resourceHelper, errorHelper) {
 
         try {
 
@@ -37,8 +42,8 @@ define(["NextWave/source/utility/prototypes",
                     ////////////////////////
                     // Public fields.
 
-                    // The only panel. Hang on to it.
-                    self.panel = null;
+                    // The Navbar dialog.
+                    self.dialog = null;
 
                     ////////////////////////
                     // Public methods.
@@ -57,39 +62,89 @@ define(["NextWave/source/utility/prototypes",
                                 };
                             }
 
-							self.panel = new Panel("Navbar",
-								orientation.full,
-								new Point(0,0),
-								new Size(self.extent.width, self.extent.height));
+							// Allocate and create the Navbar "Dialog", passing the initialization object.
+							self.dialog = new Dialog();
+							let objectConfiguration = {
+								toggleLandingPageButton: {
+									type: "Button",
+									modes: [lpModes.normaluser,lpModes.privilegeduser],
+									text: glyphs.home,
+									constructorParameterString: "'15px Arial'",
+									xType: "reserve",
+									x: settings.dialog.firstColumnWidth / 4,
+									y: 2 * settings.general.margin,
+									width: 30,
+									height: 30,
+									click: function(objectReference) {
+										manager.toggleLPLayer();
+										objectReference.handled = true;
+									}
+								},
+								runButton: {
+									type: "Button",
+									modes: [lpModes.normaluser,lpModes.privilegeduser],
+									text: glyphs.play,
+									constructorParameterString: "'15px Arial'",
+									xType: "reserve",
+									x: settings.dialog.firstColumnWidth / 4,
+									y: 2 * settings.general.margin + 50,
+									width: 30,
+									height: 30,
+									click: function(objectReference) {
 
-							self.panel.open = true;
-							self.panel.closed = false;
-							self.panel.opening = false;
-							self.panel.closing = false;
-							self.panel.pinned = true;
+										try {
 
-							// Add the Navbar to the panel.
-							try {
+											var exceptionRet = manager.runButtonClicked();
+											if (exceptionRet) { errorHelper.show(exceptionRet); }
 
-								// Allocate and create the Navbar "Dialog", passing the initialization object.
-								window.navbarDialog = new Navbar();
-								var exceptionRet = window.navbarDialog.create();
-								if (exceptionRet) {
+											// Protect run, unprotect stop.
+											self.dialog.controlObject["runButton"].setProtected(true);
+											self.dialog.controlObject["stopButton"].setProtected(false);
 
-									throw exceptionRet;
+											objectReference.handled = true;
+										} catch(e) {
+											errorHelper.show(e);
+										}
+									}
+								},
+								stopButton: {
+									type: "Button",
+									modes: [lpModes.normaluser,lpModes.privilegeduser],
+									text: glyphs.stop,
+									constructorParameterString: "'15px Arial'",
+									xType: "reserve",
+									x: settings.dialog.firstColumnWidth / 4,
+									y: 2 * settings.general.margin + 100,
+									width: 30,
+									height: 30,
+									click: function(objectReference) {
+
+										try {
+
+											var exceptionRet = manager.stopButtonClicked();
+											if (exceptionRet) { errorHelper.show(exceptionRet); }
+
+											// Unprotect run, protect stop.
+											self.dialog.controlObject["runButton"].setProtected(false);
+											self.dialog.controlObject["stopButton"].setProtected(true);
+
+											objectReference.handled = true;
+										} catch(e) {
+											errorHelper.show(e);
+										}
+									}
 								}
+							};
+							m_bPrivileged = (g_profile["can_create_classes"] || 					// Need to do it this way since manager.userAllowedToCreateEditPurchProjs not set yet.
+												g_profile["can_create_products"] ||
+												g_profile["can_create_onlineClasses"]);
+                            let exceptionRet = self.dialog.create(objectConfiguration,
+							                                 	(m_bPrivileged ? lpModes.privilegeduser : lpModes.normaluser)
+							);
+                            if (exceptionRet) {
+                                return exceptionRet;
+                            }
 
-								// Set it.
-								self.panel.setPayload("Navbar",window.navbarDialog);
-							} catch (e) {
-
-								throw exceptionRet;
-							}
-
-							// Compile to generic list of panels for looping operations.
-							m_arrayPanels = [
-								self.panel
-							];
 
                             // Indicate current state.
                             m_bCreated = true;
@@ -105,90 +160,25 @@ define(["NextWave/source/utility/prototypes",
 					// Update protectedness of Navbar's run and stopButtons.
 					self.projectLoadedStateHasChangedTo = function(bLoaded) {
 
-						window.navbarDialog.projectLoadedStateHasChangedTo(bLoaded);
+						self.dialog.controlObject["runButton"].setProtected(!bLoaded);
+						self.dialog.controlObject["stopButton"].setProtected(bLoaded);
 					}
 
                     // Destroy LayerNavbar--we're about to create a new one with a different configuration.
                     self.destroy = function() {
 
-						self.panel.destroy();
-                        window.navbarDialog.destroy();
+						self.dialog.destroy();
                     }
 
-                    // Take mouse move--set handled in reference object if handled.
-                    self.innerMouseMove = function(objectReference) {
+                    // Invoked when the mouse is moved over the tree.
+                    self.innerMouseMove = function (objectReference) {
 
                         try {
 
-                            // Must be created.
-                            if (!m_bCreated) {
+                            if (self.dialog &&
+                                $.isFunction(self.dialog.mouseMove)) {
 
-                                return null;
-                            }
-
-                            // Save off the current active panel, if.
-                            var panelOriginal = m_panelActive;
-
-                            // Clear the active panel.
-                            m_panelActive = null;
-
-                            // Test all the panels.
-                            for (var i = 0; i < m_arrayPanels.length; i++) {
-
-                                if (m_arrayPanels[i]) {
-
-                                    var exceptionRet = m_arrayPanels[i].mouseMove(objectReference);
-                                    if (exceptionRet) {
-
-                                        throw exceptionRet;
-                                    }
-
-                                    // If handled, then drop out.
-                                    if (objectReference.handled) {
-
-                                        m_panelActive = m_arrayPanels[i];
-                                        break;
-                                    }
-                                }
-                            }
-
-                            // Deactivate the old activation in
-                            // the current panel, if it changed.
-                            if (panelOriginal &&
-                                m_panelActive !== panelOriginal) {
-
-                                var exceptionRet = panelOriginal.mouseOut(objectReference);
-                                if (exceptionRet) {
-
-                                    throw exceptionRet;
-                                }
-                            }
-
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Handle mouse down.
-                    self.innerMouseDown = function(objectReference) {
-
-                        try {
-
-                            // Must be created to have panels.
-                            if (!m_bCreated) {
-
-                                return null;
-                            }
-
-                            // If active panel, just pass to it.
-                            if (m_panelActive) {
-
-                                // Panel handles down--even if not over a control.
-                                objectReference.handled = true;
-
-                                return m_panelActive.mouseDown(objectReference);
+                                return self.dialog.mouseMove(objectReference);
                             }
                             return null;
                         } catch (e) {
@@ -197,24 +187,15 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // Handle mouse up.
-                    self.innerMouseUp = function(objectReference) {
+                    // Invoked when the mouse is moved away from the canvas.
+                    self.innerMouseOut = function (objectReference) {
 
                         try {
 
-                            // Must be created to have panels.
-                            if (!m_bCreated) {
+                            if (self.dialog &&
+                                $.isFunction(self.dialog.mouseOut)) {
 
-                                return null;
-                            }
-
-                            // If active panel, just pass to it.
-                            if (m_panelActive) {
-
-                                // Panel handles down--even if not over a control.
-                                objectReference.handled = true;
-
-                                return m_panelActive.mouseUp(objectReference);
+                                return self.dialog.mouseOut(objectReference);
                             }
                             return null;
                         } catch (e) {
@@ -223,80 +204,15 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // Handle mouse wheel.
-                    self.innerMouseWheel = function(objectReference) {
+                    // Invoked when the mouse is clicked over the canvas.
+                    self.innerClick = function (objectReference) {
 
                         try {
 
-                            // Must be created to have panels.
-                            if (!m_bCreated) {
+                            if (self.dialog &&
+                                $.isFunction(self.dialog.click)) {
 
-                                return null;
-                            }
-
-                            // If active panel, just pass to it.
-                            if (m_panelActive) {
-
-                                // Panel handles down--even if not over a control.
-                                objectReference.handled = true;
-
-                                return m_panelActive.mouseWheel(objectReference);
-                            }
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Handle mouse out.
-                    self.innerMouseOut = function(objectReference) {
-
-                        try {
-
-                            // Must be created to have panels.
-                            if (!m_bCreated) {
-
-                                return null;
-                            }
-
-                            // Deactivate the activation in
-                            // the current panel, if activated.
-                            if (m_panelActive) {
-
-                                var exceptionRet = m_panelActive.mouseOut(objectReference);
-                                if (exceptionRet) {
-
-                                    throw exceptionRet;
-                                }
-                            }
-
-                            // Reset active state.
-                            m_panelActive = null;
-                        } catch (e) {
-
-                            alert(e.message);
-                        }
-                    };
-
-                    // Handle click.
-                    self.innerClick = function(objectReference) {
-
-                        try {
-
-                            // Must be created to have panels.
-                            if (!m_bCreated) {
-
-                                return null;
-                            }
-
-                            // If active panel, just pass to it.
-                            if (m_panelActive) {
-
-                                // Panel handles down--even if not over a control.
-                                objectReference.handled = true;
-
-                                return m_panelActive.click(objectReference);
+                                return self.dialog.click(objectReference);
                             }
                             return null;
                         } catch (e) {
@@ -311,23 +227,15 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            // Must be created to have panels.
-                            if (!m_bCreated) {
+							let areaMaximal = new Area(new Point(0, 0),
+								sizeExtent);
 
-                                return null;
-                            }
+                            // Render the dialog (payload).
+                            var exceptionRet = self.dialog.calculateLayout(areaMaximal,
+                                contextRender);
+                            if (exceptionRet) {
 
-                            // Set the extents of the panels.
-                            for (var i = 0; i < m_arrayPanels.length; i++) {
-
-                                if (m_arrayPanels[i]) {
-
-                                    var exceptionRet = m_arrayPanels[i].calculateLayout(sizeExtent, contextRender);
-                                    if (exceptionRet) {
-
-                                        throw exceptionRet;
-                                    }
-                                }
+                                return exceptionRet;
                             }
 
                             return null;
@@ -342,30 +250,11 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            // Must be created to have panels.
-                            if (!m_bCreated) {
+                            // Render the dialog (payload).
+                            var exceptionRet = self.dialog.render(contextRender);
+                            if (exceptionRet) {
 
-                                return null;
-                            }
-
-							// Render background.
-							contextRender.fillStyle = "rgba(255,255,255,0.10)";
-							contextRender.fillRect(0,
-								0,
-								self.extent.width,
-								self.extent.height);
-
-                            // Render the panels.
-                            for (var i = m_arrayPanels.length - 1; i >= 0; i--) {
-
-                                if (m_arrayPanels[i]) {
-
-                                    var exceptionRet = m_arrayPanels[i].render(contextRender);
-                                    if (exceptionRet) {
-
-                                        throw exceptionRet;
-                                    }
-                                }
+                                return exceptionRet;
                             }
 
                             return null;
@@ -383,10 +272,10 @@ define(["NextWave/source/utility/prototypes",
 
                     // Indicates this instance is already created.
                     var m_bCreated = false;
-                    // Collection of managed panels.
-                    var m_arrayPanels = null;
-                    // Panel in which the mouse is located.
-                    var m_panelActive = null;
+					// Hold maximalArea.
+					var m_area = null;
+					// Privileged user or not.
+					var m_bPrivileged = false;
 
                 } catch (e) {
 
