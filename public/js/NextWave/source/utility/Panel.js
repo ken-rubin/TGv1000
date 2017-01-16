@@ -603,7 +603,7 @@ define(["NextWave/source/utility/prototypes",
                             }
                             contextRender.closePath();
 
-							contextRender.fillStyle = (self.dock === "full" ? settings.panel.landingPageFillBackground : settings.panel.fillBackground);
+							contextRender.fillStyle = settings.panel.fillBackground;
                             contextRender.fill();
                             contextRender.strokeStyle = settings.general.strokeBackground;
                             contextRender.stroke();

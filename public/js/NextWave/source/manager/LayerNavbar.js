@@ -16,7 +16,7 @@ define(["NextWave/source/utility/prototypes",
         "NextWave/source/utility/Area",
         "NextWave/source/utility/Point",
         "NextWave/source/utility/Size",
-        "NextWave/source/manager/Layer",
+        "NextWave/source/manager/LayerDialogHost",
         "NextWave/source/utility/Dialog",
 		"NextWave/source/utility/List",
 		"NextWave/source/utility/ListItem",
@@ -25,7 +25,7 @@ define(["NextWave/source/utility/prototypes",
 		"Core/resourceHelper",
 		"Core/errorHelper"
         ],
-    function(prototypes, settings, lpModes, Area, Point, Size, Layer, Dialog, List, ListItem, PictureListItem, glyphs, resourceHelper, errorHelper) {
+    function(prototypes, settings, lpModes, Area, Point, Size, LayerDialogHost, Dialog, List, ListItem, PictureListItem, glyphs, resourceHelper, errorHelper) {
 
         try {
 
@@ -37,16 +37,8 @@ define(["NextWave/source/utility/prototypes",
                     var self = this; // Uber closure.
 
                     // Inherit from base class.
-                    self.inherits(Layer);
-
-                    ////////////////////////
-                    // Public fields.
-
-                    // The Navbar dialog.
-                    self.dialog = null;
-
-                    ////////////////////////
-                    // Public methods.
+                    self.inherits(LayerDialogHost,
+						"rgba(255,255,255,.05)");
 
                     // Initialze instance.
                     self.create = function() {
@@ -62,8 +54,6 @@ define(["NextWave/source/utility/prototypes",
                                 };
                             }
 
-							// Allocate and create the Navbar "Dialog", passing the initialization object.
-							self.dialog = new Dialog();
 							let objectConfiguration = {
 								toggleLandingPageButton: {
 									type: "Button",
@@ -71,7 +61,7 @@ define(["NextWave/source/utility/prototypes",
 									text: glyphs.home,
 									constructorParameterString: "'15px Arial'",
 									xType: "reserve",
-									x: settings.dialog.firstColumnWidth / 4,
+									x: settings.dialog.firstColumnWidth / 3,
 									y: 2 * settings.general.margin,
 									width: 30,
 									height: 30,
@@ -86,7 +76,7 @@ define(["NextWave/source/utility/prototypes",
 									text: glyphs.play,
 									constructorParameterString: "'15px Arial'",
 									xType: "reserve",
-									x: settings.dialog.firstColumnWidth / 4,
+									x: settings.dialog.firstColumnWidth / 3,
 									y: 2 * settings.general.margin + 50,
 									width: 30,
 									height: 30,
@@ -113,7 +103,7 @@ define(["NextWave/source/utility/prototypes",
 									text: glyphs.stop,
 									constructorParameterString: "'15px Arial'",
 									xType: "reserve",
-									x: settings.dialog.firstColumnWidth / 4,
+									x: settings.dialog.firstColumnWidth / 3,
 									y: 2 * settings.general.margin + 100,
 									width: 30,
 									height: 30,
@@ -145,7 +135,6 @@ define(["NextWave/source/utility/prototypes",
                                 return exceptionRet;
                             }
 
-
                             // Indicate current state.
                             m_bCreated = true;
 
@@ -164,106 +153,6 @@ define(["NextWave/source/utility/prototypes",
 						self.dialog.controlObject["stopButton"].setProtected(bLoaded);
 					}
 
-                    // Destroy LayerNavbar--we're about to create a new one with a different configuration.
-                    self.destroy = function() {
-
-						self.dialog.destroy();
-                    }
-
-                    // Invoked when the mouse is moved over the tree.
-                    self.innerMouseMove = function (objectReference) {
-
-                        try {
-
-                            if (self.dialog &&
-                                $.isFunction(self.dialog.mouseMove)) {
-
-                                return self.dialog.mouseMove(objectReference);
-                            }
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Invoked when the mouse is moved away from the canvas.
-                    self.innerMouseOut = function (objectReference) {
-
-                        try {
-
-                            if (self.dialog &&
-                                $.isFunction(self.dialog.mouseOut)) {
-
-                                return self.dialog.mouseOut(objectReference);
-                            }
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Invoked when the mouse is clicked over the canvas.
-                    self.innerClick = function (objectReference) {
-
-                        try {
-
-                            if (self.dialog &&
-                                $.isFunction(self.dialog.click)) {
-
-                                return self.dialog.click(objectReference);
-                            }
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Set the size of this layer and children.
-                    // Also handle responsiveness of application.
-                    self.innerCalculateLayout = function(sizeExtent, contextRender) {
-
-                        try {
-
-							let areaMaximal = new Area(new Point(0, 0),
-								sizeExtent);
-
-                            // Render the dialog (payload).
-                            var exceptionRet = self.dialog.calculateLayout(areaMaximal,
-                                contextRender);
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
-                    // Render out the layer.
-                    self.innerRender = function(contextRender, iMS) {
-
-                        try {
-
-                            // Render the dialog (payload).
-                            var exceptionRet = self.dialog.render(contextRender);
-                            if (exceptionRet) {
-
-                                return exceptionRet;
-                            }
-
-                            return null;
-                        } catch (e) {
-
-                            return e;
-                        }
-                    };
-
                     //////////////////////////
                     // Private methods.
 
@@ -272,8 +161,6 @@ define(["NextWave/source/utility/prototypes",
 
                     // Indicates this instance is already created.
                     var m_bCreated = false;
-					// Hold maximalArea.
-					var m_area = null;
 					// Privileged user or not.
 					var m_bPrivileged = false;
 
@@ -284,7 +171,7 @@ define(["NextWave/source/utility/prototypes",
             };
 
             // Do function injection.
-            functionRet.inheritsFrom(Layer);
+            functionRet.inheritsFrom(LayerDialogHost);
 
             return functionRet;
         } catch (e) {
