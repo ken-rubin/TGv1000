@@ -76,6 +76,14 @@ define(["NextWave/source/utility/prototypes",
 									widthType: "reserve",
 									width: 3 * settings.dialog.firstColumnWidth + 30,
 									height: settings.dialog.lineHeight,
+									enterFocus: function (localSelf) {
+										try {
+											manager.setFocus(localSelf);
+											return null;
+										} catch (e) {
+											errorHelper.show(e);
+										}
+									},
 									exitFocus: function (localSelf) {
 										try {
 											// Save off description.

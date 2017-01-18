@@ -55,6 +55,57 @@ define(["NextWave/source/utility/prototypes",
 						self.dialog.destroy();
                     }
 
+                    // Handle mouse down.
+                    self.innerMouseDown = function (objectReference) {
+
+                        try {
+
+                            if (self.dialog &&
+                                $.isFunction(self.dialog.mouseMove)) {
+
+                                return self.dialog.mouseDown(objectReference);
+                            }
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Handle mouse up.
+                    self.innerMouseUp = function (objectReference) {
+
+                        try {
+
+                            if (self.dialog &&
+                                $.isFunction(self.dialog.mouseMove)) {
+
+                                return self.dialog.mouseUp(objectReference);
+                            }
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Handle mouse wheel.
+                    self.innerMouseWheel = function (objectReference) {
+
+                        try {
+
+                            if (self.dialog &&
+                                $.isFunction(self.dialog.mouseMove)) {
+
+                                return self.dialog.mouseWheel(objectReference);
+                            }
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
                     // Invoked when the mouse is moved over the tree.
                     self.innerMouseMove = function (objectReference) {
 
