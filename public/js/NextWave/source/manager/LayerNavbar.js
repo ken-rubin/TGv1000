@@ -123,6 +123,28 @@ define(["NextWave/source/utility/prototypes",
 											errorHelper.show(e);
 										}
 									}
+								},
+								logoutButton: {
+									type: "Button",
+									modes: [lpModes.normaluser,lpModes.privilegeduser],
+									text: "Logout",
+									constructorParameterString: "'15px Arial'",
+									xType: "reserve",
+									x: settings.dialog.firstColumnWidth / 3 + 70,
+									y: 2 * settings.general.margin + 150,
+									width: 100,
+									height: 30,
+									click: function(objectReference) {
+
+										try {
+
+											// Will need Abandon Project stuff.
+
+											window.location = "/";
+										} catch(e) {
+											errorHelper.show(e);
+										}
+									}
 								}
 							};
 							m_bPrivileged = (g_profile["can_create_classes"] || 					// Need to do it this way since manager.userAllowedToCreateEditPurchProjs not set yet.

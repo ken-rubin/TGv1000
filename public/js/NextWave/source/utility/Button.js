@@ -132,7 +132,7 @@ define(["NextWave/source/utility/prototypes",
 								} else {
 									// We have a text string to render.
 
-									contextRender.font = self.font;
+									contextRender.font = "bold " + self.font;
 									contextRender.fillStyle = "rgba(0,0,0,0.7)";
 									contextRender.textBaseline = "middle";
 									contextRender.textAlign = "center";
