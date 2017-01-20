@@ -307,6 +307,18 @@ define(["NextWave/source/utility/prototypes",
 						}
 					}
 
+					//
+					self.stopDrawingSmartTooltip = function() {
+
+						try {
+
+							return self.tooltipLayer.stopDrawingSmartTooltip();
+						} catch(e) {
+
+							return e;
+						}
+					}
+
 					// Outer public function to reset title of panel in center.
 					self.resetCenterPanelTitle = function(strTitle) {
 

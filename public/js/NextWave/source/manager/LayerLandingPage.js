@@ -511,6 +511,17 @@ define(["NextWave/source/utility/prototypes",
 
 									m_searchResultRawArray = data.arrayRows;	// [][]
 
+									if (!Number.prototype.dollarFormat) {
+										Number.prototype.dollarFormat = function() {
+											if (!isNaN(this)) {
+												var n = this < 0 ? true : false,
+													a = (n ? this * -1 : this).toFixed(2).toString().split("."),
+													b = a[0].split("").reverse().join("").replace(/.{3,3}/g, "$&,").replace(/\,$/, "").split("").reverse().join("");
+												return((n ? "(" : "") + "$" + b + "." + a[1] + (n ? ")" : ""));
+											}
+										};
+									}
+
 									for (let n = 0; n < 6; n++) {
 
 										let stripNth = m_searchResultRawArray[n];
@@ -522,16 +533,16 @@ define(["NextWave/source/utility/prototypes",
 										listProjects.destroy(); // Don't check result because if destroy fails, that's because it hadn't been created, so it's ok.
 
 										// Loop through returned projects for ListHost[stripNum] (lhProjects).
-										let arrayOutput = stripNth.map((rawProj) => {
+										let arrayOutput = stripNth.map((itemIth) => {
 
-											let itemIth = stripNth[i];
+											//let itemIth = stripNth[i];
 											let rliNew = new PictureListItem(itemIth.projectName,
 																			itemIth.projectId,
 																			i++,
 																			resourceHelper.toURL('resources', itemIth.projectImageId, 'image', itemIth.projectAltImagePath),
 																			(bVertical ? (m_area.extent.width - settings.dialog.firstColumnWidth) / 2 : 0),
 																			(!bVertical ? m_area.extent.height / 15 : 0),
-																			"aaaa");
+																			m_functionGetTooltipText(itemIth, n));
 											rliNew.clickHandler = (projectId) => {
 
 												m_projectId = projectId;
@@ -568,6 +579,87 @@ define(["NextWave/source/utility/prototypes",
 						} catch(e) {
 							return e;
 						}
+					}
+
+					//
+					var m_functionGetTooltipText = function(itemIth, stripNum) {
+
+						let tooltip = itemIth.projectName;
+
+						switch(stripNum) {
+							case 0:
+								// Core project. Just the name is fine.
+								break;
+							case 1:
+								// My projects. Just the name is fine.
+								break;
+							case 2:
+								// Others' projects. Just the name for now. Later, maybe, whose it is.
+								break;
+							case 3:
+								// Products.
+								tooltip = "<b>" + tooltip + "</b>"
+										+ "<br>Level: " + itemIth.level
+										+ "<br>Difficulty: " + itemIth.difficulty
+										+ "<br>Description: " + itemIth.productDescription
+										+ "<br>Price: " + itemIth.price.dollarFormat();
+								if (!m_bPrivileged && itemIth.alreadyBought) {
+									tooltip += "<br><b>You've already purchased this product.</b>";
+								}
+								break;
+							case 4:
+								// Classes.
+								var strFirstClass;
+								var mntFirstClass = moment(JSON.parse(itemIth.schedule)[0].date, 'YYYY-MM-DD');
+								// mntFirstClass has to be good for a non-priv user, but it may be invalid if the class is still being set up. So handle that.
+								if (mntFirstClass.isValid()) {
+									strFirstClass = mntFirstClass.format('dddd, MMMM Do YYYY');
+								} else {
+									strFirstClass = 'n/a';
+								}
+								tooltip = "<b>" + tooltip + "</b>"
+										+ "<br>Level: " + itemIth.level
+										+ "<br>Difficulty: " + itemIth.difficulty
+										+ "<br>Description: " + itemIth.classDescription
+										+ "<br>Notes: " + itemIth.classNotes
+										+ "<br>First class: " + strFirstClass
+										+ "<br>Price: " + itemIth.price.dollarFormat();
+								var maxClassSize = itemIth.maxClassSize;
+								var numEnrollees = itemIth.numEnrollees;
+								if (!m_bPrivileged) {
+									if ( itemIth.alreadyEnrolled) {
+										tooltip += "<br><b>You've already enrolled in this class.</b>";
+									} else if (numEnrollees >= maxClassSize) {
+										tooltip += "<br><b>This class is full. Click to be put on its waitlist.</b>";
+									} else if (numEnrollees > maxClassSize - 5) {
+										tooltip += "<br><b>There are only " + (maxClassSize - numEnrollees).toString() + " spots left in this class. Really.</b>";
+									}
+								}
+								break;
+							case 5:
+								// Online classes.
+								var strFirstClass;
+								var mntFirstClass = moment(JSON.parse(itemIth.schedule)[0].date, 'YYYY-MM-DD');
+								// mntFirstClass has to be good for a non-priv user, but it may be invalid if the class is still being set up. So handle that.
+								if (mntFirstClass.isValid()) {
+									strFirstClass = mntFirstClass.format('dddd, MMMM Do YYYY');
+								} else {
+									strFirstClass = 'n/a';
+								}
+								tooltip = "<b>" + tooltip + "</b>"
+										+ "<br>Level: " + itemIth.level
+										+ "<br>Difficulty: " + itemIth.difficulty
+										+ "<br>Description: " + itemIth.classDescription
+										+ "<br>Notes: " + itemIth.classNotes
+										+ "<br>First class: " + strFirstClass
+										+ "<br>Price: " + itemIth.price.dollarFormat();
+								if (!m_bPrivileged && itemIth.alreadyEnrolled) {
+									tooltip += "<br><b>You've already enrolled in this online class.</b>";
+								}
+								break;
+						}
+
+						return tooltip;
 					}
 
 					//

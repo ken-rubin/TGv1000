@@ -182,7 +182,7 @@ define(["NextWave/source/utility/prototypes",
                         self.outline = b;
                     }
 
-                    // Change cursor if over delete handler.
+                    // Possibly cause a tooltip to be rendered.
                     self.mouseMove = function (objectReference) {
 
                         try {
@@ -199,6 +199,27 @@ define(["NextWave/source/utility/prototypes",
                             return e;
                         }
                     };
+
+					// Cause last (possible) tooltip to disappear.
+					self.mouseOut = function(objectReference) {
+
+						try {
+
+							if (!self.tooltip) {
+
+								// There couldn't have been a tooltip rendered.
+								return null;
+							}
+
+							// Cursor has moved out of this PLI.
+							// If there had been a tooltip being rendered, kill it.
+							// This will be as easy as setting the tooltip control's configuration.text = "".
+							return manager.stopDrawingSmartTooltip();
+						} catch(e) {
+
+							return e;
+						}
+					}
 
                     // Handle mouse down.
                     self.mouseDown = function(objectReference) {

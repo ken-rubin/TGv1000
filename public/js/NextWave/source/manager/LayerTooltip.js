@@ -87,16 +87,18 @@ define(["NextWave/source/utility/prototypes",
 
 						try {
 
-							//let strArea = "x: " + area.location.x + "; y: " + area.location.y + "; w: " + area.extent.width + "; h: " + area.extent.height;
-							//alert("Tooltip: " + strTooltip + " for item at " + strArea);
 							let sTt = self.dialog.controlObject["smartTooltip"];
 							if (sTt) {
 
+								// Set the tooltip's text.
 								sTt.configuration.text = strTooltip;
-								sTt.configuration.x = area.location.x + 15;
-								sTt.configuration.y = area.location.y - 25;
-								sTt.configuration.width = 200;
-								sTt.configuration.height = settings.dialog.lineHeight;
+
+								// Set the Area of the item being tooltipped, not the Area for the tooltip.
+								// Tooltip.render will calculate the size and positioning of the tooltip.
+								sTt.configuration.x = area.location.x;
+								sTt.configuration.y = area.location.y;
+								sTt.configuration.width = area.extent.width;
+								sTt.configuration.height = area.extent.height;
 							}
 
 							return null;
@@ -105,6 +107,24 @@ define(["NextWave/source/utility/prototypes",
 						}
 					}
 
+					//
+					self.stopDrawingSmartTooltip = function() {
+
+						try {
+
+							let sTt = self.dialog.controlObject["smartTooltip"];
+							if (sTt) {
+
+								// Set the tooltip's text to "".
+								sTt.configuration.text = "";
+							}
+
+							return null;
+						} catch(e) {
+
+							return e;
+						}
+					}
 
                     //////////////////////////
                     // Private methods.

@@ -72,6 +72,11 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+							if (!self.configuration.text) {
+
+								return null;
+							}
+
                             // If font specified, set, else default.
                             if (self.configuration.font) {
 
@@ -98,9 +103,10 @@ define(["NextWave/source/utility/prototypes",
                             // Render.
                             contextRender.fillStyle = settings.general.fillText;
                             contextRender.fillText(self.configuration.text,
-                                self.configuration.x,
-                                self.configuration.y,
-                                self.configuration.width);
+                                self.configuration.x + 15,
+                                self.configuration.y - 25,
+                                200,
+								settings.dialog.lineHeight);
                             return null;
                         } catch (e) {
 
