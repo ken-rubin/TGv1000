@@ -12,7 +12,7 @@
 // Require-AMD, and dependencies.
 define(["NextWave/source/utility/prototypes",
         "NextWave/source/utility/settings",
-        "NextWave/source/utility/lpModes",
+        "NextWave/source/utility/dialogModes",
         "NextWave/source/utility/Area",
         "NextWave/source/utility/Point",
         "NextWave/source/utility/Size",
@@ -25,7 +25,7 @@ define(["NextWave/source/utility/prototypes",
 		"Core/resourceHelper",
 		"Core/errorHelper"
         ],
-    function(prototypes, settings, lpModes, Area, Point, Size, LayerDialogHost, Dialog, List, ListItem, PictureListItem, glyphs, resourceHelper, errorHelper) {
+    function(prototypes, settings, dialogModes, Area, Point, Size, LayerDialogHost, Dialog, List, ListItem, PictureListItem, glyphs, resourceHelper, errorHelper) {
 
         try {
 
@@ -58,7 +58,7 @@ define(["NextWave/source/utility/prototypes",
 							let objectConfiguration = {
 								toggleLandingPageButton: {
 									type: "Button",
-									modes: [lpModes.normaluser,lpModes.privilegeduser],
+									modes: [dialogModes.normaluser,dialogModes.privilegeduser],
 									text: glyphs.home,
 									constructorParameterString: "'15px Arial'",
 									xType: "reserve",
@@ -67,13 +67,13 @@ define(["NextWave/source/utility/prototypes",
 									width: 30,
 									height: 30,
 									click: function(objectReference) {
-										manager.toggleLPLayer();
+										manager.toggleLandingPageAndTooltipLayers();
 										objectReference.handled = true;
 									}
 								},
 								runButton: {
 									type: "Button",
-									modes: [lpModes.normaluser,lpModes.privilegeduser],
+									modes: [dialogModes.normaluser,dialogModes.privilegeduser],
 									text: glyphs.play,
 									constructorParameterString: "'15px Arial'",
 									xType: "reserve",
@@ -100,7 +100,7 @@ define(["NextWave/source/utility/prototypes",
 								},
 								stopButton: {
 									type: "Button",
-									modes: [lpModes.normaluser,lpModes.privilegeduser],
+									modes: [dialogModes.normaluser,dialogModes.privilegeduser],
 									text: glyphs.stop,
 									constructorParameterString: "'15px Arial'",
 									xType: "reserve",
@@ -127,7 +127,7 @@ define(["NextWave/source/utility/prototypes",
 								},
 								logoutButton: {
 									type: "Button",
-									modes: [lpModes.normaluser,lpModes.privilegeduser],
+									modes: [dialogModes.normaluser,dialogModes.privilegeduser],
 									text: "Logout",
 									constructorParameterString: "'15px Arial'",
 									xType: "reserve",
@@ -152,7 +152,7 @@ define(["NextWave/source/utility/prototypes",
 												g_profile["can_create_products"] ||
 												g_profile["can_create_onlineClasses"]);
                             let exceptionRet = self.dialog.create(objectConfiguration,
-							                                 	(m_bPrivileged ? lpModes.privilegeduser : lpModes.normaluser)
+							                                 	(m_bPrivileged ? dialogModes.privilegeduser : dialogModes.normaluser)
 							);
                             if (exceptionRet) {
                                 return exceptionRet;

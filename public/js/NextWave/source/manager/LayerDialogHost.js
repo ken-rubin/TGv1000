@@ -12,7 +12,7 @@
 // Require-AMD, and dependencies.
 define(["NextWave/source/utility/prototypes",
         "NextWave/source/utility/settings",
-        "NextWave/source/utility/lpModes",
+        "NextWave/source/utility/dialogModes",
         "NextWave/source/utility/Area",
         "NextWave/source/utility/Point",
         "NextWave/source/utility/Size",
@@ -25,7 +25,7 @@ define(["NextWave/source/utility/prototypes",
 		"Core/resourceHelper",
 		"Core/errorHelper"
         ],
-    function(prototypes, settings, lpModes, Area, Point, Size, Layer, Dialog, List, ListItem, PictureListItem, glyphs, resourceHelper, errorHelper) {
+    function(prototypes, settings, dialogModes, Area, Point, Size, Layer, Dialog, List, ListItem, PictureListItem, glyphs, resourceHelper, errorHelper) {
 
         try {
 

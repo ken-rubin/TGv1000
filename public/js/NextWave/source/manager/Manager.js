@@ -288,7 +288,7 @@ define(["NextWave/source/utility/prototypes",
                     }
 
 					// Toggle Landing Page layer: active -> !active -> active.
-					self.toggleLPLayer = function() {
+					self.toggleLandingPageAndTooltipLayers = function() {
 
 						self.landingPageLayer.active = self.tooltipLayer.active = !self.landingPageLayer.active;
 					}
@@ -396,7 +396,10 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            // Hide panels, ai, landingPage and drag.
+							// Save state of self.landingPageLayer.active (which is the same as self.tooltipLayer.active)
+							m_bLandingPageLayerActiveState = self.landingPageLayer.active;
+
+                            // Hide panels, ai, landingPage, tooltip and drag.
                             self.canvasLayer.active = true;
 							self.landingPageLayer.active = false;
 							self.tooltipLayer.active = false;
@@ -425,11 +428,11 @@ define(["NextWave/source/utility/prototypes",
                                 throw exceptionRet;
                             }
 
-                            // Re-enable panels and drag.
+                            // Re-enable panels, drag, etc.
                             self.canvasLayer.active = false;
                             self.panelLayer.active = true;
-							self.landingPageLayer.active = true;
-							self.tooltipLayer.active = true;
+							self.landingPageLayer.active = m_bLandingPageLayerActiveState;
+							self.tooltipLayer.active = m_bLandingPageLayerActiveState;
                             self.dragLayer.active = true;
 
                             // Cause a resize.
@@ -1581,6 +1584,8 @@ define(["NextWave/source/utility/prototypes",
                     var m_dHeight = 0;
                     // Collection of layers to render in order.
                     var m_arrayLayers = null;
+					// Saves state during run for restoration at stop.
+					var m_bLandingPageLayerActiveState = null;
                     // Size of entire manager.
                     var m_areaMaximal = null;
                     // Point of click down.  Used to determine dragging.
