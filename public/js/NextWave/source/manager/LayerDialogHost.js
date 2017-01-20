@@ -30,7 +30,7 @@ define(["NextWave/source/utility/prototypes",
         try {
 
             // Constructor function.
-            var functionRet = function LayerDialogHost(rgbaBackground) {
+            var functionRet = function LayerDialogHost(rgbaBackground, bSetHandledOnMouseMove) {
 
                 try {
 
@@ -48,6 +48,8 @@ define(["NextWave/source/utility/prototypes",
 					self.areaMaximal = null;
 					// Save background color
 					self.rgbaBackground = rgbaBackground;
+					// Save.
+					self.bSetHandledOnMouseMove = bSetHandledOnMouseMove;
 
                     // Destroy LayerDialogHost--we're about to create a new one with a different configuration.
                     self.destroy = function() {
@@ -113,6 +115,9 @@ define(["NextWave/source/utility/prototypes",
 
                             if (self.dialog &&
                                 $.isFunction(self.dialog.mouseMove)) {
+
+								// When true, stops lower layers from changing cursor.
+								objectReference.handled = self.bSetHandledOnMouseMove;
 
                                 return self.dialog.mouseMove(objectReference);
                             }

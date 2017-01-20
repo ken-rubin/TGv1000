@@ -38,7 +38,8 @@ define(["NextWave/source/utility/prototypes",
 
                     // Inherit from base class.
                     self.inherits(LayerDialogHost,
-						"rgba(99,137,228,1)"		// Required for Layers inheriting LayerDialogHost.
+						"rgba(99,137,228,1)",		// Required for Layers inheriting LayerDialogHost.
+						true						// Tells LayerDialogHost to set objectReference.handled in mouse move.
 					);
 
                     // Initialze instance.
