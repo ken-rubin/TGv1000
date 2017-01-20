@@ -17,6 +17,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/Label",
     "NextWave/source/utility/Edit",
     "NextWave/source/utility/Button",
+    "NextWave/source/utility/Tooltip",
     "NextWave/source/utility/GlyphHost",
     "NextWave/source/utility/glyphs",
     "NextWave/source/utility/ListHost",
@@ -24,7 +25,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/ParameterListHost",
     "NextWave/source/utility/StatementListHost",
     "NextWave/source/utility/Picture"],
-    function (prototypes, settings, Point, Size, Area, Label, Edit, Button, GlyphHost, glyphs, ListHost, Accordion, ParameterListHost, StatementListHost, Picture) {
+    function (prototypes, settings, Point, Size, Area, Label, Edit, Button, Tooltip, GlyphHost, glyphs, ListHost, Accordion, ParameterListHost, StatementListHost, Picture) {
 
         try {
 
@@ -418,7 +419,7 @@ define(["NextWave/source/utility/prototypes",
 
 								return self.callback();
 							} else {
-								
+
 								return null;
 							}
                         } catch (e) {

@@ -38,7 +38,8 @@ define(["NextWave/source/utility/prototypes",
 
                     // Inherit from base class.
                     self.inherits(LayerDialogHost,
-						"rgba(255,255,255,.05)");
+						"rgba(255,255,255,.05)"		// Required for Layers inheriting LayerDialogHost.
+					);
 
                     // Initialze instance.
                     self.create = function() {
@@ -138,7 +139,7 @@ define(["NextWave/source/utility/prototypes",
 
 										try {
 
-											// Will need Abandon Project stuff.
+											// TODO: Will need Abandon Project stuff.
 
 											window.location = "/";
 										} catch(e) {

@@ -38,7 +38,8 @@ define(["NextWave/source/utility/prototypes",
 
                     // Inherit from base class.
                     self.inherits(LayerDialogHost,
-						"rgba(99,137,228,1)");
+						"rgba(99,137,228,1)"		// Required for Layers inheriting LayerDialogHost.
+					);
 
                     // Initialze instance.
                     self.create = function() {
@@ -137,7 +138,7 @@ define(["NextWave/source/utility/prototypes",
 									yType: "callback",
 									y: function(area) {
 										return (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 1 +
-											0.65 * settings.dialog.lineHeight;
+											0.5 * settings.dialog.lineHeight;
 									},
 									width: settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
@@ -151,7 +152,7 @@ define(["NextWave/source/utility/prototypes",
 									yType: "callback",
 									y: function(area) {
 										return (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 1 +
-											1.3 * settings.dialog.lineHeight;
+											1.0 * settings.dialog.lineHeight;
 									},
 									width: settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
@@ -178,7 +179,7 @@ define(["NextWave/source/utility/prototypes",
 									yType: "callback",
 									y: function(area) {
 										return (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 1 +
-											0.65 * settings.dialog.lineHeight;
+											0.5 * settings.dialog.lineHeight;
 									},
 									width: settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
@@ -192,7 +193,7 @@ define(["NextWave/source/utility/prototypes",
 									yType: "callback",
 									y: function(area) {
 										return (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 1 +
-											1.3 * settings.dialog.lineHeight;
+											1.0 * settings.dialog.lineHeight;
 									},
 									width: settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
@@ -238,7 +239,7 @@ define(["NextWave/source/utility/prototypes",
 									yType: "callback",
 									y: function(area) {
 										return (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 2 +
-											0.65 * settings.dialog.lineHeight;
+											0.5 * settings.dialog.lineHeight;
 									},
 									width: settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
@@ -284,7 +285,7 @@ define(["NextWave/source/utility/prototypes",
 									yType: "callback",
 									y: function(area) {
 										return (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 3 +
-											0.65 * settings.dialog.lineHeight;
+											0.5 * settings.dialog.lineHeight;
 									},
 									width: settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
@@ -330,7 +331,7 @@ define(["NextWave/source/utility/prototypes",
 									yType: "callback",
 									y: function(area) {
 										return (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 4 +
-											0.65 * settings.dialog.lineHeight;
+											0.5 * settings.dialog.lineHeight;
 									},
 									width: settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
@@ -376,7 +377,7 @@ define(["NextWave/source/utility/prototypes",
 									yType: "callback",
 									y: function(area) {
 										return (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 5 +
-											0.65 * settings.dialog.lineHeight;
+											0.5 * settings.dialog.lineHeight;
 									},
 									width: settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
@@ -422,7 +423,7 @@ define(["NextWave/source/utility/prototypes",
 									yType: "callback",
 									y: function(area) {
 										return (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 6 +
-											0.65 * settings.dialog.lineHeight;
+											0.5 * settings.dialog.lineHeight;
 									},
 									width: settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
@@ -457,7 +458,7 @@ define(["NextWave/source/utility/prototypes",
 									y: function(area) {
 										return (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 6 +
 											(area.extent.height / 15) +
-											0.65 * settings.dialog.lineHeight;
+											0.5 * settings.dialog.lineHeight;
 									},
 									widthType: "callback",
 									width: function(area) {
@@ -567,7 +568,6 @@ define(["NextWave/source/utility/prototypes",
 
 						try {
 
-							//errorHelper.show("You clicked the project named " + rawItem.projectName + ".");
 							if (m_bPrivileged) {
 
 								switch(strip) {

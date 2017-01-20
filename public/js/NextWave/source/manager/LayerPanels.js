@@ -201,7 +201,7 @@ define(["NextWave/source/utility/prototypes",
                     }
 
                     // Clear the center panel.
-                    // extraCenterPanelData is currently used only for NewProjectDialog. If that's the one, pass it along.'
+                    // extraCenterPanelData is currently used only for NewProjectDialog. If that's the one, pass it along.
                     self.clearCenter = function(strActiveCenterPanel, extraCenterPanelData) {
 
                         try {
@@ -966,10 +966,10 @@ define(["NextWave/source/utility/prototypes",
                             if (window.newProjectDialog) {
                                 window.newProjectDialog.visible = false;
                             }
-                            if (window.newProjectDialog) {
+                            if (window.saveProjectDialog) {
                                 window.saveProjectDialog.visible = false;
                             }
-                            if (window.newProjectDialog) {
+                            if (window.openProjectDialog) {
                                 window.openProjectDialog.visible = false;
                             }
 
@@ -999,10 +999,10 @@ define(["NextWave/source/utility/prototypes",
                             if (window.newProjectDialog) {
                                 window.newProjectDialog.visible = false;
                             }
-                            if (window.newProjectDialog) {
+                            if (window.saveProjectDialog) {
                                 window.saveProjectDialog.visible = false;
                             }
-                            if (window.newProjectDialog) {
+                            if (window.openProjectDialog) {
                                 window.openProjectDialog.visible = false;
                             }
 
@@ -1032,10 +1032,10 @@ define(["NextWave/source/utility/prototypes",
                             if (window.newProjectDialog) {
                                 window.newProjectDialog.visible = false;
                             }
-                            if (window.newProjectDialog) {
+                            if (window.saveProjectDialog) {
                                 window.saveProjectDialog.visible = false;
                             }
-                            if (window.newProjectDialog) {
+                            if (window.openProjectDialog) {
                                 window.openProjectDialog.visible = false;
                             }
 
@@ -1065,10 +1065,10 @@ define(["NextWave/source/utility/prototypes",
                             if (window.newProjectDialog) {
                                 window.newProjectDialog.visible = false;
                             }
-                            if (window.newProjectDialog) {
+                            if (window.saveProjectDialog) {
                                 window.saveProjectDialog.visible = false;
                             }
-                            if (window.newProjectDialog) {
+                            if (window.openProjectDialog) {
                                 window.openProjectDialog.visible = false;
                             }
 
@@ -1098,10 +1098,10 @@ define(["NextWave/source/utility/prototypes",
                             if (window.newProjectDialog) {
                                 window.newProjectDialog.visible = false;
                             }
-                            if (window.newProjectDialog) {
+                            if (window.saveProjectDialog) {
                                 window.saveProjectDialog.visible = false;
                             }
-                            if (window.newProjectDialog) {
+                            if (window.openProjectDialog) {
                                 window.openProjectDialog.visible = false;
                             }
 
@@ -1131,10 +1131,10 @@ define(["NextWave/source/utility/prototypes",
                             if (window.newProjectDialog) {
                                 window.newProjectDialog.visible = false;
                             }
-                            if (window.newProjectDialog) {
+                            if (window.saveProjectDialog) {
                                 window.saveProjectDialog.visible = false;
                             }
-                            if (window.newProjectDialog) {
+                            if (window.openProjectDialog) {
                                 window.openProjectDialog.visible = false;
                             }
 
@@ -1164,10 +1164,10 @@ define(["NextWave/source/utility/prototypes",
                             if (window.newProjectDialog) {
                                 window.newProjectDialog.visible = false;
                             }
-                            if (window.newProjectDialog) {
+                            if (window.saveProjectDialog) {
                                 window.saveProjectDialog.visible = false;
                             }
-                            if (window.newProjectDialog) {
+                            if (window.openProjectDialog) {
                                 window.openProjectDialog.visible = false;
                             }
 
@@ -1197,10 +1197,10 @@ define(["NextWave/source/utility/prototypes",
                             if (window.newProjectDialog) {
                                 window.newProjectDialog.visible = true;
                             }
-                            if (window.newProjectDialog) {
+                            if (window.saveProjectDialog) {
                                 window.saveProjectDialog.visible = false;
                             }
-                            if (window.newProjectDialog) {
+                            if (window.openProjectDialog) {
                                 window.openProjectDialog.visible = false;
                             }
 
@@ -1230,10 +1230,10 @@ define(["NextWave/source/utility/prototypes",
                             if (window.newProjectDialog) {
                                 window.newProjectDialog.visible = false;
                             }
-                            if (window.newProjectDialog) {
+                            if (window.saveProjectDialog) {
                                 window.saveProjectDialog.visible = true;
                             }
-                            if (window.newProjectDialog) {
+                            if (window.openProjectDialog) {
                                 window.openProjectDialog.visible = false;
                             }
 
@@ -1263,10 +1263,10 @@ define(["NextWave/source/utility/prototypes",
                             if (window.newProjectDialog) {
                                 window.newProjectDialog.visible = false;
                             }
-                            if (window.newProjectDialog) {
+                            if (window.saveProjectDialog) {
                                 window.saveProjectDialog.visible = false;
                             }
-                            if (window.newProjectDialog) {
+                            if (window.openProjectDialog) {
                                 window.openProjectDialog.visible = true;
                             }
 
@@ -1296,10 +1296,10 @@ define(["NextWave/source/utility/prototypes",
                             if (window.newProjectDialog) {
                                 window.newProjectDialog.visible = false;
                             }
-                            if (window.newProjectDialog) {
+                            if (window.saveProjectDialog) {
                                 window.saveProjectDialog.visible = false;
                             }
-                            if (window.newProjectDialog) {
+                            if (window.openProjectDialog) {
                                 window.openProjectDialog.visible = false;
                             }
 

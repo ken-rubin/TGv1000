@@ -27,6 +27,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/manager/LayerAl",
     "NextWave/source/manager/LayerLandingPage",
     "NextWave/source/manager/LayerNavbar",
+    "NextWave/source/manager/LayerTooltip",
     "NextWave/source/expression/Expression",
     "NextWave/source/literal/Literal",
     "NextWave/source/statement/Statement",
@@ -43,7 +44,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/project/Method",
     "NextWave/source/project/Property",
     "NextWave/source/project/Event"],
-    function (prototypes, settings, simulator, Area, Point, Size, Layer, LayerBackground, LayerCanvas, LayerPanels, LayerDebug, LayerDrag, LayerAl, LayerLandingPage, LayerNavbar, Expression, Literal, Statement, Name, CodeExpression, CodeStatement, Parameter, ParameterList, StatementList, Project, Comic, Library, Type, Method, Property, Event) {
+    function (prototypes, settings, simulator, Area, Point, Size, Layer, LayerBackground, LayerCanvas, LayerPanels, LayerDebug, LayerDrag, LayerAl, LayerLandingPage, LayerNavbar, LayerTooltip, Expression, Literal, Statement, Name, CodeExpression, CodeStatement, Parameter, ParameterList, StatementList, Project, Comic, Library, Type, Method, Property, Event) {
 
         try {
 
@@ -61,6 +62,8 @@ define(["NextWave/source/utility/prototypes",
                     self.backgroundLayer = null;
                     // Hold reference to the canvas layer.
                     self.canvasLayer = null;
+                    // Hold reference to the tooltip layer.
+                    self.tooltipLayer = null;
                     // Hold reference to the drag layer.
                     self.dragLayer = null;
                     // Hold reference to the debug layer.
@@ -143,6 +146,14 @@ define(["NextWave/source/utility/prototypes",
                                 throw exceptionRet;
                             }
 
+                            // Allocate and create the tooltip layer.
+                            self.tooltipLayer = new LayerTooltip();
+                            exceptionRet = self.tooltipLayer.create();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
                             // Allocate and create the drag layer.
                             self.dragLayer = new LayerDrag();
                             exceptionRet = self.dragLayer.create();
@@ -176,6 +187,7 @@ define(["NextWave/source/utility/prototypes",
                                     self.canvasLayer,
                                     self.panelLayer,
 									self.landingPageLayer,
+									self.tooltipLayer,
                                     self.debugLayer,
                                     self.dragLayer,
 									self.navbarLayer
@@ -258,6 +270,7 @@ define(["NextWave/source/utility/prototypes",
                                     self.canvasLayer,
                                     self.panelLayer,
 									self.landingPageLayer,
+									self.tooltipLayer,
                                     self.debugLayer,
                                     self.dragLayer,
 									self.navbarLayer
@@ -277,7 +290,7 @@ define(["NextWave/source/utility/prototypes",
 					// Toggle Landing Page layer: active -> !active -> active.
 					self.toggleLPLayer = function() {
 
-						self.landingPageLayer.active = !self.landingPageLayer.active;
+						self.landingPageLayer.active = self.tooltipLayer.active = !self.landingPageLayer.active;
 					}
 
 					// Outer public function to reset title of panel in center.
@@ -386,6 +399,7 @@ define(["NextWave/source/utility/prototypes",
                             // Hide panels, ai, landingPage and drag.
                             self.canvasLayer.active = true;
 							self.landingPageLayer.active = false;
+							self.tooltipLayer.active = false;
                             self.panelLayer.active = false;
                             self.dragLayer.active = false;
 
@@ -415,6 +429,7 @@ define(["NextWave/source/utility/prototypes",
                             self.canvasLayer.active = false;
                             self.panelLayer.active = true;
 							self.landingPageLayer.active = true;
+							self.tooltipLayer.active = true;
                             self.dragLayer.active = true;
 
                             // Cause a resize.
@@ -1450,18 +1465,8 @@ define(["NextWave/source/utility/prototypes",
                             // Get the size from the container,
                             // if possible, or default (?).
                             m_dWidth = m_jqParent.width();
-/*                            if (m_dWidth === undefined ||
-                                m_dWidth === 0) {
+                            m_dHeight = m_jqParent.height();
 
-                                m_dWidth = settings.manager.defaultWidth;
-                            }
-*/                            m_dHeight = m_jqParent.height();
-/*                            if (m_dHeight === undefined ||
-                                m_dHeight === 0) {
-
-                                m_dHeight = settings.manager.defaultHeight;
-                            }
-*/
                             // Update canvas sizes--do this last to minimize the time that the canvas is blank.
                             m_canvasRender.width = m_dWidth;
                             m_canvasRender.height = m_dHeight;
