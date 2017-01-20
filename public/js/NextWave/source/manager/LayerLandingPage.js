@@ -598,7 +598,7 @@ define(["NextWave/source/utility/prototypes",
 								break;
 							case 3:
 								// Products.
-								tooltip = "<b>" + tooltip + "</b>"
+								tooltip = tooltip
 										+ "<br>Level: " + itemIth.level
 										+ "<br>Difficulty: " + itemIth.difficulty
 										+ "<br>Description: " + itemIth.productDescription
@@ -617,7 +617,7 @@ define(["NextWave/source/utility/prototypes",
 								} else {
 									strFirstClass = 'n/a';
 								}
-								tooltip = "<b>" + tooltip + "</b>"
+								tooltip = tooltip
 										+ "<br>Level: " + itemIth.level
 										+ "<br>Difficulty: " + itemIth.difficulty
 										+ "<br>Description: " + itemIth.classDescription
@@ -646,7 +646,7 @@ define(["NextWave/source/utility/prototypes",
 								} else {
 									strFirstClass = 'n/a';
 								}
-								tooltip = "<b>" + tooltip + "</b>"
+								tooltip = tooltip
 										+ "<br>Level: " + itemIth.level
 										+ "<br>Difficulty: " + itemIth.difficulty
 										+ "<br>Description: " + itemIth.classDescription

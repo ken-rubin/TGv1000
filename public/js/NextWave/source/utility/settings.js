@@ -460,6 +460,13 @@ define(["NextWave/source/utility/prototypes"],
                             fillBackground: "#fdd"
                         }
                     };
+					self.tooltip = {
+
+						fillStyle: "#696969",
+						textStyle: "#FFFFF0",
+						lineWidth: 2,
+						lineHeight: 25
+					};
                   } catch (e) {
 
                     alert(e.message);

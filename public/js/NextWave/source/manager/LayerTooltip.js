@@ -99,6 +99,9 @@ define(["NextWave/source/utility/prototypes",
 								sTt.configuration.y = area.location.y;
 								sTt.configuration.width = area.extent.width;
 								sTt.configuration.height = area.extent.height;
+
+								// Make it calculateLayout before rendering.
+								sTt.requiresCalculateLayout = true;
 							}
 
 							return null;

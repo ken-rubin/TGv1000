@@ -40,11 +40,11 @@ define(["NextWave/source/utility/prototypes",
 
                         return new Area(self.location.clone(),
                             self.extent.clone());
-                    };                 
+                    };
 
                     // Generate path for the pinched rounded rect.
                     self.generateRectPath = function (contextRender) {
-                        
+
                         try {
 
                             // Simple square rect....
@@ -67,7 +67,7 @@ define(["NextWave/source/utility/prototypes",
 
                     // Generate path for the pinched rounded rect.
                     self.generateRoundedRectPath = function (contextRender) {
-                        
+
                         try {
 
                             // Calculate a good, relative corner radius.
@@ -121,7 +121,85 @@ define(["NextWave/source/utility/prototypes",
 
                             return null;
                         } catch (e) {
-                            
+
+                            return e;
+                        }
+                    };
+
+                    // Generate path for the pinched rounded rect.
+                    self.generateRoundedTooltipPath = function (contextRender) {
+
+                        try {
+
+                            // Calculate a good, relative corner radius.
+                            var dCornerRadius = settings.area.cornerRadius;
+
+                            // Ensure their are no calculated negative sizes.
+                            if (dCornerRadius > self.extent.height) {
+
+                                dCornerRadius = self.extent.height;
+                            } else if (dCornerRadius > self.extent.width) {
+
+                                dCornerRadius = self.extent.width;
+                            }
+
+                            // Generate the rounded path.
+                            contextRender.beginPath();
+
+							// Down the left side.
+                            contextRender.moveTo(self.location.x,
+                                    self.location.y + dCornerRadius);
+                            contextRender.lineTo(self.location.x,
+                                    (self.location.y + self.extent.height) - dCornerRadius);
+
+							// SW corner.
+                            contextRender.quadraticCurveTo(self.location.x,
+                                    (self.location.y + self.extent.height),
+                                    (self.location.x + dCornerRadius),
+                                    (self.location.y + self.extent.height));
+
+							// A bit before the drop-triangle.
+							contextRender.lineTo((self.location.x + dCornerRadius + 10),
+                                    (self.location.y + self.extent.height));
+
+							// Now the drop-triangle bottom point.
+							contextRender.lineTo((self.location.x + dCornerRadius + 15),
+                                    (self.location.y + self.extent.height + 20));
+
+							// Back to the bottom.
+							contextRender.lineTo((self.location.x + dCornerRadius + 20),
+                                    (self.location.y + self.extent.height));
+
+							// Rest of the bottom.
+                            contextRender.lineTo((self.location.x + self.extent.width) - dCornerRadius,
+                                    (self.location.y + self.extent.height));
+
+                            contextRender.quadraticCurveTo((self.location.x + self.extent.width),
+                                    (self.location.y + self.extent.height),
+                                    (self.location.x + self.extent.width),
+                                    (self.location.y + self.extent.height) - dCornerRadius);
+
+                            contextRender.lineTo((self.location.x + self.extent.width),
+                                    (self.location.y + dCornerRadius));
+
+                            contextRender.quadraticCurveTo((self.location.x + self.extent.width),
+                                    self.location.y,
+                                    (self.location.x + self.extent.width) - dCornerRadius,
+                                    self.location.y);
+
+                            contextRender.lineTo((self.location.x + dCornerRadius),
+                                    (self.location.y));
+
+                            contextRender.quadraticCurveTo(self.location.x,
+                                    self.location.y,
+                                    self.location.x,
+                                    self.location.y + dCornerRadius);
+
+                            contextRender.closePath();
+
+                            return null;
+                        } catch (e) {
+
                             return e;
                         }
                     };
@@ -145,7 +223,7 @@ define(["NextWave/source/utility/prototypes",
                         }
 
                         // Generate path.
-                        var exceptionRet = self.generateRoundedRectPath(contextRender); 
+                        var exceptionRet = self.generateRoundedRectPath(contextRender);
                         if (exceptionRet) {
 
                             throw exceptionRet;
