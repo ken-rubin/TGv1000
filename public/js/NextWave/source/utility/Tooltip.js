@@ -97,10 +97,10 @@ define(["NextWave/source/utility/prototypes",
 
                             // Render.
                             contextRender.fillStyle = settings.general.fillText;
-                            contextRender.fillText(self.text,
-                                m_area.location.x,
-                                m_area.location.y,
-                                m_area.extent.width);
+                            contextRender.fillText(self.configuration.text,
+                                self.configuration.x,
+                                self.configuration.y,
+                                self.configuration.width);
                             return null;
                         } catch (e) {
 

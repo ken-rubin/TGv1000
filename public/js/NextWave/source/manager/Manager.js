@@ -293,6 +293,20 @@ define(["NextWave/source/utility/prototypes",
 						self.landingPageLayer.active = self.tooltipLayer.active = !self.landingPageLayer.active;
 					}
 
+					// Cause self.tooltipLayer to render a smart tooltip.
+					// strTooltip holds the text. May have embedded \r\n.
+					// area is the Area for the item that wants the tooltip. tooltipLayer will have to figure out
+					// size and positioning.
+					self.drawSmartTooltip = function(strTooltip, area) {
+
+						try {
+
+							return self.tooltipLayer.drawSmartTooltip(strTooltip, area);
+						} catch(e) {
+							return e;
+						}
+					}
+
 					// Outer public function to reset title of panel in center.
 					self.resetCenterPanelTitle = function(strTitle) {
 

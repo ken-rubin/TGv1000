@@ -82,6 +82,30 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+					// Called by manager after call from PictureListItem, we need to draw a tooltip.
+					self.drawSmartTooltip = function(strTooltip, area) {
+
+						try {
+
+							//let strArea = "x: " + area.location.x + "; y: " + area.location.y + "; w: " + area.extent.width + "; h: " + area.extent.height;
+							//alert("Tooltip: " + strTooltip + " for item at " + strArea);
+							let sTt = self.dialog.controlObject["smartTooltip"];
+							if (sTt) {
+
+								sTt.configuration.text = strTooltip;
+								sTt.configuration.x = area.location.x + 15;
+								sTt.configuration.y = area.location.y - 25;
+								sTt.configuration.width = 200;
+								sTt.configuration.height = settings.dialog.lineHeight;
+							}
+
+							return null;
+						} catch(e) {
+							return e;
+						}
+					}
+
+
                     //////////////////////////
                     // Private methods.
 

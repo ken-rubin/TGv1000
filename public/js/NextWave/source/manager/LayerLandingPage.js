@@ -525,7 +525,13 @@ define(["NextWave/source/utility/prototypes",
 										let arrayOutput = stripNth.map((rawProj) => {
 
 											let itemIth = stripNth[i];
-											let rliNew = new PictureListItem(itemIth.projectName, itemIth.projectId, i++, resourceHelper.toURL('resources', itemIth.projectImageId, 'image', itemIth.projectAltImagePath), (bVertical ? (m_area.extent.width - settings.dialog.firstColumnWidth) / 2 : 0), (!bVertical ? m_area.extent.height / 15 : 0));
+											let rliNew = new PictureListItem(itemIth.projectName,
+																			itemIth.projectId,
+																			i++,
+																			resourceHelper.toURL('resources', itemIth.projectImageId, 'image', itemIth.projectAltImagePath),
+																			(bVertical ? (m_area.extent.width - settings.dialog.firstColumnWidth) / 2 : 0),
+																			(!bVertical ? m_area.extent.height / 15 : 0),
+																			"aaaa");
 											rliNew.clickHandler = (projectId) => {
 
 												m_projectId = projectId;

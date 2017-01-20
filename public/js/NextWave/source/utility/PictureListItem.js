@@ -25,7 +25,7 @@ define(["NextWave/source/utility/prototypes",
 			// One of pxFixedWidth or pxFixedHeight will be 0 and the other will not be.
 			// This will be used to determine which dimension of the image to fix and which to calculate
 			// in order to maintain aspect ratio of the original image.
-        	var functionRet = function PictureListItem(strName, id, index, url, pxFixedWidth, pxFixedHeight) {
+        	var functionRet = function PictureListItem(strName, id, index, url, pxFixedWidth, pxFixedHeight, tooltip) {
 
                 try {
 
@@ -36,8 +36,6 @@ define(["NextWave/source/utility/prototypes",
 
                     // Name of this type object.
                     self.name = strName || "default";
-                    // Fullname of this object.
-                    self.fullname = self.name.charAt(0).toUpperCase() + self.name.slice(1) + "Project";
                     // Save the id (1-6) of this item.
                     self.id = id;
                     // Save the index (0-?) of this item.
@@ -48,6 +46,8 @@ define(["NextWave/source/utility/prototypes",
                     self.outline = false;
                     // Also provide a selected coloring.
                     self.selected = false;
+					// Save a possible tooltip.
+					self.tooltip = tooltip || "";
                     // Get a reference to the settings for this object.
                     self.settingsNode = settings.list["picture"];
                     // Callback to handle click event.
@@ -187,6 +187,12 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+							// Mouse cursor is over this PLI.
+							// Possibly draw a tooltip. (Will need to worry about erasing the tooltip if mouve out.)
+							if (self.tooltip && m_area) {
+
+								return manager.drawSmartTooltip(self.tooltip, m_area);
+							}
                             return null;
                         } catch (e) {
 
@@ -323,8 +329,6 @@ define(["NextWave/source/utility/prototypes",
 
                     // The area, relative to the canvas, occupied by this instance.
                     var m_area = null;
-                    // Remember where the delete icon is--if delete handler is handled.
-                    var m_areaDeleteIcon = null;
 
                 } catch (e) {
 
