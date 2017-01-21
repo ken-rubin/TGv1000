@@ -63,7 +63,7 @@ define(["NextWave/source/utility/prototypes",
 									text: glyphs.home,
 									constructorParameterString: "'15px Arial'",
 									xType: "reserve",
-									x: settings.dialog.firstColumnWidth / 3,
+									x: settings.dialog.firstColumnWidth / 3 + 35,
 									y: 2 * settings.general.margin,
 									width: 30,
 									height: 30,
@@ -78,7 +78,7 @@ define(["NextWave/source/utility/prototypes",
 									text: glyphs.play,
 									constructorParameterString: "'15px Arial'",
 									xType: "reserve",
-									x: settings.dialog.firstColumnWidth / 3,
+									x: settings.dialog.firstColumnWidth / 3 + 35,
 									y: 2 * settings.general.margin + 50,
 									width: 30,
 									height: 30,
@@ -105,7 +105,7 @@ define(["NextWave/source/utility/prototypes",
 									text: glyphs.stop,
 									constructorParameterString: "'15px Arial'",
 									xType: "reserve",
-									x: settings.dialog.firstColumnWidth / 3,
+									x: settings.dialog.firstColumnWidth / 3 + 35,
 									y: 2 * settings.general.margin + 100,
 									width: 30,
 									height: 30,
@@ -133,8 +133,161 @@ define(["NextWave/source/utility/prototypes",
 									constructorParameterString: "'15px Arial'",
 									xType: "reserve",
 									x: settings.dialog.firstColumnWidth / 3 + 70,
-									y: 2 * settings.general.margin + 150,
+									y: 2 * settings.general.margin + 600,
 									width: 100,
+									height: 30,
+									click: function(objectReference) {
+
+										try {
+
+											// TODO: Will need Abandon Project stuff.
+
+											window.location = "/";
+										} catch(e) {
+											errorHelper.show(e);
+										}
+									}
+								},
+								createNewButton: {
+									type: "Button",
+									modes: [dialogModes.normaluser,dialogModes.privilegeduser],
+									text: "Create Project",
+									constructorParameterString: "'15px Arial'",
+									xType: "reserve",
+									x: settings.dialog.firstColumnWidth / 3 + 80,
+									y: 2 * settings.general.margin + 200,
+									width: 120,
+									height: 30,
+									click: function(objectReference) {
+
+										try {
+
+											// TODO: Will need Abandon Project stuff.
+
+										} catch(e) {
+											errorHelper.show(e);
+										}
+									}
+								},
+								buyEnrollButton: {
+									type: "Button",
+									modes: [dialogModes.normaluser,dialogModes.privilegeduser],
+									text: "Buy/Enroll",
+									constructorParameterString: "'15px Arial'",
+									xType: "reserve",
+									x: settings.dialog.firstColumnWidth / 3 + 70,
+									y: 2 * settings.general.margin + 250,
+									width: 100,
+									height: 30,
+									click: function(objectReference) {
+
+										try {
+
+											// TODO: Will need Abandon Project stuff.
+
+											window.location = "/";
+										} catch(e) {
+											errorHelper.show(e);
+										}
+									}
+								},
+								saveProjectButton: {
+									type: "Button",
+									modes: [dialogModes.normaluser,dialogModes.privilegeduser],
+									text: "Save Project",
+									constructorParameterString: "'15px Arial'",
+									xType: "reserve",
+									x: settings.dialog.firstColumnWidth / 3 + 70,
+									y: 2 * settings.general.margin + 300,
+									width: 100,
+									height: 30,
+									click: function(objectReference) {
+
+										try {
+
+											// TODO: Will need Abandon Project stuff.
+
+											window.location = "/";
+										} catch(e) {
+											errorHelper.show(e);
+										}
+									}
+								},
+								closeProjectButton: {
+									type: "Button",
+									modes: [dialogModes.normaluser,dialogModes.privilegeduser],
+									text: "Close Project",
+									constructorParameterString: "'15px Arial'",
+									xType: "reserve",
+									x: settings.dialog.firstColumnWidth / 3 + 80,
+									y: 2 * settings.general.margin + 350,
+									width: 120,
+									height: 30,
+									click: function(objectReference) {
+
+										try {
+
+											// TODO: Will need Abandon Project stuff.
+
+											window.location = "/";
+										} catch(e) {
+											errorHelper.show(e);
+										}
+									}
+								},
+								azUsersPermissionsButton: {
+									type: "Button",
+									modes: [dialogModes.privilegeduser],
+									text: "Users/Permissions",
+									constructorParameterString: "'15px Arial'",
+									xType: "reserve",
+									x: settings.dialog.firstColumnWidth / 3 + 95,
+									y: 2 * settings.general.margin + 400,
+									width: 150,
+									height: 30,
+									click: function(objectReference) {
+
+										try {
+
+											// TODO: Will need Abandon Project stuff.
+
+											window.location = "/";
+										} catch(e) {
+											errorHelper.show(e);
+										}
+									}
+								},
+								azProjectsButton: {
+									type: "Button",
+									modes: [dialogModes.privilegeduser],
+									text: "Projects",
+									constructorParameterString: "'15px Arial'",
+									xType: "reserve",
+									x: settings.dialog.firstColumnWidth / 3 + 70,
+									y: 2 * settings.general.margin + 450,
+									width: 100,
+									height: 30,
+									click: function(objectReference) {
+
+										try {
+
+											// TODO: Will need Abandon Project stuff.
+
+											window.location = "/";
+										} catch(e) {
+											errorHelper.show(e);
+										}
+									}
+								},
+								azPurchProjectsButton: {
+									type: "Button",
+									modes: [dialogModes.privilegeduser],
+									text: "Purchasables",
+									constructorParameterString: "'15px Arial'",
+									xType: "reserve",
+									x: settings.dialog.firstColumnWidth / 3 + 80,
+									y: 2 * settings.general.margin + 500,
+									width: 120,
 									height: 30,
 									click: function(objectReference) {
 
@@ -149,10 +302,12 @@ define(["NextWave/source/utility/prototypes",
 									}
 								}
 							};
+
 							m_bPrivileged = (g_profile["can_create_classes"] || 					// Need to do it this way since manager.userAllowedToCreateEditPurchProjs not set yet.
 												g_profile["can_create_products"] ||
 												g_profile["can_create_onlineClasses"]);
-                            let exceptionRet = self.dialog.create(objectConfiguration,
+
+							let exceptionRet = self.dialog.create(objectConfiguration,
 							                                 	(m_bPrivileged ? dialogModes.privilegeduser : dialogModes.normaluser)
 							);
                             if (exceptionRet) {

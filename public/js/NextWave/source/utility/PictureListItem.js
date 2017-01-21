@@ -188,7 +188,7 @@ define(["NextWave/source/utility/prototypes",
                         try {
 
 							// Mouse cursor is over this PLI.
-							// Possibly draw a tooltip. (Will need to worry about erasing the tooltip if mouve out.)
+							// Possibly draw a tooltip, depending upon whether there's text set up or not.
 							if (self.tooltip && m_area) {
 
 								return manager.drawSmartTooltip(self.tooltip, m_area);

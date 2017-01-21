@@ -462,7 +462,7 @@ define(["NextWave/source/utility/prototypes"],
                     };
 					self.tooltip = {
 
-						fillStyle: "#696969",
+						fillStyle: "#b5352f",
 						textStyle: "#FFFFF0",
 						lineWidth: 2,
 						lineHeight: 25

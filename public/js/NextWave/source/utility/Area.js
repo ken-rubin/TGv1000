@@ -166,11 +166,11 @@ define(["NextWave/source/utility/prototypes",
 							contextRender.lineTo((self.location.x + dCornerRadius + 12),
                                     (self.location.y + self.extent.height + 15));
 
-							// Back to the bottom.
+							// Back to the bottom of the rect.
 							contextRender.lineTo((self.location.x + dCornerRadius + 20),
                                     (self.location.y + self.extent.height));
 
-							// Rest of the bottom.
+							// Rest of the bottom. And then proceed as normal to finish the rect....
                             contextRender.lineTo((self.location.x + self.extent.width) - dCornerRadius,
                                     (self.location.y + self.extent.height));
 
