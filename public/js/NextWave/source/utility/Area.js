@@ -163,8 +163,8 @@ define(["NextWave/source/utility/prototypes",
                                     (self.location.y + self.extent.height));
 
 							// Now the drop-triangle bottom point.
-							contextRender.lineTo((self.location.x + dCornerRadius + 15),
-                                    (self.location.y + self.extent.height + 20));
+							contextRender.lineTo((self.location.x + dCornerRadius + 12),
+                                    (self.location.y + self.extent.height + 15));
 
 							// Back to the bottom.
 							contextRender.lineTo((self.location.x + dCornerRadius + 20),
