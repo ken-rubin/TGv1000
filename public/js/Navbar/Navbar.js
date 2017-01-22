@@ -344,11 +344,6 @@ define(["Core/errorHelper"],
 							m_functionEnable("CloseProject");
 							m_functionEnable("SaveProject");
 
-						} else if (manager.systemTypesLoaded) {
-
-							// Loaded system types can be cleared and abandoned with appropriate warning
-							m_functionEnable("CloseProject");
-							m_functionEnable("SaveProject");
 						}
 					}
 
@@ -388,17 +383,6 @@ define(["Core/errorHelper"],
 							m_functionDisable("SZUsers");
 							m_functionDisable("SZProjects");
 						}
-					}
-
-					self.enableOrDisablePlayAndStopButtons = function () {
-
-						if (manager.projectLoaded) {
-							$("#PlayBtn").removeClass("disabled");
-						} else {
-							$("#PlayBtn").addClass("disabled");
-						}
-
-						$("#StopBtn").addClass("disabled");
 					}
 
 					// Private methods

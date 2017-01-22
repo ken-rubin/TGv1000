@@ -588,13 +588,11 @@ define(["NextWave/source/utility/prototypes",
 
 						switch(stripNum) {
 							case 0:
-								// Core project. Just the name is fine.
-								break;
 							case 1:
-								// My projects. Just the name is fine.
-								break;
 							case 2:
-								// Others' projects. Just the name for now. Later, maybe, whose it is.
+								// Name and description.
+								tooltip = tooltip
+										+ "<br>Description: " + itemIth.projectDescription;
 								break;
 							case 3:
 								// Products.
@@ -615,7 +613,7 @@ define(["NextWave/source/utility/prototypes",
 								if (mntFirstClass.isValid()) {
 									strFirstClass = mntFirstClass.format('dddd, MMMM Do YYYY');
 								} else {
-									strFirstClass = 'n/a';
+									strFirstClass = '';
 								}
 								tooltip = tooltip
 										+ "<br>Level: " + itemIth.level
@@ -623,7 +621,7 @@ define(["NextWave/source/utility/prototypes",
 										+ "<br>Description: " + itemIth.classDescription
 										+ "<br>Notes: " + itemIth.classNotes
 										+ "<br>First class: " + strFirstClass
-										+ "<br>Price: " + itemIth.price.dollarFormat();
+										+ "<br>Price: " + (itemIth.price ? itemIth.price.dollarFormat() + " for all sessions" : "");
 								var maxClassSize = itemIth.maxClassSize;
 								var numEnrollees = itemIth.numEnrollees;
 								if (!m_bPrivileged) {
@@ -644,7 +642,7 @@ define(["NextWave/source/utility/prototypes",
 								if (mntFirstClass.isValid()) {
 									strFirstClass = mntFirstClass.format('dddd, MMMM Do YYYY');
 								} else {
-									strFirstClass = 'n/a';
+									strFirstClass = '';
 								}
 								tooltip = tooltip
 										+ "<br>Level: " + itemIth.level
@@ -652,7 +650,7 @@ define(["NextWave/source/utility/prototypes",
 										+ "<br>Description: " + itemIth.classDescription
 										+ "<br>Notes: " + itemIth.classNotes
 										+ "<br>First class: " + strFirstClass
-										+ "<br>Price: " + itemIth.price.dollarFormat();
+										+ "<br>Price: " + (itemIth.price ? itemIth.price.dollarFormat() + " / session" : "");
 								if (!m_bPrivileged && itemIth.alreadyEnrolled) {
 									tooltip += "<br><b>You've already enrolled in this online class.</b>";
 								}
