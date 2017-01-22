@@ -56,6 +56,10 @@ define(["NextWave/source/utility/prototypes",
                                 };
                             }
 
+							// LayerDebug's info box ends about 80px up from the bottom (area.extent.height - 80).
+							// stopButton ends at 2 * settings.general.margin + 130 = 138.
+							// Space the 8 buttons beneath stopButton starting at y=100 and ending at area.extent.height - 180.
+
 							let objectConfiguration = {
 								toggleLandingPageButton: {
 									type: "Button",
@@ -126,28 +130,6 @@ define(["NextWave/source/utility/prototypes",
 										}
 									}
 								},
-								logoutButton: {
-									type: "Button",
-									modes: [dialogModes.normaluser,dialogModes.privilegeduser],
-									text: "Logout",
-									constructorParameterString: "'15px Arial'",
-									xType: "reserve",
-									x: settings.dialog.firstColumnWidth / 3 + 70,
-									y: 2 * settings.general.margin + 600,
-									width: 100,
-									height: 30,
-									click: function(objectReference) {
-
-										try {
-
-											// TODO: Will need Abandon Project stuff.
-
-											window.location = "/";
-										} catch(e) {
-											errorHelper.show(e);
-										}
-									}
-								},
 								createNewButton: {
 									type: "Button",
 									modes: [dialogModes.normaluser,dialogModes.privilegeduser],
@@ -155,7 +137,10 @@ define(["NextWave/source/utility/prototypes",
 									constructorParameterString: "'15px Arial'",
 									xType: "reserve",
 									x: settings.dialog.firstColumnWidth / 3 + 80,
-									y: 2 * settings.general.margin + 200,
+									yType: "callback",
+									y: function(area) {
+										return (area.extent.height - 180) / 8 + 100 + 1 * 50;
+									},
 									width: 120,
 									height: 30,
 									click: function(objectReference) {
@@ -176,7 +161,10 @@ define(["NextWave/source/utility/prototypes",
 									constructorParameterString: "'15px Arial'",
 									xType: "reserve",
 									x: settings.dialog.firstColumnWidth / 3 + 70,
-									y: 2 * settings.general.margin + 250,
+									yType: "callback",
+									y: function(area) {
+										return (area.extent.height - 180) / 8 + 100 + 2 * 50;
+									},
 									width: 100,
 									height: 30,
 									click: function(objectReference) {
@@ -198,7 +186,10 @@ define(["NextWave/source/utility/prototypes",
 									constructorParameterString: "'15px Arial'",
 									xType: "reserve",
 									x: settings.dialog.firstColumnWidth / 3 + 70,
-									y: 2 * settings.general.margin + 300,
+									yType: "callback",
+									y: function(area) {
+										return (area.extent.height - 180) / 8 + 100 + 3 * 50;
+									},
 									width: 100,
 									height: 30,
 									click: function(objectReference) {
@@ -220,7 +211,10 @@ define(["NextWave/source/utility/prototypes",
 									constructorParameterString: "'15px Arial'",
 									xType: "reserve",
 									x: settings.dialog.firstColumnWidth / 3 + 80,
-									y: 2 * settings.general.margin + 350,
+									yType: "callback",
+									y: function(area) {
+										return (area.extent.height - 180) / 8 + 100 + 4 * 50;
+									},
 									width: 120,
 									height: 30,
 									click: function(objectReference) {
@@ -242,7 +236,10 @@ define(["NextWave/source/utility/prototypes",
 									constructorParameterString: "'15px Arial'",
 									xType: "reserve",
 									x: settings.dialog.firstColumnWidth / 3 + 95,
-									y: 2 * settings.general.margin + 400,
+									yType: "callback",
+									y: function(area) {
+										return (area.extent.height - 180) / 8 + 100 + 5 * 50;
+									},
 									width: 150,
 									height: 30,
 									click: function(objectReference) {
@@ -264,7 +261,10 @@ define(["NextWave/source/utility/prototypes",
 									constructorParameterString: "'15px Arial'",
 									xType: "reserve",
 									x: settings.dialog.firstColumnWidth / 3 + 70,
-									y: 2 * settings.general.margin + 450,
+									yType: "callback",
+									y: function(area) {
+										return (area.extent.height - 180) / 8 + 100 + 6 * 50;
+									},
 									width: 100,
 									height: 30,
 									click: function(objectReference) {
@@ -286,8 +286,36 @@ define(["NextWave/source/utility/prototypes",
 									constructorParameterString: "'15px Arial'",
 									xType: "reserve",
 									x: settings.dialog.firstColumnWidth / 3 + 80,
-									y: 2 * settings.general.margin + 500,
+									yType: "callback",
+									y: function(area) {
+										return (area.extent.height - 180) / 8 + 100 + 7 * 50;
+									},
 									width: 120,
+									height: 30,
+									click: function(objectReference) {
+
+										try {
+
+											// TODO: Will need Abandon Project stuff.
+
+											window.location = "/";
+										} catch(e) {
+											errorHelper.show(e);
+										}
+									}
+								},
+								logoutButton: {
+									type: "Button",
+									modes: [dialogModes.normaluser,dialogModes.privilegeduser],
+									text: "Logout",
+									constructorParameterString: "'15px Arial'",
+									xType: "reserve",
+									x: settings.dialog.firstColumnWidth / 3 + 70,
+									yType: "callback",
+									y: function(area) {
+										return (area.extent.height - 180) / 8 + 100 + 8 * 50;
+									},
+									width: 100,
 									height: 30,
 									click: function(objectReference) {
 
@@ -326,10 +354,13 @@ define(["NextWave/source/utility/prototypes",
 
 					// Project has just been loaded or unloaded in Manager.
 					// Update protectedness of Navbar's run and stopButtons.
+					// If !bLoaded, protect both buttons.
+					// If bLoaded, unprotect run, protect stop.
+					// In other words, always protect stop. Set run to !bLoaded.
 					self.projectLoadedStateHasChangedTo = function(bLoaded) {
 
 						self.dialog.controlObject["runButton"].setProtected(!bLoaded);
-						self.dialog.controlObject["stopButton"].setProtected(bLoaded);
+						self.dialog.controlObject["stopButton"].setProtected(true);
 					}
 
                     //////////////////////////

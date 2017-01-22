@@ -35,8 +35,10 @@ define(["NextWave/source/utility/prototypes",
                     // The owner dialog.
                     self.dialog = null;
                     // If protected, no editing, combo or checkbox changes, button clicking, etc. allowed.
+					// But visibility is usually true, managed by self.visible.
                     self.protected = false;
-                    // Condition specific owner object--really the 
+					self.visible = true;
+                    // Condition specific owner object--really the
                     // container of this control outside of a dialog.
                     self.owner = null;
 
@@ -50,7 +52,21 @@ define(["NextWave/source/utility/prototypes",
 
                             self.protected = bProtected;
                             return null;
-                            
+
+                        } catch (e) {
+
+                            return e;
+                        }
+                    }
+
+                    // Set visibility.
+                    self.visible = function(bVisible) {
+
+                        try {
+
+                            self.visible = bVisible;
+                            return null;
+
                         } catch (e) {
 
                             return e;
@@ -77,7 +93,7 @@ define(["NextWave/source/utility/prototypes",
 
                             // Save off the position.
                             self.configuration = objectConfiguration;
-                            
+
                             // Call down to derived.
                             return self.innerCreate();
                         } catch (e) {
@@ -106,8 +122,8 @@ define(["NextWave/source/utility/prototypes",
                         try {
 
                             self.position = areaMaximal;
-                            
-                            return self.innerCalculateLayout(areaMaximal, 
+
+                            return self.innerCalculateLayout(areaMaximal,
                                 contextRender);
                         } catch (e) {
 
