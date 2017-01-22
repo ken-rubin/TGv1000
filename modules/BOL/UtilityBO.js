@@ -28,7 +28,7 @@ module.exports = function UtilityBO(app, sql, logger, mailWrapper) {
     } else {
 
         console.log("Using remote (real) credit.");
-        stripe = require("stripe")("sk_live_FNvxhlz9j5L82jwlyA4vIMK1");
+        stripe = require("stripe")(app.get("stripe_live"));
     }
 
     ////////////////////////////////////

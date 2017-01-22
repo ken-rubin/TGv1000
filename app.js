@@ -32,9 +32,17 @@ console.log("Set development (" + app.get("development") + ").");
 var SECRET = process.env.TGv1000_JWT_Secret || "temp_secret";
 app.set("jwt_secret", SECRET);
 if (SECRET === "temp_secret") {
-    console.log("***You need to set environment variable TGv1000_JWT_Secret. Using 'temp_secret'***");
+    console.log("You need to set environment variable TGv1000_JWT_Secret. Using 'temp_secret' for now.");
 } else {
-    console.log("Have jwt_secret: " + SECRET);
+    console.log("Have retrieved jwt_secret from the env. var. TGv1000_JWT_Secret.");
+}
+
+////////////////////////////////////
+// Grab the Stripe Live Secret Key from environment variable. Set to test if not found.
+var STRIPE_LIVE = process.env.TGv1000_Stripe_Live || "sk_test_ATd0E5b9XCV8G88pXqw3CcbM";
+app.set("stripe_live", STRIPE_LIVE);
+if (STRIPE_LIVE === "sk_test_ATd0E5b9XCV8G88pXqw3CcbM") {
+	console.log("You do not have Stripe's live key in env. var. TGv1000_Stripe_Live. We're using the Test key for now.")
 }
 
 ////////////////////////////////////
@@ -83,12 +91,12 @@ app.use(express.static(__dirname + "/public"));
 console.log("Configuring jsnlog to listen for client-side messages and logging to console.");
 // jsnlog.js on the client by default sends log messages to /jsnlog.logger, using POST.
 app.post('*.logger',
-        function (req, res) { 
-    
+        function (req, res) {
+
             jsnlog_nodejs(JL, req.body);
 
             // Send empty response. This is ok, because client side jsnlog does not use response from server.
-            res.send(''); 
+            res.send('');
         }
 );
 
@@ -102,7 +110,7 @@ app.post("/renderJadeSnippet",
         function (req, res) {
 
         	try {
-        		// Look for business object--invoke to further specify the request  
+        		// Look for business object--invoke to further specify the request
         		// body with arbitrary data to be passed to the jade render call.
         		var objectBusinessObject = req.body.businessObject;
         		if (objectBusinessObject) {
@@ -135,18 +143,18 @@ console.log("Map main route login.jade.");
 app.get("/", function (req, res) {
 
     try {
-        res.render("Login/login", { 
-            title : "TGv1001" 
+        res.render("Login/login", {
+            title : "TGv1001"
         });
     } catch (e) { res.send(e.message); }
 });
 
 /////////////////////////////////////
 console.log("Map main route index.jade.");
-app.get('/index', 
+app.get('/index',
         expressJwt({ secret: SECRET,
                 getToken: function fromHeaderOrQuerystring (req) {
-                    
+
                     if (req.cookies && req.cookies.token) {
                       return req.cookies.token;
                     }
@@ -170,9 +178,9 @@ app.get('/index',
             try{
 
                 // Render the jade file to the client.
-                res.render("Index/index", { 
+                res.render("Index/index", {
                     // Pass in jade context property just for the hell of it.
-                    title : "TGv1001" 
+                    title : "TGv1001"
                 });
             } catch (e) { res.send(e.message); }
         }
@@ -204,7 +212,7 @@ console.log("Set up multer.");
 var multer = require("multer");
 var done = false;
 app.use(multer(
-    { 
+    {
         dest: './uploads/',
         rename: function (fieldname, filename) {
             return filename + Date.now();
@@ -265,9 +273,9 @@ sql.execute("select * from " + app.get("dbname") + "routes order by id asc;",
 
                 var methodInstance = moduleInstance[rowi.method];
                 if (rowi.requiresJWT === 1) {
-                    app[rowi.verb](rowi.route, 
+                    app[rowi.verb](rowi.route,
                         expressJwt(
-                            { 
+                            {
                                 secret: SECRET,
                                 getToken: function fromHeaderOrQuerystring (req) {
                                     // console.log('Got token: ' + req.cookies.token);
