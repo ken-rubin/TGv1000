@@ -60,7 +60,7 @@ define(["NextWave/source/utility/prototypes",
                     }
 
                     // Set visibility.
-                    self.visible = function(bVisible) {
+                    self.setVisible = function(bVisible) {
 
                         try {
 

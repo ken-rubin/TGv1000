@@ -224,7 +224,7 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            if (self.protected) {
+                            if (self.protected || !self.visible) {
 
                                 return null;
                             }

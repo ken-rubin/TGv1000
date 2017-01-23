@@ -242,7 +242,7 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            if (self.protected) {
+                            if (self.protected || !self.visible) {
 
                                 m_bShowCursor = false;
                                 return null;
@@ -296,7 +296,7 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            if (self.protected) {
+                            if (self.protected || !self.visible) {
 
                                 m_bShowCursor = false;
                                 return null;
@@ -529,7 +529,7 @@ define(["NextWave/source/utility/prototypes",
                     // Set a flag so that the caret is checked for visibility on the next render.
                     self.possiblyEnsureCaretVisible = function () {
 
-                        if (self.protected) {
+                        if (self.protected || !self.visible) {
 
                             return false;
                         }
@@ -556,7 +556,7 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            if (self.protected) {
+                            if (self.protected || !self.visible) {
 
                                 e.stopPropagation();
                                 return null;
@@ -618,7 +618,7 @@ define(["NextWave/source/utility/prototypes",
                     // Keep track of the command key.
                     self.keyUp = function (e) {
 
-                        if (self.protected) {
+                        if (self.protected || !self.visible) {
                             e.stopPropagation();
                             return;
                         }
@@ -637,7 +637,7 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            if (self.protected) {
+                            if (self.protected || !self.visible) {
                                 e.stopPropagation();
                                 return null;
                             }
@@ -1569,7 +1569,7 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            if (self.protected) {
+                            if (self.protected || !self.visible) {
 
                                 return;
                             }

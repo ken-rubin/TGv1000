@@ -439,6 +439,12 @@ define(["NextWave/source/utility/prototypes",
                                 // Get the ith control.
                                 var controlIth = self.controls[i];
 
+								// If it's not meant to be seen, don't show it.
+								if (!controlIth.visible) {
+
+									continue;
+								}
+
                                 // Render controlIth iff it doesn't have the property "modes" or it does and m_mode matches one controlIth.modes's array elements.
                                 // Otherwise, just skip it for this render loop.
                                 if (!m_mode || (m_mode && controlIth.hasOwnProperty("modes") && controlIth.modes.includes(m_mode))) {
