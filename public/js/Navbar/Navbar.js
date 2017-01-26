@@ -178,7 +178,8 @@ define(["Core/errorHelper"],
 
 								if (manager.projectLoaded) {
 
-									client.unloadProject(null, true, true);		// The final true is telling client.unloadProject that we're unloading due to user clicking the Close Project menu item and not because we're about to search for and open or new a project.
+									client.unloadProject(null, true, true);		// The final true is telling client.unloadProject that we're unloading due to
+																				// user clicking the Close Project menu item and not because we're about to search for and open or new a project.
 
 								}
 							});

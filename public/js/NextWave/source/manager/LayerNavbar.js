@@ -130,6 +130,30 @@ define(["NextWave/source/utility/prototypes",
 										}
 									}
 								},
+								editProjectButton: {
+									type: "Button",
+									modes: [dialogModes.normaluser,dialogModes.privilegeduser],
+									text: "Edit Project",
+									constructorParameterString: "'15px Arial'",
+									xType: "reserve",
+									x: settings.dialog.firstColumnWidth / 3 + 80,
+									yType: "callback",
+									y: function(area) {
+										return (area.extent.height - 180) / 9 + 100 + 1 * 40;
+									},
+									width: 120,
+									height: 30,
+									click: function(objectReference) {
+
+										try {
+
+											// TODO: Will need Abandon Project stuff.
+
+										} catch(e) {
+											errorHelper.show(e);
+										}
+									}
+								},
 								createNewButton: {
 									type: "Button",
 									modes: [dialogModes.normaluser,dialogModes.privilegeduser],
@@ -139,7 +163,7 @@ define(["NextWave/source/utility/prototypes",
 									x: settings.dialog.firstColumnWidth / 3 + 80,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height - 180) / 8 + 100 + 1 * 50;
+										return (area.extent.height - 180) / 9 + 100 + 2 * 40;
 									},
 									width: 120,
 									height: 30,
@@ -163,7 +187,7 @@ define(["NextWave/source/utility/prototypes",
 									x: settings.dialog.firstColumnWidth / 3 + 70,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height - 180) / 8 + 100 + 2 * 50;
+										return (area.extent.height - 180) / 9 + 100 + 3 * 40;
 									},
 									width: 100,
 									height: 30,
@@ -188,7 +212,7 @@ define(["NextWave/source/utility/prototypes",
 									x: settings.dialog.firstColumnWidth / 3 + 70,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height - 180) / 8 + 100 + 3 * 50;
+										return (area.extent.height - 180) / 9 + 100 + 4 * 40;
 									},
 									width: 100,
 									height: 30,
@@ -213,7 +237,7 @@ define(["NextWave/source/utility/prototypes",
 									x: settings.dialog.firstColumnWidth / 3 + 80,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height - 180) / 8 + 100 + 4 * 50;
+										return (area.extent.height - 180) / 9 + 100 + 5 * 40;
 									},
 									width: 120,
 									height: 30,
@@ -238,7 +262,7 @@ define(["NextWave/source/utility/prototypes",
 									x: settings.dialog.firstColumnWidth / 3 + 95,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height - 180) / 8 + 100 + 5 * 50;
+										return (area.extent.height - 180) / 9 + 100 + 6 * 40;
 									},
 									width: 150,
 									height: 30,
@@ -263,7 +287,7 @@ define(["NextWave/source/utility/prototypes",
 									x: settings.dialog.firstColumnWidth / 3 + 70,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height - 180) / 8 + 100 + 6 * 50;
+										return (area.extent.height - 180) / 9 + 100 + 7 * 40;
 									},
 									width: 100,
 									height: 30,
@@ -288,7 +312,7 @@ define(["NextWave/source/utility/prototypes",
 									x: settings.dialog.firstColumnWidth / 3 + 80,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height - 180) / 8 + 100 + 7 * 50;
+										return (area.extent.height - 180) / 9 + 100 + 8 * 40;
 									},
 									width: 120,
 									height: 30,
@@ -313,7 +337,7 @@ define(["NextWave/source/utility/prototypes",
 									x: settings.dialog.firstColumnWidth / 3 + 70,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height - 180) / 8 + 100 + 8 * 50;
+										return (area.extent.height - 180) / 9 + 100 + 9 * 40;
 									},
 									width: 100,
 									height: 30,
