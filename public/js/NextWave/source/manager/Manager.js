@@ -287,7 +287,76 @@ define(["NextWave/source/utility/prototypes",
                         }
                     }
 
-					// Toggle Landing Page layer: active -> !active -> active.
+					//////////////////////////////
+					//////////////////////////////
+					// A bunch of methods surrounding LayerLandingPage, LayerNavbar, LayTooltip.
+
+					// The following method is called by layerLandingPanel after a user clicks on a PictureListItem.
+					// It passes layerLandingPage's new mode to layerNavbar.
+					self.setNavbarLayerModeBasedOnLandingPageMode = function(mode) {
+
+						self.navbarLayer.setNavbarLayerModeBasedOnLandingPageMode(mode);
+					}
+
+					// Set self.projectLoaded, but also enable/disable navbarLayer's run and stop buttons.
+					// This sets ONLY the run and stop buttons. It may need to be enchanced to do more.
+					self.setProjectLoaded = function(bLoaded) {
+
+						self.projectLoaded = bLoaded;
+						self.navbarLayer.projectLoadedStateHasChangedTo(bLoaded);
+					}
+
+                    // Run and stop running buttons.
+                    self.runButtonClicked = function () {
+
+                        try {
+
+							// Save state of self.landingPageLayer.active (which is the same as self.tooltipLayer.active)
+							m_bLandingPageLayerActiveState = self.landingPageLayer.active;
+
+                            // Hide panels, ai, landingPage, tooltip and drag.
+                            self.canvasLayer.active = true;
+							self.dragLayer.active = self.panelLayer.active = self.tooltipLayer.active = self.landingPageLayer.active = false;
+
+                            // Cause a resize.
+                            m_functionWindowResize();
+
+                            // Build all javascript code.
+                            var objectModules = window.projectDialog.generateJavaScript();
+                            return simulator.start(objectModules);
+                        } catch(e) {
+
+                            return e;
+                        }
+                    }
+
+                    self.stopButtonClicked = function () {
+
+                        try {
+
+                            // Stop simulating.
+                            var exceptionRet = simulator.stop();
+                            if (exceptionRet) {
+
+                                throw exceptionRet;
+                            }
+
+                            // Re-activate panels, drag, etc.
+                            self.canvasLayer.active = false;
+                            self.dragLayer.active = self.panelLayer.active = true;
+							self.tooltipLayer.active = self.landingPageLayer.active = m_bLandingPageLayerActiveState;
+
+                            // Cause a resize.
+                            m_functionWindowResize();
+
+                            return null;
+                        } catch(e) {
+
+                            return e;
+                        }
+                    }
+
+					// Toggle LayerLandingPage and LayerTooltip (they go hand-in-hand): active -> !active -> active.
 					self.toggleLandingPageAndTooltipLayers = function() {
 
 						self.landingPageLayer.active = self.tooltipLayer.active = !self.landingPageLayer.active;
@@ -296,7 +365,8 @@ define(["NextWave/source/utility/prototypes",
 					// Cause self.tooltipLayer to render a smart tooltip.
 					// strTooltip holds the text. May have embedded \r\n.
 					// area is the Area for the item that wants the tooltip. tooltipLayer will have to figure out
-					// size and positioning.
+					// size and positioning. Smartly--which it doesn't do well. Smartly means figuring out visible boundaries and
+					// moving the tooltip above, below, left or right of area based on fit.
 					self.drawSmartTooltip = function(strTooltip, area) {
 
 						try {
@@ -318,6 +388,10 @@ define(["NextWave/source/utility/prototypes",
 							return e;
 						}
 					}
+
+					//////////////////////////////
+					//////////////////////////////
+					// Back to regular Manager responsibilities.
 
 					// Outer public function to reset title of panel in center.
 					self.resetCenterPanelTitle = function(strTitle) {
@@ -392,13 +466,6 @@ define(["NextWave/source/utility/prototypes",
                         } catch (e) { return e; }
                     }
 
-					// Set self.projectLoaded, but also enable/disable navbarLayer's run and stop buttons.
-					self.setProjectLoaded = function(bLoaded) {
-
-						self.projectLoaded = bLoaded;
-						self.navbarLayer.projectLoadedStateHasChangedTo(bLoaded);
-					}
-
                     // Method invoked when a project is saved.
                     self.save = function () {
 
@@ -415,60 +482,6 @@ define(["NextWave/source/utility/prototypes",
                     self.forceRender = function () {
 
                         return m_functionRender();
-                    }
-
-                    // Run and stop running buttons.
-                    self.runButtonClicked = function () {
-
-                        try {
-
-							// Save state of self.landingPageLayer.active (which is the same as self.tooltipLayer.active)
-							m_bLandingPageLayerActiveState = self.landingPageLayer.active;
-
-                            // Hide panels, ai, landingPage, tooltip and drag.
-                            self.canvasLayer.active = true;
-							self.landingPageLayer.active = false;
-							self.tooltipLayer.active = false;
-                            self.panelLayer.active = false;
-                            self.dragLayer.active = false;
-
-                            // Cause a resize.
-                            m_functionWindowResize();
-
-                            // Build all javascript code.
-                            var objectModules = window.projectDialog.generateJavaScript();
-                            return simulator.start(objectModules);
-                        } catch(e) {
-
-                            return e;
-                        }
-                    }
-                    self.stopButtonClicked = function () {
-
-                        try {
-
-                            // Stop simulating.
-                            var exceptionRet = simulator.stop();
-                            if (exceptionRet) {
-
-                                throw exceptionRet;
-                            }
-
-                            // Re-enable panels, drag, etc.
-                            self.canvasLayer.active = false;
-                            self.panelLayer.active = true;
-							self.landingPageLayer.active = m_bLandingPageLayerActiveState;
-							self.tooltipLayer.active = m_bLandingPageLayerActiveState;
-                            self.dragLayer.active = true;
-
-                            // Cause a resize.
-                            m_functionWindowResize();
-
-                            return null;
-                        } catch(e) {
-
-                            return e;
-                        }
                     }
 
                     // Test the provisional base type name for validity.

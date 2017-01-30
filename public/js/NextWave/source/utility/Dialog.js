@@ -464,13 +464,11 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // Change m_mode due to user action in derived class.
+                    // Change m_mode due to user action in derived class or a layer.
+					// The render loop will make changes happen.
                     self.setMode = function(mode) {
 
                         m_mode = mode;
-
-                        // With m_mode changed, we want to reset and re-render all objects.
-                        // That may happen automatically in the render loop.
                     }
 
                     // Return m_mode to someone.

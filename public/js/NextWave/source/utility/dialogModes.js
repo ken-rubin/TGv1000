@@ -24,8 +24,26 @@ define(["NextWave/source/utility/prototypes"],
                     ///////////////////////
                     // Public fields.
 
-                    self.normaluser = "Normal user";
-                    self.privilegeduser = "Privileged user";
+					// Used in LayerNavbar.js.
+                    self.normaluser = 1;
+                    self.privilegeduser = 2;
+
+					// Used in LayerLandingPage.js.
+                    self.normalusersearching = 1;
+                    self.privilegedusersearching = 2;
+					self.normaluserclickstrip0 = 3;
+					self.normaluserclickstrip1 = 4;
+					self.normaluserclickstrip2 = 5;
+					self.normaluserclickstrip3 = 6;
+					self.normaluserclickstrip4 = 7;
+					self.normaluserclickstrip5 = 8;
+					self.privilegeduserclickstrip0 = 9;
+					self.privilegeduserclickstrip1 = 10;
+					self.privilegeduserclickstrip2 = 11;
+					self.privilegeduserclickstrip3 = 12;
+					self.privilegeduserclickstrip4 = 13;
+					self.privilegeduserclickstrip5 = 14;
+
                 } catch (e) {
 
                     alert(e.message);

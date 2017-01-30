@@ -61,7 +61,7 @@ define(["NextWave/source/utility/prototypes",
 								searchLabel: {
 									type: "Label",
 									text: "Search string (opt.)",
-									modes: [dialogModes.normaluser,dialogModes.privilegeduser],
+									modes: [dialogModes.normalusersearching,dialogModes.privilegedusersearching],
 									font: settings.general.smallBoldFont,
 									x: settings.general.margin,
 									y: settings.general.margin,
@@ -70,7 +70,7 @@ define(["NextWave/source/utility/prototypes",
 								},
 								searchEdit: {
 									type: "Edit",
-									modes: [dialogModes.normaluser,dialogModes.privilegeduser],
+									modes: [dialogModes.normalusersearching,dialogModes.privilegedusersearching],
                                     multiline: false,
 									x: settings.general.margin +
 										settings.dialog.firstColumnWidth,
@@ -98,7 +98,7 @@ define(["NextWave/source/utility/prototypes",
 								},
 								searchButton: {
 									type: "Button",
-									modes: [dialogModes.normaluser,dialogModes.privilegeduser],
+									modes: [dialogModes.normalusersearching,dialogModes.privilegedusersearching],
 									text: glyphs.search,
 									constructorParameterString: "'15px Arial'",
 									xType: "reserve",
@@ -120,7 +120,7 @@ define(["NextWave/source/utility/prototypes",
 								coreLabelP1: {
 									type: "Label",
 									text: "Core projects. Click to",
-									modes: [dialogModes.privilegeduser],
+									modes: [dialogModes.privilegedusersearching],
 									font: settings.general.smallBoldFont,
 									x: settings.general.margin,
 									yType: "callback",
@@ -133,7 +133,7 @@ define(["NextWave/source/utility/prototypes",
 								coreLabelP2: {
 									type: "Label",
 									text: "edit or build a new",
-									modes: [dialogModes.privilegeduser],
+									modes: [dialogModes.privilegedusersearching],
 									font: settings.general.smallBoldFont,
 									x: settings.general.margin,
 									yType: "callback",
@@ -147,7 +147,7 @@ define(["NextWave/source/utility/prototypes",
 								coreLabelP3: {
 									type: "Label",
 									text: "project based on it.",
-									modes: [dialogModes.privilegeduser],
+									modes: [dialogModes.privilegedusersearching],
 									font: settings.general.smallBoldFont,
 									x: settings.general.margin,
 									yType: "callback",
@@ -161,7 +161,7 @@ define(["NextWave/source/utility/prototypes",
 								coreLabelN1: {
 									type: "Label",
 									text: "Click a project type",
-									modes: [dialogModes.normaluser],
+									modes: [dialogModes.normalusersearching],
 									font: settings.general.smallBoldFont,
 									x: settings.general.margin,
 									yType: "callback",
@@ -174,7 +174,7 @@ define(["NextWave/source/utility/prototypes",
 								coreLabelN2: {
 									type: "Label",
 									text: "to build a new",
-									modes: [dialogModes.normaluser],
+									modes: [dialogModes.normalusersearching],
 									font: settings.general.smallBoldFont,
 									x: settings.general.margin,
 									yType: "callback",
@@ -188,7 +188,7 @@ define(["NextWave/source/utility/prototypes",
 								coreLabelN3: {
 									type: "Label",
 									text: "project based on it.",
-									modes: [dialogModes.normaluser],
+									modes: [dialogModes.normalusersearching],
 									font: settings.general.smallBoldFont,
 									x: settings.general.margin,
 									yType: "callback",
@@ -201,7 +201,7 @@ define(["NextWave/source/utility/prototypes",
 								},
 								coreProjects: {
 									type: "ListHost",
-									modes: [dialogModes.normaluser,dialogModes.privilegeduser],
+									modes: [dialogModes.normalusersearching,dialogModes.privilegedusersearching],
 									constructorParameterString: "false",
 									x: settings.general.margin +
 										settings.dialog.firstColumnWidth,
@@ -221,7 +221,7 @@ define(["NextWave/source/utility/prototypes",
 								yourLabel1: {
 									type: "Label",
 									text: "Your projects.",
-									modes: [dialogModes.normaluser,dialogModes.privilegeduser],
+									modes: [dialogModes.normalusersearching,dialogModes.privilegedusersearching],
 									font: settings.general.smallBoldFont,
 									x: settings.general.margin,
 									yType: "callback",
@@ -235,7 +235,7 @@ define(["NextWave/source/utility/prototypes",
 									type: "Label",
 									text: "Click to edit.",
 									font: settings.general.smallBoldFont,
-									modes: [dialogModes.normaluser,dialogModes.privilegeduser],
+									modes: [dialogModes.normalusersearching,dialogModes.privilegedusersearching],
 									x: settings.general.margin,
 									yType: "callback",
 									y: function(area) {
@@ -247,7 +247,7 @@ define(["NextWave/source/utility/prototypes",
 								},
 								yourProjects: {
 									type: "ListHost",
-									modes: [dialogModes.normaluser,dialogModes.privilegeduser],
+									modes: [dialogModes.normalusersearching,dialogModes.privilegedusersearching],
 									constructorParameterString: "false",
 									x: settings.general.margin +
 										settings.dialog.firstColumnWidth,
@@ -267,7 +267,7 @@ define(["NextWave/source/utility/prototypes",
 								sharedLabel1: {
 									type: "Label",
 									text: "Shared projects.",
-									modes: [dialogModes.normaluser,dialogModes.privilegeduser],
+									modes: [dialogModes.normalusersearching,dialogModes.privilegedusersearching],
 									font: settings.general.smallBoldFont,
 									x: settings.general.margin,
 									yType: "callback",
@@ -280,7 +280,7 @@ define(["NextWave/source/utility/prototypes",
 								sharedLabel2: {
 									type: "Label",
 									text: "Click to copy.",
-									modes: [dialogModes.normaluser,dialogModes.privilegeduser],
+									modes: [dialogModes.normalusersearching,dialogModes.privilegedusersearching],
 									font: settings.general.smallBoldFont,
 									x: settings.general.margin,
 									yType: "callback",
@@ -293,7 +293,7 @@ define(["NextWave/source/utility/prototypes",
 								},
 								sharedProjects: {
 									type: "ListHost",
-									modes: [dialogModes.normaluser,dialogModes.privilegeduser],
+									modes: [dialogModes.normalusersearching,dialogModes.privilegedusersearching],
 									constructorParameterString: "false",
 									x: settings.general.margin +
 										settings.dialog.firstColumnWidth,
@@ -313,7 +313,7 @@ define(["NextWave/source/utility/prototypes",
 								productsLabel1: {
 									type: "Label",
 									text: "Product kits.",
-									modes: [dialogModes.normaluser,dialogModes.privilegeduser],
+									modes: [dialogModes.normalusersearching,dialogModes.privilegedusersearching],
 									font: settings.general.smallBoldFont,
 									x: settings.general.margin,
 									yType: "callback",
@@ -326,7 +326,7 @@ define(["NextWave/source/utility/prototypes",
 								productsLabel2: {
 									type: "Label",
 									text: "Click for info.",
-									modes: [dialogModes.normaluser,dialogModes.privilegeduser],
+									modes: [dialogModes.normalusersearching,dialogModes.privilegedusersearching],
 									font: settings.general.smallBoldFont,
 									x: settings.general.margin,
 									yType: "callback",
@@ -339,7 +339,7 @@ define(["NextWave/source/utility/prototypes",
 								},
 								productProjects: {
 									type: "ListHost",
-									modes: [dialogModes.normaluser,dialogModes.privilegeduser],
+									modes: [dialogModes.normalusersearching,dialogModes.privilegedusersearching],
 									constructorParameterString: "false",
 									x: settings.general.margin +
 										settings.dialog.firstColumnWidth,
@@ -359,7 +359,7 @@ define(["NextWave/source/utility/prototypes",
 								classroomLabel1: {
 									type: "Label",
 									text: "Local classes.",
-									modes: [dialogModes.normaluser,dialogModes.privilegeduser],
+									modes: [dialogModes.normalusersearching,dialogModes.privilegedusersearching],
 									font: settings.general.smallBoldFont,
 									x: settings.general.margin,
 									yType: "callback",
@@ -372,7 +372,7 @@ define(["NextWave/source/utility/prototypes",
 								classroomLabel2: {
 									type: "Label",
 									text: "Click for info.",
-									modes: [dialogModes.normaluser,dialogModes.privilegeduser],
+									modes: [dialogModes.normalusersearching,dialogModes.privilegedusersearching],
 									font: settings.general.smallBoldFont,
 									x: settings.general.margin,
 									yType: "callback",
@@ -385,7 +385,7 @@ define(["NextWave/source/utility/prototypes",
 								},
 								classroomProjects: {
 									type: "ListHost",
-									modes: [dialogModes.normaluser,dialogModes.privilegeduser],
+									modes: [dialogModes.normalusersearching,dialogModes.privilegedusersearching],
 									constructorParameterString: "false",
 									x: settings.general.margin +
 										settings.dialog.firstColumnWidth,
@@ -405,7 +405,7 @@ define(["NextWave/source/utility/prototypes",
 								onlineLabel1: {
 									type: "Label",
 									text: "Online classes.",
-									modes: [dialogModes.normaluser,dialogModes.privilegeduser],
+									modes: [dialogModes.normalusersearching,dialogModes.privilegedusersearching],
 									font: settings.general.smallBoldFont,
 									x: settings.general.margin,
 									yType: "callback",
@@ -418,7 +418,7 @@ define(["NextWave/source/utility/prototypes",
 								onlineLabel2: {
 									type: "Label",
 									text: "Click for info.",
-									modes: [dialogModes.normaluser,dialogModes.privilegeduser],
+									modes: [dialogModes.normalusersearching,dialogModes.privilegedusersearching],
 									font: settings.general.smallBoldFont,
 									x: settings.general.margin,
 									yType: "callback",
@@ -431,7 +431,7 @@ define(["NextWave/source/utility/prototypes",
 								},
 								onlineProjects: {
 									type: "ListHost",
-									modes: [dialogModes.normaluser,dialogModes.privilegeduser],
+									modes: [dialogModes.normalusersearching,dialogModes.privilegedusersearching],
 									constructorParameterString: "false",
 									x: settings.general.margin +
 										settings.dialog.firstColumnWidth,
@@ -452,7 +452,7 @@ define(["NextWave/source/utility/prototypes",
 								encouragementLabel: {
 									type: "Label",
 									text: "Click one of the project images above for more information about that project.",
-									modes: [dialogModes.normaluser,dialogModes.privilegeduser],
+									modes: [dialogModes.normalusersearching,dialogModes.privilegedusersearching],
 									font: "oblique " + settings.general.boldFont,
 									x: settings.general.margin,
 									yType: "callback",
@@ -472,7 +472,7 @@ define(["NextWave/source/utility/prototypes",
 												g_profile["can_create_products"] ||
 												g_profile["can_create_onlineClasses"]);
                             let exceptionRet = self.dialog.create(objectConfiguration,
-							                                 	(m_bPrivileged ? dialogModes.privilegeduser : dialogModes.normaluser),
+							                                 	(m_bPrivileged ? dialogModes.privilegedusersearching : dialogModes.normalusersearching),
 																m_functionSearchAndReload
 							);
                             if (exceptionRet) {
@@ -665,51 +665,68 @@ define(["NextWave/source/utility/prototypes",
 
 						try {
 
+							let newMode = 0;
+
 							if (m_bPrivileged) {
 
 								switch(strip) {
 									case 0:		// Core--priv. user makes choice of editing a core project or starting a new normal or purchasable project based on the selected core project.
-										errorHelper.show(rawItem.projectName + ": Core--priv. user makes choice of editing a core project or starting a new normal or purchasable project based on the selected core project.");
+										//errorHelper.show(rawItem.projectName + ": Core--priv. user makes choice of editing a core project or starting a new normal or purchasable project based on the selected core project.");
+										newMode = dialogModes.privilegeduserclickstrip0;
 										break;
 									case 1:		// Your own--editing. May save with new name. May also make public.
-										errorHelper.show(rawItem.projectName + ": Your own--editing. May save with new name. May also make public.");
+										//errorHelper.show(rawItem.projectName + ": Your own--editing. May save with new name. May also make public.");
+										newMode = dialogModes.privilegeduserclickstrip1;
 										break;
 									case 2:		// Shared--cloning. Another possibility is that it's being reviewed for approval to be made public.
-										errorHelper.show(rawItem.projectName + ": Shared--cloning. Another possibility is that it's being reviewed for approval to be made public.");
+										//errorHelper.show(rawItem.projectName + ": Shared--cloning. Another possibility is that it's being reviewed for approval to be made public.");
+										newMode = dialogModes.privilegeduserclickstrip2;
 										break;
 									case 3:		// Product--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.
-										errorHelper.show(rawItem.projectName + ": Product--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.");
+										//errorHelper.show(rawItem.projectName + ": Product--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.");
+										newMode = dialogModes.privilegeduserclickstrip3;
 										break;
 									case 4:		// Classroom--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.
-										errorHelper.show(rawItem.projectName + ": Classroom--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.");
+										//errorHelper.show(rawItem.projectName + ": Classroom--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.");
+										newMode = dialogModes.privilegeduserclickstrip4;
 										break;
 									case 5:		// Online--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.
-										errorHelper.show(rawItem.projectName + ": Online--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.");
+										//errorHelper.show(rawItem.projectName + ": Online--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.");
+										newMode = dialogModes.privilegeduserclickstrip5;
 										break;
 								}
 							} else {
 
 								switch(strip) {
 									case 0:		// Core--will create new normal project based on it. Cannot edit and save replacing itself.
-										errorHelper.show(rawItem.projectName + ": Core--will create new normal project based on it. Cannot edit and save replacing itself.");
+										//errorHelper.show(rawItem.projectName + ": Core--will create new normal project based on it. Cannot edit and save replacing itself.");
+										newMode = dialogModes.normaluserclickstrip0;
 										break;
 									case 1:		// Your own--editing. May save with a new name as a new project.
-										errorHelper.show(rawItem.projectName + ": Your own--editing. May save with a new name as a new project.");
+										//errorHelper.show(rawItem.projectName + ": Your own--editing. May save with a new name as a new project.");
+										newMode = dialogModes.normaluserclickstrip1;
 										break;
 									case 2:		// Shared public project--cloning.
-										errorHelper.show(rawItem.projectName + ": Shared public project--cloning.");
+										//errorHelper.show(rawItem.projectName + ": Shared public project--cloning.");
+										newMode = dialogModes.normaluserclickstrip2;
 										break;
 									case 3:		// Product that is active--will make buying decision.
-										errorHelper.show(rawItem.projectName + ": Product that is active--will make buying decision.");
+										//errorHelper.show(rawItem.projectName + ": Product that is active--will make buying decision.");
+										newMode = dialogModes.normaluserclickstrip3;
 										break;
 									case 4:		// Classroom (active, soon and nearby)--will make buying or waitlist decision.
-										errorHelper.show(rawItem.projectName + ": Classroom (active, soon and nearby)--will make buying or waitlist decision.");
+										//errorHelper.show(rawItem.projectName + ": Classroom (active, soon and nearby)--will make buying or waitlist decision.");
+										newMode = dialogModes.normaluserclickstrip4;
 										break;
 									case 5:		// Online (active and soon)--will make buying decision. There is no max number of enrollees.
-										errorHelper.show(rawItem.projectName + ": Online (active and soon)--will make buying decision. There is no max number of enrollees.");
+										//errorHelper.show(rawItem.projectName + ": Online (active and soon)--will make buying decision. There is no max number of enrollees.");
+										newMode = dialogModes.normaluserclickstrip5;
 										break;
 								}
 							}
+
+							self.dialog.setMode(newMode);
+							manager.setNavbarLayerModeBasedOnLandingPageMode(newMode);
 
 							return null;
 						} catch(e) {

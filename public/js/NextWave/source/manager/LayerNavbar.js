@@ -139,7 +139,7 @@ define(["NextWave/source/utility/prototypes",
 									x: settings.dialog.firstColumnWidth / 3 + 80,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height - 180) / 9 + 100 + 1 * 40;
+										return (area.extent.height - 180) / 10 + 100 + 1 * 40;
 									},
 									width: 120,
 									height: 30,
@@ -163,7 +163,7 @@ define(["NextWave/source/utility/prototypes",
 									x: settings.dialog.firstColumnWidth / 3 + 80,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height - 180) / 9 + 100 + 2 * 40;
+										return (area.extent.height - 180) / 10 + 100 + 2 * 40;
 									},
 									width: 120,
 									height: 30,
@@ -187,7 +187,7 @@ define(["NextWave/source/utility/prototypes",
 									x: settings.dialog.firstColumnWidth / 3 + 70,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height - 180) / 9 + 100 + 3 * 40;
+										return (area.extent.height - 180) / 10 + 100 + 3 * 40;
 									},
 									width: 100,
 									height: 30,
@@ -212,7 +212,7 @@ define(["NextWave/source/utility/prototypes",
 									x: settings.dialog.firstColumnWidth / 3 + 70,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height - 180) / 9 + 100 + 4 * 40;
+										return (area.extent.height - 180) / 10 + 100 + 4 * 40;
 									},
 									width: 100,
 									height: 30,
@@ -237,7 +237,7 @@ define(["NextWave/source/utility/prototypes",
 									x: settings.dialog.firstColumnWidth / 3 + 80,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height - 180) / 9 + 100 + 5 * 40;
+										return (area.extent.height - 180) / 10 + 100 + 5 * 40;
 									},
 									width: 120,
 									height: 30,
@@ -262,7 +262,7 @@ define(["NextWave/source/utility/prototypes",
 									x: settings.dialog.firstColumnWidth / 3 + 95,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height - 180) / 9 + 100 + 6 * 40;
+										return (area.extent.height - 180) / 10 + 100 + 6 * 40;
 									},
 									width: 150,
 									height: 30,
@@ -287,7 +287,7 @@ define(["NextWave/source/utility/prototypes",
 									x: settings.dialog.firstColumnWidth / 3 + 70,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height - 180) / 9 + 100 + 7 * 40;
+										return (area.extent.height - 180) / 10 + 100 + 7 * 40;
 									},
 									width: 100,
 									height: 30,
@@ -312,7 +312,7 @@ define(["NextWave/source/utility/prototypes",
 									x: settings.dialog.firstColumnWidth / 3 + 80,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height - 180) / 9 + 100 + 8 * 40;
+										return (area.extent.height - 180) / 10 + 100 + 8 * 40;
 									},
 									width: 120,
 									height: 30,
@@ -328,6 +328,29 @@ define(["NextWave/source/utility/prototypes",
 										}
 									}
 								},
+								cancelButton: {
+									type: "Button",
+									modes: [dialogModes.privilegeduser],
+									text: "Cancel",
+									constructorParameterString: "'15px Arial'",
+									xType: "reserve",
+									x: settings.dialog.firstColumnWidth / 3 + 65,
+									yType: "callback",
+									y: function(area) {
+										return (area.extent.height - 180) / 10 + 100 + 9 * 40;
+									},
+									width: 90,
+									height: 30,
+									click: function(objectReference) {
+
+										try {
+
+
+										} catch(e) {
+											errorHelper.show(e);
+										}
+									}
+								},
 								logoutButton: {
 									type: "Button",
 									modes: [dialogModes.normaluser,dialogModes.privilegeduser],
@@ -337,7 +360,7 @@ define(["NextWave/source/utility/prototypes",
 									x: settings.dialog.firstColumnWidth / 3 + 70,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height - 180) / 9 + 100 + 9 * 40;
+										return (area.extent.height - 180) / 10 + 100 + 10 * 40;
 									},
 									width: 100,
 									height: 30,
@@ -385,6 +408,13 @@ define(["NextWave/source/utility/prototypes",
 
 						self.dialog.controlObject["runButton"].setProtected(!bLoaded);
 						self.dialog.controlObject["stopButton"].setProtected(true);
+					}
+
+					// User clicked on a PictureListItem in LayerLandingPage.
+					// self (LayerNavbar) has to change its own mode based on this.
+					self.setNavbarLayerModeBasedOnLandingPageMode = function(mode) {
+
+
 					}
 
                     //////////////////////////
