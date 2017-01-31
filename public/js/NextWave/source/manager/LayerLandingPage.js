@@ -466,6 +466,114 @@ define(["NextWave/source/utility/prototypes",
 										return area.extent.width;
 									},
 									height: settings.dialog.lineHeight
+								},
+								priv0: {
+									type: "Label",
+									text: "priv0",
+									modes: [dialogModes.privilegeduserclickstrip0],
+									x: settings.general.margin,
+									y: settings.general.margin,
+									width: 10 * settings.dialog.firstColumnWidth,
+									height: settings.dialog.lineHeight
+								},
+								priv1: {
+									type: "Label",
+									text: "priv1",
+									modes: [dialogModes.privilegeduserclickstrip1],
+									x: settings.general.margin,
+									y: settings.general.margin,
+									width: 10 * settings.dialog.firstColumnWidth,
+									height: settings.dialog.lineHeight
+								},
+								priv2: {
+									type: "Label",
+									text: "priv2",
+									modes: [dialogModes.privilegeduserclickstrip2],
+									x: settings.general.margin,
+									y: settings.general.margin,
+									width: 10 * settings.dialog.firstColumnWidth,
+									height: settings.dialog.lineHeight
+								},
+								priv3: {
+									type: "Label",
+									text: "priv3",
+									modes: [dialogModes.privilegeduserclickstrip3],
+									x: settings.general.margin,
+									y: settings.general.margin,
+									width: 10 * settings.dialog.firstColumnWidth,
+									height: settings.dialog.lineHeight
+								},
+								priv4: {
+									type: "Label",
+									text: "priv4",
+									modes: [dialogModes.privilegeduserclickstrip4],
+									x: settings.general.margin,
+									y: settings.general.margin,
+									width: 10 * settings.dialog.firstColumnWidth,
+									height: settings.dialog.lineHeight
+								},
+								priv5: {
+									type: "Label",
+									text: "priv5",
+									modes: [dialogModes.privilegeduserclickstrip5],
+									x: settings.general.margin,
+									y: settings.general.margin,
+									width: 10 * settings.dialog.firstColumnWidth,
+									height: settings.dialog.lineHeight
+								},
+								norm0: {
+									type: "Label",
+									text: "norm0",
+									modes: [dialogModes.normaluserclickstrip0],
+									x: settings.general.margin,
+									y: settings.general.margin,
+									width: 10 * settings.dialog.firstColumnWidth,
+									height: settings.dialog.lineHeight
+								},
+								norm1: {
+									type: "Label",
+									text: "norm1",
+									modes: [dialogModes.normaluserclickstrip1],
+									x: settings.general.margin,
+									y: settings.general.margin,
+									width: 10 * settings.dialog.firstColumnWidth,
+									height: settings.dialog.lineHeight
+								},
+								norm2: {
+									type: "Label",
+									text: "norm2",
+									modes: [dialogModes.normaluserclickstrip2],
+									x: settings.general.margin,
+									y: settings.general.margin,
+									width: 10 * settings.dialog.firstColumnWidth,
+									height: settings.dialog.lineHeight
+								},
+								norm3: {
+									type: "Label",
+									text: "norm3",
+									modes: [dialogModes.normaluserclickstrip3],
+									x: settings.general.margin,
+									y: settings.general.margin,
+									width: 10 * settings.dialog.firstColumnWidth,
+									height: settings.dialog.lineHeight
+								},
+								norm4: {
+									type: "Label",
+									text: "norm4",
+									modes: [dialogModes.normaluserclickstrip4],
+									x: settings.general.margin,
+									y: settings.general.margin,
+									width: 10 * settings.dialog.firstColumnWidth,
+									height: settings.dialog.lineHeight
+								},
+								norm5: {
+									type: "Label",
+									text: "norm5",
+									modes: [dialogModes.normaluserclickstrip5],
+									x: settings.general.margin,
+									y: settings.general.margin,
+									width: 10 * settings.dialog.firstColumnWidth,
+									height: settings.dialog.lineHeight
 								}
 							};
 							m_bPrivileged = (g_profile["can_create_classes"] || 					// Need to do it this way since manager.userAllowedToCreateEditPurchProjs not set yet.
