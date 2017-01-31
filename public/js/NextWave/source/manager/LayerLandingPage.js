@@ -726,7 +726,7 @@ define(["NextWave/source/utility/prototypes",
 							}
 
 							self.dialog.setMode(newMode);
-							manager.setNavbarLayerModeBasedOnLandingPageMode(newMode);
+							manager.setNavbarLayerModes(newMode);
 
 							return null;
 						} catch(e) {

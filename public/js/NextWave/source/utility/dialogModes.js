@@ -25,12 +25,14 @@ define(["NextWave/source/utility/prototypes"],
                     // Public fields.
 
 					// Used in LayerNavbar.js.
-                    self.normaluser = 1;
-                    self.privilegeduser = 2;
+                    self.normaluserinitialstate = 101;
+                    self.privilegeduserinitialstate = 102;
 
 					// Used in LayerLandingPage.js.
                     self.normalusersearching = 1;
                     self.privilegedusersearching = 2;
+
+					// Used in LayerNavbar.js and in LayerLandingPage.js.
 					self.normaluserclickstrip0 = 3;
 					self.normaluserclickstrip1 = 4;
 					self.normaluserclickstrip2 = 5;
