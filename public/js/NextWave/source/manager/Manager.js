@@ -177,7 +177,7 @@ define(["NextWave/source/utility/prototypes",
 
                             // Save off the layers.
                             // The order of entries in this array serve to designate back to front.
-                            // For example, panelLayer is "above" lb which is below ld.
+                            // For example, panelLayer is "above" backgroundLayer which is below dragLayer.
                             // Mouse actions are passed to layers in reverse order, i.e., from front to back.
                             // If a layer doesn't see fit to handle a mouse action, the action is passed to the
                             // next lower layer for possible handling.
@@ -264,7 +264,8 @@ define(["NextWave/source/utility/prototypes",
 
                             var exceptionRet;
 
-                            m_arrayLayers =
+							// Following was set up in self.create. This is the same. Don't think it's necessary.
+/*                            m_arrayLayers =
                                 [
                                     self.backgroundLayer,
                                     self.canvasLayer,
@@ -275,7 +276,7 @@ define(["NextWave/source/utility/prototypes",
                                     self.dragLayer,
 									self.navbarLayer
                                 ];
-
+*/
                             // Reset *Loaded.
 							self.setProjectLoaded(false);
 

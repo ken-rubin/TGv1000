@@ -1,7 +1,7 @@
 ///////////////////////////////////////
 // MethodBuilder module.
 //
-// Gui component responsible for showing 
+// Gui component responsible for showing
 // a method and all its parts (e.g. type
 // name, parameters, statement-block).
 //
@@ -98,7 +98,7 @@ define(["NextWave/source/utility/prototypes",
 
                                     type: "Label",
                                     text: "::",
-                                    x: 2 * settings.general.margin + 
+                                    x: 2 * settings.general.margin +
                                         settings.dialog.firstColumnWidth - 20,
                                     y: settings.general.margin,
                                     width: 20,
@@ -108,7 +108,7 @@ define(["NextWave/source/utility/prototypes",
 
                                     type: "Edit",
                                     multiline: false,
-                                    x: 2 * settings.general.margin + 
+                                    x: 2 * settings.general.margin +
                                         settings.dialog.firstColumnWidth,
                                     y: settings.general.margin,
                                     width: settings.dialog.firstColumnWidth * 1.5,
@@ -170,14 +170,14 @@ define(["NextWave/source/utility/prototypes",
                                 argumentsParameterList: {
 
                                     type: "ParameterListHost",
-                                    x: 2 * settings.general.margin + 
+                                    x: 2 * settings.general.margin +
                                         settings.dialog.firstColumnWidth * 2.5,
                                     y: -settings.general.margin,
                                     widthType: "reserve",           // Reserve means: subtract the width from
                                                                     //  the total width on calculateLayout.
                                     width: 3 * settings.general.margin +
                                         settings.dialog.firstColumnWidth * 2.5,
-                                    height: settings.dialog.lineHeight + 
+                                    height: settings.dialog.lineHeight +
                                         4 * settings.general.margin
                                 },
                                 commentLabel: {
@@ -185,7 +185,7 @@ define(["NextWave/source/utility/prototypes",
                                     type: "Label",
                                     text: "Comment",
                                     x: settings.general.margin,
-                                    y: settings.dialog.lineHeight + 
+                                    y: settings.dialog.lineHeight +
                                         3 * settings.general.margin,
                                     width: settings.dialog.firstColumnWidth,
                                     height: settings.dialog.lineHeight
@@ -193,13 +193,13 @@ define(["NextWave/source/utility/prototypes",
                                 commentEdit: {
 
                                     type: "Edit",
-                                    x: 2 * settings.general.margin + 
+                                    x: 2 * settings.general.margin +
                                         settings.dialog.firstColumnWidth,
-                                    y: settings.dialog.lineHeight + 
+                                    y: settings.dialog.lineHeight +
                                         3 * settings.general.margin,
                                     widthType: "reserve",           // Reserve means: subtract the width from
                                                                     //  the total width on calculateLayout.
-                                    width: 4 * settings.general.margin + 
+                                    width: 4 * settings.general.margin +
                                         settings.dialog.firstColumnWidth,
                                     height: 3 * settings.dialog.lineHeight,
                                     exitFocus: function (localSelf) {
@@ -229,14 +229,14 @@ define(["NextWave/source/utility/prototypes",
 
                                     type: "StatementListHost",
                                     x: settings.general.margin,
-                                    y: 4 * settings.dialog.lineHeight + 
+                                    y: 4 * settings.dialog.lineHeight +
                                         3 * settings.general.margin,
                                     widthType: "reserve",           // Reserve means: subtract the width from
                                                                     //  the total width on calculateLayout.
                                     width: 2 * settings.general.margin,
                                     heightType: "reserve",           // Reserve means: subtract the width from
                                                                     //  the total width on calculateLayout.
-                                    height: 5 * settings.dialog.lineHeight + 
+                                    height: 5 * settings.dialog.lineHeight +
                                         4 * settings.general.margin
                                 },
                                 statementsLabel: {
@@ -245,7 +245,7 @@ define(["NextWave/source/utility/prototypes",
                                     text: "Statements",
                                     x: settings.general.margin,
                                     yType: "reserve",
-                                    y: settings.dialog.lineHeight + 
+                                    y: settings.dialog.lineHeight +
                                         1 * settings.general.margin,
                                     width: settings.dialog.firstColumnWidth,
                                     height: settings.dialog.lineHeight
@@ -254,12 +254,12 @@ define(["NextWave/source/utility/prototypes",
 
                                     type: "ListHost",
                                     constructorParameterString: "false",
-                                    x: 2 * settings.general.margin + 
+                                    x: 2 * settings.general.margin +
                                         settings.dialog.firstColumnWidth,
                                     yType: "reserve",
-                                    y: settings.dialog.lineHeight + 
+                                    y: settings.dialog.lineHeight +
                                         2 * settings.general.margin,
-                                    width: 3 * settings.general.margin + 
+                                    width: 3 * settings.general.margin +
                                         settings.dialog.firstColumnWidth,
                                     widthType: "reserve",
                                     height: 1.25 * settings.dialog.lineHeight,
@@ -315,12 +315,6 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            // Do nothing if not visible.
-                            if (!self.visible) {
-
-                                return null;
-                            }
-
                             // Pass on down the line.
                             return self.methodStatements.statementList.accumulateDragTargets(arrayAccumulator);
                         } catch (e) {
@@ -333,12 +327,6 @@ define(["NextWave/source/utility/prototypes",
                     self.accumulateExpressionArgumentListStubs = function (arrayAccumulator, parameterDragStub) {
 
                         try {
-
-                            // Do nothing if not visible.
-                            if (!self.visible) {
-
-                                return null;
-                            }
 
                             // Pass on down the line.
                             return self.methodParameters.parameterList.accumulateParameterDragStubInsertionPoints(arrayAccumulator,
@@ -355,12 +343,6 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            // Do nothing if not visible.
-                            if (!self.visible) {
-
-                                return null;
-                            }
-
                             // Pass on down the line.
                             return self.methodParameters.parameterList.accumulateParameterDragStubInsertionPoints(arrayAccumulator,
                                 parameterDragStub,
@@ -376,12 +358,6 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            // Do nothing if not visible.
-                            if (!self.visible) {
-
-                                return null;
-                            }
-
                             // Pass on down the line.
                             return self.methodStatements.statementList.accumulateExpressionPlacements(arrayAccumulator);
                         } catch (e) {
@@ -395,12 +371,6 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            // Do nothing if not visible.
-                            if (!self.visible) {
-
-                                return null;
-                            }
-
                             // Pass on down the line.
                             return self.methodStatements.statementList.accumulateDragStubInsertionPoints(arrayAccumulator,
                                 statementDragStub,
@@ -411,17 +381,11 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // Remove statements from around all elements in 
+                    // Remove statements from around all elements in
                     // self.methodStatements list and all sub-blocks.
                     self.purgeStatementDragStubs = function () {
 
                         try {
-
-                            // Do nothing if not visible.
-                            if (!self.visible) {
-
-                                return null;
-                            }
 
                             // Pass on down the line.
                             return self.methodStatements.statementList.purgeStatementDragStubs();
@@ -431,17 +395,11 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // Remove ParametersStubs from around all 
+                    // Remove ParametersStubs from around all
                     // elements in self.methodParameterss list.
                     self.purgeParameterDragStubs = function () {
 
                         try {
-
-                            // Do nothing if not visible.
-                            if (!self.visible) {
-
-                                return null;
-                            }
 
                             // Pass on down the line.
                             return self.methodParameters.parameterList.purgeParameterDragStubs();
@@ -510,8 +468,8 @@ define(["NextWave/source/utility/prototypes",
                             //      App type (type.data.typeTypeId === 1 && objectContext.method.data.name === "initialize")
                             //      objectContext.method.data.name === "construct"
                             //      (system type or app base type) && !manager.userCanWorkWithSystemTypesAndAppBaseTypes
-                            if ( 
-                                    (self.currentMethod.owner.data.typeTypeId === 1 && self.currentMethod.data.name === "initialize") || 
+                            if (
+                                    (self.currentMethod.owner.data.typeTypeId === 1 && self.currentMethod.data.name === "initialize") ||
                                     (self.currentMethod.data.name === "construct") ||
                                     (self.currentMethod.owner.data.typeTypeId > 1 && !manager.userCanWorkWithSystemTypesAndAppBaseTypes)
                                 ) {
@@ -582,14 +540,14 @@ define(["NextWave/source/utility/prototypes",
                             if (exceptionRet) {
                                 return exceptionRet;
                             }
-                            
+
                             var arraySNames = [];
                             // method.statements is a StatementList. Let's start there.
                             exceptionRet = method.statements.accumulateNames(arraySNames);
                             if (exceptionRet) {
                                 return exceptionRet;
                             }
-                            
+
                             return window.manager.panelLayer.setNames(arrayPNames.concat(arraySNames));
 
                         } catch (e) {
@@ -627,7 +585,7 @@ define(["NextWave/source/utility/prototypes",
                 }
             };
 
-            // Inherit from Control.  Wire 
+            // Inherit from Control.  Wire
             // up prototype chain to Control.
             functionRet.inheritsFrom(DialogHost);
 
