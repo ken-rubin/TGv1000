@@ -15,17 +15,17 @@ $(document).ready(function() {
 
 	try {
 
-		require(["Core/errorHelper", 
-				"Core/Client", 
-				"Navbar/Navbar", 
+		require(["Core/errorHelper",
+				"Core/Client",
+				"Navbar/Navbar",
 			    "NextWave/source/utility/prototypes",
 			    "NextWave/source/utility/settings",
 			    "NextWave/source/utility/glyphs",
 			    "NextWave/source/manager/Manager",
-			    "NextWave/source/utility/settings"], 
-			function (errorHelper, 
-						Client, 
-						Navbar, 
+			    "NextWave/source/utility/settings"],
+			function (errorHelper,
+						Client,
+						Navbar,
 						prototypes,
 						settings,
 						glyphs,
@@ -44,7 +44,7 @@ $(document).ready(function() {
 					g_profile = JSON.parse(profileJSON);
 
 					// Allocate and attach the manager/glyph objects.
-		            // Create the glyphs module first, its 
+		            // Create the glyphs module first, its
 		            // complete callback will contiue things.
 		            glyphs.create(function () {
 
@@ -58,11 +58,11 @@ $(document).ready(function() {
 
 								errorHelper.show(exceptionRet);
 								return;
-							} 
+							}
 
 							// Calculate user privileges; set in manager. They are used during manager.create().
-                            manager.userAllowedToCreateEditPurchProjs = (g_profile["can_create_classes"] || 
-                                g_profile["can_create_products"] || 
+                            manager.userAllowedToCreateEditPurchProjs = (g_profile["can_create_classes"] ||
+                                g_profile["can_create_products"] ||
                                 g_profile["can_create_onlineClasses"]) || false;
                             manager.userCanWorkWithSystemLibsAndTypes = g_profile["can_edit_base_and_system_libraries_and_types_therein"] || false;
 
@@ -71,19 +71,19 @@ $(document).ready(function() {
 							// For a user who can edit system types, this will load all system types into manager.
 							client = new Client();
 							exceptionRet = client.create(
-								function() {
+/*								function() {
 
 									// Allocate and attach the navbar module.
 									navbar = new Navbar();
 									exceptionRet = navbar.create();
-									if (exceptionRet) { 
+									if (exceptionRet) {
 										errorHelper.show(exceptionRet);
 										return;
 									}
 
 									client.setBrowserTabAndBtns();
 								}
-							);
+*/							);
 		                } catch (e) { errorHelper.show(e); }
 		            });
 				} catch(e) { errorHelper.show(e); }

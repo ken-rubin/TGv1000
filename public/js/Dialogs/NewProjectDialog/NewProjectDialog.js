@@ -1,11 +1,11 @@
 ////////////////////////////////////
 // NewProjectDialog module.
-// 
+//
 // Return constructor function.
 //
 
 // Define the module.
-define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"], 
+define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 	function (snippetHelper, errorHelper, resourceHelper) {
 
 		try {
@@ -33,17 +33,17 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							$.ajax({
 
 								cache: false,
-								data: { 
+								data: {
 
 									templateFile: "Dialogs/NewProjectDialog/newProjectDialog1"
-								}, 
+								},
 								dataType: "HTML",
 								method: "POST",
 								url: "/renderJadeSnippet"
 							}).done(m_functionRenderJadeSnippetResponse1).error(errorHelper.show);
 
 							return null;
-							
+
 						} catch (e) {
 
 							return e;
@@ -63,7 +63,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 
-							// Show the dialog--load the content from 
+							// Show the dialog--load the content from
 							// the TypesDialog jade HTML-snippet.
 
 							// Normal users choose a Core project type by clicking on the picture.
@@ -182,7 +182,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							// Save the dailog object reference.
 							m_dialog = dialogItself;
-							
+
 						} catch (e) {
 
 							errorHelper.show(e);
@@ -196,11 +196,11 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							// Close the Project type selection dialog.
 							m_dialog.close();
 
-							// Show the dialog--load the content from 
+							// Show the dialog--load the content from
 							// the TypesDialog jade HTML-snippet.
 							//
 							// There will be buttons for creating different project configurations:
-							// (1) 
+							// (1)
 							BootstrapDialog.show({
 
 								title: "New " + m_projectType + " Project",
@@ -286,7 +286,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							} else if (m_bProductProject) {
 
 								templateToGet = 'Dialogs/NewProjectDialog/productDetails.jade';
-							
+
 							} else if (m_bOnlineClassProject) {
 
 								templateToGet = 'Dialogs/NewProjectDialog/onlineClassDetails.jade';
@@ -298,15 +298,15 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								$.ajax({
 
 									cache: false,
-									data: { 
+									data: {
 
 										templateFile: templateToGet
-									}, 
+									},
 									dataType: "HTML",
 									method: "POST",
 									url: "/renderJadeSnippet"
 								}).done(m_functionRenderJadeSnippetResponse2b).error(errorHelper.show);
-							
+
 							} else {
 
 								// A normal project.
@@ -377,16 +377,16 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								m_bProductProject = true;
 							else
 								m_bOnlineClassProject = true;
-						} 
+						}
 
 						// Get the dialog DOM.
 						$.ajax({
 
 							cache: false,
-							data: { 
+							data: {
 
 								templateFile: "Dialogs/NewProjectDialog/newProjectDialog2"
-							}, 
+							},
 							dataType: "HTML",
 							method: "POST",
 							url: "/renderJadeSnippet"
@@ -462,10 +462,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								$.ajax({
 
 									cache: false,
-									data: { 
+									data: {
 
 										templateFile: "Dialogs/NewProjectDialog/newProjectDialog2"
-									}, 
+									},
 									dataType: "HTML",
 									method: "POST",
 									url: "/renderJadeSnippet"
@@ -492,7 +492,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 							var exceptionRet = client.openProjectFromDB(
 								// 1st parameter is 1-5 based on m_projectType: "Game"-1 "Console"-2 "Web Site"-3 "HoloLens"-4 "Mapping"-5
-								["Game", "Console", "Web Site", "HoloLens", "Mapping", "Empty"].indexOf(m_projectType) + 1, 
+								["Game", "Console", "Web Site", "HoloLens", "Mapping", "Empty"].indexOf(m_projectType) + 1,
 								'new',
 								function(){	// callback is used to set fields after async fetch of empty-ish core project from db.
 
@@ -542,8 +542,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 										var arrWhen = [];
 										for (var i = 1; i <=8; i++) {
 											var str = $("#When" + i).val().trim();
-											if (str.length) { 
-												arrWhen.push(m_funcWhenProcess(str)); 
+											if (str.length) {
+												arrWhen.push(m_funcWhenProcess(str));
 											} else {
 												arrWhen.push({ date: '', duration: 0});
 											}
@@ -615,8 +615,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 										var arrWhen = [];
 										for (var i = 1; i <=8; i++) {
 											var str = $("#When" + i).val().trim();
-											if (str.length) { 
-												arrWhen.push(m_funcWhenProcess(str)); 
+											if (str.length) {
+												arrWhen.push(m_funcWhenProcess(str));
 											} else {
 												arrWhen.push({ date: '', duration: 0});
 											}
@@ -649,7 +649,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						    		var exceptionRet = manager.loadProject(client.project);
 						    		if (exceptionRet) { throw exceptionRet; }
 
-									client.setBrowserTabAndBtns();
+									// client.setBrowserTabAndBtns();
 								}
 							);
 							if (exceptionRet) { throw exceptionRet; }
@@ -662,7 +662,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						}
 					}
 
-					// Privileged user enters string of form 2016/02/01.........20:00.-.20:55 
+					// Privileged user enters string of form 2016/02/01.........20:00.-.20:55
 					// Below assumes user is in EST: UTC-5:00.
 					// Returns { date: '2016-02-02T01:00:00+00:00', duration: 3360000}.
 					// 		date is start time in UTC.
@@ -705,7 +705,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							errorHelper.show(e);
 						}
 					}
-					
+
 					var m_functionURLClick = function () {
 
 						try {
@@ -720,7 +720,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							errorHelper.show(e);
 						}
 					}
-					
+
 					var m_functionDiskClick = function () {
 
 						try {

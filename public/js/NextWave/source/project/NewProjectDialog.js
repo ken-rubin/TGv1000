@@ -1240,7 +1240,7 @@ Controls arranged by Mode
 													var exceptionRet = manager.loadProject(client.project);
 													if (exceptionRet) { throw exceptionRet; }
 
-													client.setBrowserTabAndBtns();
+													// client.setBrowserTabAndBtns();
 												}
 											);
 											if (exceptionRet) { throw exceptionRet; }

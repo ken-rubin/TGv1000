@@ -134,7 +134,7 @@ define(["Core/errorHelper"],
 																	    		exceptionRet = manager.loadProject(client.project);
 																	    		if (exceptionRet) { throw exceptionRet; }
 
-																				client.setBrowserTabAndBtns();
+																				// client.setBrowserTabAndBtns();
 
 																			} catch (e) { errorHelper.show(e); }
 																		}

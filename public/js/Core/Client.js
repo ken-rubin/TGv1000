@@ -450,7 +450,7 @@ define(["Core/errorHelper",
 										objectData.project.specialProjectData.openMode = "searched";
 										self.project = objectData.project;
 										self.loadProjectIntoManager();
-										self.setBrowserTabAndBtns();
+										// self.setBrowserTabAndBtns();
 
 										return callback(null);
 
@@ -552,7 +552,7 @@ define(["Core/errorHelper",
 										objectData.project.specialProjectData.openMode = "searched";
 										self.project = objectData.project;
 										self.loadProjectIntoManager();
-										self.setBrowserTabAndBtns();
+										// self.setBrowserTabAndBtns();
 
 										callback(null);
 
@@ -620,7 +620,7 @@ define(["Core/errorHelper",
 										var exceptionRet = self.loadProjectIntoManager(callback);
 										if (exceptionRet) { errorHelper.show(exceptionRet); }
 
-										self.setBrowserTabAndBtns();
+										// self.setBrowserTabAndBtns();
 									}
 								} else {
 
@@ -682,7 +682,7 @@ define(["Core/errorHelper",
 
 							} else {
 
-								self.setBrowserTabAndBtns();
+								// self.setBrowserTabAndBtns();
 							}
 
 							return null;
@@ -726,7 +726,7 @@ define(["Core/errorHelper",
 										var exceptionRet= manager.loadProject(null);
 										if (exceptionRet) { throw exceptionRet; }
 
-										self.setBrowserTabAndBtns();
+										// self.setBrowserTabAndBtns();
 
 										if ($.isFunction(unloadedCallback)) {
 											unloadedCallback();
@@ -751,7 +751,7 @@ define(["Core/errorHelper",
 
 					//////////////////////////////
 					// Project helper methods.
-					self.setBrowserTabAndBtns = function () {
+/*					self.setBrowserTabAndBtns = function () {
 
 						if (navbar === null) {
 
@@ -779,7 +779,7 @@ define(["Core/errorHelper",
 							navbar.enableOrDisableSiteZoneMenuItems();
 						}
 					}
-
+*/
 					// self.getProject = function () {
 
 					// 	return m_clProject;

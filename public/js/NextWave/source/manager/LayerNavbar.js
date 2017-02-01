@@ -79,7 +79,7 @@ define(["NextWave/source/utility/prototypes",
 
 								toggleLandingPageButton: {
 									type: "Button",
-									modes: [dialogModes.normaluserinitialstate,dialogModes.privilegeduserinitialstate],
+									modes: ["abandonmentunderconsideration"/*dialogModes.normaluserinitialstate,dialogModes.privilegeduserinitialstate*/],
 									text: glyphs.home,
 									constructorParameterString: "'15px Arial'",
 									xType: "reserve",

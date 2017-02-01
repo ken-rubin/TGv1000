@@ -1,11 +1,11 @@
 ////////////////////////////////////
 // SaveProjectAsDialog module.
-// 
+//
 // Return constructor function.
 //
 
 // Define the module.
-define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"], 
+define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 	function (snippetHelper, errorHelper, resourceHelper) {
 
 		try {
@@ -29,10 +29,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							$.ajax({
 
 								cache: false,
-								data: { 
+								data: {
 
 									templateFile: "Dialogs/SaveProjectAsDialog/saveProjectAsDialog"
-								}, 
+								},
 								dataType: "HTML",
 								method: "POST",
 								url: "/renderJadeSnippet"
@@ -56,7 +56,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						try {
 
-							// Show the dialog--load the content from 
+							// Show the dialog--load the content from
 							// the TypesDialog jade HTML-snippet.
 							BootstrapDialog.show({
 
@@ -109,7 +109,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							if (client.project.altImagePath.length) {
 
 								$("#ProjectImage").attr("src", client.project.altImagePath);
-							
+
 							} else {
 
 								m_functionSetImageSrc(client.project.imageId);
@@ -157,10 +157,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								$.ajax({
 
 									cache: false,
-									data: { 
+									data: {
 
 										templateFile: templateToGet
-									}, 
+									},
 									dataType: "HTML",
 									method: "POST",
 									url: "/renderJadeSnippet"
@@ -256,7 +256,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								$("#MaxClassSize").val(strMax100.substr(1));
 							}
 							$("#cb1").prop("checked", client.project.specialProjectData.classData.loanComputersAvailable);
-						
+
 						} else if (client.project.specialProjectData.productProject) {
 							jQuery(function($){
 								$("#Price").mask("$999.99");
@@ -282,7 +282,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							}
 							// formatted price
 							$("#Price").val(client.project.specialProjectData.productData.price.dollarFormat());
-						
+
 						} else if (client.project.specialProjectData.onlineClassProject) {
 							jQuery(function($){
 								$("#Price").mask("$999.99");
@@ -368,7 +368,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						if (txt !== client.project.description) {
 
 							client.project.description = txt;
-							client.setBrowserTabAndBtns();
+							// client.setBrowserTabAndBtns();
 							m_setStateSaveAsBtn();
 						}
 					}
@@ -379,7 +379,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						if (txt !== client.project.tags) {
 
 							client.project.tags = txt;
-							client.setBrowserTabAndBtns();
+							// client.setBrowserTabAndBtns();
 							m_setStateSaveAsBtn();
 						}
 					}
@@ -418,8 +418,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								var arrWhen = [];
 								for (var i = 1; i <=8; i++) {
 									var str = $("#When" + i).val().trim();
-									if (str.length) { 
-										arrWhen.push(m_funcWhenProcess(str)); 
+									if (str.length) {
+										arrWhen.push(m_funcWhenProcess(str));
 									} else {
 										arrWhen.push({ date: '', duration: 0});
 									}
@@ -484,8 +484,8 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								var arrWhen = [];
 								for (var i = 1; i <=8; i++) {
 									var str = $("#When" + i).val().trim();
-									if (str.length) { 
-										arrWhen.push(m_funcWhenProcess(str)); 
+									if (str.length) {
+										arrWhen.push(m_funcWhenProcess(str));
 									} else {
 										arrWhen.push({ date: '', duration: 0});
 									}
@@ -514,7 +514,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 								};
 							}
 
-							client.setBrowserTabAndBtns();
+							// client.setBrowserTabAndBtns();
 
 							// Save to DB and load into manager.
 							client.saveProjectToDB(
@@ -527,7 +527,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 						} catch(e) { errorHelper.show(e); }
 					}
 
-					// Privileged user enters string of form 2016/02/01.........20:00.-.20:55 
+					// Privileged user enters string of form 2016/02/01.........20:00.-.20:55
 					// Below assumes user is in EST: UTC-5:00.
 					// Returns { date: '2016-02-02T01:00:00+00:00', duration: 3360000}.
 					// 		date is start time in UTC.
@@ -565,7 +565,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						} catch(e) { errorHelper.show(e); }
 					}
-					
+
 					var m_functionURLClick = function () {
 
 						try {
@@ -575,9 +575,9 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						} catch(e) { errorHelper.show(e); }
 					}
-					
+
 					var m_functionDiskClick = function () {
-						
+
 						try {
 
 							var exceptionRet = client.showImageDiskDialog(true, m_functionSetImageSrc);

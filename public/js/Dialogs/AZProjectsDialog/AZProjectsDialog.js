@@ -1,11 +1,11 @@
 ////////////////////////////////////
 // AZProjectsDialog module.
-// 
+//
 // Return constructor function.
 //
 
 // Define the module.
-define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"], 
+define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 	function (snippetHelper, errorHelper, resourceHelper) {
 
 		try {
@@ -29,10 +29,10 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							$.ajax({
 
 								cache: false,
-								data: { 
+								data: {
 
 									templateFile: "Dialogs/AZProjectsDialog/AZProjectsDialog"
-								}, 
+								},
 								dataType: "HTML",
 								method: "POST",
 								url: "/renderJadeSnippet"
@@ -99,7 +99,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 							$(".tt-selector .btn-default").powerTip({
 								smartPlacement: true
 							});
-							
+
 							// Save the dialog object reference.
 							m_dialog = dialogItself;
 
@@ -130,7 +130,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 
 						event.stopPropagation();
 						event.preventDefault();
-					
+
 						var dt = event.originalEvent.dataTransfer;
 						var files = dt.files;
 
@@ -159,7 +159,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 									if (objectData.hasOwnProperty('originalProjectId')) {
 
 										client.unloadProject(null, false);
-										
+
 										// cause whichever dialog was open to close. Like this one.
 										client.closeCurrentDialog();
 
@@ -169,7 +169,7 @@ define(["Core/snippetHelper", "Core/errorHelper", "Core/resourceHelper"],
 										objectData.specialProjectData.openMode = 'loaded';
 										client.project = objectData;
 										client.loadProjectIntoManager();
-										client.setBrowserTabAndBtns();
+										// client.setBrowserTabAndBtns();
 
 									} else if (objectData.hasOwnProperty('originalLibraryId')) {
 
