@@ -41,7 +41,7 @@ define(["NextWave/source/utility/prototypes",
 					self.runButton = null;
 					self.stopButton = null;
 					self.editProjectButton = null;
-					self.createNewButton = null;
+					self.createProjectButton = null;
 					self.buyEnrollButton = null;
 					self.saveProjectButton = null;
 					self.closeProjectButton = null;
@@ -168,7 +168,7 @@ define(["NextWave/source/utility/prototypes",
 										}
 									}
 								},
-								createNewButton: {
+								createProjectButton: {
 									type: "Button",
 									modes: [dialogModes.normaluserinitialstate,dialogModes.privilegeduserinitialstate],
 									text: "Create Project",
@@ -254,6 +254,10 @@ define(["NextWave/source/utility/prototypes",
 
 										try {
 
+											let exceptionRet = client.unloadProject(null, true, true);
+											if (exceptionRet) {
+												throw exceptionRet;
+											}
 
 										} catch(e) {
 											errorHelper.show(e);
@@ -352,6 +356,13 @@ define(["NextWave/source/utility/prototypes",
 
 										try {
 
+											// Reset some button states.
+											self.editProjectButton.setPandV(true, true);
+											self.createProjectButton.setPandV(true, true);
+											self.cancelButton.setPandV(true, false);
+
+											// Force LayerLandingPage back to search mode.
+											manager.setLandingPageDialogMode((m_bPrivileged ? dialogModes.privilegedusersearching : dialogModes.normalusersearching));
 
 										} catch(e) {
 											errorHelper.show(e);
@@ -400,7 +411,7 @@ define(["NextWave/source/utility/prototypes",
 							self.runButton = self.dialog.controlObject["runButton"];
 							self.stopButton = self.dialog.controlObject["stopButton"];
 							self.editProjectButton = self.dialog.controlObject["editProjectButton"];
-							self.createNewButton = self.dialog.controlObject["createNewButton"];
+							self.createProjectButton = self.dialog.controlObject["createProjectButton"];
 							self.buyEnrollButton = self.dialog.controlObject["buyEnrollButton"];
 							self.saveProjectButton = self.dialog.controlObject["saveProjectButton"];
 							self.closeProjectButton = self.dialog.controlObject["closeProjectButton"];
@@ -409,43 +420,6 @@ define(["NextWave/source/utility/prototypes",
 							self.azPurchProjectsButton = self.dialog.controlObject["azPurchProjectsButton"];
 							self.cancelButton = self.dialog.controlObject["cancelButton"];
 							self.logoutButton = self.dialog.controlObject["logoutButton"];
-/*
-							m_arrayButtons = [
-								self.toggleLandingPageButton,
-								self.runButton,
-								self.stopButton,
-								self.editProjectButton,
-								self.createNewButton,
-								self.buyEnrollButton,
-								self.saveProjectButton,
-								self.closeProjectButton,
-								self.azUsersPermissionsButton,
-								self.azProjectsButton,
-								self.azPurchProjectsButton,
-								self.cancelButton,
-								self.logoutButton,
-							];
-
-							m_setModeAndButtons(
-								(m_bPrivileged ? dialogModes.privilegeduserinitialstate : dialogModes.normaluserinitialstate),
-								[
-									// Each button will get {boolean, boolean}: {visible, protected}
-									{visible:false, protected:true},
-									{visible:false, protected:true},
-									{visible:false, protected:true},
-									{visible:false, protected:true},
-									{visible:false, protected:true},
-									{visible:false, protected:true},
-									{visible:false, protected:true},
-									{visible:false, protected:true},
-									m_bPrivileged ? {visible:true, protected:false} : {visible:false, protected:true},
-									m_bPrivileged ? {visible:true, protected:false} : {visible:false, protected:true},
-									m_bPrivileged ? {visible:true, protected:false} : {visible:false, protected:true},
-									{visible:false, protected:true},
-									{visible:true, protected:false}
-								]
-							);
-*/
 							// We don't have to set the initial mode for self.dialog. Manager will control this by
 							// calling navbarLayer.projectLoadedStateHasChangedTo with true or false.
 
@@ -476,7 +450,7 @@ define(["NextWave/source/utility/prototypes",
 							self.runButton.setPandV(false, true);
 							self.stopButton.setPandV(true, true);
 							self.editProjectButton.setPandV(true, false);
-							self.createNewButton.setPandV(true, false);
+							self.createProjectButton.setPandV(true, false);
 							self.buyEnrollButton.setPandV(true, false);
 							self.saveProjectButton.setPandV(false, true);
 							self.closeProjectButton.setPandV(false, true);
@@ -500,7 +474,7 @@ define(["NextWave/source/utility/prototypes",
 							self.runButton.setPandV(true, false);
 							self.stopButton.setPandV(true, false);
 							self.editProjectButton.setPandV(true, true);
-							self.createNewButton.setPandV(true, true);
+							self.createProjectButton.setPandV(true, true);
 							self.buyEnrollButton.setPandV(true, !m_bPrivileged);
 							self.saveProjectButton.setPandV(true, false);
 							self.closeProjectButton.setPandV(true, false);
@@ -522,81 +496,89 @@ define(["NextWave/source/utility/prototypes",
 						self.dialog.setMode((m_bPrivileged ? dialogModes.privilegeduserinitialstate : dialogModes.normaluserinitialstate));
 					}
 
-					// User probably clicked on a PictureListItem in LayerLandingPage.
-					// Or we're initializing here in LayerNavbar.
-					// LayerNavbar has to change its own mode based on this.
+					// User clicked on a PictureListItem in LayerLandingPage. (Or something else later.)
+
 					// The mode parameter being passed in initially is one of:
-					// dialogModes.normaluserclickstrip0-5 and dialogModes.privilegeduserclickstrip0-5. (Will be more coming.)
-					// We will set LayerNavbar's dialog mode = mode. This will hide buttons that shouldn't appear.
-					// But we will also protect or unprotect all remaining buttons.
+					// dialogModes.normaluserclickstrip0-5 and dialogModes.privilegeduserclickstrip0-5. (The may be more coming.)
+					// We will not change LayerNavbar's dialog mode. All changes will be made with self.xButton.setPandV(bool, bool).
 					self.setNavbarLayerModes = function(mode) {
 
-						// let arr = [];
 						switch(mode) {
-							case dialogModes.normaluserclickstrip0:
-
-								break;
-							case dialogModes.normaluserclickstrip1:
-
-								break;
-							case dialogModes.normaluserclickstrip2:
-
-								break;
-							case dialogModes.normaluserclickstrip3:
-
-								break;
-							case dialogModes.normaluserclickstrip4:
-
-								break;
-							case dialogModes.normaluserclickstrip5:
-
-								break;
 							case dialogModes.privilegeduserclickstrip0:
+								// Core strip--priv. user makes choice of editing a core project or starting a new normal or purchasable project based on the selected core project.
+								// In LayerLandingPage user is seeing:
+								// (1) reminder of project just clicked on;
+								// (2) instructions on using editProject or selecting one of the 4 new project types and using createProject;
+								// (3) 4 choices to make with createProject: new normal (selected by default); new classroom; new online; new product.
+								// Or can cancel to go back to the strips.
+								// We will enable editProjectButton, createProjectButton, cancelButton.
+								self.editProjectButton.setPandV(false, true);
+								self.createProjectButton.setPandV(false, true);
+								self.cancelButton.setPandV(false, true);
 
 								break;
 							case dialogModes.privilegeduserclickstrip1:
+								// Your own strip--editing. May save with new name. May also make public.
+
 
 								break;
 							case dialogModes.privilegeduserclickstrip2:
+								// Shared strip--cloning. Another possibility is that it's being reviewed for approval to be made public.
 
 								break;
 							case dialogModes.privilegeduserclickstrip3:
+								// Product strip--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.
 
 								break;
 							case dialogModes.privilegeduserclickstrip4:
+								// Classroom strip--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.
 
 								break;
 							case dialogModes.privilegeduserclickstrip5:
+								// Online strip--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.
+
+								break;
+							case dialogModes.normaluserclickstrip0:
+								// Core strip--will create new normal project based on it. Cannot edit and save replacing itself.
+								// In LayerLandingPage user is seeing all the normal user fields from NewProjectDialog.
+								// Can cancel to go back to the strips.
+								// We will hide editProjectButton, buyEnrollButton.
+								// We will enable cancelButton.
+								// createProjectButton will be enabled when a project name has been entered by the user.
+								self.editProjectButton.setPandV(true, false);
+								self.buyEnrollButton.setPandV(true, false);
+								self.cancelButton.setPandV(false, true);
+
+								break;
+							case dialogModes.normaluserclickstrip1:
+								// Your own strip--editing. May save with a new name as a new project.
+
+								break;
+							case dialogModes.normaluserclickstrip2:
+								// Shared public project strip--cloning.
+
+								break;
+							case dialogModes.normaluserclickstrip3:
+								// Product that is active strip--will make buying decision.
+
+								break;
+							case dialogModes.normaluserclickstrip4:
+								// Classroom (active, soon and nearby) strip--will make buying or waitlist decision.
+
+								break;
+							case dialogModes.normaluserclickstrip5:
+								// Online (active and soon) strip--will make buying decision. There is no max number of enrollees.
 
 								break;
 						}
-
-						// m_setModeAndButtons(mode, arr);
-						self.dialog.setMode(mode);
 					}
 
                     //////////////////////////
                     // Private methods.
 
 					//
-/*
-					var m_setModeAndButtons = function(dialogMode, arrVisible_Protected) {
-
-						for (let i = 0; i < arrVisible_Protected.length; i++) {
-
-							let btnIth = m_arrayButtons[i];
-							btnIth.setVisible(arrVisible_Protected[i].visible);
-							btnIth.setProtected(arrVisible_Protected[i].protected);
-						}
-
-						self.dialog.setMode(dialogMode);
-					}
-*/
                     //////////////////////////
                     // Private fields.
-
-					// Array of all buttons in LayerNavbar.
-					// var m_arrayButtons = null;
 
                     // Indicates this instance is already created.
                     var m_bCreated = false;

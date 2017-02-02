@@ -469,7 +469,7 @@ define(["NextWave/source/utility/prototypes",
 								},
 								priv0: {
 									type: "Label",
-									text: "priv0",
+									text: "Core strip--priv. user makes choice of editing a core project or starting a new normal or purchasable project based on the selected core project.",
 									modes: [dialogModes.privilegeduserclickstrip0],
 									x: settings.general.margin,
 									y: settings.general.margin,
@@ -478,7 +478,7 @@ define(["NextWave/source/utility/prototypes",
 								},
 								priv1: {
 									type: "Label",
-									text: "priv1",
+									text: "Your own strip--editing. May save with new name. May also make public.",
 									modes: [dialogModes.privilegeduserclickstrip1],
 									x: settings.general.margin,
 									y: settings.general.margin,
@@ -487,7 +487,7 @@ define(["NextWave/source/utility/prototypes",
 								},
 								priv2: {
 									type: "Label",
-									text: "priv2",
+									text: "Shared strip--cloning. Another possibility is that it's being reviewed for approval to be made public.",
 									modes: [dialogModes.privilegeduserclickstrip2],
 									x: settings.general.margin,
 									y: settings.general.margin,
@@ -496,7 +496,7 @@ define(["NextWave/source/utility/prototypes",
 								},
 								priv3: {
 									type: "Label",
-									text: "priv3",
+									text: "Product strip--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.",
 									modes: [dialogModes.privilegeduserclickstrip3],
 									x: settings.general.margin,
 									y: settings.general.margin,
@@ -505,7 +505,7 @@ define(["NextWave/source/utility/prototypes",
 								},
 								priv4: {
 									type: "Label",
-									text: "priv4",
+									text: "Classroom strip--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.",
 									modes: [dialogModes.privilegeduserclickstrip4],
 									x: settings.general.margin,
 									y: settings.general.margin,
@@ -514,7 +514,7 @@ define(["NextWave/source/utility/prototypes",
 								},
 								priv5: {
 									type: "Label",
-									text: "priv5",
+									text: "Online strip--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.",
 									modes: [dialogModes.privilegeduserclickstrip5],
 									x: settings.general.margin,
 									y: settings.general.margin,
@@ -523,7 +523,7 @@ define(["NextWave/source/utility/prototypes",
 								},
 								norm0: {
 									type: "Label",
-									text: "norm0",
+									text: "Core strip--will create new normal project based on it. Cannot edit and save replacing itself.",
 									modes: [dialogModes.normaluserclickstrip0],
 									x: settings.general.margin,
 									y: settings.general.margin,
@@ -532,7 +532,7 @@ define(["NextWave/source/utility/prototypes",
 								},
 								norm1: {
 									type: "Label",
-									text: "norm1",
+									text: "Your own strip--editing. May save with a new name as a new project.",
 									modes: [dialogModes.normaluserclickstrip1],
 									x: settings.general.margin,
 									y: settings.general.margin,
@@ -541,7 +541,7 @@ define(["NextWave/source/utility/prototypes",
 								},
 								norm2: {
 									type: "Label",
-									text: "norm2",
+									text: "Shared public project strip--cloning.",
 									modes: [dialogModes.normaluserclickstrip2],
 									x: settings.general.margin,
 									y: settings.general.margin,
@@ -550,7 +550,7 @@ define(["NextWave/source/utility/prototypes",
 								},
 								norm3: {
 									type: "Label",
-									text: "norm3",
+									text: "Product that is active strip--will make buying decision.",
 									modes: [dialogModes.normaluserclickstrip3],
 									x: settings.general.margin,
 									y: settings.general.margin,
@@ -559,7 +559,7 @@ define(["NextWave/source/utility/prototypes",
 								},
 								norm4: {
 									type: "Label",
-									text: "norm4",
+									text: "Classroom (active, soon and nearby) strip--will make buying or waitlist decision.",
 									modes: [dialogModes.normaluserclickstrip4],
 									x: settings.general.margin,
 									y: settings.general.margin,
@@ -568,7 +568,7 @@ define(["NextWave/source/utility/prototypes",
 								},
 								norm5: {
 									type: "Label",
-									text: "norm5",
+									text: "Online (active and soon) strip--will make buying decision. There is no max number of enrollees.",
 									modes: [dialogModes.normaluserclickstrip5],
 									x: settings.general.margin,
 									y: settings.general.margin,
@@ -596,6 +596,11 @@ define(["NextWave/source/utility/prototypes",
                             return e;
                         }
                     };
+
+					self.setLandingPageDialogMode = function(mode) {
+
+						self.dialog.setMode(mode);
+					}
 
                     //////////////////////////
                     // Private methods.
@@ -778,56 +783,44 @@ define(["NextWave/source/utility/prototypes",
 							if (m_bPrivileged) {
 
 								switch(strip) {
-									case 0:		// Core--priv. user makes choice of editing a core project or starting a new normal or purchasable project based on the selected core project.
-										//errorHelper.show(rawItem.projectName + ": Core--priv. user makes choice of editing a core project or starting a new normal or purchasable project based on the selected core project.");
+									case 0:		// Core strip--priv. user makes choice of editing a core project or starting a new normal or purchasable project based on the selected core project.
 										newMode = dialogModes.privilegeduserclickstrip0;
 										break;
-									case 1:		// Your own--editing. May save with new name. May also make public.
-										//errorHelper.show(rawItem.projectName + ": Your own--editing. May save with new name. May also make public.");
+									case 1:		// Your own strip--editing. May save with new name. May also make public.
 										newMode = dialogModes.privilegeduserclickstrip1;
 										break;
-									case 2:		// Shared--cloning. Another possibility is that it's being reviewed for approval to be made public.
-										//errorHelper.show(rawItem.projectName + ": Shared--cloning. Another possibility is that it's being reviewed for approval to be made public.");
+									case 2:		// Shared strip--cloning. Another possibility is that it's being reviewed for approval to be made public.
 										newMode = dialogModes.privilegeduserclickstrip2;
 										break;
-									case 3:		// Product--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.
-										//errorHelper.show(rawItem.projectName + ": Product--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.");
+									case 3:		// Product strip--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.
 										newMode = dialogModes.privilegeduserclickstrip3;
 										break;
-									case 4:		// Classroom--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.
-										//errorHelper.show(rawItem.projectName + ": Classroom--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.");
+									case 4:		// Classroom strip--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.
 										newMode = dialogModes.privilegeduserclickstrip4;
 										break;
-									case 5:		// Online--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.
-										//errorHelper.show(rawItem.projectName + ": Online--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.");
+									case 5:		// Online strip--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.
 										newMode = dialogModes.privilegeduserclickstrip5;
 										break;
 								}
 							} else {
 
 								switch(strip) {
-									case 0:		// Core--will create new normal project based on it. Cannot edit and save replacing itself.
-										//errorHelper.show(rawItem.projectName + ": Core--will create new normal project based on it. Cannot edit and save replacing itself.");
+									case 0:		// Core strip--will create new normal project based on it. Cannot edit and save replacing itself.
 										newMode = dialogModes.normaluserclickstrip0;
 										break;
-									case 1:		// Your own--editing. May save with a new name as a new project.
-										//errorHelper.show(rawItem.projectName + ": Your own--editing. May save with a new name as a new project.");
+									case 1:		// Your own strip--editing. May save with a new name as a new project.
 										newMode = dialogModes.normaluserclickstrip1;
 										break;
-									case 2:		// Shared public project--cloning.
-										//errorHelper.show(rawItem.projectName + ": Shared public project--cloning.");
+									case 2:		// Shared public project strip--cloning.
 										newMode = dialogModes.normaluserclickstrip2;
 										break;
-									case 3:		// Product that is active--will make buying decision.
-										//errorHelper.show(rawItem.projectName + ": Product that is active--will make buying decision.");
+									case 3:		// Product that is active strip--will make buying decision.
 										newMode = dialogModes.normaluserclickstrip3;
 										break;
-									case 4:		// Classroom (active, soon and nearby)--will make buying or waitlist decision.
-										//errorHelper.show(rawItem.projectName + ": Classroom (active, soon and nearby)--will make buying or waitlist decision.");
+									case 4:		// Classroom (active, soon and nearby) strip--will make buying or waitlist decision.
 										newMode = dialogModes.normaluserclickstrip4;
 										break;
-									case 5:		// Online (active and soon)--will make buying decision. There is no max number of enrollees.
-										//errorHelper.show(rawItem.projectName + ": Online (active and soon)--will make buying decision. There is no max number of enrollees.");
+									case 5:		// Online (active and soon) strip--will make buying decision. There is no max number of enrollees.
 										newMode = dialogModes.normaluserclickstrip5;
 										break;
 								}

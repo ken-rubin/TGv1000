@@ -94,7 +94,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             });
         }
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //
     //                  RetrieveProject
@@ -126,7 +126,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     } else {
 
                         var row = rows[0];
-                        var project = 
+                        var project =
                         {
                             id: (iFetchMode < 3) ? 0 : row.id,
                             originalProjectId: row.id,
@@ -222,9 +222,9 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                     try {
 
-                                        m_functionRetProjDoComics(  
-                                            req, 
-                                            res, 
+                                        m_functionRetProjDoComics(
+                                            req,
+                                            res,
                                             project,
                                             function(err) {
                                                 if (err) { return cb(err); }
@@ -347,7 +347,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     if (rows.length === 0) {
 
                         return callback(new Error("Could not retrieve comics for project with id=" + project.originalProjectId));
-                    } 
+                    }
 
                     // Use async to process each comic in the project and fetch their internals.
                     // After review, could change eachSeries to each.
@@ -356,25 +356,25 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                             comicIth.originalComicId = comicIth.id;
                             if (project.iFetchMode < 3) {
-                                comicIth.id = 0;                                
+                                comicIth.id = 0;
                             }
                             comicIth.comiccode = [];
                             comicIth.libraries = [];
                             comicIth.statements = [];
 
                             // Fill comicIth's comiccode and libraries.
-                            m_functionRetProjDoComicInternals(  req, 
-                                                                res, 
-                                                                project, 
+                            m_functionRetProjDoComicInternals(  req,
+                                                                res,
+                                                                project,
                                                                 comicIth,
-                                                                function(err) { 
+                                                                function(err) {
 
                                                                     if (!err) {
 
                                                                         // Add the filled comic to the project.
                                                                         project.comics.push(comicIth);
                                                                     }
-                                                                    return cbe(err); 
+                                                                    return cbe(err);
                                                                 }
                             );
                         },
@@ -386,13 +386,13 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                 function(strError) { return callback(new Error(strError)); }
             );
             if (exceptionRet) { return callback(exceptionRet); }
-        
+
         } catch(e) { return callback(e); }
     }
 
-    var m_functionRetProjDoComicInternals = function(   req, 
-                                                        res, 
-                                                        project, 
+    var m_functionRetProjDoComicInternals = function(   req,
+                                                        res,
+                                                        project,
                                                         comicIth,
                                                         callback
                                                     ) {
@@ -404,17 +404,17 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             async.parallel([
                     function(cbp1) {    // libraries
 
-                        var sqlQuery = "select l.*, cl.ordinal from " + self.dbname + "libraries l inner join " + self.dbname + "comics_libraries cl on cl.comicId=" + comicIth.originalComicId + " and cl.libraryId=l.id where l.id in (select libraryId from comics_libraries where comicId=" + comicIth.originalComicId + ");"; 
+                        var sqlQuery = "select l.*, cl.ordinal from " + self.dbname + "libraries l inner join " + self.dbname + "comics_libraries cl on cl.comicId=" + comicIth.originalComicId + " and cl.libraryId=l.id where l.id in (select libraryId from comics_libraries where comicId=" + comicIth.originalComicId + ");";
 
                         var exceptionRet = sql.execute(sqlQuery,
                             function(rows) {
-                                
+
                                 if (rows.length === 0) { return cbp1(new Error("Unable to retrieve project. Could not retrieve libraries for comic with id=" + comicIth.originalComicId)); }
 
                                 async.eachSeries(rows,
                                     function(rowIth, cbpaa) {
 
-                                        m_functionPrepareIncomingLibrary(req, res, project, comicIth, rowIth, 
+                                        m_functionPrepareIncomingLibrary(req, res, project, comicIth, rowIth,
                                             function(err) {
                                                 return cbpaa(err);
                                             }
@@ -576,7 +576,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
             // All projects now have a specialProjectData property. From both normal and privileged users.
 
-            // If a privileged user is saving a Purchasable Project (whether new or opened for editing), 
+            // If a privileged user is saving a Purchasable Project (whether new or opened for editing),
             // then specialProjectData itself will have one of these 3 properties: classData, onlineClassData or productData.
             // These three properties contain the info that has to be saved to classes, onlineclasses or products, respectively.
 
@@ -594,7 +594,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             sql.getCxnFromPool(
                 function(err, connection) {
                     try {
-                        if (err) { 
+                        if (err) {
 
                             // Cannot finish in m_functionFinalCallback until we have a connection and is has begun.
                             return res.json({
@@ -618,13 +618,13 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
                                             m_log('Connection has a transaction');
 
-                                            m_functionNewSaveProject(connection, req, res, project, 
+                                            m_functionNewSaveProject(connection, req, res, project,
                                                 function(err) {
                                                     m_functionFinalCallback(err, req, res, connection, project);
                                                 }
                                             );
                                         }
-                                    } catch(e1) { 
+                                    } catch(e1) {
                                         return res.json({
                                             success: false,
                                             message: 'Could not "begin" database transaction: ' + e1.message
@@ -633,7 +633,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                 }
                             );
                         }
-                    } catch (e2) { 
+                    } catch (e2) {
                         return res.json({
                             success: false,
                             message: 'Could not get a database connection: ' + e2.message
@@ -641,7 +641,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     }
                 }
             );
-        } catch(e) { 
+        } catch(e) {
             return res.json({
                 success: false,
                 message: 'Could not save project due to error: ' + e.message
@@ -655,7 +655,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
 
             m_log('***Continuing in m_functionNewSaveProject***');
 
-            // We'll use async.series serially to (1) insert project and 
+            // We'll use async.series serially to (1) insert project and
             // (2) use async.parallel to
             //  (2a) call off to do all of the project's comics
             //  (2b) if applicable, write to classes, products or onlineclasses
@@ -694,7 +694,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                         }
 
                         if (project.specialProjectData.openMode === "searched") {
-                            
+
                             // Make sure firstSaved isn't changed for this case.
                             // If we don't do this, then firstSaved won't be passed to MySql and firstSaved will be set = CURRENT_TIMESTAMP (now).
                             guts.firstSaved = moment(project.firstSaved).format("YYYY-MM-DD HH:mm:ss");
@@ -760,8 +760,8 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                 }
                             ],
                             // final callback for (2)
-                            function(err) { 
-                                return cb(err); 
+                            function(err) {
+                                return cb(err);
                             }
                         );
                     }
@@ -777,14 +777,14 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
     var m_savePurchProductData = function(connection, req, res, project, callback) {
 
         try {
-            
+
             let guts = '';
             let tblName = '';
             let verb = '';
             let where = '';
 
             // There may be nothing to do here. Check these conditions carefully to understand.
-            if (project.specialProjectData.userAllowedToCreateEditPurchProjs 
+            if (project.specialProjectData.userAllowedToCreateEditPurchProjs
                 && (project.specialProjectData.openMode === 'new' || project.specialProjectData.openMode === 'searched')) {
 
                 if (project.specialProjectData.classProject && project.specialProjectData.hasOwnProperty('classData')) {
@@ -899,14 +899,14 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             return callback(null);
                         }
                     );
-                } else { 
-                    return callback(null); 
+                } else {
+                    return callback(null);
                 }
-            } else { 
-                return callback(null); 
+            } else {
+                return callback(null);
             }
-        } catch(e) { 
-            callback(e); 
+        } catch(e) {
+            callback(e);
         }
     }
 
@@ -954,7 +954,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                         let ord = 0;
 
                         // async.eachSeries iterates over a collection, perform a single async task at a time.
-                        async.eachSeries(project.comics, 
+                        async.eachSeries(project.comics,
                             function(comicIth, cb) {
 
                                 async.series([
@@ -977,7 +977,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                         } else {
                                             verb = 'insert ';
                                         }
-                                        
+
                                         var strQuery = verb + self.dbname + "comics SET ?" + where;
 
                                         m_log('Inserting or updating comic with ' + strQuery + '; fields: ' + JSON.stringify(guts));
@@ -988,7 +988,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                 try {
                                                     if (err) { return cb(err); }
                                                     if (rows.length === 0) { return cb(new Error("Error writing comic to database.")); }
-                                                    
+
                                                     if (verb === "insert ") {
 
                                                         comicIth.id = rows[0].insertId;
@@ -1001,9 +1001,9 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                             function(cb){
 
                                                                 m_log("Going to m_saveComiccodeInComicIthToDB");
-                                                                m_saveComiccodeInComicIthToDB(connection, req, res, project, comicIth, 
+                                                                m_saveComiccodeInComicIthToDB(connection, req, res, project, comicIth,
                                                                     function(err) {
-                                                                        return cb(err); 
+                                                                        return cb(err);
                                                                     }
                                                                 );
                                                             },
@@ -1014,7 +1014,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                                 m_saveComics_XInComicIthToDB(connection, req, res, project, comicIth,
                                                                     'statements',
                                                                     function(err) {
-                                                                        return cb(err); 
+                                                                        return cb(err);
                                                                     }
                                                                 );
                                                             }
@@ -1049,9 +1049,9 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                     function(cb) {
 
                                         m_log("Going to m_saveLibrariesInComicIthToDB");
-                                        m_saveLibrariesInComicIthToDB(connection, req, res, comicIth, 
+                                        m_saveLibrariesInComicIthToDB(connection, req, res, comicIth,
                                             function(err) {
-                                                return cb(err); 
+                                                return cb(err);
                                             }
                                         );
                                     }
@@ -1164,7 +1164,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             );
         } catch(e) { callback(e); }
     }
-            
+
     var m_saveComiccodeInComicIthToDB = function (connection, req, res, project, comicIth, callback) {
 
         try {
@@ -1172,7 +1172,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             m_log("***In m_saveComiccodeInComicIthToDB***");
 
             var ord = 1;
-            
+
             // Before writing out the comic's comiccode, need to delete any possible pre-existing rows.
             async.series([
 
@@ -1187,7 +1187,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     } catch(e) { return cb(e); }
                 },
                 function(cb) {
-                    async.eachSeries(comicIth.comiccode, 
+                    async.eachSeries(comicIth.comiccode,
                         function(ccIth, cb) {
 
                             ccIth.comicId = comicIth.id;
@@ -1211,7 +1211,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                     return cb(null);
                                 }
                             );
-                        }, 
+                        },
                         // final callback
                         function(err) { return cb(err); }
                     );
@@ -1228,7 +1228,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
         // This routine will iterate through the comic's libraries, saving (inserting or updating) each.
         // Libraries will be saved if library.id = 0 or (library.id != 0 and req.user.userId--or the userName we get from it--is one of the library's editors).
         // Even if the library isn't being updated in the database, it still has to be linked to the comic in comics_libraries.
-        // Finally, library_editors has to match what's in the editors property of libraryJSON. 
+        // Finally, library_editors has to match what's in the editors property of libraryJSON.
         try {
 
             m_log("Just got into m_saveLibrariesInComicIthToDB with this many libraries to do: " + comicIth.libraries.length);
@@ -1268,7 +1268,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                         let idstring = '';
                         let ids = [];
 
-                        async.eachSeries(comicIth.libraries, 
+                        async.eachSeries(comicIth.libraries,
                             function(libraryIth, cb) {
 
                                 async.series([
@@ -1292,7 +1292,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                 function(err, rows) {
                                                     if (err) { return cb(err); }
                                                     if (rows.length !== 1) { return cb(new Error('Error received processing editors.'))}
-                                                    idstring = rows[0].idstring; 
+                                                    idstring = rows[0].idstring;
                                                     ids = idstring.split(',');
                                                     return cb(null);
                                                 }
@@ -1331,7 +1331,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                         } else {
                                             verb = 'insert ';
                                         }
-                                        
+
                                         var strQuery = verb + self.dbname + "libraries SET ?" + where;
 
                                         m_log('Inserting or updating library with ' + strQuery + '; fields: ' + JSON.stringify(guts));
@@ -1342,7 +1342,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                                 try {
                                                     if (err) { return cb(err); }
                                                     if (rows.length === 0) { return cb(new Error("Error writing library to database.")); }
-                                                    
+
                                                     if (verb === "insert ") {
 
                                                         libraryIth.id = rows[0].insertId;
@@ -1536,7 +1536,9 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                     // (1)
                     function(cb) {
 
-                        var strQuery = "select c.*, p.description from " + self.dbname + "classes c inner join " + self.dbname + "projects p on p.id=c.baseProjectId; select c.*, p.description from " + self.dbname + "onlineclasses c inner join " + self.dbname + "projects p on p.id=c.baseProjectId; select c.*, p.description from " + self.dbname + "products c inner join " + self.dbname + "projects p on p.id=c.baseProjectId;";
+                        var strQuery = "select c.*, p.description from " + self.dbname + "classes c inner join " + self.dbname + "projects p on p.id=c.baseProjectId;";
+						strQuery += " select c.*, p.description from " + self.dbname + "onlineclasses c inner join " + self.dbname + "projects p on p.id=c.baseProjectId;";
+						strQuery += " select c.*, p.description from " + self.dbname + "products c inner join " + self.dbname + "projects p on p.id=c.baseProjectId;";
                         sql.execute(strQuery,
                             function(rows) {
 
@@ -1544,7 +1546,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                     return cb(new Error("Unable to fetch from PP data tables."), null);
                                 }
                                 // rows is a ragged array [3][x].
-                                
+
                                 // Sort results by name.
                                 for(var i=0; i<3; i++) {
 
@@ -1568,35 +1570,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                             }
                         );
                     },
-                    // // (2)
-                    // function(passOn, cb) {
-
-                    //     // We're going to try to use nested async.eachSeries to get product tags for the 2 dimensions of passOn.arrayRows.
-                    //     async.eachSeries(passOn.arrayRows,
-                    //         function(arIth, cb) {
-
-                    //             async.eachSeries(arIth,
-                    //                 function(arIthJth, cb) {
-
-                    //                     m_functionFetchTags(
-                    //                         arIthJth.baseProjectId,
-                    //                         'project',
-                    //                         function(err, tags) {
-
-                    //                             if (err) { return cb(err); }
-
-                    //                             arIthJth.tags = tags;
-                    //                             return cb(null);
-                    //                         }
-                    //                     );
-                    //                 },
-                    //                 function(err) { return cb(err); }
-                    //             );
-                    //         },
-                    //         function(err) { return cb(err, passOn); }
-                    //     );
-                    // },
-                    // (3)
+                    // (2)
                     function(passOn, cb) {
 
                         // We're going to try to use nested async.eachSeries to get PP purchase numbers from the 2 dimensions of passOn.arrayRows.
@@ -1606,9 +1580,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                 async.eachSeries(arIth,
                                     function(arIthJth, cb) {
 
-// MUST BE CHANGED projects.comicProjectId no longer exists.
-// TODO: WORK NEEDED                        
-                                        var strQuery = "select count(*) as cnt from " + self.dbname + "projects where comicProjectId=" + arIthJth.baseProjectId + " and id<>" + arIthJth.baseProjectId + ";";
+                                        var strQuery = "select count(*) as cnt from " + self.dbname + "projects where baseProjectId=" + arIthJth.baseProjectId + " and id<>" + arIthJth.baseProjectId + ";";
                                         sql.execute(strQuery,
                                             function(rows){
 
@@ -1670,7 +1642,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
             sql.getCxnFromPool(
                 function(err, connection) {
                     try {
-                        if (err) { 
+                        if (err) {
 
                             return res.json({
                                 success: false,
@@ -1756,7 +1728,7 @@ module.exports = function ProjectBO(app, sql, logger, mailWrapper) {
                                     }
                                 ],
                                 function(err) {
-                                    
+
                                     if (err) {
                                         return res.json({
                                             success: false,
