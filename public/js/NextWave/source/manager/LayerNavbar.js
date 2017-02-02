@@ -540,11 +540,12 @@ define(["NextWave/source/utility/prototypes",
 								break;
 							case dialogModes.normaluserclickstrip0:
 								// Core strip--will create new normal project based on it. Cannot edit and save replacing itself.
-								// In LayerLandingPage user is seeing all the normal user fields from NewProjectDialog.
+								// In LayerLandingPage user is seeing all the normal user fields from NewProjectDialog page 1.
 								// Can cancel to go back to the strips.
 								// We will hide editProjectButton, buyEnrollButton.
 								// We will enable cancelButton.
-								// createProjectButton will be enabled when a project name has been entered by the user.
+								// createProjectButton will be visible but will be enabled when a project name has been entered by the user.
+								// When createProjectButton is clicked, we will load the project into manager and set manager.landingPageLayer.active = false.
 								self.editProjectButton.setPandV(true, false);
 								self.buyEnrollButton.setPandV(true, false);
 								self.cancelButton.setPandV(false, true);
@@ -552,6 +553,15 @@ define(["NextWave/source/utility/prototypes",
 								break;
 							case dialogModes.normaluserclickstrip1:
 								// Your own strip--editing. May save with a new name as a new project.
+								// LayerLandingPage is made !active.
+								// The selected project is loaded into manager.
+								// We will hide editProjectButton, buyEnrollButton, createProjectButton.
+								// saveProjectButton will be visible and enabled, but may be disabled if a project's fields fail validation.
+								self.editProjectButton.setPandV(true, false);
+								self.buyEnrollButton.setPandV(true, false);
+								self.createProjectButton.setPandV(true, false);
+								self.cancelButton.setPandV(false, true);
+								self.saveProjectButton.setPandV(false, true);
 
 								break;
 							case dialogModes.normaluserclickstrip2:
