@@ -79,7 +79,7 @@ define(["NextWave/source/utility/prototypes",
 
 								toggleLandingPageButton: {
 									type: "Button",
-									modes: ["abandonmentunderconsideration"/*dialogModes.normaluserinitialstate,dialogModes.privilegeduserinitialstate*/],
+									modes: ["notBeingUsed"/*dialogModes.normaluserinitialstate,dialogModes.privilegeduserinitialstate*/],
 									text: glyphs.home,
 									constructorParameterString: "'15px Arial'",
 									xType: "reserve",
@@ -110,8 +110,8 @@ define(["NextWave/source/utility/prototypes",
 											if (exceptionRet) { errorHelper.show(exceptionRet); }
 
 											// Protect run, unprotect stop.
-											self.dialog.controlObject["runButton"].setProtected(true);
-											self.dialog.controlObject["stopButton"].setProtected(false);
+											self.runButton.setProtected(true);
+											self.stopButton.setProtected(false);
 
 											objectReference.handled = true;
 										} catch(e) {
@@ -137,8 +137,8 @@ define(["NextWave/source/utility/prototypes",
 											if (exceptionRet) { errorHelper.show(exceptionRet); }
 
 											// Unprotect run, protect stop.
-											self.dialog.controlObject["runButton"].setProtected(false);
-											self.dialog.controlObject["stopButton"].setProtected(true);
+											self.runButton.setProtected(false);
+											self.stopButton.setProtected(true);
 
 											objectReference.handled = true;
 										} catch(e) {
@@ -163,8 +163,6 @@ define(["NextWave/source/utility/prototypes",
 
 										try {
 
-											// TODO: Will need Abandon Project stuff.
-
 										} catch(e) {
 											errorHelper.show(e);
 										}
@@ -186,8 +184,6 @@ define(["NextWave/source/utility/prototypes",
 									click: function(objectReference) {
 
 										try {
-
-											// TODO: Will need Abandon Project stuff.
 
 										} catch(e) {
 											errorHelper.show(e);
@@ -211,9 +207,6 @@ define(["NextWave/source/utility/prototypes",
 
 										try {
 
-											// TODO: Will need Abandon Project stuff.
-
-											window.location = "/";
 										} catch(e) {
 											errorHelper.show(e);
 										}
@@ -236,9 +229,9 @@ define(["NextWave/source/utility/prototypes",
 
 										try {
 
-											// TODO: Will need Abandon Project stuff.
+											var exceptionRet = client.showSaveProjectDialog();
+											if (exceptionRet) { throw exceptionRet; }
 
-											window.location = "/";
 										} catch(e) {
 											errorHelper.show(e);
 										}
@@ -261,9 +254,7 @@ define(["NextWave/source/utility/prototypes",
 
 										try {
 
-											// TODO: Will need Abandon Project stuff.
 
-											window.location = "/";
 										} catch(e) {
 											errorHelper.show(e);
 										}
@@ -286,9 +277,9 @@ define(["NextWave/source/utility/prototypes",
 
 										try {
 
-											// TODO: Will need Abandon Project stuff.
+											var exceptionRet = client.showAZUsersDialog();
+											if (exceptionRet) { throw exceptionRet; }
 
-											window.location = "/";
 										} catch(e) {
 											errorHelper.show(e);
 										}
@@ -311,9 +302,9 @@ define(["NextWave/source/utility/prototypes",
 
 										try {
 
-											// TODO: Will need Abandon Project stuff.
+											var exceptionRet = client.showAZProjectsDialog();
+											if (exceptionRet) { throw exceptionRet; }
 
-											window.location = "/";
 										} catch(e) {
 											errorHelper.show(e);
 										}
@@ -336,9 +327,9 @@ define(["NextWave/source/utility/prototypes",
 
 										try {
 
-											// TODO: Will need Abandon Project stuff.
+											var exceptionRet = client.showAZActivatePPDialog();
+											if (exceptionRet) { throw exceptionRet; }
 
-											window.location = "/";
 										} catch(e) {
 											errorHelper.show(e);
 										}
@@ -384,9 +375,8 @@ define(["NextWave/source/utility/prototypes",
 
 										try {
 
-											// TODO: Will need Abandon Project stuff.
-
 											window.location = "/";
+
 										} catch(e) {
 											errorHelper.show(e);
 										}
@@ -419,7 +409,7 @@ define(["NextWave/source/utility/prototypes",
 							self.azPurchProjectsButton = self.dialog.controlObject["azPurchProjectsButton"];
 							self.cancelButton = self.dialog.controlObject["cancelButton"];
 							self.logoutButton = self.dialog.controlObject["logoutButton"];
-
+/*
 							m_arrayButtons = [
 								self.toggleLandingPageButton,
 								self.runButton,
@@ -455,6 +445,9 @@ define(["NextWave/source/utility/prototypes",
 									{visible:true, protected:false}
 								]
 							);
+*/
+							// We don't have to set the initial mode for self.dialog. Manager will control this by
+							// calling navbarLayer.projectLoadedStateHasChangedTo with true or false.
 
                             // Indicate current state.
                             m_bCreated = true;
@@ -473,8 +466,60 @@ define(["NextWave/source/utility/prototypes",
 					// In other words, always protect stop. Set run to !bLoaded.
 					self.projectLoadedStateHasChangedTo = function(bLoaded) {
 
-						self.dialog.controlObject["runButton"].setProtected(!bLoaded);
-						self.dialog.controlObject["stopButton"].setProtected(true);
+						// self.dialog.controlObject["runButton"].setProtected(!bLoaded);
+						// self.dialog.controlObject["stopButton"].setProtected(true);
+						// self.toggleLandingPageButton.setPandV(true, true);
+						if (bLoaded) {
+
+							// A project is loaded into manager.
+
+							self.runButton.setPandV(false, true);
+							self.stopButton.setPandV(true, true);
+							self.editProjectButton.setPandV(true, false);
+							self.createNewButton.setPandV(true, false);
+							self.buyEnrollButton.setPandV(true, false);
+							self.saveProjectButton.setPandV(false, true);
+							self.closeProjectButton.setPandV(false, true);
+							if (m_bPrivileged) {
+
+								self.azUsersPermissionsButton.setPandV(false, true);
+								self.azProjectsButton.setPandV(false, true);
+								self.azPurchProjectsButton.setPandV(false, true);
+							} else {
+
+								self.azUsersPermissionsButton.setPandV(true, true);
+								self.azProjectsButton.setPandV(true, true);
+								self.azPurchProjectsButton.setPandV(true, true);
+							}
+							self.cancelButton.setPandV(true, false);
+							self.logoutButton.setPandV(true, true);
+						} else {
+
+							// No project is loaded into manager.
+
+							self.runButton.setPandV(true, false);
+							self.stopButton.setPandV(true, false);
+							self.editProjectButton.setPandV(true, true);
+							self.createNewButton.setPandV(true, true);
+							self.buyEnrollButton.setPandV(true, !m_bPrivileged);
+							self.saveProjectButton.setPandV(true, false);
+							self.closeProjectButton.setPandV(true, false);
+							if (m_bPrivileged) {
+
+								self.azUsersPermissionsButton.setPandV(false, true);
+								self.azProjectsButton.setPandV(false, true);
+								self.azPurchProjectsButton.setPandV(false, true);
+							} else {
+
+								self.azUsersPermissionsButton.setPandV(true, true);
+								self.azProjectsButton.setPandV(true, true);
+								self.azPurchProjectsButton.setPandV(true, true);
+							}
+							self.cancelButton.setPandV(true, false);
+							self.logoutButton.setPandV(false, true);
+						}
+
+						self.dialog.setMode((m_bPrivileged ? dialogModes.privilegeduserinitialstate : dialogModes.normaluserinitialstate));
 					}
 
 					// User probably clicked on a PictureListItem in LayerLandingPage.
@@ -486,7 +531,7 @@ define(["NextWave/source/utility/prototypes",
 					// But we will also protect or unprotect all remaining buttons.
 					self.setNavbarLayerModes = function(mode) {
 
-						let arr = [];
+						// let arr = [];
 						switch(mode) {
 							case dialogModes.normaluserclickstrip0:
 
@@ -526,13 +571,15 @@ define(["NextWave/source/utility/prototypes",
 								break;
 						}
 
-						m_setModeAndButtons(mode, arr);
+						// m_setModeAndButtons(mode, arr);
+						self.dialog.setMode(mode);
 					}
 
                     //////////////////////////
                     // Private methods.
 
 					//
+/*
 					var m_setModeAndButtons = function(dialogMode, arrVisible_Protected) {
 
 						for (let i = 0; i < arrVisible_Protected.length; i++) {
@@ -544,12 +591,12 @@ define(["NextWave/source/utility/prototypes",
 
 						self.dialog.setMode(dialogMode);
 					}
-
+*/
                     //////////////////////////
                     // Private fields.
 
 					// Array of all buttons in LayerNavbar.
-					var m_arrayButtons = null;
+					// var m_arrayButtons = null;
 
                     // Indicates this instance is already created.
                     var m_bCreated = false;

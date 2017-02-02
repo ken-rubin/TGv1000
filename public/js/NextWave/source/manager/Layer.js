@@ -48,6 +48,12 @@ define(["NextWave/source/utility/prototypes",
                         return null;
                     };
 
+					// A neater way to set self.active.
+					self.setActive = function(bActive) {
+
+						self.active = bActive;
+					}
+
                     // Render out the layer.
                     self.render = function (contextRender, iMS) {
 

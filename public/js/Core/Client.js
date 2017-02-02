@@ -88,11 +88,12 @@ define(["Core/errorHelper",
 									);
 								} else {
 
+									manager.loadProject(null);
 									if ($.isFunction(callback)) { callback(); }
 								}
 							} else {
 								// Privileged user.
-
+/*
 								self.openProjectFromDB(6, 'new',
 									function() {
 
@@ -131,6 +132,9 @@ define(["Core/errorHelper",
 										if ($.isFunction(callback)) { callback(); }
 									}
 								);
+*/
+								manager.loadProject(null);
+								if ($.isFunction(callback)) { callback(); }
 							}
 
 							return null;

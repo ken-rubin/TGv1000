@@ -80,10 +80,8 @@ define(["NextWave/source/utility/prototypes",
                     self.projectData = null;
                     // Directly set focus object, overrides dragObject.
                     self.alternateFocus = null;
-
                     // Indicates there is a project which has been loaded up into this manager.
                     self.projectLoaded = false;
-
                     // Indicates that the current user is allowed to create or edit classes, products or online classes.
                     self.userAllowedToCreateEditPurchProjs = false;
 
@@ -262,24 +260,6 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            var exceptionRet;
-
-							// Following was set up in self.create. This is the same. Don't think it's necessary.
-/*                            m_arrayLayers =
-                                [
-                                    self.backgroundLayer,
-                                    self.canvasLayer,
-                                    self.panelLayer,
-									self.landingPageLayer,
-									self.tooltipLayer,
-                                    self.debugLayer,
-                                    self.dragLayer,
-									self.navbarLayer
-                                ];
-*/
-                            // Reset *Loaded.
-							self.setProjectLoaded(false);
-
                             // Clear panel data.
                             return self.panelLayer.clearCenter();
                         } catch (e) {
@@ -299,10 +279,11 @@ define(["NextWave/source/utility/prototypes",
 						self.navbarLayer.setNavbarLayerModes(mode);
 					}
 
-					// Set self.projectLoaded, but also enable/disable navbarLayer's run and stop buttons.
-					// This sets ONLY the run and stop buttons. It may need to be enchanced to do more.
+					// Set self.projectLoaded, but also enable/disable and show/hide navbarLayer's buttons.
+					// It also makes LayerLandingPage active if !bLoaded and !active if bLoaded.
 					self.setProjectLoaded = function(bLoaded) {
 
+						self.landingPageLayer.setActive(!bLoaded);
 						self.projectLoaded = bLoaded;
 						self.navbarLayer.projectLoadedStateHasChangedTo(bLoaded);
 					}
@@ -459,9 +440,12 @@ define(["NextWave/source/utility/prototypes",
 								// Used to start this way:
                                 // self.panelLayer.openAndPinAllPanels();
 
-								// Now we start with the landing page as the only open and pinned panel.
                                 self.panelLayer.unpinAllPanels();
-                            }
+                            } else {
+
+    	                        // Reset *Loaded.
+								self.setProjectLoaded(false);
+							}
 
                             return null;
                         } catch (e) { return e; }

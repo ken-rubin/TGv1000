@@ -59,6 +59,13 @@ define(["NextWave/source/utility/prototypes",
 						return null;
                     }
 
+					// Set both.
+					self.setPandV = function(bProtected, bVisible) {
+
+						self.protected = bProtected;
+						self.visible = bVisible;
+					}
+
                     // Clear data.
                     self.clear = function () {
 
