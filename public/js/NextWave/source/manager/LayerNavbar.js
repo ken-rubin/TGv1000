@@ -254,7 +254,14 @@ define(["NextWave/source/utility/prototypes",
 
 										try {
 
-											let exceptionRet = client.unloadProject(null, true, true);
+											let exceptionRet = client.unloadProject(function() {
+
+													// Force LayerLandingPage back to search mode.
+													manager.setLandingPageDialogMode((m_bPrivileged ? dialogModes.privilegedusersearching : dialogModes.normalusersearching));
+												},
+												true,
+												true
+											);
 											if (exceptionRet) {
 												throw exceptionRet;
 											}
