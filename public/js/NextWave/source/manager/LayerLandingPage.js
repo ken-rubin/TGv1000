@@ -827,7 +827,7 @@ define(["NextWave/source/utility/prototypes",
 							}
 
 							self.dialog.setMode(newMode);
-							manager.setNavbarLayerModes(newMode);
+							manager.setNavbarLayerModes(newMode, m_projectId, rawItem, strip, index);
 
 							return null;
 						} catch(e) {

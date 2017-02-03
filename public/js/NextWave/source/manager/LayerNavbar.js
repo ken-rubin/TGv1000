@@ -501,85 +501,94 @@ define(["NextWave/source/utility/prototypes",
 					// The mode parameter being passed in initially is one of:
 					// dialogModes.normaluserclickstrip0-5 and dialogModes.privilegeduserclickstrip0-5. (The may be more coming.)
 					// We will not change LayerNavbar's dialog mode. All changes will be made with self.xButton.setPandV(bool, bool).
-					self.setNavbarLayerModes = function(mode) {
+					self.setNavbarLayerModes = function(mode, projectId, rawItem, strip, index) {
 
-						switch(mode) {
-							case dialogModes.privilegeduserclickstrip0:
-								// Core strip--priv. user makes choice of editing a core project or starting a new normal or purchasable project based on the selected core project.
-								// In LayerLandingPage user is seeing:
-								// (1) reminder of project just clicked on;
-								// (2) instructions on using editProject or selecting one of the 4 new project types and using createProject;
-								// (3) 4 choices to make with createProject: new normal (selected by default); new classroom; new online; new product.
-								// Or can cancel to go back to the strips.
-								// We will enable editProjectButton, createProjectButton, cancelButton.
-								self.editProjectButton.setPandV(false, true);
-								self.createProjectButton.setPandV(false, true);
-								self.cancelButton.setPandV(false, true);
+						// In the following cases, we will simply load the clicked project from the DB and into the manager,
+						// set the protected and visible states of the buttons and make LayerLandingPanel !active.
+						// Those cases for which this is not appropriate will be handled in the switch statement in the else clause.
+						if (
+							mode === dialogModes.privilegeduserclickstrip1 ||
+							mode === dialogModes.normaluserclickstrip0 ||
+							mode === dialogModes.normaluserclickstrip1 ||
+							mode === dialogModes.privilegeduserclickstrip2 ||
+							mode === dialogModes.normaluserclickstrip2 ||
+							mode === dialogModes.privilegeduserclickstrip3 ||
+							mode === dialogModes.privilegeduserclickstrip4 ||
+							mode === dialogModes.privilegeduserclickstrip5
+						) {
 
-								break;
-							case dialogModes.privilegeduserclickstrip1:
-								// Your own strip--editing. May save with new name. May also make public.
+							// LayerLandingPage is made !active.
+							// The selected project is loaded into manager.
+							// We will hide editProjectButton, buyEnrollButton, createProjectButton.
+							// saveProjectButton will be visible and enabled, but may be disabled if a project's fields fail validation.
+							self.editProjectButton.setPandV(true, false);
+							self.buyEnrollButton.setPandV(true, false);
+							self.createProjectButton.setPandV(true, false);
+							self.cancelButton.setPandV(false, true);
+							self.saveProjectButton.setPandV(false, true);
+							// Set openMode to one of "new", "copyOthers", "buyPP", "editCore", "editOwn", "editPP"
+							let openMode = '';
+							if (strip === 0) {
+								openMode = 'new';
+							} else if (strip === 1) {
+								openMode = 'editOwn';
+							} else if (strip === 2) {
+								openMode = 'copyOthers';
+							} else if (m_bPrivileged) {
+								openMode = 'editPP';
+							} else {
+								openMode = 'buyPP';
+							}
+							let exceptionRet = client.openProjectFromDB(projectId, openMode);
+							if (exceptionRet) {
 
+								errorHelper.show(exceptionRet);
+							}
 
-								break;
-							case dialogModes.privilegeduserclickstrip2:
-								// Shared strip--cloning. Another possibility is that it's being reviewed for approval to be made public.
+						} else {
 
-								break;
-							case dialogModes.privilegeduserclickstrip3:
-								// Product strip--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.
+							switch(mode) {
+								case dialogModes.privilegeduserclickstrip0:
+									// Core strip--priv. user makes choice of editing a core project or starting a new normal or purchasable project based on the selected core project.
+									// In LayerLandingPage user is seeing:
+									// (1) reminder of project just clicked on;
+									// (2) instructions on using editProject or selecting one of the 4 new project types and using createProject;
+									// (3) 4 choices to make with createProject: new normal (selected by default); new classroom; new online; new product.
+									// Or can cancel to go back to the strips.
+									// We will enable editProjectButton, createProjectButton, cancelButton.
+									self.editProjectButton.setPandV(false, true);
+									self.createProjectButton.setPandV(false, true);
+									self.cancelButton.setPandV(false, true);
 
-								break;
-							case dialogModes.privilegeduserclickstrip4:
-								// Classroom strip--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.
+									break;
+/*
+								case dialogModes.normaluserclickstrip0:
+									// Core strip--will create new normal project based on it. Cannot edit and save replacing itself.
+									// In LayerLandingPage user is seeing all the normal user fields from NewProjectDialog page 1.
+									// Can cancel to go back to the strips.
+									// We will hide editProjectButton, buyEnrollButton.
+									// We will enable cancelButton.
+									// createProjectButton will be visible but will be enabled when a project name has been entered by the user.
+									// When createProjectButton is clicked, we will load the project into manager and set manager.landingPageLayer.active = false.
+									self.editProjectButton.setPandV(true, false);
+									self.buyEnrollButton.setPandV(true, false);
+									self.cancelButton.setPandV(false, true);
 
-								break;
-							case dialogModes.privilegeduserclickstrip5:
-								// Online strip--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.
+									break;
+*/
+								case dialogModes.normaluserclickstrip3:
+									// Product that is active strip--will make buying decision.
 
-								break;
-							case dialogModes.normaluserclickstrip0:
-								// Core strip--will create new normal project based on it. Cannot edit and save replacing itself.
-								// In LayerLandingPage user is seeing all the normal user fields from NewProjectDialog page 1.
-								// Can cancel to go back to the strips.
-								// We will hide editProjectButton, buyEnrollButton.
-								// We will enable cancelButton.
-								// createProjectButton will be visible but will be enabled when a project name has been entered by the user.
-								// When createProjectButton is clicked, we will load the project into manager and set manager.landingPageLayer.active = false.
-								self.editProjectButton.setPandV(true, false);
-								self.buyEnrollButton.setPandV(true, false);
-								self.cancelButton.setPandV(false, true);
+									break;
+								case dialogModes.normaluserclickstrip4:
+									// Classroom (active, soon and nearby) strip--will make buying or waitlist decision.
 
-								break;
-							case dialogModes.normaluserclickstrip1:
-								// Your own strip--editing. May save with a new name as a new project.
-								// LayerLandingPage is made !active.
-								// The selected project is loaded into manager.
-								// We will hide editProjectButton, buyEnrollButton, createProjectButton.
-								// saveProjectButton will be visible and enabled, but may be disabled if a project's fields fail validation.
-								self.editProjectButton.setPandV(true, false);
-								self.buyEnrollButton.setPandV(true, false);
-								self.createProjectButton.setPandV(true, false);
-								self.cancelButton.setPandV(false, true);
-								self.saveProjectButton.setPandV(false, true);
+									break;
+								case dialogModes.normaluserclickstrip5:
+									// Online (active and soon) strip--will make buying decision. There is no max number of enrollees.
 
-								break;
-							case dialogModes.normaluserclickstrip2:
-								// Shared public project strip--cloning.
-
-								break;
-							case dialogModes.normaluserclickstrip3:
-								// Product that is active strip--will make buying decision.
-
-								break;
-							case dialogModes.normaluserclickstrip4:
-								// Classroom (active, soon and nearby) strip--will make buying or waitlist decision.
-
-								break;
-							case dialogModes.normaluserclickstrip5:
-								// Online (active and soon) strip--will make buying decision. There is no max number of enrollees.
-
-								break;
+									break;
+							}
 						}
 					}
 

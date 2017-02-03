@@ -615,7 +615,7 @@ define(["Core/errorHelper",
 									self.project = data.project;
 
 									// This might be a temporary work-around.
-									if (iProjectId <= 6) {
+									if (iProjectId <= 6 && $.isFunction(callback)) {
 
 										callback();
 

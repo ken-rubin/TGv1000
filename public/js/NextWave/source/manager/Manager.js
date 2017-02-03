@@ -280,9 +280,9 @@ define(["NextWave/source/utility/prototypes",
 
 					// The following method is called by layerLandingPanel after a user clicks on a PictureListItem.
 					// It passes layerLandingPage's new mode to layerNavbar.
-					self.setNavbarLayerModes = function(mode) {
+					self.setNavbarLayerModes = function(mode, iProjectId, rawItem, strip, index) {
 
-						self.navbarLayer.setNavbarLayerModes(mode);
+						self.navbarLayer.setNavbarLayerModes(mode, iProjectId, rawItem, strip, index);
 					}
 
 					// Set self.projectLoaded, but also enable/disable and show/hide navbarLayer's buttons.
