@@ -441,15 +441,9 @@ define(["NextWave/source/utility/prototypes",
                     };
 
 					// Project has just been loaded or unloaded in Manager.
-					// Update protectedness of Navbar's run and stopButtons.
-					// If !bLoaded, protect both buttons.
-					// If bLoaded, unprotect run, protect stop.
-					// In other words, always protect stop. Set run to !bLoaded.
+					// Update protectedness of Navbar's buttons.
 					self.projectLoadedStateHasChangedTo = function(bLoaded) {
 
-						// self.dialog.controlObject["runButton"].setProtected(!bLoaded);
-						// self.dialog.controlObject["stopButton"].setProtected(true);
-						// self.toggleLandingPageButton.setPandV(true, true);
 						if (bLoaded) {
 
 							// A project is loaded into manager.
@@ -504,11 +498,18 @@ define(["NextWave/source/utility/prototypes",
 					}
 
 					// User clicked on a PictureListItem in LayerLandingPage. (Or something else later.)
-
 					// The mode parameter being passed in initially is one of:
-					// dialogModes.normaluserclickstrip0-5 and dialogModes.privilegeduserclickstrip0-5. (The may be more coming.)
-					// We will not change LayerNavbar's dialog mode. All changes will be made with self.xButton.setPandV(bool, bool).
+					// dialogModes.normaluserclickstrip0-5 and dialogModes.privilegeduserclickstrip0-5. (There may be more coming.)
+					// We will not change LayerNavbar's dialog mode. All changes will be made with self.xButton.setPandV(bool, bool)
+					// to set the buttons' protectedness and visibility.
 					self.setNavbarLayerModes = function(mode, projectId, rawItem, strip, index) {
+
+						// Save arguments. This will help later when the save or buy/enroll button is clicked.
+						m_mode = mode;
+						m_projectId = projectId;
+						m_rawItem = rawItem;
+						m_strip = strip;
+						m_index = index;
 
 						// In the following cases, we will simply load the clicked project from the DB and into the manager,
 						// set the protected and visible states of the buttons and make LayerLandingPanel !active.
@@ -551,7 +552,6 @@ define(["NextWave/source/utility/prototypes",
 
 								errorHelper.show(exceptionRet);
 							}
-
 						} else {
 
 							switch(mode) {
@@ -568,21 +568,6 @@ define(["NextWave/source/utility/prototypes",
 									self.cancelButton.setPandV(false, true);
 
 									break;
-/*
-								case dialogModes.normaluserclickstrip0:
-									// Core strip--will create new normal project based on it. Cannot edit and save replacing itself.
-									// In LayerLandingPage user is seeing all the normal user fields from NewProjectDialog page 1.
-									// Can cancel to go back to the strips.
-									// We will hide editProjectButton, buyEnrollButton.
-									// We will enable cancelButton.
-									// createProjectButton will be visible but will be enabled when a project name has been entered by the user.
-									// When createProjectButton is clicked, we will load the project into manager and set manager.landingPageLayer.active = false.
-									self.editProjectButton.setPandV(true, false);
-									self.buyEnrollButton.setPandV(true, false);
-									self.cancelButton.setPandV(false, true);
-
-									break;
-*/
 								case dialogModes.normaluserclickstrip3:
 									// Product that is active strip--will make buying decision.
 
@@ -610,6 +595,12 @@ define(["NextWave/source/utility/prototypes",
                     var m_bCreated = false;
 					// Privileged user or not.
 					var m_bPrivileged = false;
+					// Info passed into self.setNavbarLayerModes is being saved for later use.
+					var m_mode = null;
+					var m_projectId = null;
+					var m_rawItem = null;
+					var m_strip = null;
+					var m_index = null;
 
                 } catch (e) {
 
