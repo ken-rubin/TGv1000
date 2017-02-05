@@ -167,7 +167,58 @@ define(["NextWave/source/utility/prototypes",
 
 							switch(m_tooltipArrowLoc) {
 
-								case "br":
+								case "br":	// Arror is on right end of bottom line of rect.
+
+									// Down the left side.
+									contextRender.moveTo(self.location.x,
+											self.location.y + dCornerRadius);
+									contextRender.lineTo(self.location.x,
+											(self.location.y + self.extent.height) - dCornerRadius);
+
+									// SW corner.
+									contextRender.quadraticCurveTo(self.location.x,
+											(self.location.y + self.extent.height),
+											(self.location.x + dCornerRadius),
+											(self.location.y + self.extent.height));
+
+									// Along the bottom until the drop-triangle.
+									contextRender.lineTo((self.location.x + self.extent.width - dCornerRadius - 20),
+											(self.location.y + self.extent.height));
+
+									// Now the drop-triangle bottom point.
+									contextRender.lineTo((self.location.x + self.extent.width - dCornerRadius - 10),
+											(self.location.y + self.extent.height + 15));
+
+									// Back to the bottom of the rect.
+									contextRender.lineTo((self.location.x + self.extent.width - dCornerRadius - 10),
+											(self.location.y + self.extent.height));
+
+									// Rest of the bottom. And then proceed as normal to finish the rect....
+									contextRender.lineTo((self.location.x + self.extent.width) - dCornerRadius,
+											(self.location.y + self.extent.height));
+
+									contextRender.quadraticCurveTo((self.location.x + self.extent.width),
+											(self.location.y + self.extent.height),
+											(self.location.x + self.extent.width),
+											(self.location.y + self.extent.height) - dCornerRadius);
+
+									contextRender.lineTo((self.location.x + self.extent.width),
+											(self.location.y + dCornerRadius));
+
+									contextRender.quadraticCurveTo((self.location.x + self.extent.width),
+											self.location.y,
+											(self.location.x + self.extent.width) - dCornerRadius,
+											self.location.y);
+
+									contextRender.lineTo((self.location.x + dCornerRadius),
+											(self.location.y));
+
+									contextRender.quadraticCurveTo(self.location.x,
+											self.location.y,
+											self.location.x,
+											self.location.y + dCornerRadius);
+									break;
+								case "bl":	// Arror is on left end of bottom line of rect.
 
 									// Down the left side.
 									contextRender.moveTo(self.location.x,
@@ -218,7 +269,7 @@ define(["NextWave/source/utility/prototypes",
 											self.location.x,
 											self.location.y + dCornerRadius);
 									break;
-								case "bl":
+								case "tl":	// Arror is on left end of top line of rect.
 
 									// Down the left side.
 									contextRender.moveTo(self.location.x,
@@ -231,36 +282,39 @@ define(["NextWave/source/utility/prototypes",
 											(self.location.y + self.extent.height),
 											(self.location.x + dCornerRadius),
 											(self.location.y + self.extent.height));
-
-									// A bit before the drop-triangle.
-									contextRender.lineTo((self.location.x + dCornerRadius + 10),
-											(self.location.y + self.extent.height));
-
-									// Now the drop-triangle bottom point.
-									contextRender.lineTo((self.location.x + dCornerRadius + 10),
-											(self.location.y + self.extent.height + 15));
-
-									// Back to the bottom of the rect.
-									contextRender.lineTo((self.location.x + dCornerRadius + 20),
-											(self.location.y + self.extent.height));
-
-									// Rest of the bottom. And then proceed as normal to finish the rect....
+									// Rest of the bottom.
 									contextRender.lineTo((self.location.x + self.extent.width) - dCornerRadius,
 											(self.location.y + self.extent.height));
 
+									// SE corner.
 									contextRender.quadraticCurveTo((self.location.x + self.extent.width),
 											(self.location.y + self.extent.height),
 											(self.location.x + self.extent.width),
 											(self.location.y + self.extent.height) - dCornerRadius);
 
+									// Right side.
 									contextRender.lineTo((self.location.x + self.extent.width),
 											(self.location.y + dCornerRadius));
 
+									// NE corner.
 									contextRender.quadraticCurveTo((self.location.x + self.extent.width),
 											self.location.y,
 											(self.location.x + self.extent.width) - dCornerRadius,
 											self.location.y);
 
+									// Across the top to the rising-triangle.
+									contextRender.lineTo((self.location.x + dCornerRadius + 20),
+											(self.location.y));
+
+									// Now the rising-triangle bottom point.
+									contextRender.lineTo((self.location.x + dCornerRadius + 10),
+											(self.location.y - 15));
+
+									// Back to the top of the rect.
+									contextRender.lineTo((self.location.x + dCornerRadius + 10),
+											(self.location.y));
+
+									// Rest of the top.
 									contextRender.lineTo((self.location.x + dCornerRadius),
 											(self.location.y));
 
@@ -269,7 +323,7 @@ define(["NextWave/source/utility/prototypes",
 											self.location.x,
 											self.location.y + dCornerRadius);
 									break;
-								case "tr":
+								case "tr":	// Arror is on right end of top line of rect.
 
 									// Down the left side.
 									contextRender.moveTo(self.location.x,
@@ -282,87 +336,39 @@ define(["NextWave/source/utility/prototypes",
 											(self.location.y + self.extent.height),
 											(self.location.x + dCornerRadius),
 											(self.location.y + self.extent.height));
-
-									// A bit before the drop-triangle.
-									contextRender.lineTo((self.location.x + dCornerRadius + 10),
-											(self.location.y + self.extent.height));
-
-									// Now the drop-triangle bottom point.
-									contextRender.lineTo((self.location.x + dCornerRadius + 10),
-											(self.location.y + self.extent.height + 15));
-
-									// Back to the bottom of the rect.
-									contextRender.lineTo((self.location.x + dCornerRadius + 20),
-											(self.location.y + self.extent.height));
-
-									// Rest of the bottom. And then proceed as normal to finish the rect....
+									// Rest of the bottom.
 									contextRender.lineTo((self.location.x + self.extent.width) - dCornerRadius,
 											(self.location.y + self.extent.height));
 
+									// SE corner.
 									contextRender.quadraticCurveTo((self.location.x + self.extent.width),
 											(self.location.y + self.extent.height),
 											(self.location.x + self.extent.width),
 											(self.location.y + self.extent.height) - dCornerRadius);
 
+									// Right side.
 									contextRender.lineTo((self.location.x + self.extent.width),
 											(self.location.y + dCornerRadius));
 
+									// NE corner.
 									contextRender.quadraticCurveTo((self.location.x + self.extent.width),
 											self.location.y,
 											(self.location.x + self.extent.width) - dCornerRadius,
 											self.location.y);
 
-									contextRender.lineTo((self.location.x + dCornerRadius),
+									// A bit before the rising-triangle.
+									contextRender.lineTo((self.location.x + self.extent.width - dCornerRadius - 10),
 											(self.location.y));
 
-									contextRender.quadraticCurveTo(self.location.x,
-											self.location.y,
-											self.location.x,
-											self.location.y + dCornerRadius);
-									break;
-								case "tl":
+									// Now the rising-triangle bottom point.
+									contextRender.lineTo((self.location.x + self.extent.width - dCornerRadius - 10),
+											(self.location.y - 15));
 
-									// Down the left side.
-									contextRender.moveTo(self.location.x,
-											self.location.y + dCornerRadius);
-									contextRender.lineTo(self.location.x,
-											(self.location.y + self.extent.height) - dCornerRadius);
+									// Back to the top of the rect.
+									contextRender.lineTo((self.location.x + self.extent.width - dCornerRadius - 20),
+											(self.location.y));
 
-									// SW corner.
-									contextRender.quadraticCurveTo(self.location.x,
-											(self.location.y + self.extent.height),
-											(self.location.x + dCornerRadius),
-											(self.location.y + self.extent.height));
-
-									// A bit before the drop-triangle.
-									contextRender.lineTo((self.location.x + dCornerRadius + 10),
-											(self.location.y + self.extent.height));
-
-									// Now the drop-triangle bottom point.
-									contextRender.lineTo((self.location.x + dCornerRadius + 10),
-											(self.location.y + self.extent.height + 15));
-
-									// Back to the bottom of the rect.
-									contextRender.lineTo((self.location.x + dCornerRadius + 20),
-											(self.location.y + self.extent.height));
-
-									// Rest of the bottom. And then proceed as normal to finish the rect....
-									contextRender.lineTo((self.location.x + self.extent.width) - dCornerRadius,
-											(self.location.y + self.extent.height));
-
-									contextRender.quadraticCurveTo((self.location.x + self.extent.width),
-											(self.location.y + self.extent.height),
-											(self.location.x + self.extent.width),
-											(self.location.y + self.extent.height) - dCornerRadius);
-
-									contextRender.lineTo((self.location.x + self.extent.width),
-											(self.location.y + dCornerRadius));
-
-									contextRender.quadraticCurveTo((self.location.x + self.extent.width),
-											self.location.y,
-											(self.location.x + self.extent.width) - dCornerRadius,
-											self.location.y);
-
+									// Rest of the top.
 									contextRender.lineTo((self.location.x + dCornerRadius),
 											(self.location.y));
 

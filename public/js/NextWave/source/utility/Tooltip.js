@@ -126,6 +126,10 @@ define(["NextWave/source/utility/prototypes",
 										if ((ttX + ttWidth < layerExtent.width) && (ttY + ttHeight < layerExtent.height)) {
 											tooltipArrowLoc = "tl";
 										} else {
+
+											// Case "tr": tooltip is below target control and right sides line up.
+											ttX = targetControlX + targetControlWidth - ttWidth;
+											ttY = targetControlY + 10 + targetControlHeight;
 											tooltipArrowLoc = "tr";
 										}
 									}
