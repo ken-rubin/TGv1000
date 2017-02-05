@@ -21,7 +21,8 @@ define(["NextWave/source/utility/prototypes",
         try {
 
             // Constructor function.
-            var functionRet = function Button(objectParameters) {
+			// objectParameters may contain 0, 1 or 3 strings: override font, protected tooltip, !protected tooltip.
+            var functionRet = function Button(...objectParameters) {
 
                 try {
 
@@ -31,13 +32,19 @@ define(["NextWave/source/utility/prototypes",
                     // constructor.  Pass parameters, if specified.
                     self.inherits(Control);
 
-					self.font = settings.general.font;
-
-					if (objectParameters) {
-
-						// Format like in settings.js: "20px Courier New"
-						self.font = objectParameters;
+					// If nothing in objectParameters, push on the default font.
+					if (!objectParameters.length) {
+						objectParameters.push(settings.general.font);
 					}
+
+					// In case there are no elements for protectedTooltip and unProtectedTooltip, push on a couple of nulls.
+					// If all 3 elements are present, this will have no effect. Otherwise, it will set the tooltips to null.
+					objectParameters.push(null);
+					objectParameters.push(null);
+
+					self.font = objectParameters[0];
+					self.protectedTooltip = objectParameters[1];
+					self.unProtectedTooltip = objectParameters[2];
 
                     ////////////////////////
                     // Public methods.
@@ -171,6 +178,19 @@ define(["NextWave/source/utility/prototypes",
 
                             m_bMouseIn = true;
 
+							// Mouse is over this button.
+							// Possibly draw one of 2 tooltips.
+							if (self.visible) {
+
+								if (self.protected && self.protectedTooltip) {
+
+									return manager.drawSmartTooltip(self.protectedTooltip, m_area);
+								} else if (!self.protected && self.unProtectedTooltip) {
+
+									return manager.drawSmartTooltip(self.unProtectedTooltip, m_area);
+								}
+							}
+
                             return null;
                         } catch (e) {
 
@@ -205,12 +225,18 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Pass to payload.
+					// Also, cause last (possible) tooltip to disappear.
                     self.mouseOut = function (objectReference) {
 
                         try {
 
                             m_bMouseIn = false;
                             m_bMouseDown = false;
+
+							if (self.visible && (self.protectedTooltip || self.unProtectedTooltip)) {
+
+								return manager.stopDrawingSmartTooltip();
+							}
 
                             return null;
                         } catch (e) {

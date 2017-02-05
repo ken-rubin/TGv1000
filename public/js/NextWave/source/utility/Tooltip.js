@@ -77,15 +77,63 @@ define(["NextWave/source/utility/prototypes",
 									let metrics = contextRender.measureText(arrTooltip[i]);
 									dMaxWidth = Math.max(dMaxWidth, metrics.width);
 								}
+
 								// dMaxWidth is width (in px) of widest line.
 								// The lines are in arrTooltip. There are arrTooltip.length of them.
-								let width = dMaxWidth + 20;
+								let ttWidth = dMaxWidth + 20;
 								let lineHeight = settings.tooltip.lineHeight;
-								let height = arrTooltip.length * lineHeight + 20;
-								let x = self.configuration.x;
-								let y = self.configuration.y - 10 - height;
+								let ttHeight = arrTooltip.length * lineHeight + 20;
 
-								m_area = new Area(new Point(x,y), new Size(width,height));
+								let tooltipArrowLoc = "";		// One of "bl", "br", "tl", "tr". Look at Area.js to understand.
+
+								let ttX = 0;
+								let ttY = 0;
+
+								// We know the tooltip's width and height. They're set in ttWidth and ttHeight.
+								// To see where the tooltip's little arrow goes and where the tooltip is positioned
+								// we will need to try out 4 positions (and arrow locations) and see if the tooltip stays within self.configuration.layerExtent.
+
+								// Tooltip (us) has these properties to use to figure out its configuration:
+								//		self.configuration.width	width of the control getting the tooltip
+								//		self.configuration.height	height of the control getting the tooltip
+								//		self.configuration.x		x position of the control getting the tooltip
+								//		self.configuration.y		y position of the control getting the tooltip
+								//		self.configuration.layerExtent size of LayerTooltip
+								// Use them to smartly position the tooltip and the little arrow. (width and height of the tooltip are already set.)
+								let targetControlWidth = self.configuration.width;
+								let targetControlHeight = self.configuration.height;
+								let targetControlX = self.configuration.x;
+								let targetControlY = self.configuration.y;
+								let layerExtent = self.configuration.layerExtent;
+
+								// Case "bl": tooltip is above its target control and the left sides line up.
+								ttX = targetControlX;
+								ttY = targetControlY - 10 - ttHeight;
+								if ((ttY > 0) && (ttX + ttWidth < layerExtent.width)) {
+									tooltipArrowLoc = "bl";
+								} else {
+
+									// Case "br": tooltip is above target control and right sides line up.
+									ttX = targetControlX + targetControlWidth - ttWidth;
+									ttY = targetControlY - 10 - ttHeight;
+									if ((ttY > 0) && (ttX > 0)) {
+										tooltipArrowLoc = "br";
+									} else {
+
+										// Case "tl": tooltip is below target control and left sides line up.
+										ttX = targetControlX;
+										ttY = targetControlY + targetControlHeight + 10;
+										if ((ttX + ttWidth < layerExtent.width) && (ttY + ttHeight < layerExtent.height)) {
+											tooltipArrowLoc = "tl";
+										} else {
+											tooltipArrowLoc = "tr";
+										}
+									}
+								}
+
+								m_area = new Area(new Point(ttX, ttY), new Size(ttWidth, ttHeight));
+								m_area.setTooltipArrowLoc(tooltipArrowLoc);
+
 								self.requiresCalculateLayout = false;
 							}
 

@@ -31,7 +31,7 @@ define(["NextWave/source/utility/prototypes",
 
                     // Collection of held items.
                     self.items = [];
-                    // Indicates how things are measured and how they scroll.
+                    // Indicates how things are measured and how they scroll. Defaults to true, but don't know of any cases where it's not provided.
                     self.vertical = bVertical;
 					self.scrollStub = bTinyScrollStub ? settings.general.tinyScrollStub : settings.general.scrollStub;
                     // Access this property based on orientation.
@@ -325,7 +325,7 @@ define(["NextWave/source/utility/prototypes",
                             // Force a render.
                             self.render(objectReference.contextRender);
 
-                            // Call helper method (again) to test the cursor  
+                            // Call helper method (again) to test the cursor
                             // point this clears out and updates any selection.
                             return m_functionTestPoint(objectReference);
                         } catch (e) {
@@ -557,7 +557,7 @@ define(["NextWave/source/utility/prototypes",
 
                                 // Don't check return...just mouse out.
                                 if ($.isFunction(m_itemCursor.mouseOut)) {
-    
+
                                     m_itemCursor.mouseOut(objectReference);
                                 }
 
@@ -629,23 +629,23 @@ define(["NextWave/source/utility/prototypes",
 
                             if (self.vertical) {
 
-                                self.scrollStubArea[0] = new Area(new Point(areaMaximal.location.x + (areaMaximal.extent.width - self.scrollStub.width) / 2, 
-                                        areaMaximal.location.y + self.scrollStub.yOffset), 
+                                self.scrollStubArea[0] = new Area(new Point(areaMaximal.location.x + (areaMaximal.extent.width - self.scrollStub.width) / 2,
+                                        areaMaximal.location.y + self.scrollStub.yOffset),
                                     new Size(self.scrollStub.width, self.scrollStub.height));
 
-                                self.scrollStubArea[1] = new Area(new Point(areaMaximal.location.x + (areaMaximal.extent.width - self.scrollStub.width) / 2, 
-                                        areaMaximal.location.y + areaMaximal.extent.height + self.scrollStub.yOffset), 
+                                self.scrollStubArea[1] = new Area(new Point(areaMaximal.location.x + (areaMaximal.extent.width - self.scrollStub.width) / 2,
+                                        areaMaximal.location.y + areaMaximal.extent.height + self.scrollStub.yOffset),
                                     new Size(self.scrollStub.width, self.scrollStub.height));
                             } else {
 
-                                self.scrollStubArea[0] = new Area(new Point(m_areaMaximal.location.x - self.scrollStub.height / 2, 
-                                        m_areaMaximal.location.y - self.scrollStub.yOffset / 5), 
-                                    new Size(self.scrollStub.height /* this one is on its side */, 
+                                self.scrollStubArea[0] = new Area(new Point(m_areaMaximal.location.x - self.scrollStub.height / 2,
+                                        m_areaMaximal.location.y - self.scrollStub.yOffset / 5),
+                                    new Size(self.scrollStub.height /* this one is on its side */,
                                         m_areaMaximal.extent.height + 2 * self.scrollStub.yOffset / 5));
 
-                                self.scrollStubArea[1] = new Area(new Point(m_areaMaximal.location.x + m_areaMaximal.extent.width - self.scrollStub.height / 2, 
-                                        m_areaMaximal.location.y - self.scrollStub.yOffset / 5), 
-                                    new Size(self.scrollStub.height /* this one is on its side */, 
+                                self.scrollStubArea[1] = new Area(new Point(m_areaMaximal.location.x + m_areaMaximal.extent.width - self.scrollStub.height / 2,
+                                        m_areaMaximal.location.y - self.scrollStub.yOffset / 5),
+                                    new Size(self.scrollStub.height /* this one is on its side */,
                                         m_areaMaximal.extent.height + 2 * self.scrollStub.yOffset / 5));
                             }
 
@@ -664,14 +664,14 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // Expose a virtual method for  
+                    // Expose a virtual method for
                     // which derived classes to stub.
                     self.innerCalculateLayout = function (areaMaximal, contextRender) {
 
                         return null;
                     };
 
-                    // Expose a virtual method for  
+                    // Expose a virtual method for
                     // which derived classes to stub.
                     self.innerRender = function (contextRender) {
 
@@ -680,7 +680,7 @@ define(["NextWave/source/utility/prototypes",
 
                     // Render out the objects.
                     self.render = function (contextRender) {
-                        
+
                         try {
 
                             // Call virtual.
@@ -706,7 +706,7 @@ define(["NextWave/source/utility/prototypes",
                                 // Adjust down the scroll, if necessary.
                                 if (m_dScrollOffset > (dTotalExtent - m_areaMaximal.extent[self.propertyAccessor])) {
 
-                                    m_dScrollOffset = Math.max(0, 
+                                    m_dScrollOffset = Math.max(0,
                                         dTotalExtent - m_areaMaximal.extent[self.propertyAccessor]);
                                 }
                             }
@@ -833,10 +833,10 @@ define(["NextWave/source/utility/prototypes",
 
                             // Restore original canvas state.
                             contextRender.restore();
-                            
+
                             return null;
                         } catch (e) {
-                            
+
                             return e;
                         }
                     };
@@ -844,7 +844,7 @@ define(["NextWave/source/utility/prototypes",
                     ///////////////////////
                     // Private methods.
 
-                    // Helper method tests cursor point, 
+                    // Helper method tests cursor point,
                     // sets cursor item and mouse cursor.
                     var m_functionTestPoint = function (objectReference) {
 
@@ -894,7 +894,7 @@ define(["NextWave/source/utility/prototypes",
                                 }
                             }
 
-                            // Deactivate the selection in the 
+                            // Deactivate the selection in the
                             // current type, if it changed.
                             if (itemOriginal &&
                                 m_itemCursor !== itemOriginal) {

@@ -21,6 +21,8 @@ define(["NextWave/source/utility/prototypes",
         try {
 
             // Constructor function.
+			// ...objectParameters may have up to 2 elements: bVertical and bUseTinyScrollStub.
+			// It may have 0 elements.
         	var functionRet = function ListHost(...objectParameters) {
 
                 try {
@@ -40,7 +42,9 @@ define(["NextWave/source/utility/prototypes",
                     self.list = null;
 
 					// Ensure defaults for List construction parameters are there, because we don't know if user passed in 0, 1 or 2.
-					objectParameters.push(false);
+					// By doing 2 stupid pushes, we're turning 0 into 2; 1 into 3; 2 into 4.
+					// Any beyond [1] will be ignored.
+					objectParameters.push(true);
 					objectParameters.push(false);
 					self.list = new List(objectParameters[0], objectParameters[1]);
 

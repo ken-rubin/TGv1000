@@ -185,10 +185,10 @@ define(["NextWave/source/utility/prototypes",
                                     self.canvasLayer,
                                     self.panelLayer,
 									self.landingPageLayer,
-									self.tooltipLayer,
                                     self.debugLayer,
                                     self.dragLayer,
-									self.navbarLayer
+									self.navbarLayer,
+									self.tooltipLayer
                                 ];
 
                             // Get the parent references.
@@ -353,7 +353,7 @@ define(["NextWave/source/utility/prototypes",
 					// Cause self.tooltipLayer to render a smart tooltip.
 					// strTooltip holds the text. May have embedded \r\n.
 					// area is the Area for the item that wants the tooltip. tooltipLayer will have to figure out
-					// size and positioning. Smartly--which it doesn't do well. Smartly means figuring out visible boundaries and
+					// size and positioning. Smartly. This means figuring out visible boundaries and
 					// moving the tooltip above, below, left or right of area based on fit.
 					self.drawSmartTooltip = function(strTooltip, area) {
 

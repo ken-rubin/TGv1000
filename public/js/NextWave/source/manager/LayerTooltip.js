@@ -82,7 +82,8 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-					// Called by manager after call from PictureListItem, we need to draw a tooltip.
+					// Called by manager after call from PictureListItem, Button or anything else that can be tooltipped.
+					// We need to draw a tooltip.
 					self.drawSmartTooltip = function(strTooltip, area) {
 
 						try {
@@ -99,6 +100,9 @@ define(["NextWave/source/utility/prototypes",
 								sTt.configuration.y = area.location.y;
 								sTt.configuration.width = area.extent.width;
 								sTt.configuration.height = area.extent.height;
+
+								// Pass in this layer's extent so the tooltip (using Area) can position itself within.
+								sTt.configuration.layerExtent = self.extent;
 
 								// Make it calculateLayout before rendering.
 								sTt.requiresCalculateLayout = true;
