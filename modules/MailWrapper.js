@@ -25,7 +25,7 @@ module.exports = function MailWrapper() {
             mailOptions = options;
 
             smtpTransport.sendMail(mailOptions, function(error, response){
-            
+
                 if (error) {
                     return callback(error);
                 }
