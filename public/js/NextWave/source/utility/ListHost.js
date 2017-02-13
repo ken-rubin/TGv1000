@@ -44,8 +44,12 @@ define(["NextWave/source/utility/prototypes",
 					// Ensure defaults for List construction parameters are there, because we don't know if user passed in 0, 1 or 2.
 					// By doing 2 stupid pushes, we're turning 0 into 2; 1 into 3; 2 into 4.
 					// Any beyond [1] will be ignored.
-					objectParameters.push(true);
-					objectParameters.push(false);
+					if (!objectParameters.length) {
+
+						objectParameters.push(true);	// Default for bVertical.
+					}
+					objectParameters.push(false);		// Default for bUseTinyScrollStub.
+
 					self.list = new List(objectParameters[0], objectParameters[1]);
 
                     ///////////////////////
