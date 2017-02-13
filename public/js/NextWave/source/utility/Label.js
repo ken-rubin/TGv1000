@@ -96,7 +96,13 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Render.
-                            contextRender.fillStyle = settings.general.fillText;
+							if (self.configuration.fillStyle) {
+
+	                            contextRender.fillStyle = self.configuration.fillStyle;
+							} else {
+
+	                            contextRender.fillStyle = settings.general.fillText;
+							}
                             contextRender.fillText(self.text,
                                 m_area.location.x,
                                 m_area.location.y,
@@ -120,7 +126,7 @@ define(["NextWave/source/utility/prototypes",
                 }
         	};
 
-            // Inherit from Control.  Wire 
+            // Inherit from Control.  Wire
             // up prototype chain to Control.
 //            functionRet.inheritsFrom(Control);
 

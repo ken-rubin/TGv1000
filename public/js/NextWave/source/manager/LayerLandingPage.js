@@ -38,7 +38,7 @@ define(["NextWave/source/utility/prototypes",
 
                     // Inherit from base class.
                     self.inherits(LayerDialogHost,
-						"rgba(99,137,228,1)",		// Required for Layers inheriting LayerDialogHost.
+						"rgba(64,64,64,1)",		// Required for Layers inheriting LayerDialogHost.
 						true						// Tells LayerDialogHost to set objectReference.handled in mouse move.
 					);
 
@@ -58,25 +58,24 @@ define(["NextWave/source/utility/prototypes",
 
                             // Create the dialog.
 							let objectConfiguration = {
-								searchLabel: {
-									type: "Label",
-									text: "Search string (opt.)",
-									modes: [dialogModes.normalusersearching,dialogModes.privilegedusersearching],
-									font: settings.general.smallBoldFont,
-									x: settings.general.margin,
-									y: settings.general.margin,
-									width: settings.dialog.firstColumnWidth,
-									height: settings.dialog.lineHeight
+								tgLogo: {
+									type: "Picture",
+									constructorParameterString: "'media/images/TGtrans.png'",
+									modes: [dialogModes.universalmode],
+									x: settings.layerLandingPage.navTopMargin,
+									y: settings.layerLandingPage.navTopMargin - 12,
+									width: 187,
+									height: 50
 								},
 								searchEdit: {
 									type: "Edit",
-									modes: [dialogModes.normalusersearching,dialogModes.privilegedusersearching],
                                     multiline: false,
+									modes: [dialogModes.universalmode],
 									x: settings.general.margin +
-										settings.dialog.firstColumnWidth,
-									y: settings.general.margin,
+										2 * settings.dialog.firstColumnWidth,
+									y: settings.layerLandingPage.navTopMargin,
 									widthType: "reserve",
-									width: 3 * settings.dialog.firstColumnWidth + 30,
+									width: 4 * settings.dialog.firstColumnWidth + 30,
 									height: settings.dialog.lineHeight,
 									enterFocus: function (localSelf) {
 										try {
@@ -98,12 +97,12 @@ define(["NextWave/source/utility/prototypes",
 								},
 								searchButton: {
 									type: "Button",
-									modes: [dialogModes.normalusersearching,dialogModes.privilegedusersearching],
 									text: glyphs.search,
 									constructorParameterString: "'15px Arial','TestP','TestUnPlkjlj lkjlkjlk jlkj lkjlj lkj lkjl kjl kjlkj lkjl kjlkj jjjj kjhkjhkjhkjh hjkhkjhkjhkkjhkjh'",
+									modes: [dialogModes.universalmode],
 									xType: "reserve",
 									x: 2 * settings.dialog.firstColumnWidth,
-									y: settings.general.margin,
+									y: settings.layerLandingPage.navTopMargin,
 									width: 30,
 									height: 30,
 									click: function() {
@@ -117,6 +116,71 @@ define(["NextWave/source/utility/prototypes",
 										}
 									}
 								},
+								horLine: {
+									type: "Picture",
+									constructorParameterString: "'media/images/horLine.png'",
+									modes: [dialogModes.universalmode],
+									x: 0,
+									y: settings.layerLandingPage.navOffset,
+									widthType: "reserve",
+									width: 0,
+									height: 4
+								},
+								navProgram: {
+									type: "Label",
+									text: "Program",
+									modes: [dialogModes.universalmode],
+									font: settings.general.boldFont,
+									fillStyle: "#F7FE00",
+									x: settings.dialog.firstColumnWidth,
+									y: settings.layerLandingPage.navOffset + 20,
+									width: 100,
+									height: settings.dialog.lineHeight
+								},
+								navPlayGames: {
+									type: "Label",
+									text: "Play Games",
+									modes: [dialogModes.universalmode],
+									font: settings.general.boldFont,
+									fillStyle: "#009999",
+									x: settings.dialog.firstColumnWidth + 125,
+									y: settings.layerLandingPage.navOffset + 20,
+									width: 100,
+									height: settings.dialog.lineHeight
+								},
+								navClasses: {
+									type: "Label",
+									text: "Classes",
+									modes: [dialogModes.universalmode],
+									font: settings.general.boldFont,
+									fillStyle: "#FF0000",
+									x: settings.dialog.firstColumnWidth + 250,
+									y: settings.layerLandingPage.navOffset + 20,
+									width: 100,
+									height: settings.dialog.lineHeight
+								},
+								navKits: {
+									type: "Label",
+									text: "Kits",
+									modes: [dialogModes.universalmode],
+									font: settings.general.boldFont,
+									fillStyle: "#FFAB00",
+									x: settings.dialog.firstColumnWidth + 375,
+									y: settings.layerLandingPage.navOffset + 20,
+									width: 100,
+									height: settings.dialog.lineHeight
+								},
+								navGromLand: {
+									type: "Label",
+									text: "GromLand",
+									modes: [dialogModes.universalmode],
+									font: settings.general.boldFont,
+									fillStyle: "#00AE68",
+									x: settings.dialog.firstColumnWidth + 500,
+									y: settings.layerLandingPage.navOffset + 20,
+									width: 100,
+									height: settings.dialog.lineHeight
+								},
 								coreLabelP1: {
 									type: "Label",
 									text: "Core projects. Click to",
@@ -125,7 +189,7 @@ define(["NextWave/source/utility/prototypes",
 									x: settings.general.margin,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 1;
+										return settings.layerLandingPage.navOffset + (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 1;
 									},
 									width: settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
@@ -138,7 +202,7 @@ define(["NextWave/source/utility/prototypes",
 									x: settings.general.margin,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 1 +
+										return settings.layerLandingPage.navOffset + (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 1 +
 											0.5 * settings.dialog.lineHeight;
 									},
 									width: settings.dialog.firstColumnWidth,
@@ -152,7 +216,7 @@ define(["NextWave/source/utility/prototypes",
 									x: settings.general.margin,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 1 +
+										return settings.layerLandingPage.navOffset + (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 1 +
 											1.0 * settings.dialog.lineHeight;
 									},
 									width: settings.dialog.firstColumnWidth,
@@ -166,7 +230,7 @@ define(["NextWave/source/utility/prototypes",
 									x: settings.general.margin,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 1;
+										return settings.layerLandingPage.navOffset + (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 1;
 									},
 									width: settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
@@ -179,7 +243,7 @@ define(["NextWave/source/utility/prototypes",
 									x: settings.general.margin,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 1 +
+										return settings.layerLandingPage.navOffset + (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 1 +
 											0.5 * settings.dialog.lineHeight;
 									},
 									width: settings.dialog.firstColumnWidth,
@@ -193,7 +257,7 @@ define(["NextWave/source/utility/prototypes",
 									x: settings.general.margin,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 1 +
+										return settings.layerLandingPage.navOffset + (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 1 +
 											1.0 * settings.dialog.lineHeight;
 									},
 									width: settings.dialog.firstColumnWidth,
@@ -207,7 +271,7 @@ define(["NextWave/source/utility/prototypes",
 										settings.dialog.firstColumnWidth,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 1;
+										return settings.layerLandingPage.navOffset + (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 1;
 									},
 									widthType: "callback",
 									width: function(area) {
@@ -226,7 +290,7 @@ define(["NextWave/source/utility/prototypes",
 									x: settings.general.margin,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 2;
+										return settings.layerLandingPage.navOffset + (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 2;
 									},
 									width: settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
@@ -239,7 +303,7 @@ define(["NextWave/source/utility/prototypes",
 									x: settings.general.margin,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 2 +
+										return settings.layerLandingPage.navOffset + (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 2 +
 											0.5 * settings.dialog.lineHeight;
 									},
 									width: settings.dialog.firstColumnWidth,
@@ -253,7 +317,7 @@ define(["NextWave/source/utility/prototypes",
 										settings.dialog.firstColumnWidth,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 2;
+										return settings.layerLandingPage.navOffset + (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 2;
 									},
 									widthType: "callback",
 									width: function(area) {
@@ -272,7 +336,7 @@ define(["NextWave/source/utility/prototypes",
 									x: settings.general.margin,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 3;
+										return settings.layerLandingPage.navOffset + (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 3;
 									},
 									width: settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
@@ -285,7 +349,7 @@ define(["NextWave/source/utility/prototypes",
 									x: settings.general.margin,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 3 +
+										return settings.layerLandingPage.navOffset + (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 3 +
 											0.5 * settings.dialog.lineHeight;
 									},
 									width: settings.dialog.firstColumnWidth,
@@ -299,7 +363,7 @@ define(["NextWave/source/utility/prototypes",
 										settings.dialog.firstColumnWidth,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 3;
+										return settings.layerLandingPage.navOffset + (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 3;
 									},
 									widthType: "callback",
 									width: function(area) {
@@ -318,7 +382,7 @@ define(["NextWave/source/utility/prototypes",
 									x: settings.general.margin,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 4;
+										return settings.layerLandingPage.navOffset + (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 4;
 									},
 									width: settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
@@ -331,7 +395,7 @@ define(["NextWave/source/utility/prototypes",
 									x: settings.general.margin,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 4 +
+										return settings.layerLandingPage.navOffset + (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 4 +
 											0.5 * settings.dialog.lineHeight;
 									},
 									width: settings.dialog.firstColumnWidth,
@@ -345,7 +409,7 @@ define(["NextWave/source/utility/prototypes",
 										settings.dialog.firstColumnWidth,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 4;
+										return settings.layerLandingPage.navOffset + (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 4;
 									},
 									widthType: "callback",
 									width: function(area) {
@@ -364,7 +428,7 @@ define(["NextWave/source/utility/prototypes",
 									x: settings.general.margin,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 5;
+										return settings.layerLandingPage.navOffset + (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 5;
 									},
 									width: settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
@@ -377,7 +441,7 @@ define(["NextWave/source/utility/prototypes",
 									x: settings.general.margin,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 5 +
+										return settings.layerLandingPage.navOffset + (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 5 +
 											0.5 * settings.dialog.lineHeight;
 									},
 									width: settings.dialog.firstColumnWidth,
@@ -391,7 +455,7 @@ define(["NextWave/source/utility/prototypes",
 										settings.dialog.firstColumnWidth,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 5;
+										return settings.layerLandingPage.navOffset + (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 5;
 									},
 									widthType: "callback",
 									width: function(area) {
@@ -410,7 +474,7 @@ define(["NextWave/source/utility/prototypes",
 									x: settings.general.margin,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 6;
+										return settings.layerLandingPage.navOffset + (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 6;
 									},
 									width: settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
@@ -423,7 +487,7 @@ define(["NextWave/source/utility/prototypes",
 									x: settings.general.margin,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 6 +
+										return settings.layerLandingPage.navOffset + (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 6 +
 											0.5 * settings.dialog.lineHeight;
 									},
 									width: settings.dialog.firstColumnWidth,
@@ -437,7 +501,7 @@ define(["NextWave/source/utility/prototypes",
 										settings.dialog.firstColumnWidth,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 6;
+										return settings.layerLandingPage.navOffset + (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 6;
 									},
 									widthType: "callback",
 									width: function(area) {
@@ -457,7 +521,7 @@ define(["NextWave/source/utility/prototypes",
 									x: settings.general.margin,
 									yType: "callback",
 									y: function(area) {
-										return (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 6 +
+										return settings.layerLandingPage.navOffset + (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 6 +
 											(area.extent.height / 15) +
 											0.5 * settings.dialog.lineHeight;
 									},
@@ -472,7 +536,7 @@ define(["NextWave/source/utility/prototypes",
 									text: "Core strip--priv. user makes choice of editing a core project or starting a new normal or purchasable project based on the selected core project.",
 									modes: [dialogModes.privilegeduserclickstrip0],
 									x: settings.general.margin,
-									y: settings.general.margin,
+									y: settings.layerLandingPage.navOffset + settings.general.margin,
 									width: 10 * settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
 								},
@@ -481,7 +545,7 @@ define(["NextWave/source/utility/prototypes",
 									text: "Your own strip--editing. May save with new name. May also make public.",
 									modes: [dialogModes.privilegeduserclickstrip1],
 									x: settings.general.margin,
-									y: settings.general.margin,
+									y: settings.layerLandingPage.navOffset + settings.general.margin,
 									width: 10 * settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
 								},
@@ -490,7 +554,7 @@ define(["NextWave/source/utility/prototypes",
 									text: "Shared strip--cloning. Another possibility is that it's being reviewed for approval to be made public.",
 									modes: [dialogModes.privilegeduserclickstrip2],
 									x: settings.general.margin,
-									y: settings.general.margin,
+									y: settings.layerLandingPage.navOffset + settings.general.margin,
 									width: 10 * settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
 								},
@@ -499,7 +563,7 @@ define(["NextWave/source/utility/prototypes",
 									text: "Product strip--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.",
 									modes: [dialogModes.privilegeduserclickstrip3],
 									x: settings.general.margin,
-									y: settings.general.margin,
+									y: settings.layerLandingPage.navOffset + settings.general.margin,
 									width: 10 * settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
 								},
@@ -508,7 +572,7 @@ define(["NextWave/source/utility/prototypes",
 									text: "Classroom strip--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.",
 									modes: [dialogModes.privilegeduserclickstrip4],
 									x: settings.general.margin,
-									y: settings.general.margin,
+									y: settings.layerLandingPage.navOffset + settings.general.margin,
 									width: 10 * settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
 								},
@@ -517,7 +581,7 @@ define(["NextWave/source/utility/prototypes",
 									text: "Online strip--cannot purchase, so must be opened for editing. Another possibility is that it's being reviewed for approval to be made active.",
 									modes: [dialogModes.privilegeduserclickstrip5],
 									x: settings.general.margin,
-									y: settings.general.margin,
+									y: settings.layerLandingPage.navOffset + settings.general.margin,
 									width: 10 * settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
 								},
@@ -526,7 +590,7 @@ define(["NextWave/source/utility/prototypes",
 									text: "Core strip--will create new normal project based on it. Cannot edit and save replacing itself.",
 									modes: [dialogModes.normaluserclickstrip0],
 									x: settings.general.margin,
-									y: settings.general.margin,
+									y: settings.layerLandingPage.navOffset + settings.general.margin,
 									width: 10 * settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
 								},
@@ -535,7 +599,7 @@ define(["NextWave/source/utility/prototypes",
 									text: "Your own strip--editing. May save with a new name as a new project.",
 									modes: [dialogModes.normaluserclickstrip1],
 									x: settings.general.margin,
-									y: settings.general.margin,
+									y: settings.layerLandingPage.navOffset + settings.general.margin,
 									width: 10 * settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
 								},
@@ -544,7 +608,7 @@ define(["NextWave/source/utility/prototypes",
 									text: "Shared public project strip--cloning.",
 									modes: [dialogModes.normaluserclickstrip2],
 									x: settings.general.margin,
-									y: settings.general.margin,
+									y: settings.layerLandingPage.navOffset + settings.general.margin,
 									width: 10 * settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
 								},
@@ -553,7 +617,7 @@ define(["NextWave/source/utility/prototypes",
 									text: "Product that is active strip--will make buying decision.",
 									modes: [dialogModes.normaluserclickstrip3],
 									x: settings.general.margin,
-									y: settings.general.margin,
+									y: settings.layerLandingPage.navOffset + settings.general.margin,
 									width: 10 * settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
 								},
@@ -562,7 +626,7 @@ define(["NextWave/source/utility/prototypes",
 									text: "Classroom (active, soon and nearby) strip--will make buying or waitlist decision.",
 									modes: [dialogModes.normaluserclickstrip4],
 									x: settings.general.margin,
-									y: settings.general.margin,
+									y: settings.layerLandingPage.navOffset + settings.general.margin,
 									width: 10 * settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
 								},
@@ -571,7 +635,7 @@ define(["NextWave/source/utility/prototypes",
 									text: "Online (active and soon) strip--will make buying decision. There is no max number of enrollees.",
 									modes: [dialogModes.normaluserclickstrip5],
 									x: settings.general.margin,
-									y: settings.general.margin,
+									y: settings.layerLandingPage.navOffset + settings.general.margin,
 									width: 10 * settings.dialog.firstColumnWidth,
 									height: settings.dialog.lineHeight
 								}
@@ -711,7 +775,7 @@ define(["NextWave/source/utility/prototypes",
 								// Products.
 								tooltip = tooltip
 										+ "<br>Level: " + itemIth.level
-										+ "<br>Difficulty: " + itemIth.difficulty
+										+ "<br>Difficulty: settings.layerLandingPage.navOffset + " + itemIth.difficulty
 										+ "<br>Description: " + itemIth.productDescription
 										+ "<br>Price: " + itemIth.price.dollarFormat();
 								if (!m_bPrivileged && itemIth.alreadyBought) {
@@ -730,7 +794,7 @@ define(["NextWave/source/utility/prototypes",
 								}
 								tooltip = tooltip
 										+ "<br>Level: " + itemIth.level
-										+ "<br>Difficulty: " + itemIth.difficulty
+										+ "<br>Difficulty: settings.layerLandingPage.navOffset + " + itemIth.difficulty
 										+ "<br>Description: " + itemIth.classDescription
 										+ "<br>Notes: " + itemIth.classNotes
 										+ "<br>First class: " + strFirstClass
@@ -759,7 +823,7 @@ define(["NextWave/source/utility/prototypes",
 								}
 								tooltip = tooltip
 										+ "<br>Level: " + itemIth.level
-										+ "<br>Difficulty: " + itemIth.difficulty
+										+ "<br>Difficulty: settings.layerLandingPage.navOffset + " + itemIth.difficulty
 										+ "<br>Description: " + itemIth.classDescription
 										+ "<br>Notes: " + itemIth.classNotes
 										+ "<br>First class: " + strFirstClass

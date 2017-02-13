@@ -11,6 +11,7 @@
 // Require-AMD, and dependencies.
 define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/settings",
+    "NextWave/source/utility/dialogModes",
     "NextWave/source/utility/Point",
     "NextWave/source/utility/Size",
     "NextWave/source/utility/Area",
@@ -25,7 +26,7 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/ParameterListHost",
     "NextWave/source/utility/StatementListHost",
     "NextWave/source/utility/Picture"],
-    function (prototypes, settings, Point, Size, Area, Label, Edit, Button, Tooltip, GlyphHost, glyphs, ListHost, Accordion, ParameterListHost, StatementListHost, Picture) {
+    function (prototypes, settings, dialogModes, Point, Size, Area, Label, Edit, Button, Tooltip, GlyphHost, glyphs, ListHost, Accordion, ParameterListHost, StatementListHost, Picture) {
 
         try {
 
@@ -189,8 +190,8 @@ define(["NextWave/source/utility/prototypes",
                                 var controlIth = self.controls[i];
 
 								// Determine value of pointIn for controlIth only if not using modes for this dialog or
-								// using modes and current mode is active.
-								if (!m_mode || !controlIth.hasOwnProperty("modes") || controlIth.modes.includes(m_mode)) {
+								// using modes and current mode is active or current mode = dialogModes.universalmode.
+								if (!m_mode || !controlIth.hasOwnProperty("modes") || controlIth.modes.includes(m_mode) || controlIth.modes.includes(dialogModes.universalmode)) {
 
 									// If control contains point, then highlight.
 									var bRet = controlIth.pointIn(objectReference.renderContent,
@@ -294,8 +295,9 @@ define(["NextWave/source/utility/prototypes",
                             if (self.highlightControl &&
                                 $.isFunction(self.highlightControl.click)) {
 
-                                    // But ignore if self.highlightControl has the property "modes" and m_mode doesn't match one of self.highlightControl.modes's array elements.
-                                    if (m_mode && self.highlightControl.hasOwnProperty("modes") && !self.highlightControl.modes.includes(m_mode)) {
+                                    // But ignore if self.highlightControl has the property "modes" and m_mode doesn't match one of self.highlightControl.modes's array elements--
+									// UNLESS self.highlightControl.modes.includes(dialogModes.universalmodes).
+                                    if (m_mode && self.highlightControl.hasOwnProperty("modes") && !self.highlightControl.modes.includes(m_mode) && !self.highlightControl.modes.includes(dialogModes.universalmode)) {
 
                                         return null;
                                     }
@@ -445,9 +447,10 @@ define(["NextWave/source/utility/prototypes",
 									continue;
 								}
 
-                                // Render controlIth iff it doesn't have the property "modes" or it does and m_mode matches one controlIth.modes's array elements.
+                                // Render controlIth iff it doesn't have the property "modes" or it does and m_mode matches one controlIth.modes's array elements
+								// controlIth.modes contains dialogModes.universalmode.
                                 // Otherwise, just skip it for this render loop.
-                                if (!m_mode || (m_mode && controlIth.hasOwnProperty("modes") && controlIth.modes.includes(m_mode))) {
+                                if (!m_mode || (m_mode && controlIth.hasOwnProperty("modes") && (controlIth.modes.includes(m_mode) || controlIth.modes.includes(dialogModes.universalmode)))) {
 
                                     // Set the layout for the controls.
                                     var exceptionRet = controlIth.render(contextRender);

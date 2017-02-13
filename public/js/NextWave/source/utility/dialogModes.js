@@ -28,6 +28,9 @@ define(["NextWave/source/utility/prototypes"],
                     self.normaluserinitialstate = 101;
                     self.privilegeduserinitialstate = 102;
 
+					// Universal mode -- used to ensure a match whatever the dialog's m_mode is set to.
+					self.universalmode = -1;
+
 					// Used in LayerLandingPage.js.
                     self.normalusersearching = 1;
                     self.privilegedusersearching = 2;

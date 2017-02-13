@@ -46,6 +46,7 @@ define(["NextWave/source/utility/prototypes",
                         return null;
                     };
 
+					// If we weren't able to set constructorParameterString when declaring the Picture:
                     self.setUrl = function (url) {
 
                         self.url = url;
@@ -90,10 +91,10 @@ define(["NextWave/source/utility/prototypes",
 
                             try {
 
-                                contextRender.save();                                
+                                contextRender.save();
                                 contextRender.clip();
                                 contextRender.drawImage(m_image,
-                                    self.position.location.x, 
+                                    self.position.location.x,
                                     self.position.location.y,
                                     self.position.extent.width,
                                     self.position.extent.height);
@@ -129,7 +130,7 @@ define(["NextWave/source/utility/prototypes",
                 }
         	};
 
-            // Inherit from Control.  Wire 
+            // Inherit from Control.  Wire
             // up prototype chain to Control.
             functionRet.inheritsFrom(Control);
 

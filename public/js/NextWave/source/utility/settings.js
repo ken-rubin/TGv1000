@@ -60,7 +60,7 @@ define(["NextWave/source/utility/prototypes"],
                         smallFont: "15px Arial",
                         smallBoldFont: "bold 15px Arial",
                         font: "20px Arial",
-                        boldFont: "20px Arial",
+                        boldFont: "bold 20px Arial",
                         largeFont: "30px Arial",
                         smallMonoSpaceFont: "15px Courier New",
                         monoSpaceFont: "20px Courier New",
@@ -230,6 +230,12 @@ define(["NextWave/source/utility/prototypes"],
                             y: 254
                         }
                     };
+					self.layerLandingPage = {
+
+						navOffset: 80,
+						navTopMargin: 25
+
+					};
                     self.layerPanels = {
 
                         namesPanel: {
