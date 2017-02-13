@@ -188,6 +188,8 @@ define(["NextWave/source/utility/prototypes",
                         try {
 
 							// Mouse cursor is over this PLI.
+                            m_bMouseIn = true;
+
 							// Possibly draw a tooltip, depending upon whether there's text set up or not.
 							if (self.tooltip && m_area) {
 
@@ -204,6 +206,8 @@ define(["NextWave/source/utility/prototypes",
 					self.mouseOut = function(objectReference) {
 
 						try {
+
+                            m_bMouseIn = false;
 
 							if (!self.tooltip) {
 
@@ -285,12 +289,24 @@ define(["NextWave/source/utility/prototypes",
                                     );
                                 } else {
 
-                                    m_area = new Area(
-                                        new Point(areaRender.location.x + settings.general.margin + dOffset,
-                                            areaRender.location.y + settings.general.margin),
-                                        new Size(self.getWidth(contextRender) - 2 * settings.general.margin,
-                                            areaRender.extent.height - 2 * settings.general.margin)
-                                    );
+									if (!m_bMouseIn) {
+
+										m_area = new Area(
+											new Point(areaRender.location.x + settings.general.margin + dOffset,
+												areaRender.location.y + settings.general.margin),
+											new Size(self.getWidth(contextRender) - 2 * settings.general.margin,
+												areaRender.extent.height - 2 * settings.general.margin)
+										);
+									} else {
+
+										let expandedWidth = 2 * (self.getWidth(contextRender) - 2 * settings.general.margin);
+										let expandedHeight = 2 * (areaRender.extent.height - 2 * settings.general.margin);
+										m_area = new Area(
+											new Point(areaRender.location.x + settings.general.margin + dOffset - (expandedWidth / 4),
+												areaRender.location.y + settings.general.margin - (expandedHeight / 4)),
+											new Size(expandedWidth, expandedHeight)
+										);
+									}
                                 }
                             }
 
@@ -350,6 +366,8 @@ define(["NextWave/source/utility/prototypes",
 
                     // The area, relative to the canvas, occupied by this instance.
                     var m_area = null;
+                    // Keep track of mouse in PLI.
+                    let m_bMouseIn = false;
 
                 } catch (e) {
 

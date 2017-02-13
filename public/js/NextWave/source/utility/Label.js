@@ -65,19 +65,6 @@ define(["NextWave/source/utility/prototypes",
 
                             m_bMouseIn = true;
 
-							// Mouse is over this label.
-							// Possibly draw one of 2 tooltips.
-							// if (self.visible) {
-
-							// 	if (self.protected && self.protectedTooltip) {
-
-							// 		return manager.drawSmartTooltip(self.protectedTooltip, m_area);
-							// 	} else if (!self.protected && self.unProtectedTooltip) {
-
-							// 		return manager.drawSmartTooltip(self.unProtectedTooltip, m_area);
-							// 	}
-							// }
-
                             return null;
                         } catch (e) {
 
@@ -112,18 +99,12 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Pass to payload.
-					// Also, cause last (possible) tooltip to disappear.
                     self.mouseOut = function (objectReference) {
 
                         try {
 
                             m_bMouseIn = false;
                             m_bMouseDown = false;
-
-							// if (self.visible && (self.protectedTooltip || self.unProtectedTooltip)) {
-
-							// 	return manager.stopDrawingSmartTooltip();
-							// }
 
                             return null;
                         } catch (e) {
@@ -169,10 +150,10 @@ define(["NextWave/source/utility/prototypes",
                             // If font specified, set, else default.
                             if (self.configuration.font) {
 
-                                contextRender.font = (m_bMouseIn ? "italic " : "") + self.configuration.font;
+                                contextRender.font = (m_bMouseIn && $.isFunction(self.configuration.clickHandler) ? "italic " : "") + self.configuration.font;
                             } else {
 
-                                contextRender.font = (m_bMouseIn ? "italic " : "") + settings.general.font;
+                                contextRender.font = (m_bMouseIn && $.isFunction(self.configuration.clickHandler) ? "italic " : "") + settings.general.font;
                             }
 
                             // If border, render border.
@@ -223,7 +204,7 @@ define(["NextWave/source/utility/prototypes",
 
                     // Placement of this instance.
                     var m_area = null;
-                    // Keep track of mouse in button.
+                    // Keep track of mouse in label.
                     let m_bMouseIn = false;
                     // Keep track of mouse down.
                     let m_bMouseDown = false;
