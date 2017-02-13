@@ -31,9 +31,15 @@ define(["NextWave/source/utility/prototypes"],
 					// Universal mode -- used to ensure a match whatever the dialog's m_mode is set to.
 					self.universalmode = -1;
 
+					// Unfiltered mode -- used to show everything.
+					self.unfilteredMode = -2;
+
 					// Used in LayerLandingPage.js.
                     self.normalusersearching = 1;
                     self.privilegedusersearching = 2;
+					self.programMode = 50;
+					self.classMode = 51;
+					self.kitMode = 52;
 
 					// Used in LayerNavbar.js and in LayerLandingPage.js.
 					self.normaluserclickstrip0 = 3;

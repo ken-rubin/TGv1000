@@ -135,7 +135,10 @@ define(["NextWave/source/utility/prototypes",
 									x: settings.dialog.firstColumnWidth,
 									y: settings.layerLandingPage.navOffset + 20,
 									width: 100,
-									height: settings.dialog.lineHeight
+									height: settings.dialog.lineHeight,
+									clickHandler: function() {
+										self.dialog.setMode(dialogModes.programMode);
+									}
 								},
 								navPlayGames: {
 									type: "Label",
@@ -154,10 +157,13 @@ define(["NextWave/source/utility/prototypes",
 									modes: [dialogModes.universalmode],
 									font: settings.general.boldFont,
 									fillStyle: "#FF0000",
-									x: settings.dialog.firstColumnWidth + 250,
+									x: settings.dialog.firstColumnWidth + 265,
 									y: settings.layerLandingPage.navOffset + 20,
 									width: 100,
-									height: settings.dialog.lineHeight
+									height: settings.dialog.lineHeight,
+									clickHandler: function() {
+										self.dialog.setMode(dialogModes.classMode);
+									}
 								},
 								navKits: {
 									type: "Label",
@@ -167,8 +173,11 @@ define(["NextWave/source/utility/prototypes",
 									fillStyle: "#FFAB00",
 									x: settings.dialog.firstColumnWidth + 375,
 									y: settings.layerLandingPage.navOffset + 20,
-									width: 100,
-									height: settings.dialog.lineHeight
+									width: 50,
+									height: settings.dialog.lineHeight,
+									clickHandler: function() {
+										self.dialog.setMode(dialogModes.kitMode);
+									}
 								},
 								navGromLand: {
 									type: "Label",
@@ -176,7 +185,7 @@ define(["NextWave/source/utility/prototypes",
 									modes: [dialogModes.universalmode],
 									font: settings.general.boldFont,
 									fillStyle: "#00AE68",
-									x: settings.dialog.firstColumnWidth + 500,
+									x: settings.dialog.firstColumnWidth + 450,
 									y: settings.layerLandingPage.navOffset + 20,
 									width: 100,
 									height: settings.dialog.lineHeight
@@ -265,7 +274,7 @@ define(["NextWave/source/utility/prototypes",
 								},
 								coreProjects: {
 									type: "ListHost",
-									modes: [dialogModes.normalusersearching,dialogModes.privilegedusersearching],
+									modes: [dialogModes.unfilteredMode,dialogModes.classMode],
 									constructorParameterString: "false",
 									x: settings.general.margin +
 										settings.dialog.firstColumnWidth,
@@ -311,7 +320,7 @@ define(["NextWave/source/utility/prototypes",
 								},
 								yourProjects: {
 									type: "ListHost",
-									modes: [dialogModes.normalusersearching,dialogModes.privilegedusersearching],
+									modes: [dialogModes.unfilteredMode,dialogModes.programMode,dialogModes.classMode,dialogModes.kitMode],
 									constructorParameterString: "false",
 									x: settings.general.margin +
 										settings.dialog.firstColumnWidth,
@@ -357,7 +366,7 @@ define(["NextWave/source/utility/prototypes",
 								},
 								sharedProjects: {
 									type: "ListHost",
-									modes: [dialogModes.normalusersearching,dialogModes.privilegedusersearching],
+									modes: [dialogModes.unfilteredMode,dialogModes.normalusersearching,dialogModes.privilegedusersearching],
 									constructorParameterString: "false",
 									x: settings.general.margin +
 										settings.dialog.firstColumnWidth,
@@ -403,7 +412,7 @@ define(["NextWave/source/utility/prototypes",
 								},
 								productProjects: {
 									type: "ListHost",
-									modes: [dialogModes.normalusersearching,dialogModes.privilegedusersearching],
+									modes: [dialogModes.unfilteredMode,dialogModes.kitMode],
 									constructorParameterString: "false",
 									x: settings.general.margin +
 										settings.dialog.firstColumnWidth,
@@ -449,7 +458,7 @@ define(["NextWave/source/utility/prototypes",
 								},
 								classroomProjects: {
 									type: "ListHost",
-									modes: [dialogModes.normalusersearching,dialogModes.privilegedusersearching],
+									modes: [dialogModes.unfilteredMode,dialogModes.classMode],
 									constructorParameterString: "false",
 									x: settings.general.margin +
 										settings.dialog.firstColumnWidth,
@@ -495,7 +504,7 @@ define(["NextWave/source/utility/prototypes",
 								},
 								onlineProjects: {
 									type: "ListHost",
-									modes: [dialogModes.normalusersearching,dialogModes.privilegedusersearching],
+									modes: [dialogModes.unfilteredMode,dialogModes.classMode],
 									constructorParameterString: "false",
 									x: settings.general.margin +
 										settings.dialog.firstColumnWidth,
@@ -512,24 +521,6 @@ define(["NextWave/source/utility/prototypes",
 										m_area = area;	// Set it aside. Works in this case.
 										return (area.extent.height / 15);
 									}
-								},
-								encouragementLabel: {
-									type: "Label",
-									text: "Click one of the project images above for more information about that project.",
-									modes: [dialogModes.normalusersearching,dialogModes.privilegedusersearching],
-									font: "oblique " + settings.general.boldFont,
-									x: settings.general.margin,
-									yType: "callback",
-									y: function(area) {
-										return settings.layerLandingPage.navOffset + (area.extent.height / 15 + settings.dialog.lineHeight / 2) * 6 +
-											(area.extent.height / 15) +
-											0.5 * settings.dialog.lineHeight;
-									},
-									widthType: "callback",
-									width: function(area) {
-										return area.extent.width;
-									},
-									height: settings.dialog.lineHeight
 								},
 								priv0: {
 									type: "Label",
@@ -644,7 +635,7 @@ define(["NextWave/source/utility/prototypes",
 												g_profile["can_create_products"] ||
 												g_profile["can_create_onlineClasses"]);
                             let exceptionRet = self.dialog.create(objectConfiguration,
-							                                 	(m_bPrivileged ? dialogModes.privilegedusersearching : dialogModes.normalusersearching),
+							                                 	dialogModes.unfilteredMode,
 																m_functionSearchAndReload
 							);
                             if (exceptionRet) {

@@ -36,6 +36,11 @@ define(["NextWave/source/utility/prototypes",
                     // Content.
                     self.text = strText || "";
 
+                    // Callback to handle click event.
+                    // Callback must accept click-event-object
+                    // reference and return an Exception.
+                    self.clickHandler = null;
+
                     ///////////////////////
                     // Public methods.
 
@@ -50,6 +55,95 @@ define(["NextWave/source/utility/prototypes",
                     self.innerCreate = function () {
 
                         self.text = self.configuration.text;
+                        return null;
+                    };
+
+                    // Pass to payload.
+                    self.mouseMove = function (objectReference) {
+
+                        try {
+
+                            m_bMouseIn = true;
+
+							// Mouse is over this label.
+							// Possibly draw one of 2 tooltips.
+							// if (self.visible) {
+
+							// 	if (self.protected && self.protectedTooltip) {
+
+							// 		return manager.drawSmartTooltip(self.protectedTooltip, m_area);
+							// 	} else if (!self.protected && self.unProtectedTooltip) {
+
+							// 		return manager.drawSmartTooltip(self.unProtectedTooltip, m_area);
+							// 	}
+							// }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Pass to payload.
+                    self.mouseDown = function (objectReference) {
+
+                        try {
+
+                            m_bMouseDown = true;
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Pass to payload.
+                    self.mouseUp = function (objectReference) {
+
+                        try {
+
+                            m_bMouseDown = false;
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Pass to payload.
+					// Also, cause last (possible) tooltip to disappear.
+                    self.mouseOut = function (objectReference) {
+
+                        try {
+
+                            m_bMouseIn = false;
+                            m_bMouseDown = false;
+
+							// if (self.visible && (self.protectedTooltip || self.unProtectedTooltip)) {
+
+							// 	return manager.stopDrawingSmartTooltip();
+							// }
+
+                            return null;
+                        } catch (e) {
+
+                            return e;
+                        }
+                    };
+
+                    // Invoked when the mouse is clicked over the canvas.
+                    self.click = function (objectReference) {
+
+						if (self.protected || !self.visible) {
+
+							return null;
+						}
+
+                        if ($.isFunction(self.configuration.clickHandler)) {
+
+                            return self.configuration.clickHandler();
+                        }
                         return null;
                     };
 
@@ -75,10 +169,10 @@ define(["NextWave/source/utility/prototypes",
                             // If font specified, set, else default.
                             if (self.configuration.font) {
 
-                                contextRender.font = self.configuration.font;
+                                contextRender.font = (m_bMouseIn ? "italic " : "") + self.configuration.font;
                             } else {
 
-                                contextRender.font = settings.general.font;
+                                contextRender.font = (m_bMouseIn ? "italic " : "") + settings.general.font;
                             }
 
                             // If border, render border.
@@ -103,10 +197,20 @@ define(["NextWave/source/utility/prototypes",
 
 	                            contextRender.fillStyle = settings.general.fillText;
 							}
-                            contextRender.fillText(self.text,
-                                m_area.location.x,
-                                m_area.location.y,
-                                m_area.extent.width);
+
+							if (self.protected) {
+
+								contextRender.fillText(self.text,
+									m_area.location.x,
+									m_area.location.y,
+									m_area.extent.width);
+							} else {
+
+								contextRender.fillText(self.text,
+									m_area.location.x + (m_bMouseDown ? 3 : 0),
+									m_area.location.y + (m_bMouseDown ? 3 : 0),
+									m_area.extent.width);
+							}
                             return null;
                         } catch (e) {
 
@@ -119,16 +223,16 @@ define(["NextWave/source/utility/prototypes",
 
                     // Placement of this instance.
                     var m_area = null;
+                    // Keep track of mouse in button.
+                    let m_bMouseIn = false;
+                    // Keep track of mouse down.
+                    let m_bMouseDown = false;
 
                 } catch (e) {
 
                     alert(e.message);
                 }
         	};
-
-            // Inherit from Control.  Wire
-            // up prototype chain to Control.
-//            functionRet.inheritsFrom(Control);
 
         	return functionRet;
         } catch (e) {
