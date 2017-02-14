@@ -238,7 +238,7 @@ define(["NextWave/source/utility/prototypes",
                     };
 
                     // Render out this type.
-                    self.render = function (contextRender, areaRender, dOffset, bVertical) {
+                    self.render = function (contextRender, areaRender, dOffset) {
 
                         try {
 
@@ -246,69 +246,54 @@ define(["NextWave/source/utility/prototypes",
                                 return null;
                             }
 
-                            // Default vertical to true.
-                            if (bVertical === undefined) {
-
-                                bVertical = true;
-                            }
-
                             // Define the containing area.
-                            if (bVertical) {
 
-                                m_area = new Area(
-                                    new Point(areaRender.location.x + settings.general.margin,
-                                        areaRender.location.y + settings.general.margin + dOffset),
-                                    new Size(areaRender.extent.width - 2 * settings.general.margin,
-                                        self.getHeight() - 2 * settings.general.margin)
-                                );
-                            } else {
+							// A special test just for the horizontal listHost's PictureListItem (which this is).
+							if (self.outline) {
 
-                                // A special test just for the horizontal listHost's PictureListItem (which this is).
-                                if (self.outline) {
+								// First we'll draw the background (outline) rectangle at normal size.
+								m_area = new Area(
+									new Point(areaRender.location.x + settings.general.margin + dOffset,
+										areaRender.location.y + settings.general.margin),
+									new Size(self.getWidth(contextRender) - 2 * settings.general.margin,
+										areaRender.extent.height - 2 * settings.general.margin)
+								);
+								contextRender.fillStyle = "rgba(255,0,0,1)";
+								contextRender.fillRect(
+									m_area.location.x,
+									m_area.location.y,
+									m_area.extent.width,
+									m_area.extent.height);
 
-                                    // First we'll draw the background (outline) rectangle at normal size.
-                                    m_area = new Area(
-                                        new Point(areaRender.location.x + settings.general.margin + dOffset,
-                                            areaRender.location.y + settings.general.margin),
-                                        new Size(self.getWidth(contextRender) - 2 * settings.general.margin,
-                                            areaRender.extent.height - 2 * settings.general.margin)
-                                    );
-                                    contextRender.fillStyle = "rgba(255,0,0,1)";
-                                    contextRender.fillRect(
-                                        m_area.location.x,
-                                        m_area.location.y,
-                                        m_area.extent.width,
-                                        m_area.extent.height);
+								// Then we'll shrink down a bit so the image drawing below will appear indented.
+								m_area = new Area(
+									new Point(areaRender.location.x + settings.general.margin + dOffset + 5,
+										areaRender.location.y + settings.general.margin + 5),
+									new Size(self.getWidth(contextRender) - 2 * settings.general.margin - 10,
+										areaRender.extent.height - 2 * settings.general.margin - 10)
+								);
+							} else {
 
-                                    // Then we'll shrink down a bit so the image drawing below will appear indented.
-                                    m_area = new Area(
-                                        new Point(areaRender.location.x + settings.general.margin + dOffset + 5,
-                                            areaRender.location.y + settings.general.margin + 5),
-                                        new Size(self.getWidth(contextRender) - 2 * settings.general.margin - 10,
-                                            areaRender.extent.height - 2 * settings.general.margin - 10)
-                                    );
-                                } else {
+								if (!m_bMouseIn) {
 
-									if (!m_bMouseIn) {
+									m_area = new Area(
+										new Point(areaRender.location.x + settings.general.margin + dOffset,
+											areaRender.location.y + settings.general.margin),
+										new Size(self.getWidth(contextRender) - 2 * settings.general.margin,
+											areaRender.extent.height - 2 * settings.general.margin)
+									);
+								} else {
 
-										m_area = new Area(
-											new Point(areaRender.location.x + settings.general.margin + dOffset,
-												areaRender.location.y + settings.general.margin),
-											new Size(self.getWidth(contextRender) - 2 * settings.general.margin,
-												areaRender.extent.height - 2 * settings.general.margin)
-										);
-									} else {
-
-										let expandedWidth = 2 * (self.getWidth(contextRender) - 2 * settings.general.margin);
-										let expandedHeight = 2 * (areaRender.extent.height - 2 * settings.general.margin);
-										m_area = new Area(
-											new Point(areaRender.location.x + settings.general.margin + dOffset - (expandedWidth / 4),
-												areaRender.location.y + settings.general.margin - (expandedHeight / 4)),
-											new Size(expandedWidth, expandedHeight)
-										);
-									}
-                                }
-                            }
+									// Will render expanded 2 times width and height.
+									let expandedWidth = 2 * (self.getWidth(contextRender) - 2 * settings.general.margin);
+									let expandedHeight = 2 * (areaRender.extent.height - 2 * settings.general.margin);
+									m_area = new Area(
+										new Point(areaRender.location.x + settings.general.margin + dOffset - (expandedWidth / 4),
+											areaRender.location.y + settings.general.margin - (expandedHeight / 4)),
+										new Size(expandedWidth, expandedHeight)
+									);
+								}
+							}
 
                             // Generate the path.
                             var exceptionRet = m_area.generateRoundedRectPath(contextRender);

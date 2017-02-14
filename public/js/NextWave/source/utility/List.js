@@ -106,7 +106,7 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // We are about to outline a PictureListItem or a RadioListItem. Turn all outlines in the List off first.
+                    // We are about to outline a RadioListItem. Turn all outlines in the List off first.
                     self.removeAllOutlines = function() {
 
                         for (var i = 0; i < self.items.length; i++) {

@@ -31,16 +31,13 @@ define(["NextWave/source/utility/prototypes",
 
                     // Collection of held items.
                     self.items = [];
-                    // Indicates how things are measured and how they scroll. Defaults to true, but don't know of any cases where it's not provided.
-                    self.vertical = false;
 					self.scrollStub = settings.general.scrollStub;
                     // Access this property based on orientation.
-                    self.propertyAccessor = (self.vertical ? "height" : "width");
+                    self.propertyAccessor = "width";
                     // Access this method based on orientation.
-                    self.methodAccessor = (self.vertical ? "getHeight" : "getWidth");
+                    self.methodAccessor = "getWidth";
                     // Access scroll cursor based on orientation.
-                    self.scrollCursor = [(self.vertical ? "n-resize" : "w-resize"),
-                        (self.vertical ? "s-resize" : "e-resize")];
+                    self.scrollCursor = ["w-resize", "e-resize"];
                     // Indicates that the corresponding scroll stud is visible--set in render.
                     self.scrollStubVisible = [false, false];
                     // Indicates that the corresponding scroll stud is visible--set in render.
@@ -107,7 +104,7 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // We are about to outline a PictureListItem or a RadioListItem. Turn all outlines in the List off first.
+                    // We are about to outline a PictureListItem. Turn all outlines in the List off first.
                     self.removeAllOutlines = function() {
 
                         for (var i = 0; i < self.items.length; i++) {
@@ -501,7 +498,7 @@ define(["NextWave/source/utility/prototypes",
 
                             // Get the direction of scrolling based on wheel change.
                             // For now, I don't think you can scroll to ther side...test....
-                            var strDeltaAccessor = (self.vertical ? "deltaY" : "deltaY");
+                            var strDeltaAccessor = "deltaY";
 
                             // Calculate distance.
                             var dAmount = -objectReference.event[strDeltaAccessor] * objectReference.event.deltaFactor;
@@ -627,27 +624,15 @@ define(["NextWave/source/utility/prototypes",
                             // Calculate the maximal area.
                             m_areaMaximal = areaMaximal;
 
-                            if (self.vertical) {
+							self.scrollStubArea[0] = new Area(new Point(m_areaMaximal.location.x - self.scrollStub.height / 2,
+									m_areaMaximal.location.y - self.scrollStub.yOffset / 5),
+								new Size(self.scrollStub.height /* this one is on its side */,
+									m_areaMaximal.extent.height + 2 * self.scrollStub.yOffset / 5));
 
-                                self.scrollStubArea[0] = new Area(new Point(areaMaximal.location.x + (areaMaximal.extent.width - self.scrollStub.width) / 2,
-                                        areaMaximal.location.y + self.scrollStub.yOffset),
-                                    new Size(self.scrollStub.width, self.scrollStub.height));
-
-                                self.scrollStubArea[1] = new Area(new Point(areaMaximal.location.x + (areaMaximal.extent.width - self.scrollStub.width) / 2,
-                                        areaMaximal.location.y + areaMaximal.extent.height + self.scrollStub.yOffset),
-                                    new Size(self.scrollStub.width, self.scrollStub.height));
-                            } else {
-
-                                self.scrollStubArea[0] = new Area(new Point(m_areaMaximal.location.x - self.scrollStub.height / 2,
-                                        m_areaMaximal.location.y - self.scrollStub.yOffset / 5),
-                                    new Size(self.scrollStub.height /* this one is on its side */,
-                                        m_areaMaximal.extent.height + 2 * self.scrollStub.yOffset / 5));
-
-                                self.scrollStubArea[1] = new Area(new Point(m_areaMaximal.location.x + m_areaMaximal.extent.width - self.scrollStub.height / 2,
-                                        m_areaMaximal.location.y - self.scrollStub.yOffset / 5),
-                                    new Size(self.scrollStub.height /* this one is on its side */,
-                                        m_areaMaximal.extent.height + 2 * self.scrollStub.yOffset / 5));
-                            }
+							self.scrollStubArea[1] = new Area(new Point(m_areaMaximal.location.x + m_areaMaximal.extent.width - self.scrollStub.height / 2,
+									m_areaMaximal.location.y - self.scrollStub.yOffset / 5),
+								new Size(self.scrollStub.height /* this one is on its side */,
+									m_areaMaximal.extent.height + 2 * self.scrollStub.yOffset / 5));
 
                             // Call virtual.
                             let exceptionRet = self.innerCalculateLayout(areaMaximal, contextRender);
@@ -782,8 +767,7 @@ define(["NextWave/source/utility/prototypes",
                                 // Render out the item.
                                 exceptionRet = itemIth.render(contextRender,
                                     m_areaMaximal,
-                                    dCursor,
-                                    self.vertical);
+                                    dCursor);
                                 if (exceptionRet) {
 
                                     throw exceptionRet;

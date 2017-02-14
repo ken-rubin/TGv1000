@@ -188,7 +188,7 @@ Controls arranged by Mode
 									height: settings.dialog.lineHeight
 								},
 								projectTypes: {
-									type: "ListHost",
+									type: "PictureListHost",
 									modes: ['Sel Proj Type-normal user','Sel Proj Type-priv user'],
 									constructorParameterString: "false",
 									x: 2 * settings.general.margin +
