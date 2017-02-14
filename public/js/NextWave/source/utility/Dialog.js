@@ -22,11 +22,12 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/GlyphHost",
     "NextWave/source/utility/glyphs",
     "NextWave/source/utility/ListHost",
+    "NextWave/source/utility/PictureListHost",
     "NextWave/source/utility/Accordion",
     "NextWave/source/utility/ParameterListHost",
     "NextWave/source/utility/StatementListHost",
     "NextWave/source/utility/Picture"],
-    function (prototypes, settings, dialogModes, Point, Size, Area, Label, Edit, Button, Tooltip, GlyphHost, glyphs, ListHost, Accordion, ParameterListHost, StatementListHost, Picture) {
+    function (prototypes, settings, dialogModes, Point, Size, Area, Label, Edit, Button, Tooltip, GlyphHost, glyphs, ListHost, PictureListHost, Accordion, ParameterListHost, StatementListHost, Picture) {
 
         try {
 

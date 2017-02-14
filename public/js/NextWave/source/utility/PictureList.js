@@ -1,7 +1,7 @@
 ///////////////////////////
-// List module.
+// PictureList module.
 //
-// Base class for lists.
+// Base class for lists of PictureListItems.
 //
 // Return constructor function.
 //
@@ -13,13 +13,14 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/settings",
     "NextWave/source/utility/Point",
     "NextWave/source/utility/Size",
-    "NextWave/source/utility/Area"],
-    function (prototypes, settings, Point, Size, Area) {
+    "NextWave/source/utility/Area",
+    "NextWave/source/utility/PictureListItem"],
+    function (prototypes, settings, Point, Size, Area, PictureListItem) {
 
         try {
 
             // Constructor function.
-        	var functionRet = function List(bVertical, bTinyScrollStub) {
+        	var functionRet = function PictureList() {
 
                 try {
 
@@ -31,8 +32,8 @@ define(["NextWave/source/utility/prototypes",
                     // Collection of held items.
                     self.items = [];
                     // Indicates how things are measured and how they scroll. Defaults to true, but don't know of any cases where it's not provided.
-                    self.vertical = bVertical;
-					self.scrollStub = bTinyScrollStub ? settings.general.tinyScrollStub : settings.general.scrollStub;
+                    self.vertical = false;
+					self.scrollStub = settings.general.scrollStub;
                     // Access this property based on orientation.
                     self.propertyAccessor = (self.vertical ? "height" : "width");
                     // Access this method based on orientation.
@@ -942,4 +943,3 @@ define(["NextWave/source/utility/prototypes",
             alert(e.message);
         }
     });
-

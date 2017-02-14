@@ -38,7 +38,7 @@ define(["NextWave/source/utility/prototypes",
 
                     // Inherit from base class.
                     self.inherits(LayerDialogHost,
-						"rgba(64,64,64,1)",		// Required for Layers inheriting LayerDialogHost.
+						"rgba(64,64,64,1)",			// Required for Layers inheriting LayerDialogHost.
 						true						// Tells LayerDialogHost to set objectReference.handled in mouse move.
 					);
 
@@ -273,9 +273,8 @@ define(["NextWave/source/utility/prototypes",
 									height: settings.dialog.lineHeight
 								},
 								coreProjects: {
-									type: "ListHost",
+									type: "PictureListHost",
 									modes: [dialogModes.unfilteredMode,dialogModes.classMode],
-									constructorParameterString: "false",
 									x: settings.general.margin +
 										settings.dialog.firstColumnWidth,
 									yType: "callback",
@@ -319,9 +318,8 @@ define(["NextWave/source/utility/prototypes",
 									height: settings.dialog.lineHeight
 								},
 								yourProjects: {
-									type: "ListHost",
+									type: "PictureListHost",
 									modes: [dialogModes.unfilteredMode,dialogModes.programMode,dialogModes.classMode,dialogModes.kitMode],
-									constructorParameterString: "false",
 									x: settings.general.margin +
 										settings.dialog.firstColumnWidth,
 									yType: "callback",
@@ -365,9 +363,8 @@ define(["NextWave/source/utility/prototypes",
 									height: settings.dialog.lineHeight
 								},
 								sharedProjects: {
-									type: "ListHost",
+									type: "PictureListHost",
 									modes: [dialogModes.unfilteredMode,dialogModes.normalusersearching,dialogModes.privilegedusersearching],
-									constructorParameterString: "false",
 									x: settings.general.margin +
 										settings.dialog.firstColumnWidth,
 									yType: "callback",
@@ -411,9 +408,8 @@ define(["NextWave/source/utility/prototypes",
 									height: settings.dialog.lineHeight
 								},
 								productProjects: {
-									type: "ListHost",
+									type: "PictureListHost",
 									modes: [dialogModes.unfilteredMode,dialogModes.kitMode],
-									constructorParameterString: "false",
 									x: settings.general.margin +
 										settings.dialog.firstColumnWidth,
 									yType: "callback",
@@ -457,9 +453,8 @@ define(["NextWave/source/utility/prototypes",
 									height: settings.dialog.lineHeight
 								},
 								classroomProjects: {
-									type: "ListHost",
+									type: "PictureListHost",
 									modes: [dialogModes.unfilteredMode,dialogModes.classMode],
-									constructorParameterString: "false",
 									x: settings.general.margin +
 										settings.dialog.firstColumnWidth,
 									yType: "callback",
@@ -503,9 +498,8 @@ define(["NextWave/source/utility/prototypes",
 									height: settings.dialog.lineHeight
 								},
 								onlineProjects: {
-									type: "ListHost",
+									type: "PictureListHost",
 									modes: [dialogModes.unfilteredMode,dialogModes.classMode],
-									constructorParameterString: "false",
 									x: settings.general.margin +
 										settings.dialog.firstColumnWidth,
 									yType: "callback",
