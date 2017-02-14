@@ -277,20 +277,20 @@ define(["NextWave/source/utility/prototypes",
 								if (!m_bMouseIn) {
 
 									// The PictureList is 2 times higher than I'd normally want it to be to allow for expanded, m_bMouseIn pictures.
-									// So, since this is the non-mouse in case, pull the picture in and shrink it down.
-									let width = self.getWidth(contextRender) - 2 * settings.general.margin;
-									let height = areaRender.extent.height - 2 * settings.general.margin;
+									// So, since this is the non-mouse in case, pull the picture in and position it centrally.
+									let plHeight = self.collection.areaMaximal.extent.height;
+									let height = plHeight * 0.6666;
+									let width = height / m_image.height * m_image.width;
 									m_area = new Area(
-										new Point(areaRender.location.x + settings.general.margin + dOffset - (width / 4),
-											areaRender.location.y + settings.general.margin + (height / 4)),
-										new Size(self.getWidth(contextRender) - 2 * settings.general.margin - (width / 2),
-											areaRender.extent.height - 2 * settings.general.margin - (height / 2))
+										new Point(areaRender.location.x + settings.general.margin + dOffset - (width / 2),
+											areaRender.location.y + settings.general.margin + (height / 8)),
+										new Size(width, height)
 									);
 								} else {
 
-									// Will render expanded 2 times width and height.
-									let expandedWidth = 2 * (self.getWidth(contextRender) - 2 * settings.general.margin);
-									let expandedHeight = 2 * (areaRender.extent.height - 2 * settings.general.margin);
+									// Will render expanded to height of list container and with width scaled.
+									let expandedHeight = self.collection.areaMaximal.extent.height;
+									let expandedWidth = expandedHeight / m_image.height * m_image.width;
 									m_area = new Area(
 										new Point(areaRender.location.x + settings.general.margin + dOffset - (expandedWidth / 4),
 											areaRender.location.y + settings.general.margin - (expandedHeight / 4)),

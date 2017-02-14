@@ -42,6 +42,10 @@ define(["NextWave/source/utility/prototypes",
                     self.scrollStubVisible = [false, false];
                     // Indicates that the corresponding scroll stud is visible--set in render.
                     self.scrollStubArea = [null, null];
+					// Expose scroll offset and area maximal.
+                    // Expose private field.
+                    self.dScrollOffset = null;
+                    self.areaMaximal = null;
 
                     ///////////////////////
                     // Public methods.
@@ -268,13 +272,13 @@ define(["NextWave/source/utility/prototypes",
                     self.pointIn = function (contextRender, point) {
 
                         // Return false if never rendered.
-                        if (!m_areaMaximal) {
+                        if (!self.areaMaximal) {
 
                             return false;
                         }
 
                         // Return simple hit-test against area.
-                        return m_areaMaximal.pointInArea(contextRender,
+                        return self.areaMaximal.pointInArea(contextRender,
                             point,
                             true);
                     }
@@ -417,14 +421,14 @@ define(["NextWave/source/utility/prototypes",
                                     m_functionScroll = function () {
 
                                         // Special case, scroll down.
-                                        if (m_dScrollOffset > 0) {
+                                        if (self.dScrollOffset > 0) {
 
-                                            m_dScrollOffset -= self.scrollStub.amount;
+                                            self.dScrollOffset -= self.scrollStub.amount;
                                         }
                                         // Pin to bounds.
-                                        if (m_dScrollOffset < 0) {
+                                        if (self.dScrollOffset < 0) {
 
-                                            m_dScrollOffset = 0;
+                                            self.dScrollOffset = 0;
                                         }
                                     };
                                 }
@@ -451,14 +455,14 @@ define(["NextWave/source/utility/prototypes",
                                     m_functionScroll = function () {
 
                                         // Special case, scroll up.
-                                        if (m_dScrollOffset < (dTotalExtent - m_areaMaximal.extent[self.propertyAccessor])) {
+                                        if (self.dScrollOffset < (dTotalExtent - self.areaMaximal.extent[self.propertyAccessor])) {
 
-                                            m_dScrollOffset += self.scrollStub.amount;
+                                            self.dScrollOffset += self.scrollStub.amount;
                                         }
                                         // Pin to bounds.
-                                        if (m_dScrollOffset > (dTotalExtent - m_areaMaximal.extent[self.propertyAccessor])) {
+                                        if (self.dScrollOffset > (dTotalExtent - self.areaMaximal.extent[self.propertyAccessor])) {
 
-                                            m_dScrollOffset = (dTotalExtent - m_areaMaximal.extent[self.propertyAccessor]);
+                                            self.dScrollOffset = (dTotalExtent - self.areaMaximal.extent[self.propertyAccessor]);
                                         }
                                     };
                                 }
@@ -491,7 +495,7 @@ define(["NextWave/source/utility/prototypes",
                             var dTotalExtent = self.getTotalExtent(objectReference.contextRender);
 
                             // Do nothing if nothing to scroll.
-                            if (dTotalExtent < m_areaMaximal.extent[self.propertyAccessor]) {
+                            if (dTotalExtent < self.areaMaximal.extent[self.propertyAccessor]) {
 
                                 return null;
                             }
@@ -507,26 +511,26 @@ define(["NextWave/source/utility/prototypes",
                             if (dAmount < 0) {
 
                                 // Move it.
-                                if (m_dScrollOffset > 0) {
+                                if (self.dScrollOffset > 0) {
 
-                                    m_dScrollOffset += dAmount;
+                                    self.dScrollOffset += dAmount;
                                 }
                                 // Pin to bounds.
-                                if (m_dScrollOffset < 0) {
+                                if (self.dScrollOffset < 0) {
 
-                                    m_dScrollOffset = 0;
+                                    self.dScrollOffset = 0;
                                 }
                             } else {
 
                                 // Move it.
-                                if (m_dScrollOffset < (dTotalExtent - m_areaMaximal.extent[self.propertyAccessor])) {
+                                if (self.dScrollOffset < (dTotalExtent - self.areaMaximal.extent[self.propertyAccessor])) {
 
-                                    m_dScrollOffset += dAmount;
+                                    self.dScrollOffset += dAmount;
                                 }
                                 // Pin to bounds.
-                                if (m_dScrollOffset > (dTotalExtent - m_areaMaximal.extent[self.propertyAccessor])) {
+                                if (self.dScrollOffset > (dTotalExtent - self.areaMaximal.extent[self.propertyAccessor])) {
 
-                                    m_dScrollOffset = (dTotalExtent - m_areaMaximal.extent[self.propertyAccessor]);
+                                    self.dScrollOffset = (dTotalExtent - self.areaMaximal.extent[self.propertyAccessor]);
                                 }
                             }
 
@@ -588,7 +592,7 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
-                            m_dScrollOffset = 1000000000;   // Past any reasonable offset...
+                            self.dScrollOffset = 1000000000;   // Past any reasonable offset...
                             m_bPossiblyAdjustScrollOffsets = true;
 
                             return null;
@@ -596,18 +600,6 @@ define(["NextWave/source/utility/prototypes",
 
                             return e;
                         }
-                    };
-
-                    // Expose private field.
-                    self.scrollOffset = function () {
-
-                        return m_dScrollOffset;
-                    };
-
-                    // Expose private field.
-                    self.areaMaximal = function () {
-
-                        return m_areaMaximal;
                     };
 
                     // Calculate the section rectangles.
@@ -622,17 +614,17 @@ define(["NextWave/source/utility/prototypes",
                                     Math.max(0, areaMaximal.extent.height - 2 * settings.general.margin) * 2));
 
                             // Calculate the maximal area.
-                            m_areaMaximal = areaMaximal;
+                            self.areaMaximal = areaMaximal;
 
-							self.scrollStubArea[0] = new Area(new Point(m_areaMaximal.location.x - self.scrollStub.height / 2,
-									m_areaMaximal.location.y - self.scrollStub.yOffset / 5),
+							self.scrollStubArea[0] = new Area(new Point(self.areaMaximal.location.x - self.scrollStub.height / 2,
+									self.areaMaximal.location.y - self.scrollStub.yOffset / 5),
 								new Size(self.scrollStub.height /* this one is on its side */,
-									m_areaMaximal.extent.height + 2 * self.scrollStub.yOffset / 5));
+									self.areaMaximal.extent.height + 2 * self.scrollStub.yOffset / 5));
 
-							self.scrollStubArea[1] = new Area(new Point(m_areaMaximal.location.x + m_areaMaximal.extent.width - self.scrollStub.height / 2,
-									m_areaMaximal.location.y - self.scrollStub.yOffset / 5),
+							self.scrollStubArea[1] = new Area(new Point(self.areaMaximal.location.x + self.areaMaximal.extent.width - self.scrollStub.height / 2,
+									self.areaMaximal.location.y - self.scrollStub.yOffset / 5),
 								new Size(self.scrollStub.height /* this one is on its side */,
-									m_areaMaximal.extent.height + 2 * self.scrollStub.yOffset / 5));
+									self.areaMaximal.extent.height + 2 * self.scrollStub.yOffset / 5));
 
                             // Call virtual.
                             let exceptionRet = self.innerCalculateLayout(areaMaximal, contextRender);
@@ -689,22 +681,22 @@ define(["NextWave/source/utility/prototypes",
                                 var dTotalExtent = self.getTotalExtent(contextRender);
 
                                 // Adjust down the scroll, if necessary.
-                                if (m_dScrollOffset > (dTotalExtent - m_areaMaximal.extent[self.propertyAccessor])) {
+                                if (self.dScrollOffset > (dTotalExtent - self.areaMaximal.extent[self.propertyAccessor])) {
 
-                                    m_dScrollOffset = Math.max(0,
-                                        dTotalExtent - m_areaMaximal.extent[self.propertyAccessor]);
+                                    self.dScrollOffset = Math.max(0,
+                                        dTotalExtent - self.areaMaximal.extent[self.propertyAccessor]);
                                 }
                             }
 
                             // Draw the rounded body background.
-                            exceptionRet = m_areaMaximal.generateRoundedRectPath(contextRender);
+                            exceptionRet = self.areaMaximal.generateRoundedRectPath(contextRender);
                             if (exceptionRet) {
 
                                 throw exceptionRet;
                             }
 
                             // Draw focus recangle if highlighted.
-                            if (self.highlight) {
+                            if (true /*self.highlight*/) {
 
                                 contextRender.fillStyle = settings.general.fillBackgroundHighlight;
                                 contextRender.fill();
@@ -723,7 +715,7 @@ define(["NextWave/source/utility/prototypes",
                             contextRender.clip();
 
                             // Render each item.
-                            var dCursor = -m_dScrollOffset;
+                            var dCursor = -self.dScrollOffset;
                             for (var i = 0; i < self.items.length; i++) {
 
                                 // Get the ith item.
@@ -748,7 +740,7 @@ define(["NextWave/source/utility/prototypes",
                                     }
 
                                     continue;
-                                } else if (dCursor > m_areaMaximal.extent[self.propertyAccessor]) {
+                                } else if (dCursor > self.areaMaximal.extent[self.propertyAccessor]) {
 
                                     // Move down/over--before continuing....
                                     // This one just short-cuts to calculating the total height.
@@ -766,7 +758,7 @@ define(["NextWave/source/utility/prototypes",
 
                                 // Render out the item.
                                 exceptionRet = itemIth.render(contextRender,
-                                    m_areaMaximal,
+                                    self.areaMaximal,
                                     dCursor);
                                 if (exceptionRet) {
 
@@ -780,10 +772,10 @@ define(["NextWave/source/utility/prototypes",
                             self.scrollStubVisible[0] = false;
                             self.scrollStubVisible[1] = false;
                             // Only show scroll stubs if can scroll.
-                            if (dCursor + m_dScrollOffset > m_areaMaximal.extent[self.propertyAccessor]) {
+                            if (dCursor + self.dScrollOffset > self.areaMaximal.extent[self.propertyAccessor]) {
 
                                 // Render the scroll up region.
-                                if (Math.floor(m_areaMaximal.extent[self.propertyAccessor]) < Math.floor(dCursor)) {
+                                if (Math.floor(self.areaMaximal.extent[self.propertyAccessor]) < Math.floor(dCursor)) {
 
                                     exceptionRet = self.scrollStubArea[1].generateRoundedRectPath(contextRender);
                                     if (exceptionRet) {
@@ -799,7 +791,7 @@ define(["NextWave/source/utility/prototypes",
                                 }
 
                                 // Render the scroll down region.
-                                if (m_dScrollOffset > 0) {
+                                if (self.dScrollOffset > 0) {
 
                                     exceptionRet = self.scrollStubArea[0].generateRoundedRectPath(contextRender);
                                     if (exceptionRet) {
@@ -905,10 +897,6 @@ define(["NextWave/source/utility/prototypes",
 
                     // Indicates this instance is already created.
                     var m_bCreated = false;
-                    // The whole area.
-                    var m_areaMaximal = null;
-                    // How far the tree is scrolled.
-                    var m_dScrollOffset = 0;
                     // Type under cursor.
                     var m_itemCursor = null;
                     // Scroll callback--set for up or down when cursor over stub.
