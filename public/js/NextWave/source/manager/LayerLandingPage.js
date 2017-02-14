@@ -139,7 +139,7 @@ define(["NextWave/source/utility/prototypes",
 									height: settings.dialog.lineHeight,
 									clickHandler: function() {
 										m_PictureListHostCounter = 0;
-										self.dialog.setMode(dialogModes.programMode);
+										self.dialog.setMode(dialogModes.programMode, true);
 									}
 								},
 								navPlayGames: {
@@ -154,7 +154,7 @@ define(["NextWave/source/utility/prototypes",
 									height: settings.dialog.lineHeight,
 									clickHandler: function() {
 										m_PictureListHostCounter = 0;
-										self.dialog.setMode(dialogModes.gameMode);
+										self.dialog.setMode(dialogModes.gameMode, true);
 									}
 								},
 								navClasses: {
@@ -169,7 +169,7 @@ define(["NextWave/source/utility/prototypes",
 									height: settings.dialog.lineHeight,
 									clickHandler: function() {
 										m_PictureListHostCounter = 0;
-										self.dialog.setMode(dialogModes.classMode);
+										self.dialog.setMode(dialogModes.classMode, true);
 									}
 								},
 								navKits: {
@@ -184,7 +184,7 @@ define(["NextWave/source/utility/prototypes",
 									height: settings.dialog.lineHeight,
 									clickHandler: function() {
 										m_PictureListHostCounter = 0;
-										self.dialog.setMode(dialogModes.kitMode);
+										self.dialog.setMode(dialogModes.kitMode, true);
 									}
 								},
 								navGromLand: {
@@ -204,8 +204,10 @@ define(["NextWave/source/utility/prototypes",
 									x: 4 * settings.general.margin,
 									yType: "callback",
 									y: function(area) {
+										let dMode = self.dialog.getMode();
+										if (dMode === dialogModes.unfilteredMode || dMode === dialogModes.classMode) { m_PictureListHostCounter++; }
 										return settings.layerLandingPage.navOffset + 50 + settings.dialog.lineHeight +
-											(area.extent.height / 7) * m_PictureListHostCounter++;
+											(area.extent.height / 7) * m_PictureListHostCounter;
 									},
 									widthType: "callback",
 									width: function(area) {
@@ -223,8 +225,10 @@ define(["NextWave/source/utility/prototypes",
 									x: 4 * settings.general.margin,
 									yType: "callback",
 									y: function(area) {
+										let dMode = self.dialog.getMode();
+										if (dMode === dialogModes.unfilteredMode || dMode === dialogModes.programMode || dMode === dialogModes.classMode || dMode === dialogModes.kitMode) { m_PictureListHostCounter++; }
 										return settings.layerLandingPage.navOffset + 50 + settings.dialog.lineHeight +
-											(area.extent.height / 7) * m_PictureListHostCounter++;
+											(area.extent.height / 7) * m_PictureListHostCounter;
 									},
 									widthType: "callback",
 									width: function(area) {
@@ -238,12 +242,14 @@ define(["NextWave/source/utility/prototypes",
 								},
 								sharedProjects: {
 									type: "PictureListHost",
-									modes: [dialogModes.unfilteredMode,dialogModes.normalusersearching,dialogModes.privilegedusersearching],
+									modes: [dialogModes.unfilteredMode],
 									x: 4 * settings.general.margin,
 									yType: "callback",
 									y: function(area) {
+										let dMode = self.dialog.getMode();
+										if (dMode === dialogModes.unfilteredMode) { m_PictureListHostCounter++; }
 										return settings.layerLandingPage.navOffset + 50 + settings.dialog.lineHeight +
-											(area.extent.height / 7) * m_PictureListHostCounter++;
+											(area.extent.height / 7) * m_PictureListHostCounter;
 									},
 									widthType: "callback",
 									width: function(area) {
@@ -261,8 +267,10 @@ define(["NextWave/source/utility/prototypes",
 									x: 4 * settings.general.margin,
 									yType: "callback",
 									y: function(area) {
+										let dMode = self.dialog.getMode();
+										if (dMode === dialogModes.unfilteredMode || dMode === dialogModes.kitMode) { m_PictureListHostCounter++; }
 										return settings.layerLandingPage.navOffset + 50 + settings.dialog.lineHeight +
-											(area.extent.height / 7) * m_PictureListHostCounter++;
+											(area.extent.height / 7) * m_PictureListHostCounter;
 									},
 									widthType: "callback",
 									width: function(area) {
@@ -280,8 +288,10 @@ define(["NextWave/source/utility/prototypes",
 									x: 4 * settings.general.margin,
 									yType: "callback",
 									y: function(area) {
+										let dMode = self.dialog.getMode();
+										if (dMode === dialogModes.unfilteredMode || dMode === dialogModes.classMode) { m_PictureListHostCounter++; }
 										return settings.layerLandingPage.navOffset + 50 + settings.dialog.lineHeight +
-											(area.extent.height / 7) * m_PictureListHostCounter++;
+											(area.extent.height / 7) * m_PictureListHostCounter;
 									},
 									widthType: "callback",
 									width: function(area) {
@@ -299,8 +309,10 @@ define(["NextWave/source/utility/prototypes",
 									x: 4 * settings.general.margin,
 									yType: "callback",
 									y: function(area) {
+										let dMode = self.dialog.getMode();
+										if (dMode === dialogModes.unfilteredMode || dMode === dialogModes.classMode) { m_PictureListHostCounter++; }
 										return settings.layerLandingPage.navOffset + 50 + settings.dialog.lineHeight +
-											(area.extent.height / 7) * m_PictureListHostCounter++;
+											(area.extent.height / 7) * m_PictureListHostCounter;
 									},
 									widthType: "callback",
 									width: function(area) {

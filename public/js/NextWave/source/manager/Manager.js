@@ -919,6 +919,26 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
+					self.reCalculateLayout = function(whichLayer) {
+
+						try {
+
+							let sizeExtent = new Size(m_dWidth,
+                                m_dHeight);
+
+                            // Pass to layer.
+                            var exceptionRet = whichLayer.calculateLayout(sizeExtent, m_contextRender);
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+							return null;
+						} catch(e) {
+
+							return e;
+						}
+					}
+
                     //////////////////////////
                     // Private methods.
 

@@ -249,38 +249,42 @@ define(["NextWave/source/utility/prototypes",
                             // Define the containing area.
 
 							// A special test just for the horizontal listHost's PictureListItem (which this is).
-							if (self.outline) {
+							// if (self.outline) {
 
-								// First we'll draw the background (outline) rectangle at normal size.
-								m_area = new Area(
-									new Point(areaRender.location.x + settings.general.margin + dOffset,
-										areaRender.location.y + settings.general.margin),
-									new Size(self.getWidth(contextRender) - 2 * settings.general.margin,
-										areaRender.extent.height - 2 * settings.general.margin)
-								);
-								contextRender.fillStyle = "rgba(255,0,0,1)";
-								contextRender.fillRect(
-									m_area.location.x,
-									m_area.location.y,
-									m_area.extent.width,
-									m_area.extent.height);
+							// 	// First we'll draw the background (outline) rectangle at normal size.
+							// 	m_area = new Area(
+							// 		new Point(areaRender.location.x + settings.general.margin + dOffset,
+							// 			areaRender.location.y + settings.general.margin),
+							// 		new Size(self.getWidth(contextRender) - 2 * settings.general.margin,
+							// 			areaRender.extent.height - 2 * settings.general.margin)
+							// 	);
+							// 	contextRender.fillStyle = "rgba(255,0,0,1)";
+							// 	contextRender.fillRect(
+							// 		m_area.location.x,
+							// 		m_area.location.y,
+							// 		m_area.extent.width,
+							// 		m_area.extent.height);
 
-								// Then we'll shrink down a bit so the image drawing below will appear indented.
-								m_area = new Area(
-									new Point(areaRender.location.x + settings.general.margin + dOffset + 5,
-										areaRender.location.y + settings.general.margin + 5),
-									new Size(self.getWidth(contextRender) - 2 * settings.general.margin - 10,
-										areaRender.extent.height - 2 * settings.general.margin - 10)
-								);
-							} else {
+							// 	// Then we'll shrink down a bit so the image drawing below will appear indented.
+							// 	m_area = new Area(
+							// 		new Point(areaRender.location.x + settings.general.margin + dOffset + 5,
+							// 			areaRender.location.y + settings.general.margin + 5),
+							// 		new Size(self.getWidth(contextRender) - 2 * settings.general.margin - 10,
+							// 			areaRender.extent.height - 2 * settings.general.margin - 10)
+							// 	);
+							// } else {
 
 								if (!m_bMouseIn) {
 
+									// The PictureList is 2 times higher than I'd normally want it to be to allow for expanded, m_bMouseIn pictures.
+									// So, since this is the non-mouse in case, pull the picture in and shrink it down.
+									let width = self.getWidth(contextRender) - 2 * settings.general.margin;
+									let height = areaRender.extent.height - 2 * settings.general.margin;
 									m_area = new Area(
-										new Point(areaRender.location.x + settings.general.margin + dOffset,
-											areaRender.location.y + settings.general.margin),
-										new Size(self.getWidth(contextRender) - 2 * settings.general.margin,
-											areaRender.extent.height - 2 * settings.general.margin)
+										new Point(areaRender.location.x + settings.general.margin + dOffset - (width / 4),
+											areaRender.location.y + settings.general.margin + (height / 4)),
+										new Size(self.getWidth(contextRender) - 2 * settings.general.margin - (width / 2),
+											areaRender.extent.height - 2 * settings.general.margin - (height / 2))
 									);
 								} else {
 
@@ -293,7 +297,7 @@ define(["NextWave/source/utility/prototypes",
 										new Size(expandedWidth, expandedHeight)
 									);
 								}
-							}
+							// }
 
                             // Generate the path.
                             var exceptionRet = m_area.generateRoundedRectPath(contextRender);

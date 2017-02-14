@@ -618,8 +618,8 @@ define(["NextWave/source/utility/prototypes",
                             // Make a slightly smaller copy of the maximal area--with borders.
                             areaMaximal = new Area(new Point(areaMaximal.location.x + settings.general.margin,
                                     areaMaximal.location.y + settings.general.margin),
-                                new Size(Math.max(0, areaMaximal.extent.width - 2 * settings.general.margin),
-                                    Math.max(0, areaMaximal.extent.height - 2 * settings.general.margin)));
+                                new Size(Math.max(0, areaMaximal.extent.width - 2 * settings.general.margin) * 2,
+                                    Math.max(0, areaMaximal.extent.height - 2 * settings.general.margin) * 2));
 
                             // Calculate the maximal area.
                             m_areaMaximal = areaMaximal;
