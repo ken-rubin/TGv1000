@@ -256,8 +256,8 @@ define(["NextWave/source/utility/prototypes",
 
 											let exceptionRet = client.unloadProject(function() {
 
-													// Force LayerLandingPage back to search mode.
-													manager.setLandingPageDialogMode((m_bPrivileged ? dialogModes.privilegedusersearching : dialogModes.normalusersearching));
+													// Force LayerLandingPage back to previous mode.
+													manager.resetLandingPageDialogMode();
 												},
 												true,
 												true
@@ -369,7 +369,7 @@ define(["NextWave/source/utility/prototypes",
 											self.cancelButton.setPandV(true, false);
 
 											// Force LayerLandingPage back to search mode.
-											manager.setLandingPageDialogMode((m_bPrivileged ? dialogModes.privilegedusersearching : dialogModes.normalusersearching));
+											manager.resetLandingPageDialogMode();
 
 										} catch(e) {
 											errorHelper.show(e);

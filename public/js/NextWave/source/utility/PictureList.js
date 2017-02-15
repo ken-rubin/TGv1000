@@ -710,7 +710,7 @@ define(["NextWave/source/utility/prototypes",
                                 contextRender.stroke();
                             } else {
 
-                                contextRender.fillStyle = "green";//settings.general.fillBackgroundSolid;
+                                contextRender.fillStyle = settings.general.fillBackgroundSolid;
                                 contextRender.fill();
                             }
 
@@ -736,7 +736,7 @@ define(["NextWave/source/utility/prototypes",
                                 if (dCursor + dExtent < 0) {
 
                                     // Move over--before continuing....
-                                    dCursor += dExtent;
+                                    dCursor += dExtent + settings.layerLandingPage.pictureSpacer;
 
                                     // Reset area if not visible.
                                     exceptionRet = itemIth.clearArea();
@@ -750,7 +750,7 @@ define(["NextWave/source/utility/prototypes",
 
                                     // Move down/over--before continuing....
                                     // This one just short-cuts to calculating the total height.
-                                    dCursor += dExtent;
+                                    dCursor += dExtent + settings.layerLandingPage.pictureSpacer;
 
                                     // Reset area if not visible.
                                     exceptionRet = itemIth.clearArea();
@@ -772,7 +772,7 @@ define(["NextWave/source/utility/prototypes",
                                 }
 
                                 // Move over.
-                                dCursor += dExtent;
+                                dCursor += dExtent + settings.layerLandingPage.pictureSpacer;
                             }
 
                             self.scrollStubVisible[0] = false;

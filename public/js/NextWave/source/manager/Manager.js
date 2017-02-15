@@ -273,9 +273,9 @@ define(["NextWave/source/utility/prototypes",
 					// A bunch of methods surrounding LayerLandingPage, LayerNavbar, LayTooltip.
 
 					// This is so that LayerNavbar can set LayerLandingPage's mode based on a button click.
-					self.setLandingPageDialogMode = function(mode) {
+					self.resetLandingPageDialogMode = function() {
 
-						self.landingPageLayer.setLandingPageDialogMode(mode);
+						self.landingPageLayer.resetLandingPageDialogMode();
 					}
 
 					// The following method is called by layerLandingPanel after a user clicks on a PictureListItem.
@@ -290,6 +290,7 @@ define(["NextWave/source/utility/prototypes",
 					self.setProjectLoaded = function(bLoaded) {
 
 						self.landingPageLayer.setActive(!bLoaded);
+						self.tooltipLayer.setActive(!bLoaded);
 						self.projectLoaded = bLoaded;
 						self.navbarLayer.projectLoadedStateHasChangedTo(bLoaded);
 					}

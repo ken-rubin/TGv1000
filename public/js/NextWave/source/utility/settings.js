@@ -155,6 +155,11 @@ define(["NextWave/source/utility/prototypes"],
 						// corner of your selected glyphicon and use those coordinates.
 						// Small adjustments will still be necessary.
                         //
+						settings: {
+
+							x: 1061,
+							y: 6
+						},
                         pushpin: {
 
                             x: 708,
@@ -236,7 +241,7 @@ define(["NextWave/source/utility/prototypes"],
 						navOffset: 80,
 						navTopMargin: 25,
 						dVerticalPct: 0.6,
-						
+						pictureSpacer: 25
 
 					};
                     self.layerPanels = {

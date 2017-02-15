@@ -162,6 +162,12 @@ define(["NextWave/source/utility/prototypes",
 
                         try {
 
+							let exceptionRet = manager.stopDrawingSmartTooltip();
+							if (exceptionRet) {
+
+								throw exceptionRet;
+							}
+
                             // If click is defined, call it.
                             if ($.isFunction(self.clickHandler)) {
 
@@ -247,32 +253,6 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Define the containing area.
-
-							// A special test just for the horizontal listHost's PictureListItem (which this is).
-							// if (self.outline) {
-
-							// 	// First we'll draw the background (outline) rectangle at normal size.
-							// 	m_area = new Area(
-							// 		new Point(areaRender.location.x + settings.general.margin + dOffset,
-							// 			areaRender.location.y + settings.general.margin),
-							// 		new Size(self.getWidth(contextRender) - 2 * settings.general.margin,
-							// 			areaRender.extent.height - 2 * settings.general.margin)
-							// 	);
-							// 	contextRender.fillStyle = "rgba(255,0,0,1)";
-							// 	contextRender.fillRect(
-							// 		m_area.location.x,
-							// 		m_area.location.y,
-							// 		m_area.extent.width,
-							// 		m_area.extent.height);
-
-							// 	// Then we'll shrink down a bit so the image drawing below will appear indented.
-							// 	m_area = new Area(
-							// 		new Point(areaRender.location.x + settings.general.margin + dOffset + 5,
-							// 			areaRender.location.y + settings.general.margin + 5),
-							// 		new Size(self.getWidth(contextRender) - 2 * settings.general.margin - 10,
-							// 			areaRender.extent.height - 2 * settings.general.margin - 10)
-							// 	);
-							// } else {
 
 							let expandedHeight = self.collection.areaMaximal.extent.height;
 							let height = expandedHeight * settings.layerLandingPage.dVerticalPct;

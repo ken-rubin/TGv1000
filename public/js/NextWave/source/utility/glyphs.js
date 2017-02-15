@@ -75,6 +75,9 @@ define(["NextWave/source/utility/prototypes",
                     // home.
                     self.home = new Area(new Point(settings.glyphs.home.x,settings.glyphs.home.y),
                         new Size(settings.glyphs.width, settings.glyphs.width));
+                    // settings.
+                    self.settings = new Area(new Point(settings.glyphs.settings.x,settings.glyphs.settings.y),
+                        new Size(settings.glyphs.width, settings.glyphs.width));
 
                     ///////////////////////
                     // Public methods.
