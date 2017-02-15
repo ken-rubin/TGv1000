@@ -234,7 +234,9 @@ define(["NextWave/source/utility/prototypes"],
 					self.layerLandingPage = {
 
 						navOffset: 80,
-						navTopMargin: 25
+						navTopMargin: 25,
+						dVerticalPct: 0.6,
+						
 
 					};
                     self.layerPanels = {

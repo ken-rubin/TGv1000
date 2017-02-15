@@ -608,10 +608,16 @@ define(["NextWave/source/utility/prototypes",
                         try {
 
                             // Make a slightly smaller copy of the maximal area--with borders.
-                            areaMaximal = new Area(new Point(areaMaximal.location.x + settings.general.margin,
-                                    areaMaximal.location.y + settings.general.margin),
-                                new Size(Math.max(0, areaMaximal.extent.width - 2 * settings.general.margin) * 2,
-                                    Math.max(0, areaMaximal.extent.height - 2 * settings.general.margin) * 2));
+                            areaMaximal = new Area(
+								new Point(
+											areaMaximal.location.x + settings.general.margin,
+                                    		areaMaximal.location.y + settings.general.margin
+										),
+                                new Size(
+											Math.max(0, areaMaximal.extent.width - 2 * settings.general.margin),
+                                    		Math.max(0, areaMaximal.extent.height - 2 * settings.general.margin)
+										)
+							);
 
                             // Calculate the maximal area.
                             self.areaMaximal = areaMaximal;
@@ -704,7 +710,7 @@ define(["NextWave/source/utility/prototypes",
                                 contextRender.stroke();
                             } else {
 
-                                contextRender.fillStyle = settings.general.fillBackgroundSolid;
+                                contextRender.fillStyle = "green";//settings.general.fillBackgroundSolid;
                                 contextRender.fill();
                             }
 
@@ -729,7 +735,7 @@ define(["NextWave/source/utility/prototypes",
                                 // as soon as no longer visible at all.
                                 if (dCursor + dExtent < 0) {
 
-                                    // Move down/over--before continuing....
+                                    // Move over--before continuing....
                                     dCursor += dExtent;
 
                                     // Reset area if not visible.
@@ -765,7 +771,7 @@ define(["NextWave/source/utility/prototypes",
                                     throw exceptionRet;
                                 }
 
-                                // Move down.
+                                // Move over.
                                 dCursor += dExtent;
                             }
 

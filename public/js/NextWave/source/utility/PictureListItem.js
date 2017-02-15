@@ -275,8 +275,7 @@ define(["NextWave/source/utility/prototypes",
 							// } else {
 
 							let expandedHeight = self.collection.areaMaximal.extent.height;
-							let dVerticalPct = 0.6;
-							let height = expandedHeight * dVerticalPct;
+							let height = expandedHeight * settings.layerLandingPage.dVerticalPct;
 							let width = height / m_image.height * m_image.width;
 							let expandedWidth = expandedHeight / m_image.height * m_image.width;
 
@@ -284,8 +283,8 @@ define(["NextWave/source/utility/prototypes",
 
 								// Since this is the non-mouse in case, pull the picture in and position it centrally.
 								m_area = new Area(
-									new Point(areaRender.location.x + dOffset + ((expandedWidth - width) * dVerticalPct),
-											self.collection.areaMaximal.location.y + (expandedHeight - height) * dVerticalPct),
+									new Point(areaRender.location.x + dOffset + ((expandedWidth - width) * settings.layerLandingPage.dVerticalPct),
+											self.collection.areaMaximal.location.y + (expandedHeight - height) * settings.layerLandingPage.dVerticalPct),
 									new Size(width, height)
 								);
 							} else {

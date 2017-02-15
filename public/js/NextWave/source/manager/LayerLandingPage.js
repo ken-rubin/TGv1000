@@ -204,16 +204,14 @@ define(["NextWave/source/utility/prototypes",
 									x: 4 * settings.general.margin,
 									yType: "callback",
 									y: function(area) {
-										let dMode = self.dialog.getMode();
-										if (dMode === dialogModes.unfilteredMode || dMode === dialogModes.classMode) { m_PictureListHostCounter++; }
+										if (self.dialog.controlObject["coreProjects"].modes.includes(self.dialog.getMode())) { m_PictureListHostCounter++; }
 										return settings.layerLandingPage.navOffset + 50 + settings.dialog.lineHeight +
-											(((area.extent.height - (settings.layerLandingPage.navOffset + 20 + settings.dialog.lineHeight)) / 7) + settings.dialog.lineHeight) * (m_PictureListHostCounter - 1);
+											(((area.extent.height - (settings.layerLandingPage.navOffset + 20 + settings.dialog.lineHeight)) / 7) /*- settings.dialog.lineHeight*/) * (m_PictureListHostCounter - 1);
 									},
 									widthType: "reserve",
 									width: 8 * settings.general.margin,
 									heightType: "callback",
 									height: function(area) {
-										m_area = area;	// Set it aside for use later.
 										return (((area.extent.height - (settings.layerLandingPage.navOffset + 20 + settings.dialog.lineHeight)) / 7) - settings.dialog.lineHeight);
 									}
 								},
@@ -223,16 +221,14 @@ define(["NextWave/source/utility/prototypes",
 									x: 4 * settings.general.margin,
 									yType: "callback",
 									y: function(area) {
-										let dMode = self.dialog.getMode();
-										if (dMode === dialogModes.unfilteredMode || dMode === dialogModes.programMode || dMode === dialogModes.classMode || dMode === dialogModes.kitMode) { m_PictureListHostCounter++; }
+										if (self.dialog.controlObject["yourProjects"].modes.includes(self.dialog.getMode())) { m_PictureListHostCounter++; }
 										return settings.layerLandingPage.navOffset + 50 + settings.dialog.lineHeight +
-											(((area.extent.height - (settings.layerLandingPage.navOffset + 20 + settings.dialog.lineHeight)) / 7) + settings.dialog.lineHeight) * (m_PictureListHostCounter - 1);
+											(((area.extent.height - (settings.layerLandingPage.navOffset + 20 + settings.dialog.lineHeight)) / 7) /*- settings.dialog.lineHeight*/) * (m_PictureListHostCounter - 1);
 									},
 									widthType: "reserve",
 									width: 8 * settings.general.margin,
 									heightType: "callback",
 									height: function(area) {
-										m_area = area;	// Set it aside for use later.
 										return (((area.extent.height - (settings.layerLandingPage.navOffset + 20 + settings.dialog.lineHeight)) / 7) - settings.dialog.lineHeight);
 									}
 								},
@@ -242,16 +238,14 @@ define(["NextWave/source/utility/prototypes",
 									x: 4 * settings.general.margin,
 									yType: "callback",
 									y: function(area) {
-										let dMode = self.dialog.getMode();
-										if (dMode === dialogModes.unfilteredMode) { m_PictureListHostCounter++; }
+										if (self.dialog.controlObject["sharedProjects"].modes.includes(self.dialog.getMode())) { m_PictureListHostCounter++; }
 										return settings.layerLandingPage.navOffset + 50 + settings.dialog.lineHeight +
-											(((area.extent.height - (settings.layerLandingPage.navOffset + 20 + settings.dialog.lineHeight)) / 7) + settings.dialog.lineHeight) * (m_PictureListHostCounter - 1);
+											(((area.extent.height - (settings.layerLandingPage.navOffset + 20 + settings.dialog.lineHeight)) / 7) /*- settings.dialog.lineHeight*/) * (m_PictureListHostCounter - 1);
 									},
 									widthType: "reserve",
 									width: 8 * settings.general.margin,
 									heightType: "callback",
 									height: function(area) {
-										m_area = area;	// Set it aside for use later.
 										return (((area.extent.height - (settings.layerLandingPage.navOffset + 20 + settings.dialog.lineHeight)) / 7) - settings.dialog.lineHeight);
 									}
 								},
@@ -261,16 +255,14 @@ define(["NextWave/source/utility/prototypes",
 									x: 4 * settings.general.margin,
 									yType: "callback",
 									y: function(area) {
-										let dMode = self.dialog.getMode();
-										if (dMode === dialogModes.unfilteredMode || dMode === dialogModes.kitMode) { m_PictureListHostCounter++; }
+										if (self.dialog.controlObject["productProjects"].modes.includes(self.dialog.getMode())) { m_PictureListHostCounter++; }
 										return settings.layerLandingPage.navOffset + 50 + settings.dialog.lineHeight +
-											(((area.extent.height - (settings.layerLandingPage.navOffset + 20 + settings.dialog.lineHeight)) / 7) + settings.dialog.lineHeight) * (m_PictureListHostCounter - 1);
+											(((area.extent.height - (settings.layerLandingPage.navOffset + 20 + settings.dialog.lineHeight)) / 7) /*- settings.dialog.lineHeight*/) * (m_PictureListHostCounter - 1);
 									},
 									widthType: "reserve",
 									width: 8 * settings.general.margin,
 									heightType: "callback",
 									height: function(area) {
-										m_area = area;	// Set it aside for use later.
 										return (((area.extent.height - (settings.layerLandingPage.navOffset + 20 + settings.dialog.lineHeight)) / 7) - settings.dialog.lineHeight);
 									}
 								},
@@ -280,16 +272,14 @@ define(["NextWave/source/utility/prototypes",
 									x: 4 * settings.general.margin,
 									yType: "callback",
 									y: function(area) {
-										let dMode = self.dialog.getMode();
-										if (dMode === dialogModes.unfilteredMode || dMode === dialogModes.classMode) { m_PictureListHostCounter++; }
+										if (self.dialog.controlObject["classroomProjects"].modes.includes(self.dialog.getMode())) { m_PictureListHostCounter++; }
 										return settings.layerLandingPage.navOffset + 50 + settings.dialog.lineHeight +
-											(((area.extent.height - (settings.layerLandingPage.navOffset + 20 + settings.dialog.lineHeight)) / 7) + settings.dialog.lineHeight) * (m_PictureListHostCounter - 1);
+											(((area.extent.height - (settings.layerLandingPage.navOffset + 20 + settings.dialog.lineHeight)) / 7) /*- settings.dialog.lineHeight*/) * (m_PictureListHostCounter - 1);
 									},
 									widthType: "reserve",
 									width: 8 * settings.general.margin,
 									heightType: "callback",
 									height: function(area) {
-										m_area = area;	// Set it aside for use later.
 										return (((area.extent.height - (settings.layerLandingPage.navOffset + 20 + settings.dialog.lineHeight)) / 7) - settings.dialog.lineHeight);
 									}
 								},
@@ -299,16 +289,14 @@ define(["NextWave/source/utility/prototypes",
 									x: 4 * settings.general.margin,
 									yType: "callback",
 									y: function(area) {
-										let dMode = self.dialog.getMode();
-										if (dMode === dialogModes.unfilteredMode || dMode === dialogModes.classMode) { m_PictureListHostCounter++; }
+										if (self.dialog.controlObject["onlineProjects"].modes.includes(self.dialog.getMode())) { m_PictureListHostCounter++; }
 										return settings.layerLandingPage.navOffset + 50 + settings.dialog.lineHeight +
-											(((area.extent.height - (settings.layerLandingPage.navOffset + 20 + settings.dialog.lineHeight)) / 7) + settings.dialog.lineHeight) * (m_PictureListHostCounter - 1);
+											(((area.extent.height - (settings.layerLandingPage.navOffset + 20 + settings.dialog.lineHeight)) / 7) /*- settings.dialog.lineHeight*/) * (m_PictureListHostCounter - 1);
 									},
 									widthType: "reserve",
 									width: 8 * settings.general.margin,
 									heightType: "callback",
 									height: function(area) {
-										m_area = area;	// Set it aside for use later.
 										return (((area.extent.height - (settings.layerLandingPage.navOffset + 20 + settings.dialog.lineHeight)) / 7) - settings.dialog.lineHeight);
 									}
 								},
@@ -701,6 +689,7 @@ define(["NextWave/source/utility/prototypes",
 
 										let stripNth = m_searchResultRawArray[n];
 										let lhProjects = self.dialog.controlObject[m_arrayListHostNames[n]];
+										let listProjectsHeight = lhProjects.list.areaMaximal.extent.height;
 										let listProjects = lhProjects.list;
 										let i = 0;
 
@@ -715,7 +704,7 @@ define(["NextWave/source/utility/prototypes",
 																			i++,
 																			resourceHelper.toURL('resources', itemIth.projectImageId, 'image', itemIth.projectAltImagePath),
 																			0,
-																			m_area.extent.height / 7,
+																			listProjectsHeight * settings.layerLandingPage.dVerticalPct,
 																			m_functionGetTooltipText(itemIth, n));
 											rliNew.clickHandler = (projectId) => {
 
@@ -908,8 +897,6 @@ define(["NextWave/source/utility/prototypes",
 					var m_arrayListHostNames = ["coreProjects","yourProjects","sharedProjects","productProjects","classroomProjects","onlineProjects"];
 					// The project id for the user's selected project.
 					var m_projectId = 0;
-					// Hold maximalArea.
-					var m_area = null;
 					// Search string.
 					var m_strSearch = "";
 					// Privileged user or not.
