@@ -274,29 +274,29 @@ define(["NextWave/source/utility/prototypes",
 							// 	);
 							// } else {
 
-								if (!m_bMouseIn) {
+							let expandedHeight = self.collection.areaMaximal.extent.height;
+							let dVerticalPct = 0.6;
+							let height = expandedHeight * dVerticalPct;
+							let width = height / m_image.height * m_image.width;
+							let expandedWidth = expandedHeight / m_image.height * m_image.width;
 
-									// The PictureList is 2 times higher than I'd normally want it to be to allow for expanded, m_bMouseIn pictures.
-									// So, since this is the non-mouse in case, pull the picture in and position it centrally.
-									let plHeight = self.collection.areaMaximal.extent.height;
-									let height = plHeight * 0.6666;
-									let width = height / m_image.height * m_image.width;
-									m_area = new Area(
-										new Point(areaRender.location.x + settings.general.margin + dOffset - (width / 2),
-											areaRender.location.y + settings.general.margin + (height / 8)),
-										new Size(width, height)
-									);
-								} else {
+							if (!m_bMouseIn) {
 
-									// Will render expanded to height of list container and with width scaled.
-									let expandedHeight = self.collection.areaMaximal.extent.height;
-									let expandedWidth = expandedHeight / m_image.height * m_image.width;
-									m_area = new Area(
-										new Point(areaRender.location.x + settings.general.margin + dOffset - (expandedWidth / 4),
-											areaRender.location.y + settings.general.margin - (expandedHeight / 4)),
-										new Size(expandedWidth, expandedHeight)
-									);
-								}
+								// Since this is the non-mouse in case, pull the picture in and position it centrally.
+								m_area = new Area(
+									new Point(areaRender.location.x + dOffset + ((expandedWidth - width) * dVerticalPct),
+											self.collection.areaMaximal.location.y + (expandedHeight - height) * dVerticalPct),
+									new Size(width, height)
+								);
+							} else {
+
+								// Will render expanded to height of list container and with width scaled.
+								m_area = new Area(
+									new Point(areaRender.location.x + dOffset,
+											self.collection.areaMaximal.location.y),
+									new Size(expandedWidth, expandedHeight)
+								);
+							}
 							// }
 
                             // Generate the path.

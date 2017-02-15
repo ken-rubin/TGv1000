@@ -696,7 +696,7 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Draw focus recangle if highlighted.
-                            if (true /*self.highlight*/) {
+                            if (self.highlight) {
 
                                 contextRender.fillStyle = settings.general.fillBackgroundHighlight;
                                 contextRender.fill();
@@ -704,7 +704,7 @@ define(["NextWave/source/utility/prototypes",
                                 contextRender.stroke();
                             } else {
 
-                                contextRender.fillStyle = settings.general.fillBackground;
+                                contextRender.fillStyle = settings.general.fillBackgroundSolid;
                                 contextRender.fill();
                             }
 

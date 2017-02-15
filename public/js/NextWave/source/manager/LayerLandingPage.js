@@ -38,7 +38,7 @@ define(["NextWave/source/utility/prototypes",
 
                     // Inherit from base class.
                     self.inherits(LayerDialogHost,
-						"rgba(64,64,64,1)",			// Required for Layers inheriting LayerDialogHost.
+						settings.general.fillBackgroundSolid,			// Required for Layers inheriting LayerDialogHost.
 						true						// Tells LayerDialogHost to set objectReference.handled in mouse move.
 					);
 
@@ -207,7 +207,7 @@ define(["NextWave/source/utility/prototypes",
 										let dMode = self.dialog.getMode();
 										if (dMode === dialogModes.unfilteredMode || dMode === dialogModes.classMode) { m_PictureListHostCounter++; }
 										return settings.layerLandingPage.navOffset + 50 + settings.dialog.lineHeight +
-											(area.extent.height / 7 + settings.dialog.lineHeight) * (m_PictureListHostCounter - 1);
+											(((area.extent.height - (settings.layerLandingPage.navOffset + 20 + settings.dialog.lineHeight)) / 7) + settings.dialog.lineHeight) * (m_PictureListHostCounter - 1);
 									},
 									widthType: "reserve",
 									width: 8 * settings.general.margin,
@@ -226,7 +226,7 @@ define(["NextWave/source/utility/prototypes",
 										let dMode = self.dialog.getMode();
 										if (dMode === dialogModes.unfilteredMode || dMode === dialogModes.programMode || dMode === dialogModes.classMode || dMode === dialogModes.kitMode) { m_PictureListHostCounter++; }
 										return settings.layerLandingPage.navOffset + 50 + settings.dialog.lineHeight +
-											(area.extent.height / 7 + settings.dialog.lineHeight) * (m_PictureListHostCounter - 1);
+											(((area.extent.height - (settings.layerLandingPage.navOffset + 20 + settings.dialog.lineHeight)) / 7) + settings.dialog.lineHeight) * (m_PictureListHostCounter - 1);
 									},
 									widthType: "reserve",
 									width: 8 * settings.general.margin,
@@ -245,7 +245,7 @@ define(["NextWave/source/utility/prototypes",
 										let dMode = self.dialog.getMode();
 										if (dMode === dialogModes.unfilteredMode) { m_PictureListHostCounter++; }
 										return settings.layerLandingPage.navOffset + 50 + settings.dialog.lineHeight +
-											(area.extent.height / 7 + settings.dialog.lineHeight) * (m_PictureListHostCounter - 1);
+											(((area.extent.height - (settings.layerLandingPage.navOffset + 20 + settings.dialog.lineHeight)) / 7) + settings.dialog.lineHeight) * (m_PictureListHostCounter - 1);
 									},
 									widthType: "reserve",
 									width: 8 * settings.general.margin,
@@ -264,7 +264,7 @@ define(["NextWave/source/utility/prototypes",
 										let dMode = self.dialog.getMode();
 										if (dMode === dialogModes.unfilteredMode || dMode === dialogModes.kitMode) { m_PictureListHostCounter++; }
 										return settings.layerLandingPage.navOffset + 50 + settings.dialog.lineHeight +
-											(area.extent.height / 7 + settings.dialog.lineHeight) * (m_PictureListHostCounter - 1);
+											(((area.extent.height - (settings.layerLandingPage.navOffset + 20 + settings.dialog.lineHeight)) / 7) + settings.dialog.lineHeight) * (m_PictureListHostCounter - 1);
 									},
 									widthType: "reserve",
 									width: 8 * settings.general.margin,
@@ -283,7 +283,7 @@ define(["NextWave/source/utility/prototypes",
 										let dMode = self.dialog.getMode();
 										if (dMode === dialogModes.unfilteredMode || dMode === dialogModes.classMode) { m_PictureListHostCounter++; }
 										return settings.layerLandingPage.navOffset + 50 + settings.dialog.lineHeight +
-											(area.extent.height / 7 + settings.dialog.lineHeight) * (m_PictureListHostCounter - 1);
+											(((area.extent.height - (settings.layerLandingPage.navOffset + 20 + settings.dialog.lineHeight)) / 7) + settings.dialog.lineHeight) * (m_PictureListHostCounter - 1);
 									},
 									widthType: "reserve",
 									width: 8 * settings.general.margin,
@@ -302,7 +302,7 @@ define(["NextWave/source/utility/prototypes",
 										let dMode = self.dialog.getMode();
 										if (dMode === dialogModes.unfilteredMode || dMode === dialogModes.classMode) { m_PictureListHostCounter++; }
 										return settings.layerLandingPage.navOffset + 50 + settings.dialog.lineHeight +
-											(area.extent.height / 7 + settings.dialog.lineHeight) * (m_PictureListHostCounter - 1);
+											(((area.extent.height - (settings.layerLandingPage.navOffset + 20 + settings.dialog.lineHeight)) / 7) + settings.dialog.lineHeight) * (m_PictureListHostCounter - 1);
 									},
 									widthType: "reserve",
 									width: 8 * settings.general.margin,
