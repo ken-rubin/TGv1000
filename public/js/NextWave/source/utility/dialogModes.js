@@ -40,6 +40,7 @@ define(["NextWave/source/utility/prototypes"],
 					self.programMode = 50;
 					self.classMode = 51;
 					self.kitMode = 52;
+					self.gameMode = 53;
 
 					// Used in LayerNavbar.js and in LayerLandingPage.js.
 					self.normaluserclickstrip0 = 3;

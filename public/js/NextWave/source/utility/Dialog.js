@@ -22,11 +22,12 @@ define(["NextWave/source/utility/prototypes",
     "NextWave/source/utility/GlyphHost",
     "NextWave/source/utility/glyphs",
     "NextWave/source/utility/ListHost",
+    "NextWave/source/utility/PictureListHost",
     "NextWave/source/utility/Accordion",
     "NextWave/source/utility/ParameterListHost",
     "NextWave/source/utility/StatementListHost",
     "NextWave/source/utility/Picture"],
-    function (prototypes, settings, dialogModes, Point, Size, Area, Label, Edit, Button, Tooltip, GlyphHost, glyphs, ListHost, Accordion, ParameterListHost, StatementListHost, Picture) {
+    function (prototypes, settings, dialogModes, Point, Size, Area, Label, Edit, Button, Tooltip, GlyphHost, glyphs, ListHost, PictureListHost, Accordion, ParameterListHost, StatementListHost, Picture) {
 
         try {
 
@@ -50,7 +51,7 @@ define(["NextWave/source/utility/prototypes",
                     self.position = new Area();
                     // THe highlighted control, if non-null.
                     self.highlightControl = null;
-					// A callback in case more dialog initialization is needed after cself.calculateLayout runs.
+					// A callback in case more dialog initialization is needed after self.calculateLayout runs.
 					self.callback = null;
 
                     ///////////////////////
@@ -469,9 +470,17 @@ define(["NextWave/source/utility/prototypes",
 
                     // Change m_mode due to user action in derived class or a layer.
 					// The render loop will make changes happen.
-                    self.setMode = function(mode) {
+					// However, there is now a second parameter that has us rerun self.calculateLayout.
+					// This is used when the m_mode is changed in LayerLandingPage to recalculate
+					// the locations of the varyious PictureListHosts.
+                    self.setMode = function(mode, bRecalc) {
 
                         m_mode = mode;
+
+						if (bRecalc) {
+
+							return manager.reCalculateLayout(manager.landingPageLayer);
+						}
                     }
 
                     // Return m_mode to someone.
