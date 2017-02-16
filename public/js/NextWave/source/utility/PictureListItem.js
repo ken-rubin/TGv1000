@@ -182,7 +182,10 @@ define(["NextWave/source/utility/prototypes",
                         }
                     };
 
-                    // Outline self.
+                    // Outline self. This is actually deprecated, but outlining is still present in the soon-to-allso-be-deprecated
+					// NewProjectDialog.js, so it remains until then. NewProjectDialog used ListHost which creates a List, not PictureListHost
+					// which creates a PictureList, but it still fills the List with PictureListItems. That's why we still have to handle outlining.
+					// For a little while.
                     self.setOutline = function(b) {
 
                         self.outline = b;
@@ -253,30 +256,55 @@ define(["NextWave/source/utility/prototypes",
                             }
 
                             // Define the containing area.
+							// A temporary test (see setting of self.outline above) just for the horizontal listHost's PictureListItem.
+							if (self.outline) {
 
-							let expandedHeight = self.collection.areaMaximal.extent.height;
-							let height = expandedHeight * settings.layerLandingPage.dVerticalPct;
-							let width = height / m_image.height * m_image.width;
-							let expandedWidth = expandedHeight / m_image.height * m_image.width;
-
-							if (!m_bMouseIn) {
-
-								// Since this is the non-mouse in case, pull the picture in and position it centrally.
+								// First we'll draw the background (outline) rectangle at normal size.
 								m_area = new Area(
-									new Point(areaRender.location.x + dOffset + ((expandedWidth - width) * settings.layerLandingPage.dVerticalPct),
-											self.collection.areaMaximal.location.y + (expandedHeight - height) * settings.layerLandingPage.dVerticalPct),
-									new Size(width, height)
+									new Point(areaRender.location.x + settings.general.margin + dOffset,
+										areaRender.location.y + settings.general.margin),
+									new Size(self.getWidth(contextRender) - 2 * settings.general.margin,
+										areaRender.extent.height - 2 * settings.general.margin)
+								);
+								contextRender.fillStyle = "rgba(255,0,0,1)";
+								contextRender.fillRect(
+									m_area.location.x,
+									m_area.location.y,
+									m_area.extent.width,
+									m_area.extent.height);
+
+								// Then we'll shrink down a bit so the image drawing below will appear indented.
+								m_area = new Area(
+									new Point(areaRender.location.x + settings.general.margin + dOffset + 5,
+										areaRender.location.y + settings.general.margin + 5),
+									new Size(self.getWidth(contextRender) - 2 * settings.general.margin - 10,
+										areaRender.extent.height - 2 * settings.general.margin - 10)
 								);
 							} else {
 
-								// Will render expanded to height of list container and with width scaled.
-								m_area = new Area(
-									new Point(areaRender.location.x + dOffset,
-											self.collection.areaMaximal.location.y),
-									new Size(expandedWidth, expandedHeight)
-								);
+								let expandedHeight = self.collection.areaMaximal.extent.height;
+								let height = expandedHeight * settings.layerLandingPage.dVerticalPct;
+								let width = height / m_image.height * m_image.width;
+								let expandedWidth = expandedHeight / m_image.height * m_image.width;
+
+								if (!m_bMouseIn) {
+
+									// Since this is the non-mouse in case, pull the picture in and position it centrally.
+									m_area = new Area(
+										new Point(areaRender.location.x + dOffset + ((expandedWidth - width) * settings.layerLandingPage.dVerticalPct),
+												self.collection.areaMaximal.location.y + (expandedHeight - height) * settings.layerLandingPage.dVerticalPct),
+										new Size(width, height)
+									);
+								} else {
+
+									// Will render expanded to height of list container and with width scaled.
+									m_area = new Area(
+										new Point(areaRender.location.x + dOffset,
+												self.collection.areaMaximal.location.y),
+										new Size(expandedWidth, expandedHeight)
+									);
+								}
 							}
-							// }
 
                             // Generate the path.
                             var exceptionRet = m_area.generateRoundedRectPath(contextRender);
